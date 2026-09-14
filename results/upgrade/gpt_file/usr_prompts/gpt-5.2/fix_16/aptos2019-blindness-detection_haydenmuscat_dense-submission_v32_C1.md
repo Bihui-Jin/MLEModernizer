@@ -1,0 +1,888 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "3")
+
+try:
+    import subprocess, sys
+
+    def _get_dist_version(dist_name):
+        try:
+            import pkg_resources
+
+            return pkg_resources.get_distribution(dist_name).version
+        except Exception:
+            return None
+
+    pb_ver = _get_dist_version("protobuf")
+    if pb_ver is not None:
+        major = int(str(pb_ver).split(".")[0])
+        if major >= 4:
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", "-q", "protobuf==3.20.3"]
+            )
+            import importlib
+
+            importlib.invalidate_caches()
+except Exception as e:
+    print("Warning: protobuf pin attempt failed; continuing. Error:", repr(e))
+
+import gc
+import numpy as np
+import pandas as pd
+import cv2
+import psutil
+import matplotlib.pyplot as plt
+
+from sklearn.metrics import cohen_kappa_score
+
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.applications import DenseNet121
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dropout, Dense
+from tensorflow.keras.optimizers import Adam
+
+np.random.seed(42)
+tf.random.set_seed(42)
+
+IMG_DIM = 224
+BATCH_SIZE = 32
+CHANNELS = 3
+NUM_CLASSES = 5
+
+MODEL_WEIGHTS = "../input/densenetmulti/ben_normal_-0.9021.h5"
+
+
+def resolve_input_folder():
+    candidates = [
+        "/kaggle/input/aptos2019-blindness-detection/",
+        "/kaggle/input/aptos2019-blindness-detection/aptos2019-blindness-detection/",
+        "/kaggle/data/aptos2019-blindness-detection/",
+        "/kaggle/data/aptos2019-blindness-detection/aptos2019-blindness-detection/",
+        "../input/aptos2019-blindness-detection/",
+        "../input/aptos2019-blindness-detection/aptos2019-blindness-detection/",
+        "../data/aptos2019-blindness-detection/",
+        "../data/aptos2019-blindness-detection/aptos2019-blindness-detection/",
+        "/kaggle/input/",
+        "../input/",
+    ]
+    for c in candidates:
+        try:
+            c2 = c if c.endswith("/") else (c + "/")
+            if os.path.exists(os.path.join(c2, "train.csv")) and os.path.exists(
+                os.path.join(c2, "test.csv")
+            ):
+                return c2
+        except Exception:
+            pass
+    return "./"
+
+
+def _dense_kernel_shape_and_l1(model):
+    try:
+        dense_layer = model.layers[-1]
+        w = dense_layer.get_weights()
+        if not w or len(w) < 2:
+            return None, None
+        kernel = w[0]
+        l1 = float(np.mean(np.abs(kernel)))
+        return tuple(kernel.shape), l1
+    except Exception:
+        return None, None
+
+
+def _try_load_weights_into_model_strict(model, weights_path):
+    if not weights_path or (not os.path.exists(weights_path)):
+        return False
+    try:
+        model.load_weights(weights_path)
+    except Exception:
+        return False
+
+    kshape, l1 = _dense_kernel_shape_and_l1(model)
+    if kshape != (1024, NUM_CLASSES):
+        return False
+    if l1 is None or l1 < 1e-4:
+        return False
+    return True
+
+
+def resolve_model_weights(path):
+    env_p = os.environ.get("KAGGLE_MODEL_WEIGHTS", "").strip()
+    candidates = []
+    if path:
+        candidates.append(path)
+    if env_p:
+        candidates.append(env_p)
+
+    candidates += [
+        "/kaggle/input/densenetmulti/ben_normal_-0.9021.h5",
+        "../input/densenetmulti/ben_normal_-0.9021.h5",
+        "/kaggle/data/densenetmulti/ben_normal_-0.9021.h5",
+        "../data/densenetmulti/ben_normal_-0.9021.h5",
+        "/kaggle/input/densenet-multi/ben_normal_-0.9021.h5",
+        "../input/densenet-multi/ben_normal_-0.9021.h5",
+        "/kaggle/data/densenet-multi/ben_normal_-0.9021.h5",
+        "../data/densenet-multi/ben_normal_-0.9021.h5",
+        "/kaggle/input/densenetmulti/ben_normal_-0.9021.hdf5",
+        "../input/densenetmulti/ben_normal_-0.9021.hdf5",
+        "/kaggle/data/densenetmulti/ben_normal_-0.9021.hdf5",
+        "../data/densenetmulti/ben_normal_-0.9021.hdf5",
+    ]
+
+    for p in candidates:
+        try:
+            if p and os.path.exists(p):
+                return p
+        except Exception:
+            pass
+
+    for base in ["/kaggle/input", "/kaggle/data"]:
+        try:
+            if os.path.isdir(base):
+                likely_tokens = (
+                    "densenet",
+                    "ben",
+                    "normal",
+                    "aptos",
+                    "blind",
+                    "retina",
+                    "dr",
+                )
+                for root, _, files in os.walk(base):
+                    for fn in sorted(files):
+                        low = fn.lower()
+                        if not low.endswith((".h5", ".hdf5")):
+                            continue
+                        if not any(tok in low for tok in likely_tokens):
+                            continue
+                        return os.path.join(root, fn)
+        except Exception as e:
+            print("Warning: weights search failed under", base, "error:", repr(e))
+
+    return None
+
+
+INPUT_FOLDER = resolve_input_folder()
+MODEL_WEIGHTS_RESOLVED = resolve_model_weights(MODEL_WEIGHTS)
+
+print("Resolved INPUT_FOLDER:", INPUT_FOLDER)
+print("Resolved MODEL_WEIGHTS (candidate):", MODEL_WEIGHTS_RESOLVED)
+print("CPU count:", psutil.cpu_count())
+print("TensorFlow version:", tf.__version__)
+
+try:
+    cv2.setUseOptimized(True)
+    cv2.setNumThreads(max(1, (psutil.cpu_count(logical=True) or 2) - 1))
+except Exception:
+    pass
+
+gc.collect()
+
+
+
+
+## === cell 1
+def crop(gray, img, percent_smaller):
+    thresh = 8
+
+    top = 0
+    left = 0
+    bottom = gray.shape[0] - 1
+    right = gray.shape[1] - 1
+
+    middleCol = gray[:, int(gray.shape[1] / 2)] > thresh
+    while top < bottom and middleCol[top] == 0:
+        top += 1
+    while bottom > top and middleCol[bottom] == 0:
+        bottom -= 1
+
+    middleRow = gray[int(gray.shape[0] / 2)] > thresh
+    while left < right and middleRow[left] == 0:
+        left += 1
+    while right > left and middleRow[right] == 0:
+        right -= 1
+
+    height = bottom - top
+    width = right - left
+
+    bottom -= int(percent_smaller * height)
+    top += int(percent_smaller * height)
+    right -= int(percent_smaller * width)
+    left += int(percent_smaller * width)
+
+    if height < 100 or width < 100 or bottom <= top or right <= left:
+        return img
+
+    return img[top:bottom, left:right]
+
+
+def benYCC(bgr, weight=4, gamma=20):
+    ycc = cv2.cvtColor(bgr, cv2.COLOR_BGR2YCrCb)
+    y, cr, cb = cv2.split(ycc)
+    y = cv2.addWeighted(y, weight, cv2.GaussianBlur(y, (0, 0), gamma), -weight, 128)
+    ycc_modified = cv2.merge((y, cr, cb))
+    bens = cv2.cvtColor(ycc_modified, cv2.COLOR_YCrCb2BGR)
+    return bens
+
+
+def benSimple(img, weight=4, gamma=20):
+    bens = cv2.addWeighted(
+        img, weight, cv2.GaussianBlur(img, (0, 0), gamma), -weight, 128
+    )
+    return bens
+
+
+def reflectAndSquareUp(img):
+    height = img.shape[0]
+    width = img.shape[1]
+
+    if height > width:
+        offset = int((height - width) / 2)
+        return img[offset : offset + width]
+    else:
+        pad_top = int((width - height) / 2)
+        pad_bottom = width - height - pad_top
+        return cv2.copyMakeBorder(
+            img, pad_top, pad_bottom, 0, 0, borderType=cv2.BORDER_REFLECT_101
+        )
+
+
+def circleMask(img):
+    if img.shape[0] != img.shape[1]:
+        return img
+
+    dim = img.shape[0]
+    half = int(dim / 2)
+
+    circle_mask = np.zeros((dim, dim), np.uint8)
+    circle_mask = cv2.circle(circle_mask, (half, half), half, 1, thickness=-1)
+
+    return cv2.bitwise_and(img, img, mask=circle_mask)
+
+
+_GAMMA_LUT_CACHE = {}
+
+
+def adjust_gamma(image_in, gamma=1.0):
+    g = float(gamma)
+    lut = _GAMMA_LUT_CACHE.get(g)
+    if lut is None:
+        invGamma = 1.0 / g
+        lut = (np.arange(256, dtype=np.float32) / 255.0) ** invGamma
+        lut = np.clip(lut * 255.0, 0, 255).astype("uint8")
+        _GAMMA_LUT_CACHE[g] = lut
+    return cv2.LUT(image_in, lut)
+
+
+def processBenNormal(bgr):
+    if bgr is None:
+        raise ValueError("cv2.imread returned None")
+
+    green = bgr[:, :, 1]
+    cropped = crop(green, bgr, 0.02)
+    squared = reflectAndSquareUp(cropped)
+    resized = cv2.resize(squared, (2 * IMG_DIM, 2 * IMG_DIM))
+    circled = circleMask(resized)
+
+    med = np.median(circled)
+    med = max(med, 1.0)
+    equalised = adjust_gamma(circled, 1 + np.log(90) - np.log(med))
+
+    resized_again = cv2.resize(benYCC(equalised), (IMG_DIM, IMG_DIM))
+    return cv2.cvtColor(resized_again, cv2.COLOR_BGR2RGB)
+
+
+def processBenWeird(bgr):
+    if bgr is None:
+        raise ValueError("cv2.imread returned None")
+
+    green = bgr[:, :, 1]
+    cropped = crop(green, bgr, 0.02)
+    squared = reflectAndSquareUp(cropped)
+    resized = cv2.resize(squared, (2 * IMG_DIM, 2 * IMG_DIM))
+    circled = circleMask(resized)
+
+    med = np.median(circled)
+    med = max(med, 1.0)
+    equalised = adjust_gamma(circled, 1 + np.log(90) - np.log(med))
+
+    resized_again = cv2.resize(benSimple(equalised), (IMG_DIM, IMG_DIM))
+    return cv2.cvtColor(resized_again, cv2.COLOR_BGR2RGB)
+
+
+
+
+## === cell 2
+def dataGenerator(jitter=0.1):
+    datagen = image.ImageDataGenerator(
+        rescale=1.0 / 255,
+        horizontal_flip=True and (jitter > 0.01),
+        vertical_flip=True and (jitter > 0.01),
+        rotation_range=int(800 * jitter),
+        brightness_range=[1 - jitter, 1],
+        channel_shift_range=int(30 * jitter),
+        zoom_range=[(1 - jitter), (1 + jitter / 2)],
+        fill_mode="reflect",
+    )
+    return datagen
+
+
+
+
+## === cell 3
+DO_PLOT_AUGMENTATION = False
+figure = plt.figure(figsize=(22, 20))
+
+
+def test_datagen_plot():
+    sample_df = pd.read_csv(f"{INPUT_FOLDER}test.csv")
+    sample_df.id_code = sample_df.id_code.apply(lambda x: x + ".png")
+
+    img_list = np.empty((32, IMG_DIM, IMG_DIM, 3), dtype=np.float32)
+    for i, filename in enumerate(sample_df[:32].id_code):
+        try:
+            bgr = cv2.imread(f"{INPUT_FOLDER}test_images/{filename}")
+            img_list[i, :, :, :] = processBenNormal(bgr)
+        except Exception:
+            img_list[i, :, :, :] = 128.0
+
+    datagen_sample = dataGenerator(0.03).flow(img_list, shuffle=True, batch_size=32)
+
+    for x in datagen_sample:
+        for j in range(16):
+            ax = figure.add_subplot(4, 4, j + 1)
+            img_ = np.clip(x[j], 0, 1)
+            plt.imshow(img_)
+            ax.axis("off")
+        break
+
+
+if DO_PLOT_AUGMENTATION:
+    test_datagen_plot()
+    plt.show()
+
+gc.collect()
+
+
+
+
+## === cell 4
+def create_model():
+    model = Sequential()
+    base = DenseNet121(
+        weights="imagenet",
+        include_top=False,
+        input_shape=(IMG_DIM, IMG_DIM, CHANNELS),
+    )
+    model.add(base)
+    model.add(GlobalAveragePooling2D())
+    model.add(Dropout(0.5))
+    model.add(Dense(NUM_CLASSES, activation="sigmoid"))
+
+    loaded = False
+
+    if MODEL_WEIGHTS_RESOLVED and os.path.exists(MODEL_WEIGHTS_RESOLVED):
+        print("Trying to load pretrained weights (strict):", MODEL_WEIGHTS_RESOLVED)
+        loaded = _try_load_weights_into_model_strict(model, MODEL_WEIGHTS_RESOLVED)
+        if loaded:
+            try:
+                base.trainable = False
+            except Exception:
+                pass
+            kshape, l1 = _dense_kernel_shape_and_l1(model)
+            print("Loaded weights OK. Dense kernel shape:", kshape, "mean|w|:", l1)
+        else:
+            print(
+                "Warning: weights candidate exists but failed strict compatibility checks:",
+                MODEL_WEIGHTS_RESOLVED,
+            )
+    else:
+        print("Warning: pretrained weights candidate path not found.")
+
+    return model, loaded
+
+
+model, weights_loaded = create_model()
+model.compile(
+    optimizer=Adam(learning_rate=0.00005),
+    loss="binary_crossentropy",
+    metrics=["accuracy"],
+)
+gc.collect()
+
+
+
+
+## === cell 5
+def _safe_makedirs(p):
+    try:
+        os.makedirs(p, exist_ok=True)
+    except Exception:
+        pass
+
+
+_CACHE_DIR = "/kaggle/working/ben_cache"
+_safe_makedirs(_CACHE_DIR)
+
+
+def _memmap_path(prefix, n):
+    return os.path.join(_CACHE_DIR, f"{prefix}_n{n}_img{IMG_DIM}_c{CHANNELS}.dat")
+
+
+def _ids_to_np(ids):
+    """
+    Bugfix: np.save(..., allow_pickle=False) cannot save object arrays.
+    Store ids as fixed-width unicode so it is non-object and safe to save without pickle.
+    """
+    ids = [str(x) for x in ids]
+    maxlen = max([len(s) for s in ids] + [1])
+    return np.asarray(ids, dtype=f"<U{maxlen}")
+
+
+def _build_or_load_memmap(prefix, id_codes, images_dir):
+    """
+    Returns (memmap_array, index_map) where memmap_array is (n, IMG_DIM, IMG_DIM, 3) float32.
+    Uses a .dat memmap file plus a .npy index list to avoid recomputing preprocessing.
+    """
+    id_codes = [str(x) for x in list(id_codes)]
+    n = len(id_codes)
+    mmap_file = _memmap_path(prefix, n)
+    ids_file = mmap_file + ".ids.npy"
+
+    if os.path.exists(mmap_file) and os.path.exists(ids_file):
+        try:
+            saved_ids = np.load(ids_file, allow_pickle=False)
+            saved_list = saved_ids.astype(str).tolist()
+            if saved_ids.shape[0] == n and saved_list == id_codes:
+                x = np.memmap(
+                    mmap_file,
+                    mode="r",
+                    dtype=np.float32,
+                    shape=(n, IMG_DIM, IMG_DIM, CHANNELS),
+                )
+                idx = {k: i for i, k in enumerate(id_codes)}
+                return x, idx
+        except Exception:
+            pass
+
+    xw = np.memmap(
+        mmap_file,
+        mode="w+",
+        dtype=np.float32,
+        shape=(n, IMG_DIM, IMG_DIM, CHANNELS),
+    )
+    for i, idc in enumerate(id_codes):
+        filename = idc + ".png"
+        try:
+            bgr = cv2.imread(os.path.join(images_dir, filename))
+            xw[i, :, :, :] = processBenNormal(bgr)
+        except Exception:
+            xw[i, :, :, :] = 128.0
+        if (i + 1) % 256 == 0:
+            xw.flush()
+    xw.flush()
+
+    np.save(ids_file, _ids_to_np(id_codes), allow_pickle=False)
+
+    xr = np.memmap(
+        mmap_file,
+        mode="r",
+        dtype=np.float32,
+        shape=(n, IMG_DIM, IMG_DIM, CHANNELS),
+    )
+    idx = {k: i for i, k in enumerate(id_codes)}
+    return xr, idx
+
+
+def _to_cumulative_probs_from_class_heads(preds, eps=1e-6):
+    preds = np.asarray(preds, dtype=np.float32)
+    preds = np.clip(preds, 0.0, 1.0)
+    row_sum = preds.sum(axis=1, keepdims=True)
+    probs = preds / (row_sum + eps)
+    cum = np.cumsum(probs[:, ::-1], axis=1)[:, ::-1]
+    cum_gt = cum[:, 1:]  # P(y>0..3)
+    return cum_gt
+
+
+def label_convert(preds, thresholds=None):
+    preds = np.asarray(preds, dtype=np.float32)
+    if preds.ndim != 2 or preds.shape[1] != NUM_CLASSES:
+        raise ValueError(f"preds must have shape (n,{NUM_CLASSES}); got {preds.shape}")
+
+    cum = _to_cumulative_probs_from_class_heads(preds)
+
+    if thresholds is None:
+        thresholds = np.full((NUM_CLASSES - 1,), 0.5, dtype=np.float32)
+    thresholds = np.asarray(thresholds, dtype=np.float32).reshape((1, -1))
+    if thresholds.shape[1] != (NUM_CLASSES - 1):
+        raise ValueError(
+            f"thresholds must have length {NUM_CLASSES-1}; got {thresholds.shape}"
+        )
+
+    cls = (cum > thresholds).astype(np.int32).sum(axis=1)
+    return np.clip(cls, 0, NUM_CLASSES - 1)
+
+
+def load_processed_images(id_codes, images_dir):
+    x, _ = _build_or_load_memmap("tmp_load", list(id_codes), images_dir)
+    return np.asarray(x)  # materialize if caller expects ndarray
+
+
+def predict_on_array(img_array, jitters=3):
+    prediction_jitters = np.zeros(
+        (len(img_array), jitters, NUM_CLASSES), dtype=np.float32
+    )
+    jit_vals = [0.02 * i for i in range(jitters)]
+    datagens = [dataGenerator(j) for j in jit_vals]
+    for i, datagen in enumerate(datagens):
+        flow = datagen.flow(img_array, shuffle=False, batch_size=BATCH_SIZE)
+        pred = model.predict(flow, steps=len(flow), verbose=0)
+        prediction_jitters[:, i] = pred
+    return np.median(prediction_jitters, axis=1)
+
+
+def tune_thresholds_qwk(preds, y_true, init=0.5, iters=2, grid=None):
+    if grid is None:
+        grid = np.array([0.25, 0.35, 0.45, 0.5, 0.55, 0.65, 0.75], dtype=np.float32)
+
+    thresholds = np.full((NUM_CLASSES - 1,), float(init), dtype=np.float32)
+    best = cohen_kappa_score(
+        y_true, label_convert(preds, thresholds), weights="quadratic"
+    )
+
+    for _ in range(iters):
+        improved = False
+        for k in range(NUM_CLASSES - 1):
+            best_k = thresholds[k]
+            best_score_k = best
+            for t in grid:
+                cand = thresholds.copy()
+                cand[k] = t
+                y_pred = label_convert(preds, cand)
+                score = cohen_kappa_score(y_true, y_pred, weights="quadratic")
+                if score > best_score_k:
+                    best_score_k = score
+                    best_k = t
+            if best_score_k > best + 1e-12:
+                thresholds[k] = best_k
+                best = best_score_k
+                improved = True
+        if not improved:
+            break
+
+    return thresholds, best
+
+
+train_df = pd.read_csv(INPUT_FOLDER + "train.csv")
+train_images_dir = INPUT_FOLDER + "train_images/"
+train_df = train_df.sample(frac=1.0, random_state=42).reset_index(drop=True)
+
+val_frac = 0.15
+val_n = int(len(train_df) * val_frac)
+val_df = train_df.iloc[:val_n].copy()
+tr_df = train_df.iloc[val_n:].copy()
+
+
+def to_onehot_multilabel(y_int):
+    y_int = np.asarray(y_int).astype(int)
+    out = np.zeros((len(y_int), NUM_CLASSES), dtype=np.float32)
+    for i, c in enumerate(y_int):
+        c = int(np.clip(c, 0, NUM_CLASSES - 1))
+        out[i, : c + 1] = 1.0
+    return out
+
+
+if not weights_loaded:
+    print(
+        "No external DR weights loaded; training classifier head (backbone frozen) to improve score."
+    )
+    try:
+        model.layers[0].trainable = False
+    except Exception:
+        pass
+
+    tr_n = len(tr_df)
+    tr_take = tr_n  # use full remaining training split; no sampling/approximation
+
+    tr_ids = tr_df["id_code"].iloc[:tr_take].tolist()
+    tr_x_mm, _ = _build_or_load_memmap("train_split", tr_ids, train_images_dir)
+    tr_x = np.asarray(tr_x_mm)
+    tr_y = to_onehot_multilabel(tr_df["diagnosis"].iloc[:tr_take].values)
+
+    model.fit(
+        dataGenerator(0.10).flow(tr_x, tr_y, batch_size=BATCH_SIZE, shuffle=True),
+        steps_per_epoch=int(np.ceil(tr_take / float(BATCH_SIZE))),
+        epochs=1,
+        verbose=1,
+    )
+    del tr_x, tr_y, tr_x_mm
+    gc.collect()
+
+best_thresholds = None
+
+print("Preparing validation set of size:", len(val_df))
+val_ids = val_df["id_code"].tolist()
+val_x_mm, _ = _build_or_load_memmap("val_split", val_ids, train_images_dir)
+val_x = np.asarray(val_x_mm)
+val_preds = predict_on_array(val_x, jitters=3)
+val_y = val_df["diagnosis"].values.astype(int)
+
+base_qwk = cohen_kappa_score(val_y, label_convert(val_preds), weights="quadratic")
+print("Validation QWK with default threshold=0.5:", base_qwk)
+
+best_thresholds, tuned_qwk = tune_thresholds_qwk(val_preds, val_y, init=0.5, iters=2)
+print("Tuned thresholds:", best_thresholds)
+print("Validation QWK after tuning:", tuned_qwk)
+
+del val_x, val_x_mm
+gc.collect()
+
+
+
+
+## === cell 6
+def make_predictions(d_set, jitters=5):
+    images_dir = f"{INPUT_FOLDER}{d_set}_images/"
+    df = pd.read_csv(f"{INPUT_FOLDER}{d_set}.csv")
+    id_codes = df["id_code"].tolist()
+
+    print(f"Making predictions on the {d_set} dataset. Total: {len(id_codes)}")
+    print("Images dir:", images_dir)
+
+    x_mm, _ = _build_or_load_memmap(f"{d_set}_full", id_codes, images_dir)
+    x = np.asarray(x_mm)
+
+    prediction_jitters = np.zeros((len(x), jitters, NUM_CLASSES), dtype=np.float32)
+    jit_vals = [0.02 * i for i in range(jitters)]
+    datagens = [dataGenerator(j) for j in jit_vals]
+
+    for i, datagen in enumerate(datagens):
+        flow = datagen.flow(x, shuffle=False, batch_size=BATCH_SIZE)
+        pred = model.predict(flow, steps=len(flow), verbose=0)
+        prediction_jitters[:, i] = pred
+
+    preds = np.median(prediction_jitters, axis=1)
+    del x, x_mm, prediction_jitters
+    gc.collect()
+    return preds
+
+
+test_predictions = make_predictions("test", 5)
+
+if best_thresholds is not None:
+    test_classes = label_convert(test_predictions, best_thresholds)
+else:
+    test_classes = label_convert(test_predictions)
+
+print(test_predictions[:5])
+print(test_classes[:5])
+
+test_df = pd.read_csv(INPUT_FOLDER + "test.csv")
+if len(test_classes) != len(test_df):
+    raise RuntimeError(
+        f"Prediction length mismatch: got {len(test_classes)} preds for {len(test_df)} rows"
+    )
+
+test_df["diagnosis"] = test_classes.astype(int)
+test_df = test_df[["id_code", "diagnosis"]]
+test_df.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with shape:", test_df.shape)
+print(test_df.head())
+print("submission.csv exists:", os.path.exists("submission.csv"))
+print(
+    "submission.csv size:",
+    os.path.getsize("submission.csv") if os.path.exists("submission.csv") else None,
+)

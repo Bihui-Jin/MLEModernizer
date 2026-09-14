@@ -1,0 +1,528 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+protobuf==6.33.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9595159442047616
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+DATA_DIR = "/kaggle/input/hms-harmful-brain-activity-classification"
+TRAIN_CSV = f"{DATA_DIR}/train.csv"
+TEST_CSV = f"{DATA_DIR}/test.csv"
+SAMPLE_SUB = f"{DATA_DIR}/sample_submission.csv"
+
+TARGET_COLS = [
+    "seizure_vote",
+    "lpd_vote",
+    "gpd_vote",
+    "lrda_vote",
+    "grda_vote",
+    "other_vote",
+]
+FEATURE_COLS = ["eeg_id", "spectrogram_id", "patient_id"]
+
+
+
+## === cell 2
+train = pd.read_csv(TRAIN_CSV)
+test = pd.read_csv(TEST_CSV)
+sample = pd.read_csv(SAMPLE_SUB)
+
+train_agg = train.groupby("eeg_id", as_index=False).agg(
+    spectrogram_id=("spectrogram_id", "first"),
+    patient_id=("patient_id", "first"),
+    **{c: (c, "sum") for c in TARGET_COLS},
+)
+
+y_counts = train_agg[TARGET_COLS].to_numpy(dtype=np.float32)
+y = y_counts / np.clip(y_counts.sum(axis=1, keepdims=True), 1.0, None)
+
+X_train = train_agg[FEATURE_COLS].copy()
+X_test = test[FEATURE_COLS].copy()
+
+
+
+## === cell 3
+import tensorflow_decision_forests as tfdf
+
+
+def fit_regressor(df_in: pd.DataFrame, label: str) -> tfdf.keras.RandomForestModel:
+    model = tfdf.keras.RandomForestModel(
+        task=tfdf.keras.Task.REGRESSION,
+        random_seed=42,
+    )
+    ds = tfdf.keras.pd_dataframe_to_tf_dataset(
+        df_in,
+        label=label,
+        task=tfdf.keras.Task.REGRESSION,
+    )
+    model.fit(ds, verbose=0)
+    return model
+
+
+train_df = X_train.copy()
+for i, c in enumerate(TARGET_COLS):
+    train_df[c] = y[:, i].astype(np.float32)
+
+models = {c: fit_regressor(train_df, c) for c in TARGET_COLS}
+
+
+
+## === cell 4
+test_df = X_test.copy()
+
+ds_test = tfdf.keras.pd_dataframe_to_tf_dataset(test_df)
+
+preds = []
+for c in TARGET_COLS:
+    p = models[c].predict(ds_test, verbose=0).reshape(-1).astype(np.float32)
+    preds.append(p)
+
+pred = np.stack(preds, axis=1)
+
+pred = np.maximum(pred, 0.0)
+row_sums = pred.sum(axis=1, keepdims=True)
+pred = np.where(row_sums > 0, pred / row_sums, 1.0 / len(TARGET_COLS))
+
+eps = 1e-6
+pred = np.clip(pred, eps, 1.0)
+pred = pred / pred.sum(axis=1, keepdims=True)
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/3402527956.py in <cell line: 0>()
+      5 preds = []
+      6 for c in TARGET_COLS:
+----> 7     p = models[c].predict(ds_test, verbose=0).reshape(-1).astype(np.float32)
+      8     preds.append(p)
+      9 
+
+/usr/local/lib/python3.11/dist-packages/tf_keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+     68             # To get the full stack trace, call:
+     69             # `tf.debugging.disable_traceback_filtering()`
+---> 70             raise e.with_traceback(filtered_tb) from None
+     71         finally:
+     72             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py in tf__predict_function_trained(iterator, model)
+     44                 except:
+     45                     do_return = False
+---> 46                     raise
+     47                 return fscope.ret(retval_, do_return)
+     48         return tf__predict_function_trained
+
+/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py in run_step(data)
+     28                         do_return_1 = False
+     29                         retval__1 = ag__.UndefinedReturnValue()
+---> 30                         outputs = ag__.converted_call(ag__.ld(model).predict_step, (ag__.ld(data),), None, fscope_1)
+     31                         with ag__.ld(tf).control_dependencies(ag__.ld(_minimum_control_deps)(ag__.ld(outputs))):
+     32                             ag__.converted_call(ag__.ld(model)._predict_counter.assign_add, (1,), None, fscope_1)
+
+/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py in tf__call(self, inputs, training)
+    230                 finalized_pred = ag__.Undefined('finalized_pred')
+    231                 continue__2 = ag__.Undefined('continue__2')
+--> 232                 ag__.if_stmt(ag__.ld(self)._semantics is None, if_body_8, else_body_8, get_state_11, set_state_11, ('do_return', 'retval_'), 2)
+    233                 return fscope.ret(retval_, do_return)
+    234         return tf__call
+
+/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py in else_body_8()
+     41                 def else_body_8():
+     42                     nonlocal do_return, retval_
+---> 43                     normalized_inputs = ag__.converted_call(ag__.ld(self)._build_normalized_inputs, (ag__.ld(inputs),), None, fscope)
+     44                     predictions = {}
+     45                     has_secondary_tasks = ag__.converted_call(ag__.ld(any), ([ag__.not_(ag__.ld(t).primary) for t in ag__.ld(self)._multitask],), None, fscope)
+
+/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py in tf___build_normalized_inputs(self, inputs)
+     96                     ag__.if_stmt(ag__.converted_call(ag__.ld(isinstance), (ag__.ld(inputs), ag__.ld(tf).Tensor), None, fscope), if_body_3, else_body_3, get_state_3, set_state_3, ('inputs',), 1)
+     97                 ag__.if_stmt(ag__.converted_call(ag__.ld(isinstance), (ag__.ld(inputs), ag__.ld(dict)), None, fscope), if_body_4, else_body_4, get_state_4, set_state_4, ('inputs',), 1)
+---> 98                 semantic_inputs = ag__.converted_call(ag__.ld(tf_core).combine_tensors_and_semantics, (ag__.ld(inputs), ag__.ld(self)._semantics), None, fscope)
+     99                 normalized_semantic_inputs = ag__.converted_call(ag__.ld(tf_core).normalize_inputs, (ag__.ld(semantic_inputs),), dict(categorical_integer_offset_correction=ag__.not_(ag__.ld(self)._advanced_arguments.disable_categorical_integer_offset_correction)), fscope)
+    100                 normalized_inputs, _ = ag__.converted_call(ag__.ld(tf_core).decombine_tensors_and_semantics, (ag__.ld(normalized_semantic_inputs),), None, fscope)
+
+/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/tensorflow/core_inference.py in tf__combine_tensors_and_semantics(inputs, semantics)
+     32                 def else_body():
+     33                     pass
+---> 34                 ag__.if_stmt(ag__.not_(ag__.converted_call(ag__.converted_call(ag__.ld(set), (ag__.converted_call(ag__.ld(semantics).keys, (), None, fscope),), None, fscope).issubset, (ag__.converted_call(ag__.ld(inputs).keys, (), None, fscope),), None, fscope)), if_body, else_body, get_state, set_state, (), 0)
+     35                 semantic_tensors = {}
+     36 
+
+/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/tensorflow/core_inference.py in if_body()
+     28 
+     29                 def if_body():
+---> 30                     raise ag__.converted_call(ag__.ld(ValueError), (ag__.converted_call('semantics is not a subset of inputs (inputs={} vs semantics={}).'.format, (ag__.converted_call(ag__.ld(inputs).keys, (), None, fscope), ag__.converted_call(ag__.ld(semantics).keys, (), None, fscope)), None, fscope),), None, fscope)
+     31 
+     32                 def else_body():
+
+ValueError: in user code:
+
+    File "/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py", line 486, in run_step  *
+        outputs = model.predict_step(data)
+    File "/usr/local/lib/python3.11/dist-packages/tf_keras/src/engine/training.py", line 2377, in predict_step  **
+        return self(x, training=False)
+    File "/usr/local/lib/python3.11/dist-packages/tf_keras/src/utils/traceback_utils.py", line 70, in error_handler
+        raise e.with_traceback(filtered_tb) from None
+    File "/tmp/__autograph_generated_filekgmw7tv2.py", line 232, in tf__call
+        ag__.if_stmt(ag__.ld(self)._semantics is None, if_body_8, else_body_8, get_state_11, set_state_11, ('do_return', 'retval_'), 2)
+    File "/tmp/__autograph_generated_filekgmw7tv2.py", line 43, in else_body_8
+        normalized_inputs = ag__.converted_call(ag__.ld(self)._build_normalized_inputs, (ag__.ld(inputs),), None, fscope)
+    File "/tmp/__autograph_generated_filed0x3c7q3.py", line 98, in tf___build_normalized_inputs
+        semantic_inputs = ag__.converted_call(ag__.ld(tf_core).combine_tensors_and_semantics, (ag__.ld(inputs), ag__.ld(self)._semantics), None, fscope)
+    File "/tmp/__autograph_generated_filemc5c2luc.py", line 34, in tf__combine_tensors_and_semantics
+        ag__.if_stmt(ag__.not_(ag__.converted_call(ag__.converted_call(ag__.ld(set), (ag__.converted_call(ag__.ld(semantics).keys, (), None, fscope),), None, fscope).issubset, (ag__.converted_call(ag__.ld(inputs).keys, (), None, fscope),), None, fscope)), if_body, else_body, get_state, set_state, (), 0)
+    File "/tmp/__autograph_generated_filemc5c2luc.py", line 30, in if_body
+        raise ag__.converted_call(ag__.ld(ValueError), (ag__.converted_call('semantics is not a subset of inputs (inputs={} vs semantics={}).'.format, (ag__.converted_call(ag__.ld(inputs).keys, (), None, fscope), ag__.converted_call(ag__.ld(semantics).keys, (), None, fscope)), None, fscope),), None, fscope)
+
+    ValueError: Exception encountered when calling layer 'random_forest_model' (type RandomForestModel).
+    
+    in user code:
+    
+        File "/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py", line 672, in call  *
+            normalized_inputs = self._build_normalized_inputs(inputs)
+        File "/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/keras/core_inference.py", line 631, in _build_normalized_inputs  *
+            semantic_inputs = tf_core.combine_tensors_and_semantics(
+        File "/usr/local/lib/python3.11/dist-packages/tensorflow_decision_forests/tensorflow/core_inference.py", line 431, in combine_tensors_and_semantics  *
+            raise ValueError("semantics is not a subset of inputs "
+    
+        ValueError: semantics is not a subset of inputs (inputs=dict_keys(['eeg_id', 'spectrogram_id', 'patient_id']) vs semantics=dict_keys(['eeg_id', 'spectrogram_id', 'patient_id', 'lpd_vote', 'gpd_vote', 'lrda_vote', 'grda_vote', 'other_vote'])).
+    
+    
+    Call arguments received by layer 'random_forest_model' (type RandomForestModel):
+      • inputs={'eeg_id': 'tf.Tensor(shape=(None,), dtype=int64)', 'spectrogram_id': 'tf.Tensor(shape=(None,), dtype=int64)', 'patient_id': 'tf.Tensor(shape=(None,), dtype=int64)'}
+      • training=False
+
+
+## === cell 5
+sub = pd.DataFrame({"eeg_id": test["eeg_id"].values})
+for i, c in enumerate(TARGET_COLS):
+    sub[c] = pred[:, i]
+
+sub = sample[["eeg_id"]].merge(sub, on="eeg_id", how="left")
+
+for c in TARGET_COLS:
+    if c not in sub.columns:
+        sub[c] = 1.0 / len(TARGET_COLS)
+sub[TARGET_COLS] = sub[TARGET_COLS].fillna(1.0 / len(TARGET_COLS))
+
+vals = sub[TARGET_COLS].to_numpy(dtype=np.float32)
+vals = np.clip(vals, 1e-6, 1.0)
+vals = vals / vals.sum(axis=1, keepdims=True)
+sub[TARGET_COLS] = vals
+
+sub.to_csv("submission.csv", index=False)
+print(sub.head())
+print("Wrote submission.csv with shape:", sub.shape)
+print(
+    "Row sum min/max:",
+    sub[TARGET_COLS].sum(axis=1).min(),
+    sub[TARGET_COLS].sum(axis=1).max(),
+)
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/813361245.py in <cell line: 0>()
+      2 sub = pd.DataFrame({"eeg_id": test["eeg_id"].values})
+      3 for i, c in enumerate(TARGET_COLS):
+----> 4     sub[c] = pred[:, i]
+      5 
+      6 sub = sample[["eeg_id"]].merge(sub, on="eeg_id", how="left")
+
+NameError: name 'pred' is not defined

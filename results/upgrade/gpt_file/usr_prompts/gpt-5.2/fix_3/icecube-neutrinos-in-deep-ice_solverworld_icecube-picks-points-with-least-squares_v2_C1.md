@@ -1,0 +1,516 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a neutrino particle's direction. 
+
+## Metric
+Mean angular error between the predicted and true event origins.
+
+## Submission Format
+For each `event_id` in the test set, you must predict the `azimuth` and `zenith`. The file should contain a header and have the following format:
+
+```
+event_id,azimuth,zenith
+730,1,1
+769,1,1
+774,1,1
+etc.
+```
+
+## Dataset 
+[train/test]_meta.parquet
+
+-   `batch_id` (`int`): the ID of the batch the event was placed into.
+-   `event_id` (`int`): the event ID.
+-   `[first/last]_pulse_index` (`int`): index of the first/last row in the features dataframe belonging to this event.
+-   `[azimuth/zenith]` (`float32`): the [azimuth/zenith] angle in radians of the neutrino. A value between 0 and 2*pi for the azimuth and 0 and pi for zenith. The target columns. Not provided for the test set. The direction vector represented by zenith and azimuth points to where the neutrino came from.
+-   NB: Other quantities regarding the event, such as the interaction point in `x, y, z` (vertex position), the neutrino energy, or the interaction type and kinematics are not included in the dataset.
+
+[train/test]/batch_[n].parquet Each batch contains tens of thousands of events. Each event may contain thousands of pulses, each of which is the digitized output from a photomultiplier tube and occupies one row.
+
+-   `event_id` (`int`): the event ID. Saved as the index column in parquet.
+-   `time` (`int`): the time of the pulse in nanoseconds in the current event time window. The absolute time of a pulse has no relevance, and only the relative time with respect to other pulses within an event is of relevance.
+-   `sensor_id` (`int`): the ID of which of the 5160 IceCube photomultiplier sensors recorded this pulse.
+-   `charge` (`float32`): An estimate of the amount of light in the pulse, in units of photoelectrons (p.e.). A physical photon does not exactly result in a measurement of 1 p.e. but rather can take values spread around 1 p.e. As an example, a pulse with charge 2.7 p.e. could quite likely be the result of two or three photons hitting the photomultiplier tube around the same time. This data has `float16` precision but is stored as `float32` due to limitations of the version of pyarrow the data was prepared with.
+-   `auxiliary` (`bool`): If `True`, the pulse was not fully digitized, is of lower quality, and was more likely to originate from noise. If `False`, then this pulse was contributed to the trigger decision and the pulse was fully digitized.
+
+sample_submission.parquet An example submission with the correct columns and properly ordered event IDs. The sample submission is provided in the parquet format so it can be read quickly but *your final submission must be a csv*.
+
+`sensor_geometry.csv` The `x`, `y`, and `z` positions for each of the 5160 IceCube sensors. The row index corresponds to the `sensor_idx` feature of pulses. The `x`, `y`, and `z` coordinates are in units of meters, with the origin at the center of the IceCube detector. The coordinate system is right-handed, and the z-axis points upwards when standing at the South Pole. You can convert from these coordinates to `azimuth` and `zenith` with the following formulas (here the vector (x,y,z) is normalized):
+
+```
+x = cos(azimuth) * sin(zenith)
+y = sin(azimuth) * sin(zenith)
+z = cos(zenith)
+
+```
+
+# 2. Python version
+
+3.11
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (231 lines)
+            sample_submission.csv (13200001 lines)
+            sample_submission.csv.zip (35.3 MB)
+            sensor_geometry.csv (5161 lines)
+            sensor_geometry.csv.zip (36.0 kB)
+            test.zip (9.3 GB)
+            test_meta.parquet (172.5 MB)
+            train.zip (83.9 GB)
+            train_meta.parquet (3.5 GB)
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+            test/
+                batch_104.parquet (172.9 MB)
+                batch_128.parquet (172.7 MB)
+                ... and 64 other files
+                test/
+            train/
+                batch_1.parquet (172.1 MB)
+                batch_10.parquet (173.4 MB)
+                ... and 592 other files
+                train/
+        input/
+            description.md (231 lines)
+            sample_submission.csv (13200001 lines)
+            sample_submission.csv.zip (35.3 MB)
+            sensor_geometry.csv (5161 lines)
+            sensor_geometry.csv.zip (36.0 kB)
+            test.zip (9.3 GB)
+            test_meta.parquet (172.5 MB)
+            train.zip (83.9 GB)
+            train_meta.parquet (3.5 GB)
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+            test/
+                batch_104.parquet (172.9 MB)
+                batch_128.parquet (172.7 MB)
+                ... and 64 other files
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+            train/
+                batch_1.parquet (172.1 MB)
+                batch_10.parquet (173.4 MB)
+                ... and 592 other files
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+        working/
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+```
+
+-> data/icecube-neutrinos-in-deep-ice/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> data/icecube-neutrinos-in-deep-ice/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> data/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> data/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> input/icecube-neutrinos-in-deep-ice/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> input/icecube-neutrinos-in-deep-ice/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+1.1764789678613623
+
+# 6. Current score
+
+1.53458
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 1.53458) has done: 'The timeout is dominated by per-event Python overhead (pandas groupby creating many small DataFrames) and the `nearby()` function’s O(n²) distance/time matrix for up to 500 pulses per event. The refactor keeps the exact same calculations and thresholds, but avoids `groupby()` materialization by iterating event slices from `event_id` boundaries, and replaces `nearby()` with an equivalent vectorized version that uses squared-distance and per-sensor masking without building 3D arrays. It also reduces repeated pandas indexing work by converting needed columns to NumPy once per batch and uses fast in-place writes into preallocated NumPy arrays for the submission. All changes are deterministic and preserve the algorithm’s logic and outputs up to negligible floating-point differences.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import glob
+import numpy as np
+import pandas as pd
+import gc
+import time
+import math
+
+PATH_DATASET = "/kaggle/input/icecube-neutrinos-in-deep-ice"
+DATA_DIR = PATH_DATASET
+
+os.environ.setdefault("PYTHONHASHSEED", "0")
+np.random.seed(0)
+
+
+
+## === cell 1
+geometry = pd.read_csv(
+    os.path.join(DATA_DIR, "sensor_geometry.csv"), usecols=["sensor_id", "x", "y", "z"]
+)
+geometry.set_index("sensor_id", inplace=True)
+geometry = geometry.astype(np.float32, copy=False)
+geometry.info()
+
+
+
+## === cell 2
+DELTA_T = 200
+DELTA_POS = 55
+WTS = (0.1, 0.9, 0)  # weights for weight formula
+
+
+
+
+## === cell 3
+def nearby(df, delta_t=300, delta_dist=55):
+    """is there a nearby event in time and space. Return an array giving counts of nearby sensors"""
+    times = df["time"].to_numpy(copy=False)
+    sensors = df["sensor_id"].to_numpy(copy=False)
+    pos = df[["x", "y", "z"]].to_numpy(copy=False)
+
+    n = times.shape[0]
+    if n <= 1:
+        return np.zeros(n, dtype=np.int32)
+
+    dt = np.abs(times[:, None] - times[None, :])
+
+    same_sensor = sensors[:, None] == sensors[None, :]
+    dt[same_sensor] = 1000
+
+    dx = np.abs(pos[:, None, 0] - pos[None, :, 0])
+    dy = np.abs(pos[:, None, 1] - pos[None, :, 1])
+    dz = np.abs(pos[:, None, 2] - pos[None, :, 2])
+    close = (dx < delta_dist) & (dy < delta_dist) & (dz < delta_dist)
+
+    xx = (dt < delta_t) & close
+    return np.count_nonzero(xx, axis=1).astype(np.int32, copy=False)
+
+
+def adjust_polar(azimuth, zenith):
+    if azimuth < 0:
+        azimuth += math.pi * 2
+    elif zenith < 0:
+        zenith += math.pi
+    azimuth = azimuth % (2 * math.pi)
+    return azimuth, zenith
+
+
+def v_to_polar(x, y, z):
+    """Convert x,y,z to polar direction, accounting for arrival reversal"""
+    x, y, z = -x, -y, -z
+    x2y2 = x**2 + y**2
+    r = math.sqrt(x2y2 + z**2)
+    if x2y2 < 1e-6:
+        x2y2 = 1e-6
+    azimuth = math.acos(x / math.sqrt(x2y2)) * np.sign(y)
+    zenith = math.acos(z / r)
+    azimuth, zenith = adjust_polar(azimuth, zenith)
+    return azimuth, zenith
+
+
+
+
+## === cell 4
+def time_window(times, width=4000):
+    """find min and max time that gives most points in fixed size window"""
+    mn = times.min()
+    mx = times.max()
+    if mx - mn < width:
+        return mn, mx
+    avg = times.mean()
+    step = 25
+    best_count = 0
+    best_center = avg
+    for center in np.arange(avg - 1000, avg + 1000, step):
+        c = np.count_nonzero(
+            np.logical_and(times > center - width / 2, times < center + width / 2)
+        )
+        if c > best_count:
+            best_count = c
+            best_center = center
+    if best_count < 3:
+        return mn, mx
+    m1 = max(best_center - width / 2, mn)
+    m2 = min(best_center + width / 2, mx)
+    return m1, m2
+
+
+
+
+## === cell 5
+def compute_direction(r, t, use_weights=None):
+    """compute r vector from time,x,y,z columns: x,y,z,time,charge"""
+    assert r.shape[1] == 3
+    assert t.shape[1] == 1
+    if use_weights is None:
+        weight = np.ones_like(t)
+    else:
+        weight = use_weights
+
+    weight = (weight / np.sum(weight)).reshape(-1, 1)
+
+    def avg(p):
+        if len(p.shape) == 1:
+            p = p.reshape(-1, 1)
+        return np.sum(p * weight, axis=0)
+
+    q = avg(t**2) - avg(t) ** 2
+    v_est = (avg(r * t) - avg(r) * avg(t)) / q
+    r_est = avg(r) - v_est * avg(t)
+    return v_est, r_est
+
+
+
+
+## === cell 6
+ssub = pd.read_csv(
+    os.path.join(PATH_DATASET, "sample_submission.csv"), usecols=["event_id"]
+)
+event_ids = ssub["event_id"].to_numpy(np.int64, copy=False)
+
+out_az = np.zeros(event_ids.shape[0], dtype=np.float32)
+out_ze = np.zeros(event_ids.shape[0], dtype=np.float32)
+
+eid_to_row = {int(eid): i for i, eid in enumerate(event_ids)}
+
+print(ssub.head())
+print(ssub.info())
+
+
+
+## === cell 7
+ls = sorted(glob.glob(os.path.join(PATH_DATASET, "test", "batch_*.parquet")))
+if len(ls) == 0:
+    ls = sorted(
+        glob.glob(
+            os.path.join(
+                PATH_DATASET, "icecube-neutrinos-in-deep-ice", "test", "batch_*.parquet"
+            )
+        )
+    )
+print(f"Found {len(ls)} test batch files")
+
+
+
+## === cell 8
+for batch_file in ls:
+    print(f"processing: {batch_file}")
+    df_big = pd.read_parquet(batch_file)
+    gc.collect()
+
+    df_big = df_big.merge(geometry, left_on="sensor_id", right_index=True, copy=False)
+
+    df_big.sort_values("event_id", kind="mergesort", inplace=True)  # stable
+    df_big.reset_index(drop=True, inplace=True)
+
+    ev = df_big["event_id"].to_numpy(copy=False)
+    t_all = df_big["time"].to_numpy(copy=False)
+    sid_all = df_big["sensor_id"].to_numpy(copy=False)
+    aux_all = df_big["auxiliary"].to_numpy(copy=False)
+    chg_all = df_big["charge"].to_numpy(copy=False)
+    x_all = df_big["x"].to_numpy(copy=False)
+    y_all = df_big["y"].to_numpy(copy=False)
+    z_all = df_big["z"].to_numpy(copy=False)
+
+    boundaries = np.flatnonzero(ev[1:] != ev[:-1]) + 1
+    starts = np.r_[0, boundaries]
+    ends = np.r_[boundaries, ev.shape[0]]
+
+    for s, e in zip(starts, ends):
+        eid = int(ev[s])
+        df = pd.DataFrame(
+            {
+                "time": t_all[s:e],
+                "sensor_id": sid_all[s:e],
+                "auxiliary": aux_all[s:e],
+                "charge": chg_all[s:e],
+                "x": x_all[s:e],
+                "y": y_all[s:e],
+                "z": z_all[s:e],
+            }
+        )
+
+        df_pri = df[~df["auxiliary"]]
+        tw_source = df_pri["time"] if len(df_pri) else df["time"]
+        t0, t1 = time_window(tw_source.to_numpy(copy=False), width=4000)
+
+        df = df[(df.time >= t0) & (df.time <= t1)]
+        if len(df) > 500:
+            df = df.sort_values(["auxiliary", "charge"], ascending=[True, False]).iloc[
+                :500
+            ]
+        df_pri = df[~df["auxiliary"]]
+
+        ccc = nearby(df, delta_t=DELTA_T, delta_dist=DELTA_POS)
+
+        if np.sum(ccc) < 5:
+            weight = None
+            use_df = df_pri
+        else:
+            weight = (
+                WTS[0] * (~df["auxiliary"]).to_numpy(copy=False)
+                + WTS[1] * (ccc > 0)
+                + WTS[2] * (ccc > 1)
+            )
+            use_df = df
+
+        xyz = use_df[["x", "y", "z"]].to_numpy(copy=False)
+        ti = use_df["time"].to_numpy(copy=False).reshape(-1, 1)
+        v_est, r_est = compute_direction(xyz, ti, use_weights=weight)
+        azimuth, zenith = v_to_polar(*v_est)
+
+        row = eid_to_row.get(eid)
+        if row is not None:
+            out_az[row] = np.float32(azimuth)
+            out_ze[row] = np.float32(zenith)
+
+        if len(df) < 1e5:
+            print(f"Estimation event {eid} with azimuth={azimuth} & zenith={zenith}")
+
+    del df_big
+    gc.collect()
+
+
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3804         try:
+-> 3805             return self._engine.get_loc(casted_key)
+   3806         except KeyError as err:
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+KeyError: 'event_id'
+
+The above exception was the direct cause of the following exception:
+
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_11/1031716386.py in <cell line: 0>()
+     14 
+     15     # Cache columns as numpy arrays (reduces repeated pandas overhead inside the loop).
+---> 16     ev = df_big["event_id"].to_numpy(copy=False)
+     17     t_all = df_big["time"].to_numpy(copy=False)
+     18     sid_all = df_big["sensor_id"].to_numpy(copy=False)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4100             if self.columns.nlevels > 1:
+   4101                 return self._getitem_multilevel(key)
+-> 4102             indexer = self.columns.get_loc(key)
+   4103             if is_integer(indexer):
+   4104                 indexer = [indexer]
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3810             ):
+   3811                 raise InvalidIndexError(key)
+-> 3812             raise KeyError(key) from err
+   3813         except TypeError:
+   3814             # If we have a listlike key, _check_indexing_error will raise
+
+KeyError: 'event_id'
+
+## === cell 9
+sub = pd.DataFrame({"event_id": event_ids, "azimuth": out_az, "zenith": out_ze})
+sub = sub[["event_id", "azimuth", "zenith"]]
+sub.to_csv("submission.csv", index=False)
+
+print(sub.head())
+print("Wrote submission.csv, rows:", len(sub))
+
+with open("submission.csv", "r") as f:
+    for _ in range(5):
+        print(f.readline().strip())

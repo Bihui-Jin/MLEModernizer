@@ -1,0 +1,647 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+3.9611
+
+# 6. Current score
+
+7.13862
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 5.84879) has done: 'I fix the main score issue caused by inconsistent one-hot encoding between train and test years by fitting the year dummies on the combined year set, so the feature columns align exactly. I also remove the rounding of predictions (rounding adds avoidable error under RMSE) while keeping the same XGBoost training approach and parameters. Finally, I modernize the XGBoost objective to `reg:squarederror` (same regression semantics, avoids deprecated behavior) and keep everything else intact so the pipeline remains stable and produces `finaloutput.csv` in the required format.'
+- What this solution (achieved 6.01473) has done: 'Your current score (5.84879 RMSE) is worse than the target (3.9611), so we should make small, safe improvements that don’t change the overall XGBoost approach. The biggest issue is that `train_test_split` is random and you are using early stopping on a single split without a fixed seed, which can land on a suboptimal number of trees; I make the split deterministic and use a fixed `seed` in XGBoost for stability and typically slightly better generalization. I also add a minimal, standard NYC feature-cleaning step to drop trips with zero/near-zero distance and cap extreme distances; this preserves your core features but removes noise that commonly hurts RMSE. Finally, I compute distance and datetime-derived features vectorized (same semantics) to avoid slow Python loops and keep runtime within limits.'
+- What this solution (achieved 5.93382) has done: 'Your score is worse than the target (RMSE 6.01 vs 3.96, lower is better), so the smallest reliable improvement is to stop using a random holdout split with early stopping to pick the number of trees (which can underfit and wastes data). I keep the same XGBoost training approach/params, but first determine the best boosting round via a deterministic CV on the training sample, then retrain once on 100% of that cleaned sample with that fixed number of rounds (no early stopping). I also add one minimal, standard cleaning rule that directly reduces RMSE for this competition: remove rows where `passenger_count==0` (noise/outliers), while keeping your existing filters and features unchanged. The output remains `finaloutput.csv` with exactly `key,fare_amount`.'
+- What this solution (achieved 5.92147) has done: 'I make two minimal, score-relevant fixes that typically reduce RMSE for this competition without changing your core XGBoost approach: (1) fix a subtle label/feature misalignment bug introduced by filtering `passenger_count>0` after `dropna/drop outliers` (we apply the same row mask to both `feat` and `df` before extracting `fare_amount`), and (2) add standard but small datetime features (`hour`, `weekday`, `month`) that preserve your existing feature extraction style and usually improve generalization. I also keep your deterministic CV-based choice of boosting rounds and the same objective/metric, and ensure the submission CSV is still written as `finaloutput.csv` with `key,fare_amount`. These changes are designed to improve score toward the target (lower RMSE) with minimal disruption and stable runtime.'
+- What this solution (achieved 7.23569) has done: 'Your current RMSE (5.92147) is worse than the target (3.9611), so we should make small, safe improvements that usually reduce error without changing the overall XGBoost approach. The biggest win with minimal disruption is to add a couple of standard NYC Taxi engineered features (absolute lat/lon deltas and simple Manhattan distance, plus a “distance per passenger” interaction) while keeping the same model type, objective, and CV-based selection of boosting rounds. I also add a tiny amount of additional, competition-standard data cleaning (remove extreme low fares and cap passenger_count to >=1) to reduce noise/outliers that inflate RMSE. Finally, I ensure train/test feature columns align exactly after feature engineering so the submission remains valid and stable.'
+- What this solution (achieved 7.23693) has done: 'We keep your exact XGBoost approach and feature set, but fix two score-critical data issues that inflate RMSE: (1) remove the duplicated `labels.csv`-style leakage/contamination risk by ensuring we only train on clean `train.csv` rows with valid coordinate bounds and realistic fares/passenger counts, and (2) add one standard NYC taxi cleaning rule that improves RMSE without changing modeling logic—dropping obviously-bad trips with identical pickup/dropoff coordinates (near-zero displacement) which otherwise behave like noisy labels even after the haversine filter. We also make XGBoost consume data with `missing=np.nan` explicitly and set a conservative `min_child_weight`/`subsample`/`colsample_bytree` only if needed—but since core logic must be preserved, we not change your hyperparameters beyond adding deterministic defaults already implied by XGBoost; the main gain comes from cleaner training rows. The pipeline still run end-to-end within time, and still write `finaloutput.csv` with exactly `key,fare_amount`.'
+- What this solution (achieved 8.2542) has done: 'Your current RMSE (7.23693, lower is better) is far worse than the target (3.9611), and the biggest minimal-change lever in this competition is training-data quality: the model is being trained on many mislabeled/outlier trips that dominate RMSE. I keep your exact XGBoost approach (same model family, same CV-based boosting-round selection, same features) but add a few standard NYC Taxi cleaning filters that remove obvious label noise (e.g., fare vs distance inconsistencies, zero passengers, and extreme per‑km pricing) while keeping runtime under control. I also ensure the same filters are applied consistently before label extraction (to avoid subtle misalignment) and keep your submission writing exactly as `finaloutput.csv` with `key,fare_amount`. These changes are directly aimed at reducing RMSE toward the target without changing the core training/prediction semantics.'
+- What this solution (achieved 7.86691) has done: 'You’re far above the target RMSE (8.2542 vs 3.9611; lower is better), so we should make small, standard data-quality fixes that reliably reduce error without changing your core XGBoost setup. The biggest likely issue is that you’re training on a million-row sample that still contains many outliers and “bad geography” (especially airport/long trips and extreme pricing) that your current filters don’t fully remove; tightening these filters modestly usually drops RMSE a lot on this competition. I keep the same features and the same XGBoost training approach (CV to pick boosting rounds, then train once) and only adjust the cleaning thresholds and add one minimal, competition-standard coordinate sanity filter for test as well (to prevent pathological test rows from producing huge errors). Submission writing stays identical as `finaloutput.csv` with `key,fare_amount`.'
+- What this solution (achieved 7.70396) has done: 'You’re well above the target RMSE (7.86691 vs 3.9611; lower is better), so we should make small, score-relevant improvements without changing the XGBoost approach. The biggest low-risk gain here is to add the standard NYC “airport” and “center distance” location features (JFK/LGA/EWR and Midtown) using your existing lat/lon inputs; this keeps the same model type/training loop/objective but gives it the missing signal for long/expensive trips that currently inflate RMSE. I also add one minimal cleaning rule to drop implausibly-high fares for short distances (fare-per-km cap a bit tighter) while keeping your existing filters and ensuring feature/label alignment is unchanged. The submission writing remains identical (`finaloutput.csv` with `key,fare_amount`).'
+- What this solution (achieved 7.06099) has done: 'I fix the runtime error by making `haversine_km` accept scalar lon/lat inputs (your airport constants are floats) while keeping the same distance logic. I also add a tiny, score-neutral stability guard to ensure any infinities/NaNs created by feature engineering get converted to NaN before building the DMatrix, preventing XGBoost failures. The rest of your training approach (CV to pick boosting rounds, then train once and predict) and your feature set remain unchanged, and the script still write `finaloutput.csv` with the required `key,fare_amount` columns.'
+- What this solution (achieved 6.8032) has done: 'Your current code doesn’t have a measurable Kaggle score yet (no “current_score”), so the most direct way to move toward the target RMSE is to (1) guarantee a valid submission file with exactly the same row count/order as `test.csv` (right now you drop “bad geo” rows from test, which can create missing keys and invalidate or harm scoring), and (2) make the train cleaning consistent with the features actually used (your cleaning mask is applied on `feat` but `label` is taken from `df`, which can silently misalign after prior row drops). I keep the same XGBoost approach (CV to pick boosting rounds, then train once) and the same feature set, but stop dropping test rows, instead clipping test coordinates into sane bounds so every test `key` gets a prediction. I also remove the unused train/test split (it’s not used anywhere) to avoid confusion while keeping training semantics identical. These are minimal changes aimed at producing a valid submission and typically improving RMSE by preventing missing/misaligned rows.'
+- What this solution (achieved 6.98196) has done: 'Your current RMSE (6.8032) is still far above the target (3.9611), so we need small but meaningful, competition-standard improvements without changing the core XGBoost training approach. The most impactful minimal change here is adding two classic geospatial features that your model is currently missing: bearing (direction) and “center” coordinates (midpoint), which help XGBoost learn geography-dependent fare structure without altering the model family or loop. In addition, I tighten train-only data cleaning in a way that directly targets RMSE outliers (remove extreme `fare_per_km` cases and obvious minimum-fare noise) while keeping your existing filters and leaving test rows intact (still clipped, never dropped). Finally, I keep your CV-to-pick-rounds + train-on-full-sample workflow identical, but add conservative XGBoost defaults (`subsample`, `colsample_bytree`, `max_depth`, `eta`) only if they are missing; since you currently rely on XGBoost defaults that can be unstable across versions, explicitly setting them improves generalization consistency and typically reduces RMSE.'
+- What this solution (achieved 7.20645) has done: 'Your current RMSE (6.98196) is well above the target (3.9611, lower is better), so we need small changes that reliably reduce error without changing your XGBoost approach. The biggest issue in your pipeline is a subtle but severe label/feature misalignment introduced by filtering `feat` while `df` is no longer used—your `label` is taken from `feat` after filtering, but any later operations must keep indices perfectly aligned; we lock this down explicitly and ensure no accidental reindexing happens between mask creation and label extraction. Next, we add the most standard NYC Taxi signal that is missing but minimal: pickup/dropoff in “NYC bounding box + water/outlier” filter on *both* train and test via clipping (not dropping test rows), plus a tiny fare sanity filter tied to distance (remove extreme $/km tails a bit tighter), which typically reduces RMSE outliers without changing model logic. Finally, we keep your CV-based boosting-round selection but make it slightly more stable by using `tree_method='hist'` (same semantics, faster/more deterministic in Kaggle) to allow using more of the 1M sample within time.'
+- What this solution (achieved 7.13862) has done: 'Your RMSE (7.20645) is far above the target (3.9611), so the smallest meaningful move is to improve training-sample quality without changing the core XGBoost approach, features, or loss. I keep your exact feature engineering and CV→train workflow, but (1) fix a subtle year-dummy column alignment issue by forcing string-prefixed dummy names (prevents any accidental numeric-column collision), (2) add two standard, high-impact NYC cleaning filters tied to geography and fare realism (drop trips with both ends far outside NYC core and tighten fare-per-km tails slightly), and (3) ensure the mask is applied before label extraction with index reset to avoid any accidental misalignment. These changes typically reduce RMSE by removing noisy/outlier labels while keeping runtime within limits and still writing `finaloutput.csv` in the required format.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from math import sin, cos, sqrt, atan2, radians
+import xgboost
+import os
+
+print(os.listdir("../input"))
+
+
+
+## === cell 1
+df = pd.read_csv("../input/train.csv", nrows=1000000)
+
+
+
+## === cell 2
+test = pd.read_csv("../input/test.csv")
+
+
+
+## === cell 3
+testkey = test.key
+
+
+
+## === cell 4
+df = df.dropna(how="any", axis="rows")
+test = test.dropna(how="any", axis="rows")
+
+
+
+## === cell 5
+len(df)
+
+
+
+## === cell 6
+df.head()
+
+
+
+## === cell 7
+l = df[
+    (df.pickup_latitude > 42.0)
+    | (df.pickup_latitude < 40.0)
+    | (df.dropoff_latitude > 42.0)
+    | (df.dropoff_latitude < 40.0)
+    | (df.pickup_longitude > -73.0)
+    | (df.pickup_longitude < -75.0)
+    | (df.dropoff_longitude > -73.0)
+    | (df.dropoff_longitude < -75.0)
+].index
+
+
+
+## === cell 8
+df = df.drop(l, axis=0)
+
+
+
+## === cell 9
+test = test.copy()
+test["pickup_latitude"] = test["pickup_latitude"].clip(lower=40.0, upper=42.0)
+test["dropoff_latitude"] = test["dropoff_latitude"].clip(lower=40.0, upper=42.0)
+test["pickup_longitude"] = test["pickup_longitude"].clip(lower=-75.0, upper=-73.0)
+test["dropoff_longitude"] = test["dropoff_longitude"].clip(lower=-75.0, upper=-73.0)
+testkey = test["key"]
+
+
+
+## === cell 10
+z = df[
+    (df.fare_amount > 300.0)
+    | (df.fare_amount < 0.0)
+    | (df.passenger_count > 7.0)
+    | (df.passenger_count < 0.0)
+].index
+
+
+
+## === cell 11
+df = df.drop(z, axis=0)
+
+
+
+## === cell 12
+len(df)
+
+
+
+
+## === cell 13
+def distlatlong(lon1, lat1, lon2, lat2):
+    lat1 = radians(lat1)
+    lat2 = radians(lat2)
+    lon1 = radians(lon1)
+    lon2 = radians(lon2)
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = (sin(dlat / 2)) ** 2 + cos(lat1) * cos(lat2) * (sin(dlon / 2)) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = 6373.0 * c
+    return distance
+
+
+
+
+## === cell 14
+def haversine_km(lon1, lat1, lon2, lat2):
+    lon1 = np.radians(np.asarray(lon1, dtype="float64"))
+    lat1 = np.radians(np.asarray(lat1, dtype="float64"))
+    lon2 = np.radians(np.asarray(lon2, dtype="float64"))
+    lat2 = np.radians(np.asarray(lat2, dtype="float64"))
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = (np.sin(dlat / 2.0) ** 2) + np.cos(lat1) * np.cos(lat2) * (
+        np.sin(dlon / 2.0) ** 2
+    )
+    c = 2.0 * np.arctan2(np.sqrt(a), np.sqrt(1.0 - a))
+    return 6373.0 * c
+
+
+df["dist"] = haversine_km(
+    df["pickup_longitude"],
+    df["pickup_latitude"],
+    df["dropoff_longitude"],
+    df["dropoff_latitude"],
+)
+test["dist"] = haversine_km(
+    test["pickup_longitude"],
+    test["pickup_latitude"],
+    test["dropoff_longitude"],
+    test["dropoff_latitude"],
+)
+
+
+
+## === cell 15
+same_loc = (df["pickup_longitude"].sub(df["dropoff_longitude"]).abs() < 1e-6) & (
+    df["pickup_latitude"].sub(df["dropoff_latitude"]).abs() < 1e-6
+)
+df = df.loc[~same_loc].copy()
+
+
+
+## === cell 16
+df = df[(df["dist"] >= 0.05) & (df["dist"] < 60.0)].copy()
+test["dist"] = test["dist"].clip(lower=0.05, upper=60.0)
+
+
+
+## === cell 17
+sns.boxplot(x=df.dist)
+
+
+
+## === cell 18
+test.head()
+
+
+
+## === cell 19
+df["pickup_datetime"] = pd.to_datetime(df["pickup_datetime"], errors="coerce")
+test["pickup_datetime"] = pd.to_datetime(test["pickup_datetime"], errors="coerce")
+df = df.dropna(subset=["pickup_datetime"]).copy()
+test["pickup_datetime"] = test["pickup_datetime"].fillna(pd.Timestamp("2010-01-01"))
+
+
+
+## === cell 20
+df.info()
+
+
+
+## === cell 21
+df["latenights"] = (df["pickup_datetime"].dt.hour < 5).astype(int)
+test["latenights"] = (test["pickup_datetime"].dt.hour < 5).astype(int)
+
+
+
+## === cell 22
+df["year"] = df["pickup_datetime"].dt.year
+test["year"] = test["pickup_datetime"].dt.year
+
+
+
+## === cell 23
+df["day"] = df["pickup_datetime"].dt.day
+test["day"] = test["pickup_datetime"].dt.day
+
+
+
+## === cell 24
+df["hour"] = df["pickup_datetime"].dt.hour
+test["hour"] = test["pickup_datetime"].dt.hour
+df["weekday"] = df["pickup_datetime"].dt.weekday
+test["weekday"] = test["pickup_datetime"].dt.weekday
+df["month"] = df["pickup_datetime"].dt.month
+test["month"] = test["pickup_datetime"].dt.month
+
+
+
+## === cell 25
+for _df in (df, test):
+    _df["abs_lon_diff"] = (_df["pickup_longitude"] - _df["dropoff_longitude"]).abs()
+    _df["abs_lat_diff"] = (_df["pickup_latitude"] - _df["dropoff_latitude"]).abs()
+    _df["manhattan_approx"] = _df["abs_lon_diff"] + _df["abs_lat_diff"]
+    _df["passenger_count"] = _df["passenger_count"].clip(lower=1, upper=6)
+    _df["dist_per_passenger"] = _df["dist"] / (_df["passenger_count"].astype("float64"))
+
+
+
+
+## === cell 26
+def bearing_rad(lon1, lat1, lon2, lat2):
+    lon1 = np.radians(np.asarray(lon1, dtype="float64"))
+    lat1 = np.radians(np.asarray(lat1, dtype="float64"))
+    lon2 = np.radians(np.asarray(lon2, dtype="float64"))
+    lat2 = np.radians(np.asarray(lat2, dtype="float64"))
+    dlon = lon2 - lon1
+    y = np.sin(dlon) * np.cos(lat2)
+    x = np.cos(lat1) * np.sin(lat2) - np.sin(lat1) * np.cos(lat2) * np.cos(dlon)
+    return np.arctan2(y, x)
+
+
+for _df in (df, test):
+    _df["bearing"] = bearing_rad(
+        _df["pickup_longitude"],
+        _df["pickup_latitude"],
+        _df["dropoff_longitude"],
+        _df["dropoff_latitude"],
+    )
+    _df["center_lat"] = (_df["pickup_latitude"] + _df["dropoff_latitude"]) / 2.0
+    _df["center_lon"] = (_df["pickup_longitude"] + _df["dropoff_longitude"]) / 2.0
+
+
+
+## === cell 27
+JFK_LON, JFK_LAT = -73.7781, 40.6413
+LGA_LON, LGA_LAT = -73.8740, 40.7769
+EWR_LON, EWR_LAT = -74.1745, 40.6895
+MID_LON, MID_LAT = -73.9855, 40.7580  # Times Square-ish
+
+for _df in (df, test):
+    _df["pickup_to_jfk_km"] = haversine_km(
+        _df["pickup_longitude"], _df["pickup_latitude"], JFK_LON, JFK_LAT
+    )
+    _df["dropoff_to_jfk_km"] = haversine_km(
+        _df["dropoff_longitude"], _df["dropoff_latitude"], JFK_LON, JFK_LAT
+    )
+    _df["pickup_to_lga_km"] = haversine_km(
+        _df["pickup_longitude"], _df["pickup_latitude"], LGA_LON, LGA_LAT
+    )
+    _df["dropoff_to_lga_km"] = haversine_km(
+        _df["dropoff_longitude"], _df["dropoff_latitude"], LGA_LON, LGA_LAT
+    )
+    _df["pickup_to_ewr_km"] = haversine_km(
+        _df["pickup_longitude"], _df["pickup_latitude"], EWR_LON, EWR_LAT
+    )
+    _df["dropoff_to_ewr_km"] = haversine_km(
+        _df["dropoff_longitude"], _df["dropoff_latitude"], EWR_LON, EWR_LAT
+    )
+    _df["pickup_to_midtown_km"] = haversine_km(
+        _df["pickup_longitude"], _df["pickup_latitude"], MID_LON, MID_LAT
+    )
+    _df["dropoff_to_midtown_km"] = haversine_km(
+        _df["dropoff_longitude"], _df["dropoff_latitude"], MID_LON, MID_LAT
+    )
+
+
+
+## === cell 28
+df.head()
+
+
+
+## === cell 29
+test.head()
+
+
+
+## === cell 30
+feat = df.drop(
+    [
+        "key",
+        "pickup_datetime",
+        "pickup_longitude",
+        "pickup_latitude",
+        "dropoff_longitude",
+        "dropoff_latitude",
+    ],
+    axis=1,
+)
+test_feat = test.drop(
+    [
+        "key",
+        "pickup_datetime",
+        "pickup_longitude",
+        "pickup_latitude",
+        "dropoff_longitude",
+        "dropoff_latitude",
+    ],
+    axis=1,
+)
+
+
+
+## === cell 31
+test_feat.year.unique()
+
+
+
+## === cell 32
+all_years = pd.Index(
+    pd.concat([feat["year"], test_feat["year"]], axis=0).unique()
+).sort_values()
+year_cols = pd.Index([f"year_{int(y)}" for y in all_years])
+
+year_dummies_train = (
+    pd.get_dummies(feat["year"].astype(int))
+    .rename(columns=lambda y: f"year_{int(y)}")
+    .reindex(columns=year_cols, fill_value=0)
+)
+
+year_dummies_test = (
+    pd.get_dummies(test_feat["year"].astype(int))
+    .rename(columns=lambda y: f"year_{int(y)}")
+    .reindex(columns=year_cols, fill_value=0)
+)
+
+feat = pd.concat([feat.drop("year", axis=1), year_dummies_train], axis=1)
+test_feat = pd.concat([test_feat.drop("year", axis=1), year_dummies_test], axis=1)
+
+
+
+## === cell 33
+feat.head()
+
+
+
+## === cell 34
+test_feat.head()
+
+
+
+## === cell 35
+mid_pick = df["pickup_to_midtown_km"]
+mid_drop = df["dropoff_to_midtown_km"]
+near_midtown = (mid_pick < 25.0) | (mid_drop < 25.0)
+
+base_mask = (
+    (feat["passenger_count"] >= 1)
+    & (feat["fare_amount"] >= 2.5)
+    & (feat["fare_amount"] <= 200.0)
+    & near_midtown.values
+)
+
+dist_for_ratio = feat["dist"].clip(lower=0.05).astype("float64")
+fare_per_km = feat["fare_amount"].astype("float64") / dist_for_ratio
+
+base_mask &= (fare_per_km >= 1.7) & (fare_per_km <= 11.0)
+base_mask &= ~((feat["dist"] > 25.0) & (feat["fare_amount"] < 25.0))
+base_mask &= ~((feat["dist"] < 0.3) & (feat["fare_amount"] > 35.0))
+base_mask &= feat["passenger_count"] <= 6
+
+feat = feat.loc[base_mask].copy()
+
+
+
+## === cell 36
+feat = feat.reset_index(drop=True)
+
+
+
+## === cell 37
+label = feat["fare_amount"].astype("float64")
+
+
+
+## === cell 38
+feat = feat.drop("fare_amount", axis=1)
+
+
+
+## === cell 39
+feat, test_feat = feat.align(test_feat, join="left", axis=1, fill_value=0)
+
+
+
+## === cell 40
+feat = feat.replace([np.inf, -np.inf], np.nan)
+test_feat = test_feat.replace([np.inf, -np.inf], np.nan)
+
+
+
+## === cell 41
+xgbfinaltest = xgboost.DMatrix(test_feat, missing=np.nan)
+
+
+
+## === cell 42
+params = {
+    "eval_metric": "rmse",
+    "objective": "reg:squarederror",
+    "seed": 42,
+    "eta": 0.1,
+    "max_depth": 8,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "tree_method": "hist",
+}
+
+
+
+## === cell 43
+dtrain_full = xgboost.DMatrix(feat, label, missing=np.nan)
+
+cv = xgboost.cv(
+    params=params,
+    dtrain=dtrain_full,
+    num_boost_round=300,
+    nfold=5,
+    seed=42,
+    shuffle=True,
+    early_stopping_rounds=20,
+    verbose_eval=False,
+)
+best_num_boost_round = int(cv.shape[0])
+
+xgbmodel = xgboost.train(
+    params=params,
+    dtrain=dtrain_full,
+    num_boost_round=best_num_boost_round,
+)
+
+
+
+## === cell 44
+pred = xgbmodel.predict(xgbfinaltest)
+
+
+
+## === cell 45
+pred = pred
+
+
+
+## === cell 46
+finalset = pd.DataFrame({"key": testkey, "fare_amount": pred})
+
+
+
+## === cell 47
+finalset = finalset[["key", "fare_amount"]]
+
+
+
+## === cell 48
+finalset.head()
+
+
+
+## === cell 49
+finalset.to_csv("finaloutput.csv", index=False)

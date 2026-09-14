@@ -1,0 +1,442 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the class of a given image from a synthetic dataset.
+
+## MetricMulti-class classification accuracy.
+
+## Submission FormatFor each `Id` in the test set, you must predict the `Cover_Type` class. The file should contain a header and have the following format:
+```
+Id,Cover_Type
+4000000,2
+4000001,1
+4000001,3
+etc.
+```
+
+## Dataset 
+- train.csv - the training data with the target `Cover_Type` column
+- test.csv - the test set; you will be predicting the `Cover_Type` for each row in this file (the target integer class)
+- sample_submission.csv - a sample submission file in the correct format
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+imbalanced-learn==0.13.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+optuna==4.5.0
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        input/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        working/
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+```
+
+-> data/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/tabular-playground-series-dec-2021/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> data/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> input/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+import collections
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score
+
+from xgboost import XGBClassifier
+
+import optuna
+
+RANDOM_STATE = 42
+np.random.seed(RANDOM_STATE)
+
+
+
+## === cell 1
+df_train_og = pd.read_csv("../input/tabular-playground-series-dec-2021/train.csv")
+df_test_og = pd.read_csv("../input/tabular-playground-series-dec-2021/test.csv")
+submission = pd.read_csv(
+    "../input/tabular-playground-series-dec-2021/sample_submission.csv"
+)
+
+
+
+## === cell 2
+df_train_og.shape
+
+
+
+## === cell 3
+df_train_og.head()
+
+
+
+## === cell 4
+df_train_og.nunique()
+
+
+
+
+## === cell 5
+def reduce_mem_usage(df, verbose=True):
+    numerics = ["int8", "int16", "int32", "int64", "float16", "float32", "float64"]
+    start_mem = df.memory_usage().sum() / 1024**2
+
+    for col in df.columns:
+        col_type = df[col].dtypes
+
+        if col_type in numerics:
+            c_min = df[col].min()
+            c_max = df[col].max()
+
+            if str(col_type)[:3] == "int":
+                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+                    df[col] = df[col].astype(np.int8)
+                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
+                    df[col] = df[col].astype(np.int16)
+                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                    df[col] = df[col].astype(np.int32)
+                elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
+                    df[col] = df[col].astype(np.int64)
+            else:
+                if (
+                    c_min > np.finfo(np.float32).min
+                    and c_max < np.finfo(np.float32).max
+                ):
+                    df[col] = df[col].astype(np.float32)
+                else:
+                    df[col] = df[col].astype(np.float64)
+
+    end_mem = df.memory_usage().sum() / 1024**2
+
+    if verbose:
+        print(
+            "Mem. usage decreased to {:5.2f} Mb ({:.1f}% reduction)".format(
+                end_mem, 100 * (start_mem - end_mem) / start_mem
+            )
+        )
+
+    return df
+
+
+
+
+## === cell 6
+df_train = reduce_mem_usage(df_train_og)
+df_test = reduce_mem_usage(df_test_og)
+del df_train_og
+del df_test_og
+
+
+
+## === cell 7
+cat_count = collections.Counter(df_train["Cover_Type"])
+cat_freq = list(cat_count.values())
+cat = list(cat_count.keys())
+plt.figure(figsize=(8, 4))
+plt.bar(cat, cat_freq)
+plt.title("Original class distribution")
+plt.show()
+print(cat_count)
+
+
+
+## === cell 8
+df_train = df_train[(df_train["Cover_Type"] != 4) & (df_train["Cover_Type"] != 5)]
+
+
+
+## === cell 9
+drop_cols = ["Id", "Cover_Type", "Soil_Type7", "Soil_Type15"]
+X = df_train.drop(columns=drop_cols)
+y = df_train["Cover_Type"]
+
+class_counts = y.value_counts()
+minority_class = class_counts.idxmin()
+minority_n = int(class_counts.min())
+
+parts = []
+for cls, cnt in class_counts.items():
+    idx = df_train.index[df_train["Cover_Type"] == cls]
+    if cls == minority_class:
+        chosen_idx = idx
+    else:
+        chosen_idx = np.random.choice(idx.to_numpy(), size=minority_n, replace=False)
+    parts.append(df_train.loc[chosen_idx])
+
+df_res = (
+    pd.concat(parts, axis=0)
+    .sample(frac=1.0, random_state=RANDOM_STATE)
+    .reset_index(drop=True)
+)
+X_res = df_res.drop(columns=drop_cols)
+y_res = df_res["Cover_Type"]
+
+print("After undersampling (not minority -> equal to minority count):")
+print(y_res.value_counts().sort_index())
+
+
+
+## === cell 10
+cat_count = collections.Counter(y_res)
+cat_freq = list(cat_count.values())
+cat = list(cat_count.keys())
+plt.figure(figsize=(8, 4))
+plt.bar(cat, cat_freq)
+plt.title("Resampled class distribution")
+plt.show()
+print(cat_count)
+
+
+
+## === cell 11
+from sklearn.feature_selection import SelectKBest, f_classif
+
+selector = SelectKBest(f_classif, k="all")
+fitter = selector.fit(X_res, y_res)
+scores_df = pd.DataFrame(fitter.scores_)
+columns_df = pd.DataFrame(X_res.columns)
+featurescores = pd.concat([scores_df, columns_df], axis=1)
+featurescores.columns = ["score", "column name"]
+plt.figure(figsize=(20, 5))
+plt.bar(featurescores["column name"], featurescores["score"], width=0.4)
+plt.xticks(rotation="vertical")
+plt.show()
+
+
+
+## === cell 12
+featurescores = featurescores.sort_values(by="score", ascending=False)
+featurescores.head(10)
+
+
+
+## === cell 13
+x_train, x_test, y_train, y_test = train_test_split(
+    X_res, y_res, test_size=0.2, random_state=RANDOM_STATE, stratify=y_res
+)
+
+
+
+## === cell 14
+classes_sorted = np.sort(y_res.unique())
+label_to_index = {int(c): i for i, c in enumerate(classes_sorted)}
+index_to_label = {i: int(c) for i, c in enumerate(classes_sorted)}
+
+y_train_enc = y_train.map(label_to_index).astype(int)
+y_test_enc = y_test.map(label_to_index).astype(int)
+y_res_enc = y_res.map(label_to_index).astype(int)
+
+num_class = int(len(classes_sorted))
+print("Original classes kept:", classes_sorted.tolist())
+print("Encoded num_class:", num_class)
+
+
+
+
+## === cell 15
+def _safe_tree_method(preferred="gpu_hist"):
+    try:
+        tmp_X = np.array([[0.0, 1.0], [1.0, 0.0]], dtype=np.float32)
+        tmp_y = np.array([0, 1], dtype=np.int32)
+        model = XGBClassifier(
+            tree_method=preferred,
+            n_estimators=1,
+            max_depth=2,
+            learning_rate=0.1,
+            verbosity=0,
+            objective="multi:softmax",
+            num_class=2,
+            n_jobs=1,
+        )
+        model.fit(tmp_X, tmp_y)
+        return preferred
+    except Exception:
+        return "hist"
+
+
+TREE_METHOD = _safe_tree_method("gpu_hist")
+TREE_METHOD
+
+
+
+
+## === cell 16
+def objective_xgb(trial):
+    xgb_params = {
+        "learning_rate": 0.01,
+        "tree_method": TREE_METHOD,
+        "booster": "gbtree",
+        "n_estimators": trial.suggest_int("n_estimators", 500, 4000, 100),
+        "reg_lambda": trial.suggest_int("reg_lambda", 1, 100),
+        "reg_alpha": trial.suggest_int("reg_alpha", 1, 100),
+        "subsample": trial.suggest_float("subsample", 0.2, 1.0, step=0.1),
+        "colsample_bytree": trial.suggest_float("colsample_bytree", 0.2, 1.0, step=0.1),
+        "max_depth": trial.suggest_int("max_depth", 3, 10),
+        "min_child_weight": trial.suggest_int("min_child_weight", 2, 10),
+        "gamma": trial.suggest_float("gamma", 0, 20),
+        "random_state": RANDOM_STATE,
+        "n_jobs": -1,
+        "verbosity": 0,
+        "objective": "multi:softmax",
+        "num_class": num_class,
+    }
+
+    pipe = Pipeline(
+        steps=[("step1", StandardScaler()), ("step2", XGBClassifier(**xgb_params))]
+    )
+
+    pipe.fit(x_train, y_train_enc)
+    y_pred_enc = pipe.predict(x_test)
+    return accuracy_score(y_test_enc, y_pred_enc)
+
+
+
+
+## === cell 17
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+sampler = optuna.samplers.TPESampler(seed=RANDOM_STATE)
+study_xgb = optuna.create_study(direction="maximize", sampler=sampler)
+study_xgb.optimize(objective_xgb, n_trials=50)
+
+study_xgb.best_value, study_xgb.best_params
+
+
+
+## === cell 18
+best_params_xgb = dict(study_xgb.best_params)
+best_params_xgb.update(
+    {
+        "learning_rate": 0.01,
+        "tree_method": TREE_METHOD,
+        "booster": "gbtree",
+        "random_state": RANDOM_STATE,
+        "n_jobs": -1,
+        "verbosity": 0,
+        "objective": "multi:softmax",
+        "num_class": num_class,
+    }
+)
+
+pipe = Pipeline(
+    steps=[("step1", StandardScaler()), ("step2", XGBClassifier(**best_params_xgb))]
+)
+
+
+
+## === cell 19
+pipe.fit(x_train, y_train_enc)
+val_pred_enc = pipe.predict(x_test)
+print("Holdout accuracy:", accuracy_score(y_test_enc, val_pred_enc))
+
+
+
+## === cell 20
+pipe.fit(X_res, y_res_enc)
+
+df_test_features = df_test.drop(columns=["Id", "Soil_Type7", "Soil_Type15"])
+final_pred_enc = pipe.predict(df_test_features)
+
+final_pred = pd.Series(final_pred_enc).map(index_to_label).astype(int).to_numpy()
+
+
+
+## === cell 21
+submission["Cover_Type"] = final_pred.astype(int)
+out_path = "submission.csv"
+submission.to_csv(out_path, index=False)
+print("Wrote:", out_path)
+submission.head()

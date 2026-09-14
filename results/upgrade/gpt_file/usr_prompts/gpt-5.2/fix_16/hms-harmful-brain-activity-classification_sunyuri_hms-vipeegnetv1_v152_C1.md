@@ -1,0 +1,1534 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.3372414704793624
+
+# 6. Current score
+
+1.4041
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.40995) has done: 'I fix the TensorFlow/protobuf crash by forcing the pure-Python protobuf implementation before importing TensorFlow, which avoids the `MessageFactory.GetPrototype` error in Kaggle’s Python 3.12 environment. Then I fix the submission-length explosion by removing the merge patterns that can create a cartesian product when `eeg_id` duplicates exist, and instead build the submission directly aligned to `test.eeg_id` order. Finally, I keep the model/weights inference logic unchanged, but make the fallback path and post-processing strictly produce a (9850, 7) CSV with probabilities that are finite, clipped, and row-normalized to sum to 1.'
+- What this solution (achieved 1.4041) has done: 'I fix the TensorFlow/protobuf crash in this Kaggle Python 3.12 environment by applying a small compatibility monkey-patch before importing TensorFlow (keeping your existing “pure-Python protobuf” setting). Then I add a minimal probability “prior blending” calibration step after model inference (or fallback) to move the KL score down toward the target by shrinking overly-confident predictions toward the global train label distribution (this preserves the same model and inference core logic). Finally, I keep the submission alignment strictly in `test.eeg_id` order and enforce finite, clipped, row-normalized probabilities so the CSV is always valid.'
+- What this solution (achieved 1.4041) has done: 'You’re far above the target KL (1.4041 vs 0.3372; lower is better), so we should improve score substantially but with minimal, low-risk changes that preserve your model/inference core. The biggest likely issue is that your targets/pred column names don’t match the competition submission schema (`*_vote`), which can silently break evaluation or force effectively bad predictions; we fix this by mapping your internal 6-class output to the exact `*_vote` columns and writing those. Then we make the prior-blending step operate in the correct label space (vote-probabilities) and add a tiny epsilon-smoothing + renormalization to reduce KL blowups from overconfident zeros, without changing the model. Finally, we keep the test order alignment exactly as `test.eeg_id` and still always produce a valid `submission.csv`.'
+- What this solution (achieved 1.4041) has done: 'Your KL is far above the target (1.4041 vs 0.3372; lower is better), so we should improve accuracy without changing the model/data pipeline. The biggest low-risk gain here is fixing a label-space mismatch: your `my_loss` collapses the model’s 6th logit into “other”, which implies the pretrained weights likely output 7 classes (5 + 2 “other-like”) and are meant to be postprocessed the same way at inference; right now you submit the raw 6-way softmax, which can be badly miscalibrated relative to how the model was trained. I keep the architecture and inference loop intact, but add an inference-time postprocess that mirrors `my_loss` (collapse the last logit into `other_vote`) when the loaded model outputs 7 (or generally >6) classes, and keep your existing prior-blending + clipping/renorm to prevent KL blowups. This is a minimal semantic alignment change that should materially reduce KL while still producing a valid 9850x7 submission.'
+- What this solution (achieved 1.4041) has done: 'Your current KL (1.4041) is far worse than the target (0.3372, lower is better), so the most likely “minimal but high-impact” fix is to align inference-time probabilities with the exact semantics used inside your training loss. Right now `my_loss` collapses all classes from index 5 onward into `other`, but your inference collapse assumes the same ordering without checking; if the pretrained model’s class order differs, you submit systematically wrong class probabilities and KL blow up. I (1) add an automatic “best mapping” step that uses `train.csv` to choose the permutation of the model’s first K logits to the 5 non-other classes that best matches overall label priors, then (2) keep your existing prior-blending + clipping/renorm to prevent zeros/infs. This keeps the same model/weights and only changes post-processing to better match the competition’s label space.'
+- What this solution (achieved 1.4041) has done: 'Your current KL (1.4041) is far above the target (0.3372; lower is better), so we should improve materially with minimal risk while preserving your model and inference pipeline. The biggest score-risk in your current code is the “best permutation by prior” step: matching global priors can still choose a wrong class mapping and systematically scramble columns, which can severely inflate KL. I replace that with a safer, still-minimal mapping chooser that uses a tiny held-out slice of `train.csv` to pick the permutation (and any tail-collapse behavior) that actually minimizes KL against true vote distributions, then apply that fixed mapping to test predictions. Everything else (model, weights, generator, averaging, prior-blend, clipping/renorm, submission alignment) stays the same.'
+- What this solution (achieved 1.4041) has done: 'Your current KL (1.4041) is far worse than the target (0.3372; lower is better), so we need a meaningful improvement but with minimal risk and without changing the model itself. The biggest score issue in your current script is that you never actually compute the “best permutation by KL” (it’s explicitly skipped), so if the pretrained logits’ class order doesn’t match the submission columns, your predictions are effectively scrambled and KL blows up. I implement the previously-intended “choose permutation by minimizing KL on a small labeled slice” by running inference on a small subset of `train.csv` (loading only the needed EEG files for those rows) and selecting the best mapping of the first 5 classes, keeping `other` intact. Then I apply that fixed mapping to test predictions, keeping your existing tail-collapse, eps-smoothing, prior blending, and strict submission alignment unchanged.'
+- What this solution (achieved 1.4041) has done: 'Your current KL (1.4041) is far worse than the target (0.3372; lower is better), so we should fix the most likely “predictions are systematically wrong” issue with the smallest possible change. Right now the permutation-selection step is effectively disabled because `DATATYPE` includes `"spe"`, causing it to skip mapping entirely; if the pretrained logits’ class order doesn’t match the submission columns, KL blow up even if the model is good. I keep your model, weights, generator, and inference loop unchanged, but enable permutation selection by loading only the small required train spectrogram slices on-the-fly (not the whole spectrogram dataset) for a small labeled subset, then choosing the class permutation that actually minimizes KL on that subset. Everything else (tail-collapse into `other`, prior blending, clipping/renorm, and strict submission alignment) stays the same.'
+- What this solution (achieved 1.4041) has done: 'Your current KL (1.4041) is much worse than the target (0.3372; lower is better), so we need a meaningful but still low-risk improvement without changing the model or feature extraction. The biggest likely score issue left is that your permutation selection is computed on only one fold’s weights, then applied to all folds; if different folds have different class ordering, this can scramble probabilities and inflate KL. I change permutation selection to be done per-fold (using the same small labeled train slice), then apply that fold-specific permutation to that fold’s test predictions before averaging—this preserves your exact model/inference core and only adjusts post-processing alignment. I also keep your existing tail-collapse, clipping/renorm, and prior blending unchanged to maintain submission validity and avoid KL blowups.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import io
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", None)
+
+try:
+    from google.protobuf import message_factory as _message_factory  # noqa: E402
+
+    if hasattr(_message_factory, "MessageFactory") and not hasattr(
+        _message_factory.MessageFactory, "GetPrototype"
+    ):
+
+        def _GetPrototype(self, descriptor):
+            return self.GetMessageClass(descriptor)
+
+        _message_factory.MessageFactory.GetPrototype = _GetPrototype  # type: ignore[attr-defined]
+except Exception:
+    pass
+
+from PIL import Image  # noqa: E402
+
+PLATFORM = "kaggle"  # local kaggle
+NEEDTRAIN = False
+DATATYPE = ["eeg", "spe", "img"]  # 'eeg', 'spe', 'img', 'stft'
+STAGETRAIN = [2, 3]
+STAGETEST = 3
+print(DATATYPE)
+
+LOAD_MODELS_FROM = "models2024040201"
+if PLATFORM == "local":
+    LOAD_MODELS_FROM = f"./input/{LOAD_MODELS_FROM}"
+elif PLATFORM == "kaggle":
+    LOAD_MODELS_FROM = f"/kaggle/input/{LOAD_MODELS_FROM}"
+
+EEG_LENGTH = 30  # s
+SFREQ = 100
+
+HIGH = 128
+LENGTH = 256
+
+IMG_HIGH = 64
+IMG_WIDE = 256
+
+SEED = 2024
+NSPLIT = 5
+BATCHSIZE = 16
+
+READ_SPEC_FILES = False
+READ_EEG_FILES = False
+READ_IMG_FILES = False
+READ_STFT_FILES = False
+
+READ_EXTRA_SPEC_FILES = True
+READ_EXTRA_EEG_FILES = True
+READ_EXTRA_IMG_FILES = True
+READ_EXTRA_STFT_FILES = True
+
+spectrograms = {}
+eegs = {}
+imgs = {}
+stfts = {}
+
+spectrograms2 = {}
+eegs2 = {}
+imgs2 = {}
+stfts2 = {}
+
+filter_range = [0.5, 40]
+
+BRAIN = {
+    "LL": ["Fp1-F7", "F7-T3", "T3-T5", "T5-O1"],
+    "RL": ["Fp2-F8", "F8-T4", "T4-T6", "T6-O2"],
+    "LP": ["Fp1-F3", "F3-C3", "C3-P3", "P3-O1"],
+    "RP": ["Fp2-F4", "F4-C4", "C4-P4", "P4-O2"],
+}
+
+SUB_TARGETS = [
+    "seizure_vote",
+    "lpd_vote",
+    "gpd_vote",
+    "lrda_vote",
+    "grda_vote",
+    "other_vote",
+]
+
+
+
+## === cell 1
+import numpy as np
+import pandas as pd
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+import tensorflow as tf
+
+try:
+    import cupy as cp  # optional
+except Exception:
+    cp = None
+
+try:
+    import albumentations as albu  # optional (not required for current pipeline)
+except Exception:
+    albu = None
+
+print("TensorFlow version =", tf.__version__)
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+gpus = tf.config.list_physical_devices("GPU")
+if len(gpus) <= 1:
+    strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
+    print(f"Using {len(gpus)} GPU")
+else:
+    strategy = tf.distribute.MirroredStrategy()
+    print(f"Using {len(gpus)} GPUs")
+
+np.random.seed(SEED)
+os.environ["PYTHONHASHSEED"] = str(SEED)
+os.environ["TF_DETERMINISTIC_OPS"] = "1"
+tf.random.set_seed(SEED)
+tf.keras.utils.set_random_seed(SEED)
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+MIX = True
+if MIX:
+    try:
+        from tensorflow.keras import mixed_precision
+
+        mixed_precision.set_global_policy("float32")
+        print("Mixed precision disabled (policy=float32) for stability")
+    except Exception:
+        print("Mixed precision policy not set; continuing")
+else:
+    print("Using full precision")
+
+
+
+## === cell 2
+if PLATFORM == "local":
+    df = pd.read_csv("./input/hms-harmful-brain-activity-classification/train.csv")
+elif PLATFORM == "kaggle":
+    df = pd.read_csv(
+        "/kaggle/input/hms-harmful-brain-activity-classification/train.csv"
+    )
+
+TARGETS = df.columns[-6:]
+print("Train shape:", df.shape)
+print("Targets", list(TARGETS))
+
+_train_votes = df[list(SUB_TARGETS)].to_numpy(dtype=np.float64)
+_train_votes = np.clip(_train_votes, 0.0, None)
+_train_prior = _train_votes.sum(axis=0)
+_train_prior = _train_prior / (_train_prior.sum() + 1e-12)
+TRAIN_PRIOR = _train_prior.astype(np.float64)
+print("Train prior:", dict(zip(list(SUB_TARGETS), TRAIN_PRIOR.round(6))))
+
+df.head()
+
+
+
+## === cell 3
+TARS = {"Seizure": 0, "LPD": 1, "GPD": 2, "LRDA": 3, "GRDA": 4, "Other": 5}
+TARS2 = {x: y for y, x in TARS.items()}
+
+
+class DataGenerator(tf.keras.utils.Sequence):
+    "Generates data for Keras"
+
+    def __init__(
+        self,
+        data,
+        batch_size=32,
+        shuffle=False,
+        augment=False,
+        mode="train",
+        specs=None,
+        eegs=None,
+        imgs=None,
+        stfts=None,
+        targets=None,
+    ):
+
+        self.targets = targets
+        self.cmin = -4
+        self.cmax = 6
+        self.cmaps = matplotlib.colormaps["cividis"](np.linspace(0, 1, 256))[:, :3]
+
+        self.data = data
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.augment = False
+        self.mode = mode
+        self.specs = specs
+        self.eegs = eegs
+        self.imgs = imgs
+        self.stfts = stfts
+        self.on_epoch_end()
+
+    def __len__(self):
+        ct = int(np.ceil(len(self.data) / self.batch_size))
+        return ct
+
+    def __getitem__(self, index):
+        indexes = self.indexes[index * self.batch_size : (index + 1) * self.batch_size]
+        x, y = self.__data_generation(indexes)
+        return x, y
+
+    def on_epoch_end(self):
+        self.indexes = np.arange(len(self.data))
+        if self.shuffle:
+            np.random.shuffle(self.indexes)
+
+    def __data_generation(self, indexes):
+        if "spe" in DATATYPE:
+            x_spe = np.zeros((len(indexes), HIGH, LENGTH, 3, 4), dtype="float32")
+        if "eeg" in DATATYPE:
+            x_eeg = np.zeros(
+                (len(indexes), 6, round(20 * SFREQ), 3, 4), dtype="float32"
+            )
+            x_eeg2 = np.zeros((len(indexes), 4, round(50 * SFREQ), 4), dtype="float32")
+        if "img" in DATATYPE:
+            x_img = np.zeros((len(indexes), IMG_HIGH, IMG_WIDE, 3, 4), dtype="float32")
+        if "stft" in DATATYPE:
+            x_stft = np.zeros((len(indexes), 64, 128 * 4, 3, 4), dtype="float32")
+        y = np.zeros((len(indexes), len(self.targets)), dtype="float32")
+
+        for j, i in enumerate(indexes):
+            row = self.data.iloc[i]
+
+            if self.mode == "test":
+                r_spe = 0
+                r_eeg = 0
+            elif self.mode == "valid":
+                r_spe = (
+                    round(row.spectrogram_label_offset_seconds / 2)
+                    if "spectrogram_label_offset_seconds" in row
+                    else 0
+                )
+                r_eeg = (
+                    round(row.eeg_label_offset_seconds * SFREQ)
+                    if "eeg_label_offset_seconds" in row
+                    else 0
+                )
+            else:
+                r_spe = (
+                    round(row.spectrogram_label_offset_seconds / 2)
+                    if "spectrogram_label_offset_seconds" in row
+                    else 0
+                )
+                r_eeg = (
+                    round(row.eeg_label_offset_seconds * SFREQ)
+                    if "eeg_label_offset_seconds" in row
+                    else 0
+                )
+
+            if self.mode == "train":
+                x1 = np.random.rand() * LENGTH / 2
+                x2 = np.random.rand() * LENGTH / 2
+                if np.random.rand() < 0.5:
+                    x1 = x1 + LENGTH / 2
+                    x2 = x2 + LENGTH / 2
+                x_spe_min = round(min(x1, x2))
+                x_spe_max = round(max(x1, x2))
+
+            for k in range(4):
+                if "spe" in DATATYPE:
+                    spe = self.specs[row.spectrogram_id][
+                        r_spe : r_spe + 300, k * 100 : (k + 1) * 100
+                    ].T
+
+                    if (spe.shape[0] != 100) or (spe.shape[1] != 300):
+                        spe2 = np.zeros((100, 300))
+                        spe2[: spe.shape[0], : spe.shape[1]] = spe
+                        spe = spe2
+
+                    spe = np.nan_to_num(spe, nan=0.0)
+                    spe = np.clip(spe, np.exp(self.cmin), np.exp(self.cmax))
+                    spe = np.log(spe)
+
+                    spe = np.round((spe - self.cmin) / (self.cmax - self.cmin) * 255)
+                    spe = np.reshape(spe, (spe.shape[0] * spe.shape[1]))
+                    spe = np.array(spe, dtype=np.int16)
+
+                    spe = self.cmaps[spe]
+                    spe = np.reshape(spe, (100, 300, 3))
+                    spe = spe[
+                        :,
+                        round((spe.shape[1] - LENGTH) / 2) : -round(
+                            (spe.shape[1] - LENGTH) / 2
+                        ),
+                        :,
+                    ]
+
+                    if self.mode == "train":
+                        spe[:, x_spe_min:x_spe_max, :] = 0
+
+                    x_spe[
+                        j,
+                        round((HIGH - spe.shape[0]) / 2) : round(
+                            (HIGH + spe.shape[0]) / 2
+                        ),
+                        :,
+                        :,
+                        k,
+                    ] = spe
+                    x_spe[j, :, :, 0, k] = (x_spe[j, :, :, 0, k] - 0.485) / (0.229**2)
+                    x_spe[j, :, :, 1, k] = (x_spe[j, :, :, 1, k] - 0.456) / (0.224**2)
+                    x_spe[j, :, :, 2, k] = (x_spe[j, :, :, 2, k] - 0.406) / (0.225**2)
+
+                if "eeg" in DATATYPE:
+                    eeg = self.eegs[row.eeg_id][:, r_eeg : r_eeg + round(50 * SFREQ), k]
+
+                    if eeg.shape[1] < 50 * SFREQ:
+                        eeg = np.concatenate((eeg, eeg), 1)
+                        eeg = eeg[:, : 50 * SFREQ]
+
+                    eeg1 = eeg[:, round(10 * SFREQ) : round(30 * SFREQ)]
+                    eeg2 = eeg[:, round(15 * SFREQ) : round(35 * SFREQ)]
+                    eeg3 = eeg[:, round(20 * SFREQ) : round(40 * SFREQ)]
+
+                    x_eeg[j, 1:5, :, 0, k] = eeg1
+                    x_eeg[j, 1:5, :, 1, k] = eeg2
+                    x_eeg[j, 1:5, :, 2, k] = eeg3
+                    x_eeg[j, :, :, :, k] = (
+                        x_eeg[j, :, :, :, k]
+                        - np.mean(x_eeg[j, :, :, :, k], 1, keepdims=True)
+                    ) / (np.std(x_eeg[j, :, :, :, k], 1, keepdims=True) + 1e-6)
+
+                if "img" in DATATYPE:
+                    img = self.imgs[row.eeg_id][:, :, k, :]
+                    x_img[j, :, :, :, k] = img
+
+                if "stft" in DATATYPE:
+                    stft = self.stfts[row.eeg_id][:, :, :, k]
+
+                    stft = np.concatenate(
+                        [stft[0, :, :], stft[1, :, :], stft[2, :, :], stft[3, :, :]], 1
+                    )
+                    stft = np.clip(stft, np.exp(self.cmin), np.exp(self.cmax))
+                    stft = np.log(stft)
+                    stft = np.nan_to_num(stft, nan=0.0)
+
+                    stft = np.round((stft - self.cmin) / (self.cmax - self.cmin) * 255)
+                    stft = np.reshape(stft, (stft.shape[0] * stft.shape[1]))
+                    stft = np.array(stft, dtype=np.int16)
+
+                    stft = self.cmaps[stft]
+                    stft = np.reshape(stft, (64, 128 * 4, 3))
+
+                    x_stft[j, :, :, :, k] = stft
+                    x_stft[j, :, :, 0, k] = (x_stft[j, :, :, 0, k] - 0.485) / (0.229**2)
+                    x_stft[j, :, :, 1, k] = (x_stft[j, :, :, 1, k] - 0.456) / (0.224**2)
+                    x_stft[j, :, :, 2, k] = (x_stft[j, :, :, 2, k] - 0.406) / (0.225**2)
+
+            if self.mode != "test":
+                label = row[self.targets].values
+                if self.mode == "train" and sum(label == 1):
+                    xx = (np.random.random() + 1) * 0.005
+                    label[label == 0] = xx
+                    label[label == 1] = 1 - 5 * xx
+                y[j] = label
+
+        if "eeg" in DATATYPE:
+            for i_eeg in range(x_eeg2.shape[0]):
+                xx = np.std(x_eeg2[i_eeg, :, :, :], 1, keepdims=True)
+                xx = np.mean(xx)
+                x_eeg2[i_eeg, :, :, :] = (
+                    x_eeg2[i_eeg, :, :, :]
+                    - np.mean(x_eeg2[i_eeg, :, :, :], 1, keepdims=True)
+                ) / (xx + 1e-6)
+
+        x = []
+        if "spe" in DATATYPE:
+            x.append(x_spe)
+        if "eeg" in DATATYPE:
+            x.append(x_eeg)
+        if "img" in DATATYPE:
+            if self.mode == "train":
+                aug_img = (np.random.random((x_img.shape[0], 1, 1, 1, 1)) > 0.5) * 2 - 1
+                x_img = x_img * aug_img
+            x.append(x_img)
+        if "stft" in DATATYPE:
+            x.append(x_stft)
+
+        return x, y
+
+
+
+
+## === cell 4
+try:
+    import efficientnet.tfkeras as efn  # type: ignore
+
+    _EFN_AVAILABLE = True
+except Exception:
+    efn = None
+    _EFN_AVAILABLE = False
+
+
+def _make_effnet_b0(name: str):
+    if _EFN_AVAILABLE:
+        base = efn.EfficientNetB0(include_top=False, weights=None, name=name)
+    else:
+        base = tf.keras.applications.EfficientNetB0(
+            include_top=False, weights=None, name=name
+        )
+    return base
+
+
+def build_model(TARGETS_PRETRAIN):
+    l2_layer = tf.keras.layers.Lambda(
+        lambda t: tf.nn.l2_normalize(t, axis=-1), name="l2norm"
+    )
+
+    inp = []
+    y = None
+
+    if "spe" in DATATYPE:
+        inp_spe = tf.keras.Input(shape=(HIGH, LENGTH, 3, 4), name="inp_spe")
+        x_spe = tf.keras.layers.Concatenate(axis=1, name="cat_spe")(
+            [inp_spe[:, :, :, :, i] for i in range(4)]
+        )
+        base_model_spe = _make_effnet_b0("spe_efficientnetb0")
+        x_spe = base_model_spe(x_spe)
+        x_spe = tf.keras.layers.GlobalAveragePooling2D(name="gap_spe")(x_spe)
+        x_spe = l2_layer(x_spe)
+
+        inp.append(inp_spe)
+        y = x_spe
+
+    if "eeg" in DATATYPE:
+        inp_eeg = tf.keras.Input(shape=(6, round(20 * SFREQ), 3, 4), name="inp_eeg")
+        x_eeg = tf.keras.layers.Concatenate(axis=1, name="cat_eeg")(
+            [inp_eeg[:, :, :, :, i] for i in range(4)]
+        )
+        base_model_eeg = _make_effnet_b0("eeg_efficientnetb0")
+        x_eeg = base_model_eeg(x_eeg)
+        x_eeg = tf.keras.layers.GlobalAveragePooling2D(name="gap_eeg")(x_eeg)
+        x_eeg = l2_layer(x_eeg)
+
+        inp.append(inp_eeg)
+        y = (
+            tf.keras.layers.Concatenate(axis=1, name="fuse_spe_eeg")([y, x_eeg])
+            if y is not None
+            else x_eeg
+        )
+
+    if "img" in DATATYPE:
+        inp_img = tf.keras.Input(shape=(IMG_HIGH, IMG_WIDE, 3, 4), name="inp_img")
+        x_img = tf.keras.layers.Concatenate(axis=1, name="cat_img")(
+            [inp_img[:, :, :, :, i] for i in range(4)]
+        )
+        base_model_img = _make_effnet_b0("img_efficientnetb0")
+        x_img = base_model_img(x_img)
+        x_img = tf.keras.layers.GlobalAveragePooling2D(name="gap_img")(x_img)
+        x_img = l2_layer(x_img)
+
+        inp.append(inp_img)
+        y = (
+            tf.keras.layers.Concatenate(axis=1, name="fuse_prev_img")([y, x_img])
+            if y is not None
+            else x_img
+        )
+
+    if "stft" in DATATYPE:
+        inp_stft = tf.keras.Input(shape=(64, 128 * 4, 3, 4), name="inp_stft")
+        x_stft = tf.keras.layers.Concatenate(axis=1, name="cat_stft")(
+            [inp_stft[:, :, :, :, i] for i in range(4)]
+        )
+        base_model_stft = _make_effnet_b0("stft_efficientnetb0")
+        x_stft = base_model_stft(x_stft)
+        x_stft = tf.keras.layers.GlobalAveragePooling2D(name="gap_stft")(x_stft)
+        x_stft = l2_layer(x_stft)
+
+        inp.append(inp_stft)
+        y = (
+            tf.keras.layers.Concatenate(axis=1, name="fuse_prev_stft")([y, x_stft])
+            if y is not None
+            else x_stft
+        )
+
+    y = tf.keras.layers.Dense(
+        len(TARGETS_PRETRAIN),
+        activation="softmax",
+        dtype="float32",
+        name="head_softmax",
+    )(y)
+    model = tf.keras.Model(inputs=inp, outputs=y, name="hms_model")
+    return model
+
+
+def my_loss(y_ture, y_pred):
+    y_pred1 = y_pred[:, 5:6]
+    y_pred1 = tf.reduce_sum(y_pred1, 1, keepdims=True)
+    y_pred2 = y_pred[:, 0:5]
+    y_pred = tf.concat((y_pred2, y_pred1), axis=1)
+    return tf.keras.losses.KLD(y_ture, y_pred)
+
+
+
+
+## === cell 5
+if PLATFORM == "local":
+    test = pd.read_csv("./input/hms-harmful-brain-activity-classification/test.csv")
+    sample_sub = pd.read_csv(
+        "./input/hms-harmful-brain-activity-classification/sample_submission.csv"
+    )
+elif PLATFORM == "kaggle":
+    test = pd.read_csv(
+        "/kaggle/input/hms-harmful-brain-activity-classification/test.csv"
+    )
+    sample_sub = pd.read_csv(
+        "/kaggle/input/hms-harmful-brain-activity-classification/sample_submission.csv"
+    )
+
+print("Test shape", test.shape)
+test.head()
+
+if "spe" in DATATYPE:
+    if PLATFORM == "local":
+        PATH2 = "./input/hms-harmful-brain-activity-classification/test_spectrograms/"
+    elif PLATFORM == "kaggle":
+        PATH2 = (
+            "/kaggle/input/hms-harmful-brain-activity-classification/test_spectrograms/"
+        )
+
+    files2 = os.listdir(PATH2)
+    print(f"There are {len(files2)} test spectrogram parquets")
+
+    spectrograms2 = {}
+    for i, f in enumerate(files2):
+        if i % 100 == 0:
+            print(i, ", ", end="")
+        tmp = pd.read_parquet(f"{PATH2}{f}")
+        name = int(f.split(".")[0])
+        spectrograms2[name] = tmp.iloc[:, 1:].values
+    print()
+
+from scipy import signal
+
+if PLATFORM == "local":
+    PATH2 = "./input/hms-harmful-brain-activity-classification/test_eegs/"
+elif PLATFORM == "kaggle":
+    PATH2 = "/kaggle/input/hms-harmful-brain-activity-classification/test_eegs/"
+
+files2 = os.listdir(PATH2)
+print(f"There are {len(files2)} test eeg parquets")
+
+eegs2 = {}
+imgs2 = {}
+stfts2 = {}
+
+b, a = signal.butter(3, np.float32(filter_range) * 2 / SFREQ, "bandpass")
+
+test_eeg_ids = set(test.eeg_id.astype(int).tolist())
+
+for i, f in enumerate(files2):
+    if i % 100 == 0:
+        print(i, ", ", end="")
+    name = int(f.split(".")[0])
+    if name not in test_eeg_ids:
+        continue
+
+    eeg_default = pd.read_parquet(f"{PATH2}{f}")
+
+    list_eeg = []
+    list_img = []
+    list_stft = []
+
+    for region in BRAIN.keys():
+        eeg = np.zeros((len(BRAIN[region]), eeg_default.shape[0]), dtype=np.float32)
+        for chan_i, chan in enumerate(BRAIN[region]):
+            eeg[chan_i, :] = (
+                eeg_default.loc[:, chan.split("-")[0]]
+                - eeg_default.loc[:, chan.split("-")[1]]
+            ).values
+
+        eeg[np.isnan(eeg)] = 0
+
+        if 200 != SFREQ:
+            eeg = signal.resample_poly(eeg, SFREQ, 200, axis=1)
+
+        eeg = signal.filtfilt(b, a, eeg, axis=1)
+
+        time_temp = 0
+        time_start = round(time_temp * SFREQ + (50 - EEG_LENGTH) / 2 * SFREQ)
+        time_stop = round(time_temp * SFREQ + (50 + EEG_LENGTH) / 2 * SFREQ)
+
+        list_img.append(eeg[:, time_start:time_stop])
+
+        if "stft" in DATATYPE:
+            frequencies, times, Sxx = signal.spectrogram(
+                eeg[:, round(time_temp * SFREQ) : round((time_temp + 50) * SFREQ)],
+                SFREQ,
+                nperseg=256,
+                noverlap=219,
+                nfft=320,
+            )
+            valid_freq = (frequencies > 0.0) & (frequencies <= 20)
+            Sxx_filtered = Sxx[:, valid_freq, :-1]
+            Sxx_filtered = np.reshape(
+                Sxx_filtered,
+                (
+                    Sxx_filtered.shape[0],
+                    Sxx_filtered.shape[1],
+                    Sxx_filtered.shape[2],
+                    1,
+                ),
+            )
+            list_stft.append(Sxx_filtered)
+
+        list_eeg.append(np.reshape(eeg, (eeg.shape[0], eeg.shape[1], 1)))
+
+    list_eeg = np.concatenate(list_eeg, 2)
+
+    if "stft" in DATATYPE:
+        list_stft = np.concatenate(list_stft, -1)
+        stfts2[name] = list_stft
+
+    if "eeg" in DATATYPE:
+        eegs2[name] = list_eeg
+
+    if "img" in DATATYPE:
+        eeg_all_region = np.concatenate(list_img, 0)
+
+        fig = plt.figure(clear=True)
+        fig.patch.set_facecolor("black")
+        amp = 200
+        for ii in range(eeg_all_region.shape[0]):
+            jj = ii * amp + (ii // 4) * amp
+            plt.plot(eeg_all_region[ii, :] + jj, color="red", linewidth=0.5)
+        plt.xlim(-10, eeg_all_region.shape[1] + 10)
+        plt.ylim(-amp / 2, eeg_all_region.shape[0] * amp + amp / 2 * 5)
+        plt.axis("off")
+
+        byte_stream = io.BytesIO()
+        plt.savefig(byte_stream, format="png", bbox_inches="tight")
+        byte_stream.seek(0)
+        img = Image.open(byte_stream)
+        img = np.array(img)[:, :, :1]
+        byte_stream.truncate(0)
+        plt.close("all")
+
+        img = np.concatenate((img, img, img), 2)
+        img = np.array(
+            tf.image.resize(img / 255, (IMG_HIGH * 4, IMG_WIDE)), dtype=np.float32
+        )
+        img = img[:, :, 0:1]
+
+        img = np.concatenate(
+            [
+                img[0 * IMG_HIGH : 1 * IMG_HIGH, :, :],
+                img[1 * IMG_HIGH : 2 * IMG_HIGH, :, :],
+                img[2 * IMG_HIGH : 3 * IMG_HIGH, :, :],
+                img[3 * IMG_HIGH : 4 * IMG_HIGH, :, :],
+            ],
+            -1,
+        )
+
+        img[:, :, 0] = -img[:, :, 0]
+        img[:, :, 2] = -img[:, :, 2]
+        img = np.reshape(img, (img.shape[0], img.shape[1], img.shape[2], 1))
+
+        eeg_all_region2 = eeg_all_region[
+            :,
+            round(eeg_all_region.shape[1] * 1 / 4) : round(
+                eeg_all_region.shape[1] * 3 / 4
+            ),
+        ]
+        fig = plt.figure(clear=True)
+        fig.patch.set_facecolor("black")
+        amp = 150
+        for ii in range(eeg_all_region2.shape[0]):
+            jj = ii * amp + (ii // 4) * amp
+            plt.plot(eeg_all_region2[ii, :] + jj, color="red", linewidth=0.5)
+        plt.xlim(-5, eeg_all_region2.shape[1] + 5)
+        plt.ylim(-amp / 2, eeg_all_region2.shape[0] * amp + amp / 2 * 5)
+        plt.axis("off")
+
+        byte_stream = io.BytesIO()
+        plt.savefig(byte_stream, format="png", bbox_inches="tight")
+        byte_stream.seek(0)
+        img2 = Image.open(byte_stream)
+        img2 = np.array(img2)[:, :, :1]
+        byte_stream.truncate(0)
+        plt.close("all")
+
+        img2 = np.concatenate((img2, img2, img2), 2)
+        img2 = np.array(
+            tf.image.resize(img2 / 255, (IMG_HIGH * 4, IMG_WIDE)), dtype=np.float32
+        )
+        img2 = img2[:, :, 0:1]
+
+        img2 = np.concatenate(
+            [
+                img2[0 * IMG_HIGH : 1 * IMG_HIGH, :, :],
+                img2[1 * IMG_HIGH : 2 * IMG_HIGH, :, :],
+                img2[2 * IMG_HIGH : 3 * IMG_HIGH, :, :],
+                img2[3 * IMG_HIGH : 4 * IMG_HIGH, :, :],
+            ],
+            -1,
+        )
+
+        img2[:, :, 0] = -img2[:, :, 0]
+        img2[:, :, 2] = -img2[:, :, 2]
+        img2 = np.reshape(img2, (img2.shape[0], img2.shape[1], img2.shape[2], 1))
+
+        eeg_all_region3 = eeg_all_region[
+            :,
+            round(eeg_all_region.shape[1] * 2 / 5) : round(
+                eeg_all_region.shape[1] * 3 / 5
+            ),
+        ]
+        fig = plt.figure(clear=True)
+        fig.patch.set_facecolor("black")
+        amp = 100
+        for ii in range(eeg_all_region3.shape[0]):
+            jj = ii * amp + (ii // 4) * amp
+            plt.plot(eeg_all_region3[ii, :] + jj, color="red", linewidth=0.5)
+        plt.xlim(-2, eeg_all_region3.shape[1] + 2)
+        plt.ylim(-amp / 2, eeg_all_region3.shape[0] * amp + amp / 2 * 5)
+        plt.axis("off")
+
+        byte_stream = io.BytesIO()
+        plt.savefig(byte_stream, format="png", bbox_inches="tight")
+        byte_stream.seek(0)
+        img3 = Image.open(byte_stream)
+        img3 = np.array(img3)[:, :, :1]
+        byte_stream.truncate(0)
+        plt.close("all")
+
+        img3 = np.concatenate((img3, img3, img3), 2)
+        img3 = np.array(
+            tf.image.resize(img3 / 255, (IMG_HIGH * 4, IMG_WIDE)), dtype=np.float32
+        )
+        img3 = img3[:, :, 0:1]
+
+        img3 = np.concatenate(
+            [
+                img3[0 * IMG_HIGH : 1 * IMG_HIGH, :, :],
+                img3[1 * IMG_HIGH : 2 * IMG_HIGH, :, :],
+                img3[2 * IMG_HIGH : 3 * IMG_HIGH, :, :],
+                img3[3 * IMG_HIGH : 4 * IMG_HIGH, :, :],
+            ],
+            -1,
+        )
+
+        img3[:, :, 0] = -img3[:, :, 0]
+        img3[:, :, 2] = -img3[:, :, 2]
+        img3 = np.reshape(img3, (img3.shape[0], img3.shape[1], img3.shape[2], 1))
+
+        img = np.concatenate([img, img2, img3], -1)
+        imgs2[name] = img
+
+print()
+
+
+
+
+## === cell 6
+def _sanitize_and_normalize_probs(p: np.ndarray, eps: float = 1e-6) -> np.ndarray:
+    p = np.asarray(p, dtype=np.float64)
+    if p.ndim != 2:
+        raise ValueError(f"Expected (N,C) probs, got shape {p.shape}")
+    p = np.nan_to_num(
+        p,
+        nan=1.0 / p.shape[1],
+        posinf=1.0 / p.shape[1],
+        neginf=1.0 / p.shape[1],
+    )
+    p = np.clip(p, 0.0, 1.0)
+    p = p + eps
+    p = p / p.sum(axis=1, keepdims=True)
+    return p
+
+
+def _collapse_to_6_other_is_tail(p: np.ndarray) -> np.ndarray:
+    """
+    Score-relevant: mirror `my_loss` behavior by summing classes [5:] into `other`.
+    """
+    p = np.asarray(p, dtype=np.float64)
+    if p.shape[1] == 6:
+        return p
+    if p.shape[1] >= 7:
+        other = p[:, 5:].sum(axis=1, keepdims=True)
+        return np.concatenate([p[:, :5], other], axis=1)
+    raise ValueError(f"Unexpected number of classes: {p.shape[1]} (need >=6)")
+
+
+def _kl_divergence(y_true: np.ndarray, y_pred: np.ndarray, eps: float = 1e-6) -> float:
+    """
+    Match competition semantics: KL(true || pred) averaged over rows.
+    Both inputs are expected to be row-normalized probabilities (votes normalized).
+    """
+    yt = _sanitize_and_normalize_probs(y_true, eps=eps)
+    yp = _sanitize_and_normalize_probs(y_pred, eps=eps)
+    return float(np.mean(np.sum(yt * (np.log(yt) - np.log(yp)), axis=1)))
+
+
+def _apply_perm_first5(p6: np.ndarray, perm5: np.ndarray) -> np.ndarray:
+    p6 = np.asarray(p6, dtype=np.float64)
+    perm5 = np.asarray(perm5, dtype=int)
+    out = np.zeros_like(p6)
+    out[:, :5] = p6[:, perm5]
+    out[:, 5] = p6[:, 5]
+    return out
+
+
+def _load_eeg_features_for_ids(
+    eeg_ids,
+    eeg_dir: str,
+    datatype,
+    sfreq: int,
+    eeg_length: int,
+    brain: dict,
+    filter_rng,
+):
+    """
+    Score-relevant helper used for permutation selection when 'eeg'/'img'/'stft' are present.
+    Feature extraction is kept identical to test loader for semantic consistency.
+    """
+    from scipy import signal as _signal
+
+    eeg_ids = [int(x) for x in eeg_ids]
+    b, a = _signal.butter(3, np.float32(filter_rng) * 2 / sfreq, "bandpass")
+
+    eegs_local = {}
+    imgs_local = {}
+    stfts_local = {}
+
+    for eeg_id in eeg_ids:
+        fpath = os.path.join(eeg_dir, f"{int(eeg_id)}.parquet")
+        if not os.path.exists(fpath):
+            continue
+
+        eeg_default = pd.read_parquet(fpath)
+
+        list_eeg = []
+        list_img = []
+        list_stft = []
+
+        for region in brain.keys():
+            eeg = np.zeros((len(brain[region]), eeg_default.shape[0]), dtype=np.float32)
+            for chan_i, chan in enumerate(brain[region]):
+                eeg[chan_i, :] = (
+                    eeg_default.loc[:, chan.split("-")[0]]
+                    - eeg_default.loc[:, chan.split("-")[1]]
+                ).values
+
+            eeg[np.isnan(eeg)] = 0
+
+            if 200 != sfreq:
+                eeg = _signal.resample_poly(eeg, sfreq, 200, axis=1)
+
+            eeg = _signal.filtfilt(b, a, eeg, axis=1)
+
+            time_temp = 0
+            time_start = round(time_temp * sfreq + (50 - eeg_length) / 2 * sfreq)
+            time_stop = round(time_temp * sfreq + (50 + eeg_length) / 2 * sfreq)
+
+            list_img.append(eeg[:, time_start:time_stop])
+
+            if "stft" in datatype:
+                frequencies, times, Sxx = _signal.spectrogram(
+                    eeg[:, round(time_temp * sfreq) : round((time_temp + 50) * sfreq)],
+                    sfreq,
+                    nperseg=256,
+                    noverlap=219,
+                    nfft=320,
+                )
+                valid_freq = (frequencies > 0.0) & (frequencies <= 20)
+                Sxx_filtered = Sxx[:, valid_freq, :-1]
+                Sxx_filtered = np.reshape(
+                    Sxx_filtered,
+                    (
+                        Sxx_filtered.shape[0],
+                        Sxx_filtered.shape[1],
+                        Sxx_filtered.shape[2],
+                        1,
+                    ),
+                )
+                list_stft.append(Sxx_filtered)
+
+            list_eeg.append(np.reshape(eeg, (eeg.shape[0], eeg.shape[1], 1)))
+
+        list_eeg = np.concatenate(list_eeg, 2)
+
+        if "stft" in datatype:
+            list_stft = np.concatenate(list_stft, -1)
+            stfts_local[int(eeg_id)] = list_stft
+
+        if "eeg" in datatype:
+            eegs_local[int(eeg_id)] = list_eeg
+
+        if "img" in datatype:
+            eeg_all_region = np.concatenate(list_img, 0)
+
+            fig = plt.figure(clear=True)
+            fig.patch.set_facecolor("black")
+            amp = 200
+            for ii in range(eeg_all_region.shape[0]):
+                jj = ii * amp + (ii // 4) * amp
+                plt.plot(eeg_all_region[ii, :] + jj, color="red", linewidth=0.5)
+            plt.xlim(-10, eeg_all_region.shape[1] + 10)
+            plt.ylim(-amp / 2, eeg_all_region.shape[0] * amp + amp / 2 * 5)
+            plt.axis("off")
+
+            byte_stream = io.BytesIO()
+            plt.savefig(byte_stream, format="png", bbox_inches="tight")
+            byte_stream.seek(0)
+            img = Image.open(byte_stream)
+            img = np.array(img)[:, :, :1]
+            byte_stream.truncate(0)
+            plt.close("all")
+
+            img = np.concatenate((img, img, img), 2)
+            img = np.array(
+                tf.image.resize(img / 255, (IMG_HIGH * 4, IMG_WIDE)), dtype=np.float32
+            )
+            img = img[:, :, 0:1]
+
+            img = np.concatenate(
+                [
+                    img[0 * IMG_HIGH : 1 * IMG_HIGH, :, :],
+                    img[1 * IMG_HIGH : 2 * IMG_HIGH, :, :],
+                    img[2 * IMG_HIGH : 3 * IMG_HIGH, :, :],
+                    img[3 * IMG_HIGH : 4 * IMG_HIGH, :, :],
+                ],
+                -1,
+            )
+
+            img[:, :, 0] = -img[:, :, 0]
+            img[:, :, 2] = -img[:, :, 2]
+            img = np.reshape(img, (img.shape[0], img.shape[1], img.shape[2], 1))
+
+            eeg_all_region2 = eeg_all_region[
+                :,
+                round(eeg_all_region.shape[1] * 1 / 4) : round(
+                    eeg_all_region.shape[1] * 3 / 4
+                ),
+            ]
+            fig = plt.figure(clear=True)
+            fig.patch.set_facecolor("black")
+            amp = 150
+            for ii in range(eeg_all_region2.shape[0]):
+                jj = ii * amp + (ii // 4) * amp
+                plt.plot(eeg_all_region2[ii, :] + jj, color="red", linewidth=0.5)
+            plt.xlim(-5, eeg_all_region2.shape[1] + 5)
+            plt.ylim(-amp / 2, eeg_all_region2.shape[0] * amp + amp / 2 * 5)
+            plt.axis("off")
+
+            byte_stream = io.BytesIO()
+            plt.savefig(byte_stream, format="png", bbox_inches="tight")
+            byte_stream.seek(0)
+            img2 = Image.open(byte_stream)
+            img2 = np.array(img2)[:, :, :1]
+            byte_stream.truncate(0)
+            plt.close("all")
+
+            img2 = np.concatenate((img2, img2, img2), 2)
+            img2 = np.array(
+                tf.image.resize(img2 / 255, (IMG_HIGH * 4, IMG_WIDE)), dtype=np.float32
+            )
+            img2 = img2[:, :, 0:1]
+
+            img2 = np.concatenate(
+                [
+                    img2[0 * IMG_HIGH : 1 * IMG_HIGH, :, :],
+                    img2[1 * IMG_HIGH : 2 * IMG_HIGH, :, :],
+                    img2[2 * IMG_HIGH : 3 * IMG_HIGH, :, :],
+                    img2[3 * IMG_HIGH : 4 * IMG_HIGH, :, :],
+                ],
+                -1,
+            )
+
+            img2[:, :, 0] = -img2[:, :, 0]
+            img2[:, :, 2] = -img2[:, :, 2]
+            img2 = np.reshape(img2, (img2.shape[0], img2.shape[1], img2.shape[2], 1))
+
+            eeg_all_region3 = eeg_all_region[
+                :,
+                round(eeg_all_region.shape[1] * 2 / 5) : round(
+                    eeg_all_region.shape[1] * 3 / 5
+                ),
+            ]
+            fig = plt.figure(clear=True)
+            fig.patch.set_facecolor("black")
+            amp = 100
+            for ii in range(eeg_all_region3.shape[0]):
+                jj = ii * amp + (ii // 4) * amp
+                plt.plot(eeg_all_region3[ii, :] + jj, color="red", linewidth=0.5)
+            plt.xlim(-2, eeg_all_region3.shape[1] + 2)
+            plt.ylim(-amp / 2, eeg_all_region3.shape[0] * amp + amp / 2 * 5)
+            plt.axis("off")
+
+            byte_stream = io.BytesIO()
+            plt.savefig(byte_stream, format="png", bbox_inches="tight")
+            byte_stream.seek(0)
+            img3 = Image.open(byte_stream)
+            img3 = np.array(img3)[:, :, :1]
+            byte_stream.truncate(0)
+            plt.close("all")
+
+            img3 = np.concatenate((img3, img3, img3), 2)
+            img3 = np.array(
+                tf.image.resize(img3 / 255, (IMG_HIGH * 4, IMG_WIDE)), dtype=np.float32
+            )
+            img3 = img3[:, :, 0:1]
+
+            img3 = np.concatenate(
+                [
+                    img3[0 * IMG_HIGH : 1 * IMG_HIGH, :, :],
+                    img3[1 * IMG_HIGH : 2 * IMG_HIGH, :, :],
+                    img3[2 * IMG_HIGH : 3 * IMG_HIGH, :, :],
+                    img3[3 * IMG_HIGH : 4 * IMG_HIGH, :, :],
+                ],
+                -1,
+            )
+
+            img3[:, :, 0] = -img3[:, :, 0]
+            img3[:, :, 2] = -img3[:, :, 2]
+            img3 = np.reshape(img3, (img3.shape[0], img3.shape[1], img3.shape[2], 1))
+
+            img = np.concatenate([img, img2, img3], -1)
+            imgs_local[int(eeg_id)] = img
+
+    return eegs_local, imgs_local, stfts_local
+
+
+def _load_spectrogram_slices_for_rows(df_rows: pd.DataFrame, spec_dir: str) -> dict:
+    """
+    Score-relevant minimal change: enable permutation selection even when 'spe' in DATATYPE
+    without loading all train spectrograms. We only load unique spectrogram_id files needed
+    for the small subset and store full arrays (same type as test spectrogram loader).
+    """
+    specs_local = {}
+    uniq = df_rows["spectrogram_id"].astype(int).unique().tolist()
+    for sid in uniq:
+        fpath = os.path.join(spec_dir, f"{int(sid)}.parquet")
+        if not os.path.exists(fpath):
+            continue
+        tmp = pd.read_parquet(fpath)
+        specs_local[int(sid)] = tmp.iloc[:, 1:].values
+    return specs_local
+
+
+
+
+## === cell 7
+preds = []
+
+weight_paths = [
+    os.path.join(LOAD_MODELS_FROM, f"f{i}_stage{STAGETEST}.h5") for i in range(NSPLIT)
+]
+missing = [p for p in weight_paths if not os.path.exists(p)]
+
+required_cols = ["eeg_id"] + list(SUB_TARGETS)
+
+if len(missing) == 0:
+    try:
+        with strategy.scope():
+            probe_model = build_model(SUB_TARGETS)
+        probe_model.load_weights(weight_paths[0])
+        out_dim = int(probe_model.output_shape[-1])
+        del probe_model
+        tf.keras.backend.clear_session()
+    except Exception:
+        out_dim = len(SUB_TARGETS)
+
+    TARGETS_PRETRAIN = list(SUB_TARGETS)
+    if out_dim != len(SUB_TARGETS):
+        TARGETS_PRETRAIN = [f"c{i}" for i in range(out_dim)]
+        print(
+            f"Detected weight output dim={out_dim}; will collapse tail into other and map to vote columns."
+        )
+    else:
+        print(f"Detected weight output dim={out_dim}; using direct 6 vote probs.")
+
+    with strategy.scope():
+        model = build_model(TARGETS_PRETRAIN)
+
+    test_gen = DataGenerator(
+        test,
+        shuffle=False,
+        batch_size=BATCHSIZE * 2,
+        mode="test",
+        specs=spectrograms2,
+        eegs=eegs2,
+        imgs=imgs2,
+        stfts=stfts2,
+        targets=SUB_TARGETS,
+    )
+
+    rng = np.random.default_rng(SEED)
+    max_perm_rows = 384
+    pick = rng.choice(np.arange(len(df)), size=max_perm_rows, replace=False)
+    df_pick = df.iloc[pick].reset_index(drop=True)
+
+    y_votes = df_pick[list(SUB_TARGETS)].to_numpy(dtype=np.float64)
+    y_votes = np.clip(y_votes, 0.0, None)
+    y_true6 = y_votes / (y_votes.sum(axis=1, keepdims=True) + 1e-12)
+    y_true6 = _sanitize_and_normalize_probs(y_true6, eps=1e-6)
+
+    if PLATFORM == "local":
+        train_eeg_dir = "./input/hms-harmful-brain-activity-classification/train_eegs/"
+        train_spec_dir = (
+            "./input/hms-harmful-brain-activity-classification/train_spectrograms/"
+        )
+    else:
+        train_eeg_dir = (
+            "/kaggle/input/hms-harmful-brain-activity-classification/train_eegs/"
+        )
+        train_spec_dir = "/kaggle/input/hms-harmful-brain-activity-classification/train_spectrograms/"
+
+    specs_p = {}
+    if "spe" in DATATYPE:
+        specs_p = _load_spectrogram_slices_for_rows(df_pick, train_spec_dir)
+
+    need_ids = df_pick["eeg_id"].astype(int).tolist()
+    eegs_p, imgs_p, stfts_p = _load_eeg_features_for_ids(
+        need_ids,
+        eeg_dir=train_eeg_dir,
+        datatype=DATATYPE,
+        sfreq=SFREQ,
+        eeg_length=EEG_LENGTH,
+        brain=BRAIN,
+        filter_rng=filter_range,
+    )
+
+    keep = np.ones(len(df_pick), dtype=bool)
+    if "eeg" in DATATYPE:
+        keep &= df_pick["eeg_id"].astype(int).isin(list(eegs_p.keys())).to_numpy()
+    if "img" in DATATYPE:
+        keep &= df_pick["eeg_id"].astype(int).isin(list(imgs_p.keys())).to_numpy()
+    if "stft" in DATATYPE:
+        keep &= df_pick["eeg_id"].astype(int).isin(list(stfts_p.keys())).to_numpy()
+    if "spe" in DATATYPE:
+        keep &= (
+            df_pick["spectrogram_id"].astype(int).isin(list(specs_p.keys())).to_numpy()
+        )
+
+    df_pick2 = df_pick.loc[keep].reset_index(drop=True)
+    y_true6_2 = y_true6[keep]
+
+    if len(df_pick2) < 48:
+        print(
+            f"Permutation selection: only {len(df_pick2)} train rows have all needed inputs; disabling permutations."
+        )
+        train_gen_perm = None
+    else:
+        train_gen_perm = DataGenerator(
+            df_pick2,
+            shuffle=False,
+            batch_size=BATCHSIZE * 2,
+            mode="valid",
+            specs=specs_p,
+            eegs=eegs_p,
+            imgs=imgs_p,
+            stfts=stfts_p,
+            targets=SUB_TARGETS,
+        )
+
+    from itertools import permutations
+
+    for i in range(NSPLIT):
+        print(f"Fold {i+1}")
+        wpath = weight_paths[i]
+        model.load_weights(wpath)
+
+        perm5_fold = None
+        if train_gen_perm is not None:
+            try:
+                p_raw = model.predict(train_gen_perm, verbose=0)
+                p6 = _collapse_to_6_other_is_tail(p_raw)
+                p6 = _sanitize_and_normalize_probs(p6, eps=1e-6)
+
+                best_perm = None
+                best_kl = None
+                for perm in permutations(range(5), 5):
+                    perm = np.array(perm, dtype=int)
+                    p_re = _apply_perm_first5(p6, perm)
+                    kl = _kl_divergence(y_true6_2, p_re, eps=1e-6)
+                    if best_kl is None or kl < best_kl:
+                        best_kl = kl
+                        best_perm = perm
+
+                perm5_fold = np.array(best_perm, dtype=int)
+                print(
+                    "  perm5_fold:",
+                    perm5_fold.tolist(),
+                    "KL=",
+                    float(best_kl),
+                )
+            except Exception as e:
+                perm5_fold = None
+                print(
+                    "  Permutation selection failed for this fold; disabling. Error:",
+                    repr(e),
+                )
+
+        pred_i = model.predict(test_gen, verbose=1)
+        pred_i = _collapse_to_6_other_is_tail(pred_i)
+        pred_i = _sanitize_and_normalize_probs(pred_i, eps=1e-6)
+
+        if perm5_fold is not None:
+            pred_i = _apply_perm_first5(pred_i, perm5_fold)
+            pred_i = _sanitize_and_normalize_probs(pred_i, eps=1e-6)
+
+        preds.append(pred_i)
+
+    pred = np.mean(preds, axis=0)
+    pred = _sanitize_and_normalize_probs(pred, eps=1e-6)
+
+    sub = pd.DataFrame(pred, columns=list(SUB_TARGETS))
+    sub.insert(0, "eeg_id", test["eeg_id"].values)
+else:
+    print(
+        "WARNING: Missing expected weights files; writing fallback submission from sample_submission."
+    )
+    print("Missing (showing up to 5):", missing[:5])
+
+    sample_map = sample_sub.set_index("eeg_id")[list(SUB_TARGETS)]
+    probs = sample_map.reindex(test["eeg_id"].values).to_numpy(dtype=np.float64)
+
+    if np.isnan(probs).any():
+        nan_rows = np.isnan(probs).any(axis=1)
+        probs[nan_rows, :] = 1.0 / probs.shape[1]
+
+    probs = _sanitize_and_normalize_probs(probs, eps=1e-6)
+
+    sub = pd.DataFrame(probs, columns=list(SUB_TARGETS))
+    sub.insert(0, "eeg_id", test["eeg_id"].values)
+
+alpha = (
+    0.65  # keep majority of model signal, but smooth toward global label distribution
+)
+probs = sub[list(SUB_TARGETS)].to_numpy(dtype=np.float64)
+probs = _sanitize_and_normalize_probs(probs, eps=1e-6)
+
+prior = TRAIN_PRIOR.reshape(1, -1)
+probs = alpha * probs + (1.0 - alpha) * prior
+probs = _sanitize_and_normalize_probs(probs, eps=1e-6)
+sub.loc[:, list(SUB_TARGETS)] = probs
+
+sub = sub[required_cols]
+assert len(sub) == len(test), (len(sub), len(test))
+
+sub.to_csv("submission.csv", index=False)
+print("Wrote submission.csv")
+print("Submission shape", sub.shape)
+print(
+    "Row-sum stats:",
+    float(sub[list(SUB_TARGETS)].sum(axis=1).min()),
+    float(sub[list(SUB_TARGETS)].sum(axis=1).max()),
+)
+sub.head()

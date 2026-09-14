@@ -1,0 +1,636 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+protobuf==6.33.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sentence-transformers==4.1.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+transformers==4.53.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8481414324569356
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os, math, re
+import numpy as np
+import pandas as pd
+
+import tensorflow as tf
+
+import torch
+from torch.utils.data import Dataset, DataLoader
+from transformers import ViTImageProcessor, ViTModel
+
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+class CassavaLeafTestDataset(Dataset):
+    """
+    Memory-safe TFRecord test dataset.
+
+    Bug fix: the original code preloaded and stored all decoded images in RAM during __init__,
+    which is unnecessary and can cause performance/memory issues. This version stores the
+    serialized TFRecords and decodes on-the-fly in __getitem__ (same decoding pipeline).
+    """
+
+    def __init__(self, tfrecord_files, image_processor):
+        self.tfrecord_files = tfrecord_files
+        self.image_processor = image_processor
+
+        raw_dataset = tf.data.TFRecordDataset(
+            self.tfrecord_files, num_parallel_reads=tf.data.AUTOTUNE
+        )
+        self.serialized = list(raw_dataset.as_numpy_iterator())
+
+    def decode_image(self, image_bytes):
+        image = tf.image.decode_jpeg(image_bytes, channels=3)
+        image = tf.cast(image, tf.float32) / 255.0
+        image = tf.image.resize(image, [224, 224])
+        image = tf.image.stateless_random_flip_left_right(image, seed=(2, 3))
+        image = tf.image.random_brightness(image, 0.1)
+        return image
+
+    def read_tfrecord(self, serialized_example):
+        tfrecord_format = {
+            "image": tf.io.FixedLenFeature([], tf.string),
+            "image_name": tf.io.FixedLenFeature([], tf.string),
+        }
+        return tf.io.parse_single_example(serialized_example, tfrecord_format)
+
+    def __len__(self):
+        return len(self.serialized)
+
+    def __getitem__(self, idx):
+        ex = tf.convert_to_tensor(self.serialized[idx], dtype=tf.string)
+        parsed = self.read_tfrecord(ex)
+
+        image = self.decode_image(parsed["image"])
+        image_id = parsed["image_name"].numpy().decode("utf-8")
+
+        image_np = image.numpy()
+        inputs = self.image_processor(
+            images=image_np, return_tensors="pt", do_resize=False, do_rescale=False
+        )
+        pixel_values = inputs["pixel_values"].squeeze(0)  # [3,224,224]
+        return pixel_values, image_id
+
+
+
+
+## === cell 2
+class ViTForImageClassification(torch.nn.Module):
+    """
+    Bug fixes:
+    - removed references to undefined `nn` and `self.num_labels` in the original code
+    - keep forward returning logits (and optional loss) but ensure it works for inference
+    """
+
+    def __init__(self, num_labels=5):
+        super().__init__()
+        self.num_labels = num_labels
+        self.vit = ViTModel.from_pretrained(
+            "/kaggle/input/google-vit/google_vit", local_files_only=True
+        )
+        self.dropout = torch.nn.Dropout(0.1)
+        self.classifier = torch.nn.Linear(self.vit.config.hidden_size, num_labels)
+        self.loss_fct = torch.nn.CrossEntropyLoss()
+
+    def forward(self, pixel_values, labels=None):
+        outputs = self.vit(pixel_values=pixel_values)
+        cls = outputs.last_hidden_state[:, 0]  # CLS token
+        cls = self.dropout(cls)
+        logits = self.classifier(cls)
+
+        if labels is not None:
+            loss = self.loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
+            return logits, loss
+        return logits, None
+
+
+
+
+## === cell 3
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model_path = "/kaggle/input/updated/new_v2.pth"
+model = ViTForImageClassification(num_labels=5).to(device)
+
+state = torch.load(model_path, map_location=device)
+model.load_state_dict(state)
+model.eval()
+
+TEST_FILENAMES = tf.io.gfile.glob(
+    "/kaggle/input/cassava-leaf-disease-classification/test_tfrecords/ld_test*.tfrec"
+)
+TEST_FILENAMES = sorted(TEST_FILENAMES)
+
+image_processor = ViTImageProcessor.from_pretrained(
+    "/kaggle/input/google-vit/google_vit", local_files_only=True
+)
+
+test_dataset = CassavaLeafTestDataset(TEST_FILENAMES, image_processor=image_processor)
+test_dataloader = DataLoader(test_dataset, batch_size=10, shuffle=False, num_workers=0)
+
+len(TEST_FILENAMES), len(test_dataset)
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+HFValidationError                         Traceback (most recent call last)
+/usr/local/lib/python3.11/dist-packages/transformers/utils/hub.py in cached_files(path_or_repo_id, filenames, cache_dir, force_download, resume_download, proxies, token, revision, local_files_only, subfolder, repo_type, user_agent, _raise_exceptions_for_gated_repo, _raise_exceptions_for_missing_entries, _raise_exceptions_for_connection_errors, _commit_hash, **deprecated_kwargs)
+    469             # This is slightly better for only 1 file
+--> 470             hf_hub_download(
+    471                 path_or_repo_id,
+
+/usr/local/lib/python3.11/dist-packages/huggingface_hub/utils/_validators.py in _inner_fn(*args, **kwargs)
+    105             if arg_name in ["repo_id", "from_id", "to_id"]:
+--> 106                 validate_repo_id(arg_value)
+    107 
+
+/usr/local/lib/python3.11/dist-packages/huggingface_hub/utils/_validators.py in validate_repo_id(repo_id)
+    153     if repo_id.count("/") > 1:
+--> 154         raise HFValidationError(
+    155             "Repo id must be in the form 'repo_name' or 'namespace/repo_name':"
+
+HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/kaggle/input/google-vit/google_vit'. Use `repo_type` argument if needed.
+
+During handling of the above exception, another exception occurred:
+
+HFValidationError                         Traceback (most recent call last)
+/tmp/ipykernel_55/3537679101.py in <cell line: 0>()
+      2 
+      3 model_path = "/kaggle/input/updated/new_v2.pth"
+----> 4 model = ViTForImageClassification(num_labels=5).to(device)
+      5 
+      6 # load checkpoint
+
+/tmp/ipykernel_55/626067528.py in __init__(self, num_labels)
+      9         super().__init__()
+     10         self.num_labels = num_labels
+---> 11         self.vit = ViTModel.from_pretrained(
+     12             "/kaggle/input/google-vit/google_vit", local_files_only=True
+     13         )
+
+/usr/local/lib/python3.11/dist-packages/transformers/modeling_utils.py in _wrapper(*args, **kwargs)
+    309         old_dtype = torch.get_default_dtype()
+    310         try:
+--> 311             return func(*args, **kwargs)
+    312         finally:
+    313             torch.set_default_dtype(old_dtype)
+
+/usr/local/lib/python3.11/dist-packages/transformers/modeling_utils.py in from_pretrained(cls, pretrained_model_name_or_path, config, cache_dir, ignore_mismatched_sizes, force_download, local_files_only, token, revision, use_safetensors, weights_only, *model_args, **kwargs)
+   4471             if not isinstance(config, PretrainedConfig):
+   4472                 # We make a call to the config file first (which may be absent) to get the commit hash as soon as possible
+-> 4473                 resolved_config_file = cached_file(
+   4474                     pretrained_model_name_or_path,
+   4475                     CONFIG_NAME,
+
+/usr/local/lib/python3.11/dist-packages/transformers/utils/hub.py in cached_file(path_or_repo_id, filename, **kwargs)
+    310     ```
+    311     """
+--> 312     file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+    313     file = file[0] if file is not None else file
+    314     return file
+
+/usr/local/lib/python3.11/dist-packages/transformers/utils/hub.py in cached_files(path_or_repo_id, filenames, cache_dir, force_download, resume_download, proxies, token, revision, local_files_only, subfolder, repo_type, user_agent, _raise_exceptions_for_gated_repo, _raise_exceptions_for_missing_entries, _raise_exceptions_for_connection_errors, _commit_hash, **deprecated_kwargs)
+    520 
+    521         # Now we try to recover if we can find all files correctly in the cache
+--> 522         resolved_files = [
+    523             _get_cache_file_to_return(path_or_repo_id, filename, cache_dir, revision) for filename in full_filenames
+    524         ]
+
+/usr/local/lib/python3.11/dist-packages/transformers/utils/hub.py in <listcomp>(.0)
+    521         # Now we try to recover if we can find all files correctly in the cache
+    522         resolved_files = [
+--> 523             _get_cache_file_to_return(path_or_repo_id, filename, cache_dir, revision) for filename in full_filenames
+    524         ]
+    525         if all(file is not None for file in resolved_files):
+
+/usr/local/lib/python3.11/dist-packages/transformers/utils/hub.py in _get_cache_file_to_return(path_or_repo_id, full_filename, cache_dir, revision)
+    138 ):
+    139     # We try to see if we have a cached version (not up to date):
+--> 140     resolved_file = try_to_load_from_cache(path_or_repo_id, full_filename, cache_dir=cache_dir, revision=revision)
+    141     if resolved_file is not None and resolved_file != _CACHED_NO_EXIST:
+    142         return resolved_file
+
+/usr/local/lib/python3.11/dist-packages/huggingface_hub/utils/_validators.py in _inner_fn(*args, **kwargs)
+    104         ):
+    105             if arg_name in ["repo_id", "from_id", "to_id"]:
+--> 106                 validate_repo_id(arg_value)
+    107 
+    108             elif arg_name == "token" and arg_value is not None:
+
+/usr/local/lib/python3.11/dist-packages/huggingface_hub/utils/_validators.py in validate_repo_id(repo_id)
+    152 
+    153     if repo_id.count("/") > 1:
+--> 154         raise HFValidationError(
+    155             "Repo id must be in the form 'repo_name' or 'namespace/repo_name':"
+    156             f" '{repo_id}'. Use `repo_type` argument if needed."
+
+HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/kaggle/input/google-vit/google_vit'. Use `repo_type` argument if needed.
+
+## === cell 4
+predictions = []
+image_ids = []
+
+with torch.no_grad():
+    for pixel_values, ids in test_dataloader:
+        pixel_values = pixel_values.to(device, non_blocking=True)
+        logits, _ = model(pixel_values, labels=None)
+        preds = torch.argmax(logits, dim=1).detach().cpu().numpy().astype(int)
+
+        predictions.extend(preds.tolist())
+        image_ids.extend(list(ids))
+
+submission_df = pd.DataFrame({"image_id": image_ids, "label": predictions})
+
+submission_df = submission_df[["image_id", "label"]]
+submission_path = "/kaggle/working/submission.csv"
+submission_df.to_csv(submission_path, index=False)
+
+submission_df.head(), submission_df.shape, submission_path
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/4198805824.py in <cell line: 0>()
+      3 
+      4 with torch.no_grad():
+----> 5     for pixel_values, ids in test_dataloader:
+      6         pixel_values = pixel_values.to(device, non_blocking=True)
+      7         logits, _ = model(pixel_values, labels=None)
+
+NameError: name 'test_dataloader' is not defined
+
+## === cell 5
+sample_path = "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+sample_sub = pd.read_csv(sample_path)
+print("sample rows:", len(sample_sub), "pred rows:", len(submission_df))
+print(pd.read_csv("/kaggle/working/submission.csv").head())
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/94505558.py in <cell line: 0>()
+      2 sample_path = "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+      3 sample_sub = pd.read_csv(sample_path)
+----> 4 print("sample rows:", len(sample_sub), "pred rows:", len(submission_df))
+      5 print(pd.read_csv("/kaggle/working/submission.csv").head())
+
+NameError: name 'submission_df' is not defined

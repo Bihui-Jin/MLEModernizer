@@ -1,0 +1,563 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.439046
+
+# 6. Current score
+
+0.94174
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.39779) has done: 'Your notebook currently doesn’t yield a Kaggle score because it relies on external Kaggle Datasets (`/kaggle/input/hms-mk-codes`, `/kaggle/input/requirements-mk`, `/kaggle/input/hms-mk-data`) that are not included in the provided environment, so the pipeline cannot reliably run end-to-end and generate a valid `submission.csv`. To unblock scoring while keeping the task semantics correct (probabilities summing to 1 with the required columns), I replace those external dependencies with a minimal, fully self-contained baseline that reads `train.csv`, learns per-class priors (mean vote distribution), and writes a valid `submission.csv` aligned to `sample_submission.csv`. This produce a proper submission deterministically within the time limit; once you provide the missing external inputs (or a current score from a valid submission), we can make minimal metric-aligned adjustments to move specifically toward the 0.439046 target.'
+- What this solution (achieved 1.39779) has done: 'I keep your “class prior” baseline core logic, but fix the likely reason you’re getting “Not yielded”: your `DATA_PATH` points to `/kaggle/input/...`, while your environment shows the files under `/kaggle/data/...`. I make the data path robust by auto-detecting the correct root directory without changing any modeling semantics. I also ensure the submission rows are aligned to `sample_submission.csv`’s `eeg_id` order (safe and sometimes avoids submission format pitfalls). Finally, I keep the probability normalization and validations so the submission is always valid and scores can be produced.'
+- What this solution (achieved 1.39779) has done: 'The runtime error comes from validating uniqueness on `eeg_id`: in this competition the submission must have one row per test `eeg_id`, and `sample_submission.csv` can contain duplicate `eeg_id` rows (so uniqueness is not guaranteed). I fix this by building the submission from `test.csv` grouped to unique `eeg_id` (one row per EEG), then merging back to the `sample_submission.csv` row order so the output row count and ordering match exactly. This keeps your “class prior” core logic intact (same prior computation and constant prediction), but ensures the submission is structurally valid and avoids the assertion failure. I also update the validation to check alignment with `sample_submission.csv` rather than requiring uniqueness.'
+- What this solution (achieved 1.48352) has done: 'Your current baseline predicts a constant class-prior distribution, which is typically far from the per-eeg vote distribution and leads to a high KL. To move the score down toward the 0.439 target while keeping the same “prior-only” core logic, I make a minimal, metric-aligned calibration: compute the prior in a way that better matches the evaluation target (average *raw vote proportions* aggregated per `eeg_id`, so overlapping train rows don’t overweight certain EEGs). I also add a tiny Dirichlet-style smoothing using the observed average number of annotator votes to avoid overconfident zeros while staying extremely close to the same approach. Submission writing, alignment to `sample_submission.csv`, and probability normalization remain unchanged.'
+- What this solution (achieved 0.79151) has done: 'Your current solution is a constant “global prior” predictor, which is the main reason the KL is high; to move toward the 0.439 target without changing the overall approach, we keep the same prior-only logic but make the prior slightly more informative by conditioning on `patient_id` when available. Specifically, we compute per-patient average vote-probabilities (aggregated per `eeg_id` first to avoid overlap overweighting), then predict the corresponding patient prior for each test EEG, falling back to the global prior for unseen patients. This stays within the same modeling semantics (no new model/training loop), but should reduce KL meaningfully because label distributions vary by patient. Submission alignment/normalization checks remain unchanged so the output stays valid.'
+- What this solution (achieved 0.79151) has done: 'Your current patient-conditioned prior is still too coarse, so the smallest safe way to move KL down toward the 0.439 target is to keep the same “lookup prior then fallback” logic but condition on a bit more metadata already available in `test.csv`: `spectrogram_id`. We compute per-(patient_id, spectrogram_id) average vote-probabilities (after aggregating votes per `eeg_id` to avoid overlap overweighting), then back off hierarchically at inference time: (patient,spectrogram) → patient → global. This remains a prior-only approach (no new model/training loop), but should better match distribution shifts and reduce KL. We keep the same smoothing/normalization and submission alignment checks so the output stays valid and deterministic.'
+- What this solution (achieved 0.86561) has done: 'Your current hierarchical lookup (patient+spectrogram → patient → global) is still too “spiky” and can miscalibrate probabilities for unseen/rare groups, hurting KL. To move the score down toward the 0.439 target with minimal semantic change, I keep the exact same lookup/backoff logic but add a tiny interpolation (“shrinkage”) of every group prior toward the global prior; this usually improves KL by reducing overconfidence while preserving relative group differences. I also switch the smoothing strength from a fixed 1.0 to a value scaled to the typical annotator vote count so the smoothing is appropriately sized for this competition’s soft labels. Output format, row alignment, and normalization checks remain unchanged and the script still produces a valid `submission.csv`.'
+- What this solution (achieved 0.97868) has done: 'Your current score (0.86561, lower-is-better) is still far above the target 0.439046, so we should improve (decrease) KL with the smallest change that keeps the same “hierarchical prior lookup + fallback” core logic. The main issue is likely over/under-confidence from using simple group means with a fixed shrink=0.15; I replace that with data-driven, count-based empirical Bayes shrinkage so rare (patient,spectrogram) groups automatically back off more to patient/global while common groups stay specific. This preserves the exact semantics (still just priors/lookup; no new model/training loop) but typically improves KL by reducing noisy group priors. I also make the smoothing strength scale with the observed annotator count distribution (median instead of mean) for more robust calibration, while keeping the rest of the pipeline, alignment, and normalization unchanged.'
+- What this solution (achieved 0.77026) has done: 'Your current KL (0.97868; lower is better) is still far above the 0.439046 target, so we should improve by reducing miscalibration while keeping the exact same “hierarchical prior lookup + fallback” logic. The smallest high-impact adjustment is to make the shrinkage/regularization fully vote-count-aware at each hierarchy level: compute group priors from summed votes (not mean of per-eeg probabilities) and apply an empirical-Bayes Dirichlet backoff to the parent prior using the group’s total votes, which automatically smooths rare groups more and frequent groups less. This keeps the same semantics (still just priors from train, looked up by (patient,spectrogram) → patient → global) but typically lowers KL because it better matches soft-label uncertainty. Submission alignment/normalization are unchanged, and it still writes a valid `submission.csv`.'
+- What this solution (achieved 0.82166) has done: 'We should reduce KL (lower is better) by making the hierarchical priors less noisy for small (patient_id, spectrogram_id) groups while keeping the exact same “lookup priors with Dirichlet backoff” core logic. The minimal, metric-aligned change is to set the Dirichlet backoff strength `k` from the actual evidence size: use the median `total_votes` at each hierarchy level (patient and patient+spectrogram) so the smoothing matches how many annotator votes those groups typically have, instead of tying it to per-eeg votes. This keeps everything else identical (same aggregation, same hierarchy, same submission alignment/normalization), but usually improves calibration and lowers KL. The script still runs end-to-end and writes a valid `submission.csv`.'
+- What this solution (achieved 0.89968) has done: 'Your current score (0.82166, lower-is-better) is still far above the target (0.439046), so we should reduce KL with the smallest change that keeps the same hierarchical “(patient,spectrogram) → patient → global” prior lookup logic. The main lever left is calibration: your backoff strength is currently set to medians, which can still make small/medium groups too confident; I switch to a more vote-count-aware empirical Bayes backoff that uses the *effective sample size* distribution (75th percentile) to increase smoothing slightly and reduce KL. I also add a tiny, global “temperature” mixing toward the global prior (same semantics: still priors/lookup, just less overconfident), applied uniformly to all predictions to improve calibration without changing the core approach. Submission alignment, normalization, and I/O stay unchanged.'
+- What this solution (achieved 0.94174) has done: 'Your current KL (0.89968; lower is better) is still far above the target (0.439046), so we should reduce KL with the smallest change that preserves the exact “hierarchical priors with Dirichlet backoff” core logic. The least invasive lever is calibration: right now `mix_global=0.08` likely isn’t enough to tame overconfident/rare-group priors; increasing this interpolation toward the global prior usually improves KL by reducing miscalibration without changing the lookup/backoff structure. I also switch the final mix to be slightly more data-driven by setting it from the typical evidence size (based on median votes per EEG), while keeping it bounded to stay conservative. Output format, alignment to `sample_submission.csv`, and probability normalization remain unchanged.'
+- What this solution (achieved 0.94174) has done: 'Your current KL (0.94174; lower is better) is still far above the 0.439046 target, so we should reduce KL by improving calibration while keeping the same hierarchical prior lookup/backoff core logic. The smallest impactful change is to make the final “mix toward global” depend on how much evidence each prediction has: for (patient,spectrogram) groups with low train vote totals, mix more toward global; for high-evidence groups, mix less. This preserves the exact semantics (still just priors from train with hierarchical fallback), but reduces overconfidence where group priors are noisy, which typically improves KL. All I/O, submission alignment to `sample_submission.csv`, and probability normalization remain unchanged.'
+- What this solution (achieved 0.94174) has done: 'Your current KL (0.94174, lower is better) is still far above the 0.439046 target, so we should reduce it by improving calibration without changing the core “hierarchical priors with Dirichlet backoff” approach. The minimal, high-impact adjustment is to make the final global-mixing weight depend on evidence at *both* hierarchy levels: (patient,spectrogram) total votes and patient total votes; when either is low, we mix more toward the global prior to avoid noisy, overconfident group priors that hurt KL. This preserves the same lookup/backoff logic and prediction semantics (still only priors derived from train metadata), but should reduce miscalibration. I keep I/O, alignment to `sample_submission.csv`, and probability normalization unchanged so a valid `submission.csv` is always produced.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+
+
+## === cell 1
+CANDIDATE_BASES = [
+    "/kaggle/input/hms-harmful-brain-activity-classification",
+    "/kaggle/data/hms-harmful-brain-activity-classification",
+    "/kaggle/data/input/hms-harmful-brain-activity-classification",
+]
+DATA_PATH = next((p for p in CANDIDATE_BASES if os.path.exists(p)), None)
+if DATA_PATH is None:
+    raise FileNotFoundError(
+        "Could not find competition dataset folder. Tried:\n"
+        + "\n".join(CANDIDATE_BASES)
+    )
+
+OUT_PATH = "/kaggle/working"
+
+TRAIN_CSV = os.path.join(DATA_PATH, "train.csv")
+TEST_CSV = os.path.join(DATA_PATH, "test.csv")
+SAMPLE_SUB_CSV = os.path.join(DATA_PATH, "sample_submission.csv")
+
+TARGET_COLS = [
+    "seizure_vote",
+    "lpd_vote",
+    "gpd_vote",
+    "lrda_vote",
+    "grda_vote",
+    "other_vote",
+]
+
+for fp in [TRAIN_CSV, TEST_CSV, SAMPLE_SUB_CSV]:
+    if not os.path.exists(fp):
+        raise FileNotFoundError(f"Missing required file: {fp}")
+
+print("Using DATA_PATH:", DATA_PATH)
+
+
+
+## === cell 2
+train = pd.read_csv(TRAIN_CSV)
+test = pd.read_csv(TEST_CSV)
+sample_sub = pd.read_csv(SAMPLE_SUB_CSV)
+
+missing = [c for c in TARGET_COLS if c not in train.columns]
+if missing:
+    raise ValueError(f"Missing target columns in train.csv: {missing}")
+
+required_cols = ["patient_id", "spectrogram_id"]
+for col in required_cols:
+    if col not in train.columns or col not in test.columns:
+        raise ValueError(f"Expected {col} column in both train.csv and test.csv.")
+
+train_votes = train[["eeg_id", "patient_id", "spectrogram_id"] + TARGET_COLS].copy()
+for c in TARGET_COLS:
+    train_votes[c] = train_votes[c].astype(np.float64)
+
+eeg_vote_sums = train_votes.groupby(
+    ["eeg_id", "patient_id", "spectrogram_id"], sort=False
+)[TARGET_COLS].sum()
+
+eeg_totals = eeg_vote_sums.sum(axis=1).to_numpy(dtype=np.float64)
+eeg_totals_safe = eeg_totals.copy()
+eeg_totals_safe[eeg_totals_safe == 0.0] = 1.0
+eeg_probs = eeg_vote_sums.to_numpy(dtype=np.float64) / eeg_totals_safe[:, None]
+
+avg_votes_per_eeg = float(np.mean(eeg_totals)) if len(eeg_totals) else 1.0
+med_votes_per_eeg = float(np.median(eeg_totals)) if len(eeg_totals) else 1.0
+
+alpha_strength = float(max(1.0, 0.5 * med_votes_per_eeg))
+uniform = np.full(len(TARGET_COLS), 1.0 / len(TARGET_COLS), dtype=np.float64)
+
+global_vote_sum = eeg_vote_sums.sum(axis=0).to_numpy(dtype=np.float64)
+global_total_votes = float(global_vote_sum.sum()) if global_vote_sum.sum() > 0 else 1.0
+global_prior = (global_vote_sum + alpha_strength * uniform) / (
+    global_total_votes + alpha_strength
+)
+global_prior = np.clip(global_prior, 1e-12, 1.0)
+global_prior = global_prior / global_prior.sum()
+
+eeg_probs_df = pd.DataFrame(
+    eeg_probs, columns=TARGET_COLS, index=eeg_vote_sums.index
+).reset_index()
+
+eeg_vote_sums_df = eeg_vote_sums.reset_index()
+eeg_vote_sums_df["total_votes"] = (
+    eeg_vote_sums_df[TARGET_COLS].sum(axis=1).astype(np.float64)
+)
+
+
+def dirichlet_backoff(
+    child_vote_sum: np.ndarray,
+    child_total: np.ndarray,
+    parent_prior: np.ndarray,
+    k: float,
+):
+    child_vote_sum = np.asarray(child_vote_sum, dtype=np.float64)
+    child_total = np.asarray(child_total, dtype=np.float64)
+    parent_prior = np.asarray(parent_prior, dtype=np.float64)
+    out = (child_vote_sum + k * parent_prior) / (child_total[:, None] + k)
+    out = np.clip(out, 1e-12, 1.0)
+    out = out / out.sum(axis=1, keepdims=True)
+    return out
+
+
+pat_agg = eeg_vote_sums_df.groupby("patient_id", sort=False)[
+    TARGET_COLS + ["total_votes"]
+].sum()
+patient_vote_sum = pat_agg[TARGET_COLS].to_numpy(dtype=np.float64)
+patient_total_votes = pat_agg["total_votes"].to_numpy(dtype=np.float64)
+
+ps_agg = eeg_vote_sums_df.groupby(["patient_id", "spectrogram_id"], sort=False)[
+    TARGET_COLS + ["total_votes"]
+].sum()
+ps_vote_sum = ps_agg[TARGET_COLS].to_numpy(dtype=np.float64)
+ps_total_votes = ps_agg["total_votes"].to_numpy(dtype=np.float64)
+
+
+def safe_quantile(x: np.ndarray, q: float, fallback: float) -> float:
+    x = np.asarray(x, dtype=np.float64)
+    x = x[np.isfinite(x)]
+    if x.size == 0:
+        return float(fallback)
+    return float(np.quantile(x, q))
+
+
+q_patient_total = safe_quantile(patient_total_votes, 0.75, med_votes_per_eeg)
+q_ps_total = safe_quantile(ps_total_votes, 0.75, med_votes_per_eeg)
+
+k_patient = float(max(1.0, q_patient_total))
+k_ps = float(max(1.0, q_ps_total))
+
+patient_prior_vals = dirichlet_backoff(
+    patient_vote_sum, patient_total_votes, global_prior, k_patient
+)
+patient_prior_df = pd.DataFrame(
+    patient_prior_vals, columns=TARGET_COLS, index=pat_agg.index
+)
+
+ps_index = ps_agg.index
+ps_pat = pd.Index(ps_index.get_level_values(0), name="patient_id")
+ps_parent = patient_prior_df.reindex(ps_pat).to_numpy(dtype=np.float64)
+miss_pat = ~np.isfinite(ps_parent).all(axis=1)
+if miss_pat.any():
+    ps_parent[miss_pat] = global_prior
+
+ps_prior_vals = dirichlet_backoff(ps_vote_sum, ps_total_votes, ps_parent, k_ps)
+ps_prior_df = pd.DataFrame(ps_prior_vals, columns=TARGET_COLS, index=ps_agg.index)
+
+global_prior_dict = dict(zip(TARGET_COLS, global_prior.tolist()))
+print("avg_votes_per_eeg:", avg_votes_per_eeg)
+print("med_votes_per_eeg:", med_votes_per_eeg)
+print("alpha_strength:", alpha_strength)
+print("q_patient_total:", q_patient_total, "q_ps_total:", q_ps_total)
+print("k_patient:", k_patient, "k_ps:", k_ps)
+print("Global prior:", global_prior_dict)
+print("Num patient priors:", len(patient_prior_df))
+print("Num (patient,spectrogram) priors:", len(ps_prior_df))
+
+
+
+## === cell 3
+test_unique = test[["eeg_id", "patient_id", "spectrogram_id"]].drop_duplicates().copy()
+
+tmp = test_unique.merge(
+    ps_prior_df.reset_index(),
+    on=["patient_id", "spectrogram_id"],
+    how="left",
+)
+
+pred_mat = np.empty((len(test_unique), len(TARGET_COLS)), dtype=np.float64)
+
+for j, c in enumerate(TARGET_COLS):
+    col = tmp[c].to_numpy(dtype=np.float64)
+
+    miss = ~np.isfinite(col)
+    if miss.any():
+        pid = tmp.loc[miss, "patient_id"]
+        fallback = patient_prior_df.reindex(pid.to_numpy()).to_numpy(dtype=np.float64)[
+            :, j
+        ]
+        fallback_miss = ~np.isfinite(fallback)
+        if fallback_miss.any():
+            fallback[fallback_miss] = global_prior_dict[c]
+        col[miss] = fallback
+
+    pred_mat[:, j] = col
+
+pred_mat = np.clip(pred_mat, 1e-12, 1.0)
+pred_mat = pred_mat / pred_mat.sum(axis=1, keepdims=True)
+
+ps_train_totals = (
+    ps_agg["total_votes"]
+    .reset_index()
+    .rename(columns={"total_votes": "ps_total_votes"})
+)
+tmp2 = test_unique.merge(
+    ps_train_totals, on=["patient_id", "spectrogram_id"], how="left"
+)
+ps_total = tmp2["ps_total_votes"].to_numpy(dtype=np.float64)
+ps_total = np.where(np.isfinite(ps_total), ps_total, 0.0)
+
+patient_train_totals = (
+    pat_agg["total_votes"]
+    .reset_index()
+    .rename(columns={"total_votes": "pat_total_votes"})
+)
+tmp3 = test_unique.merge(patient_train_totals, on=["patient_id"], how="left")
+pat_total = tmp3["pat_total_votes"].to_numpy(dtype=np.float64)
+pat_total = np.where(np.isfinite(pat_total), pat_total, 0.0)
+
+base_mix = float(np.clip(1.0 / (1.0 + med_votes_per_eeg / 6.0), 0.12, 0.22))
+
+k0_ps = float(max(1.0, k_ps))
+k0_pat = float(max(1.0, k_patient))
+
+mix_ps = k0_ps / (k0_ps + ps_total)
+mix_pat = k0_pat / (k0_pat + pat_total)
+
+mix_i = base_mix * np.maximum(mix_ps, mix_pat)
+mix_i = np.clip(mix_i, 0.10, 0.32)
+
+pred_mat = (1.0 - mix_i[:, None]) * pred_mat + mix_i[:, None] * global_prior[None, :]
+pred_mat = np.clip(pred_mat, 1e-12, 1.0)
+pred_mat = pred_mat / pred_mat.sum(axis=1, keepdims=True)
+
+for j, c in enumerate(TARGET_COLS):
+    test_unique[c] = pred_mat[:, j]
+
+sub = sample_sub[["eeg_id"]].merge(
+    test_unique[["eeg_id"] + TARGET_COLS], on="eeg_id", how="left"
+)
+
+for c in TARGET_COLS:
+    sub[c] = sub[c].astype(np.float64)
+    sub[c] = sub[c].fillna(global_prior_dict[c])
+
+p2 = sub[TARGET_COLS].to_numpy(dtype=np.float64)
+p2 = np.clip(p2, 1e-12, 1.0)
+p2 = p2 / p2.sum(axis=1, keepdims=True)
+sub[TARGET_COLS] = p2
+
+out_file = os.path.join(OUT_PATH, "submission.csv")
+sub.to_csv(out_file, index=False)
+
+print("base_mix used:", base_mix)
+print(
+    "mix_i min/median/max:",
+    float(np.min(mix_i)),
+    float(np.median(mix_i)),
+    float(np.max(mix_i)),
+)
+(out_file, sub.shape, sub.head())
+
+
+
+## === cell 4
+assert (
+    list(sub.columns) == ["eeg_id"] + TARGET_COLS
+), "Submission columns do not match required format."
+assert len(sub) == len(sample_sub), "Submission row count must match sample_submission."
+assert np.array_equal(
+    sub["eeg_id"].to_numpy(), sample_sub["eeg_id"].to_numpy()
+), "Submission eeg_id order must match sample_submission."
+row_sum_check = sub[TARGET_COLS].sum(axis=1).to_numpy()
+assert np.allclose(row_sum_check, 1.0, atol=1e-6), "Row probabilities do not sum to 1."
+assert np.isfinite(sub[TARGET_COLS].to_numpy()).all(), "Non-finite probabilities found."
+print("Wrote:", out_file)
+print(sub.head(3).to_string(index=False))
+
+
+
+## === cell 5
+with open(out_file, "r") as f:
+    for _ in range(5):
+        print(f.readline().rstrip())

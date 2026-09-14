@@ -1,0 +1,1180 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8943789664551224
+
+# 6. Current score
+
+0.18049
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.12332) has done: 'I fix the Vision Transformer input-size mismatch by resizing images to the size expected by the pretrained ViT weights (224), which removes the runtime assertion and allows inference to run. I also load the provided trained weights for the ViT, EfficientNet, and linear head if they exist in common Kaggle working/input locations; otherwise the code still run but be untrained (and score poorly). Finally, I make the dataset read only `.jpg/.png` files to avoid accidental non-image entries and ensure the submission merges correctly and is fully populated. These are minimal execution/stability fixes that preserve your model and inference logic.'
+- What this solution (achieved 0.1775) has done: 'Your low score is consistent with using randomly initialized fusion/heads (and possibly not finding your trained checkpoints), so the smallest high-impact fix is to make checkpoint loading robust to common key-prefix patterns (`model.`, `module.`, `vit_model.`, `eff_model.`, `linear_head.`) and to search a few additional likely locations under `/kaggle/input` and `/kaggle/working`. I also align preprocessing with the official torchvision pretrained weights by using `weights.transforms()` for ViT/EfficientNet (same resizing is kept), which typically improves accuracy without changing the model or inference logic. Finally, I keep submission alignment safeguards but ensure deterministic, correct loading and inference behavior.'
+- What this solution (achieved 0.1775) has done: 'I fix the preprocessing crash by using the official torchvision `weights.transforms()` pipelines (which removes the missing `meta["mean"/"std"]` KeyError in this torchvision version) while keeping your resize-to-224/528 logic intact. I also ensure `test_loader` is always created by making cell 3 run successfully, which resolves the downstream `NameError`. Finally, I make the test image directory resolution robust to the duplicated nested `test_images/test_images` folder so predictions cover all `sample_submission.csv` rows and the merge produces zero missing labels, yielding a valid `submission.csv`.'
+- What this solution (achieved 0.1775) has done: 'Your current score (0.1775) is far below the target (0.8944), which strongly suggests the fusion head (and possibly parts of the backbones) are not being loaded from the intended trained checkpoint(s). I make the checkpoint loading robust to “combined” checkpoints (single file containing vit/eff/head weights) by detecting common key patterns and routing sub-state-dicts to the right module, while keeping your exact model definitions and inference logic unchanged. I also switch the models to `eval()` before loading and force `strict=False` loading diagnostics so we don’t silently skip usable weights. These are minimal, execution-safe changes aimed specifically at moving accuracy upward toward the target by ensuring the intended trained weights actually get used.'
+- What this solution (achieved 0.17414) has done: 'Your current score (0.1775) is far below the target (0.8944), so the most likely issue is still that your intended trained fusion weights are not being loaded, leaving the ViT/EfficientNet heads and/or linear_head effectively random for this task. I keep your exact model definitions and inference flow, but make checkpoint loading more robust to common “single-model” checkpoints (where keys don’t include vit/eff/head prefixes) by trying direct loads into each module and also by handling `DataParallel`-style `module.` prefixes cleanly. I also make the image preprocessing strictly match the pretrained weights’ expected input by removing the fixed `CenterCrop(600,600)` (which can damage leaf composition) and relying on the official `weights.transforms()` resize/crop pipeline; this is a minimal, metric-aligned change that typically improves accuracy without changing the architecture. Finally, I keep submission alignment checks and ensure the script always writes a valid `submission.csv`.'
+- What this solution (achieved 0.17414) has done: 'Your score is far below the target (0.174 vs 0.894, higher-is-better), which most strongly suggests your trained fusion/head checkpoint still isn’t being loaded and you’re effectively submitting with random task-specific heads. I make the checkpoint loader minimally more robust by (1) additionally searching common Cassava notebook output locations under the competition dataset tree, and (2) handling “single-state-dict” checkpoints where keys match one submodel (e.g., `encoder.*`, `heads.*`, `classifier.*`) by intelligently trying multiple remappings before giving up. I also add a safety check to print exactly which parts got nontrivial loads (so you can confirm it’s not silently skipping), while keeping your model definitions, preprocessing, and inference logic unchanged. The result should move accuracy upward toward the target by actually using the intended trained weights when they exist.'
+- What this solution (achieved 0.17414) has done: 'Your current score (0.174) is far below the target (0.894, higher-is-better), and with your architecture the most likely cause is that you’re *not actually using task-trained weights* for the ViT/EfficientNet heads and the fusion linear head (they remain random). I keep your exact model and inference flow, but make checkpoint discovery/load more correct by (1) prioritizing checkpoints that look like Cassava-trained outputs and de-prioritizing irrelevant tiny `.pt/.pth` files under `/kaggle/input`, and (2) adding a “classifier/head key remap” so common fine-tuning checkpoints (with keys like `heads.*`, `classifier.*`, `fc.*`) correctly load into your replaced `vit_model.heads.head` / `eff_model.classifier.1` / `linear_head`. These are minimal changes focused on actually loading the right weights, which should move accuracy strongly upward toward your target if such checkpoints exist in the environment. The rest (preprocess via `weights.transforms()`, dataset, fusion, submission merge) is kept unchanged.'
+- What this solution (achieved 0.17414) has done: 'Your score gap to the target is large (0.174 → 0.894, higher-is-better), so the most likely issue is still that no Cassava-trained fusion weights are being loaded and you’re effectively predicting with random heads. I keep your exact model/inference logic, but tighten checkpoint selection to prefer “real” model weights (correct tensor shapes for ViT head / EfficientNet classifier / fusion head) and avoid accidentally loading irrelevant optimizer/scheduler-only artifacts. I also add a safe fallback: if a “combined” checkpoint contains head weights under common names (e.g., `classifier.weight`, `fc.weight`), we route those into the correct submodules when shapes match, instead of silently partially loading. These changes are minimal and directly aimed at making your submission use the intended trained weights, which is the main lever to move accuracy toward the target.'
+- What this solution (achieved 0.17414) has done: 'Your score is far below the target (0.174 → 0.894, higher-is-better), and with your current architecture the most likely cause is that the fusion head is effectively untrained at inference because no suitable Cassava-trained checkpoints are being found/loaded. I keep your model definitions and inference exactly the same, but make checkpoint discovery/load *shape-driven and module-targeted* (separately for ViT head, EfficientNet head, and fusion head) so we reliably pick up the intended trained weights even when filenames/keys don’t follow your expected prefixes. I also ensure the ViT/EfficientNet preprocessing always matches their respective pretrained-weight pipelines (already mostly true) while keeping your submission merge/alignment unchanged. These minimal changes are aimed specifically at moving accuracy upward by actually using the trained heads/fusion weights if they exist in the environment.'
+- What this solution (achieved 0.18049) has done: 'Your current score (0.174) is far below the target (0.894), so we should increase performance with minimal, metric-aligned changes while preserving your model and inference logic. The biggest likely issue now is a preprocessing mismatch: `weights.transforms()` for ViT/EfficientNet already includes its own resize/crop, but your code defines `vit_img_size/eff_img_size` and never enforces them; depending on the torchvision version and transforms, you can end up feeding inconsistent sizes/aspect crops that hurt the fusion. I add an explicit, deterministic size-normalization step that preserves the official normalization but forces ViT to 224 and EfficientNet to 528 (your intended design), and I also switch inference to use raw logits for fusion (no change to outputs, just avoids any accidental activation differences inside backbones). These are small, safe changes that typically move accuracy upward without altering architecture or training loops, and the script still write a valid `submission.csv`.'
+- What this solution (achieved 0.18049) has done: 'Your score is far below the target (0.1805 vs 0.8944), so we should improve accuracy with the smallest changes that don’t alter your model architecture or inference semantics. The most likely cause is that your checkpoint loader is accidentally rejecting or not routing valid fine-tuned weights because it only recognizes a narrow set of head key patterns/shapes. I minimally expand the “plausible head” detection and routing to include very common ViT/EfficientNet fine-tuning key names (e.g., `heads.*`, `classifier.*`, `fc.*`, `head.*`) and also handle checkpoints saved as a dict of sub-state-dicts (`{"vit":..., "eff":..., "linear_head":...}`). These changes are specifically aimed at ensuring your trained weights (if present anywhere under `/kaggle/input` or `/kaggle/working`) actually get loaded, which should move the score strongly upward toward the target while keeping everything else the same and still writing a valid `submission.csv`.'
+- What this solution (achieved 0.18049) has done: 'Your score gap to the target is very large (0.18049 → 0.89438, higher-is-better), so the most likely problem is still that you’re not actually loading any Cassava-finetuned weights and you’re effectively using random task heads. I keep your model architectures and inference flow identical, but make checkpoint discovery/load more deterministic and shape-driven by (1) explicitly prioritizing “best/last/fold” checkpoints under the competition dataset tree, and (2) adding a final, safe “head-only extraction by shape” pass that can pull the 5-class classifier weights out of common fine-tune checkpoints even when keys are nested (e.g., `model`, `ema`, `state_dict`). I also fix a subtle transform issue: composing `weights.transforms()` after an explicit `Resize` can result in a second internal resize/crop; instead we keep the official normalization but force the exact intended sizes (224/528) just once. These are minimal changes aimed specifically at moving accuracy upward toward your target while still producing a valid `submission.csv`.'
+- What this solution (achieved 0.18049) has done: 'Your score gap to the target is very large (0.18049 vs 0.89438), so we should improve accuracy with the smallest changes that keep your fusion architecture and inference flow intact. The most likely remaining issue is that checkpoint loading is still not actually loading *task-trained* weights for the two 5-class heads and/or the fusion head; I make loading explicitly “shape-checked” and report whether each required head weight/bias was loaded, so we don’t accept useless partial loads. I also prioritize checkpoints that contain the fusion head shapes (5×10 and 5) and only fall back to less-specific checkpoints if needed, which should move accuracy upward if any valid Cassava-trained weights exist in `/kaggle/input` or `/kaggle/working`. Finally, I keep your preprocessing and submission merge logic unchanged, but add a tiny safety to use `torch.inference_mode()` and ensure the submission is fully populated.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import glob
+
+import pandas as pd
+import torch
+from PIL import Image
+from torch.backends import cudnn
+from torch.utils.data import DataLoader
+from torchvision.datasets import VisionDataset
+from torchvision.transforms import v2
+from torchvision import models
+
+torch.manual_seed(3407)
+torch.cuda.manual_seed(3407)
+
+cudnn.deterministic = True
+cudnn.benchmark = False
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
+DATA_DIR = "/kaggle/input/cassava-leaf-disease-classification"
+test_dir = f"{DATA_DIR}/test_images/"
+sample_sub_path = f"{DATA_DIR}/sample_submission.csv"
+
+eff_img_size = 528
+vit_img_size = 224
+
+batch_size = 16
+num_workers = 4
+num_classes = 5
+tta = False
+
+weights_vit = models.ViT_B_16_Weights.IMAGENET1K_V1
+vit_model = models.vit_b_16(weights=weights_vit)
+vit_model.heads.head = torch.nn.Linear(vit_model.heads.head.in_features, num_classes)
+
+weights_eff = models.EfficientNet_B0_Weights.IMAGENET1K_V1
+eff_model = models.efficientnet_b0(weights=weights_eff)
+eff_model.classifier[1] = torch.nn.Linear(
+    eff_model.classifier[1].in_features, num_classes
+)
+
+linear_head = torch.nn.Linear(num_classes * 2, num_classes)
+
+vit_model = vit_model.to(device)
+eff_model = eff_model.to(device)
+linear_head = linear_head.to(device)
+
+
+def _peek_state_dict(obj):
+    if (
+        isinstance(obj, dict)
+        and "state_dict" in obj
+        and isinstance(obj["state_dict"], dict)
+    ):
+        return obj["state_dict"]
+    if isinstance(obj, dict):
+        return obj
+    return None
+
+
+def _strip_prefixes(k: str) -> str:
+    nk = k
+    for p in ("model.", "module.", "net.", "backbone.", "student.", "teacher."):
+        if nk.startswith(p):
+            nk = nk[len(p) :]
+    return nk
+
+
+def _tensor_shape(x):
+    try:
+        return tuple(x.shape)
+    except Exception:
+        return None
+
+
+def _flatten_possible_state_dicts(obj):
+    out = []
+    if isinstance(obj, dict):
+        sd = _peek_state_dict(obj)
+        if isinstance(sd, dict) and any(
+            isinstance(v, torch.Tensor) for v in sd.values()
+        ):
+            out.append(sd)
+        for k in ("model", "ema", "student", "teacher", "net", "weights"):
+            if k in obj and isinstance(obj[k], dict):
+                sd2 = _peek_state_dict(obj[k])
+                if isinstance(sd2, dict) and any(
+                    isinstance(v, torch.Tensor) for v in sd2.values()
+                ):
+                    out.append(sd2)
+        for v in obj.values():
+            if isinstance(v, dict) and any(
+                isinstance(t, torch.Tensor) for t in v.values()
+            ):
+                out.append(v)
+    seen = set()
+    uniq = []
+    for d in out:
+        if id(d) not in seen:
+            uniq.append(d)
+            seen.add(id(d))
+    return uniq
+
+
+def _ckpt_has_plausible_heads(state: dict) -> bool:
+    vit_w = (num_classes, vit_model.heads.head.in_features)
+    vit_b = (num_classes,)
+    eff_w = (num_classes, eff_model.classifier[1].in_features)
+    eff_b = (num_classes,)
+    fus_w = (num_classes, num_classes * 2)
+    fus_b = (num_classes,)
+
+    cleaned = {_strip_prefixes(k): v for k, v in state.items()}
+    keys = list(cleaned.keys())
+
+    def any_key_matches_shape(candidates, shape):
+        for ck in candidates:
+            if ck in cleaned and _tensor_shape(cleaned[ck]) == shape:
+                return True
+        return False
+
+    vit_w_keys = [
+        "vit_model.heads.head.weight",
+        "vit.heads.head.weight",
+        "heads.head.weight",
+        "heads.weight",
+        "head.weight",
+        "classifier.weight",
+        "fc.weight",
+    ]
+    vit_b_keys = [
+        "vit_model.heads.head.bias",
+        "vit.heads.head.bias",
+        "heads.head.bias",
+        "heads.bias",
+        "head.bias",
+        "classifier.bias",
+        "fc.bias",
+    ]
+
+    eff_w_keys = [
+        "eff_model.classifier.1.weight",
+        "eff.classifier.1.weight",
+        "classifier.1.weight",
+        "classifier.weight",
+        "fc.weight",
+        "head.weight",
+    ]
+    eff_b_keys = [
+        "eff_model.classifier.1.bias",
+        "eff.classifier.1.bias",
+        "classifier.1.bias",
+        "classifier.bias",
+        "fc.bias",
+        "head.bias",
+    ]
+
+    fus_w_keys = [
+        "linear_head.weight",
+        "fusion_head.weight",
+        "fusion.weight",
+        "head.weight",
+        "classifier.weight",
+        "fc.weight",
+    ]
+    fus_b_keys = [
+        "linear_head.bias",
+        "fusion_head.bias",
+        "fusion.bias",
+        "head.bias",
+        "classifier.bias",
+        "fc.bias",
+    ]
+
+    vit_ok = any_key_matches_shape(vit_w_keys, vit_w) and any_key_matches_shape(
+        vit_b_keys, vit_b
+    )
+    eff_ok = any_key_matches_shape(eff_w_keys, eff_w) and any_key_matches_shape(
+        eff_b_keys, eff_b
+    )
+    fus_ok = any_key_matches_shape(fus_w_keys, fus_w) and any_key_matches_shape(
+        fus_b_keys, fus_b
+    )
+
+    many_tensors = len(keys) > 200
+    return vit_ok or eff_ok or fus_ok or many_tensors
+
+
+def _extract_required_head_tensors(cleaned: dict):
+    req = {
+        "vit_w": vit_model.heads.head.weight.shape,
+        "vit_b": vit_model.heads.head.bias.shape,
+        "eff_w": eff_model.classifier[1].weight.shape,
+        "eff_b": eff_model.classifier[1].bias.shape,
+        "fus_w": linear_head.weight.shape,
+        "fus_b": linear_head.bias.shape,
+    }
+
+    def find_by_shape(candidates, shape):
+        for ck in candidates:
+            if ck in cleaned and _tensor_shape(cleaned[ck]) == tuple(shape):
+                return cleaned[ck]
+        return None
+
+    vit_w = find_by_shape(
+        cleaned,
+        req["vit_w"],
+    )
+    vit_b = find_by_shape(
+        cleaned,
+        req["vit_b"],
+    )
+    eff_w = find_by_shape(
+        cleaned,
+        req["eff_w"],
+    )
+    eff_b = find_by_shape(
+        cleaned,
+        req["eff_b"],
+    )
+    fus_w = find_by_shape(
+        cleaned,
+        req["fus_w"],
+    )
+    fus_b = find_by_shape(
+        cleaned,
+        req["fus_b"],
+    )
+
+    return {
+        "vit_w": vit_w,
+        "vit_b": vit_b,
+        "eff_w": eff_w,
+        "eff_b": eff_b,
+        "fus_w": fus_w,
+        "fus_b": fus_b,
+    }
+
+
+def _load_any_checkpoint(
+    vit_model: torch.nn.Module,
+    eff_model: torch.nn.Module,
+    linear_head: torch.nn.Module,
+    ckpt_path: str,
+) -> bool:
+    if not ckpt_path or not os.path.exists(ckpt_path):
+        return False
+
+    try:
+        sd_raw = torch.load(ckpt_path, map_location="cpu")
+    except Exception:
+        return False
+
+    if isinstance(sd_raw, dict):
+        for keyset in (
+            ("vit_model", "eff_model", "linear_head"),
+            ("vit", "eff", "head"),
+            ("vit", "efficientnet", "linear_head"),
+            ("model_vit", "model_eff", "fusion"),
+        ):
+            if all((k in sd_raw and isinstance(sd_raw[k], dict)) for k in keyset):
+                vit_sd = {_strip_prefixes(k): v for k, v in sd_raw[keyset[0]].items()}
+                eff_sd = {_strip_prefixes(k): v for k, v in sd_raw[keyset[1]].items()}
+                head_sd = {_strip_prefixes(k): v for k, v in sd_raw[keyset[2]].items()}
+
+                loaded_any = False
+                try:
+                    m, u = vit_model.load_state_dict(vit_sd, strict=False)
+                    loaded_any = loaded_any or (len(u) < len(vit_sd))
+                except Exception:
+                    pass
+                try:
+                    m, u = eff_model.load_state_dict(eff_sd, strict=False)
+                    loaded_any = loaded_any or (len(u) < len(eff_sd))
+                except Exception:
+                    pass
+                try:
+                    m, u = linear_head.load_state_dict(head_sd, strict=False)
+                    loaded_any = loaded_any or (len(u) < len(head_sd))
+                except Exception:
+                    pass
+
+                if loaded_any:
+                    print(
+                        f"[ckpt:{os.path.basename(ckpt_path)}] loaded via sub-state-dicts keys={keyset}"
+                    )
+                    return True
+
+    candidate_sds = _flatten_possible_state_dicts(sd_raw)
+    if not candidate_sds:
+        sd = _peek_state_dict(sd_raw)
+        if isinstance(sd, dict):
+            candidate_sds = [sd]
+
+    def _try_load(module: torch.nn.Module, state: dict, tag: str) -> bool:
+        if not state:
+            return False
+        try:
+            m, u = module.load_state_dict(state, strict=False)
+        except Exception as e:
+            print(
+                f"[ckpt:{os.path.basename(ckpt_path)}] {tag} load failed: {type(e).__name__}: {e}"
+            )
+            return False
+        useful = (len(state) > 0) and (len(u) < len(state))
+        print(
+            f"[ckpt:{os.path.basename(ckpt_path)}] {tag} loaded. missing={len(m)} unexpected={len(u)} useful={useful}"
+        )
+        return useful
+
+    def _shape_eq(t, ref):
+        return _tensor_shape(t) == tuple(ref)
+
+    for sd0 in candidate_sds:
+        if sd0 is None or not isinstance(sd0, dict):
+            continue
+
+        cleaned = {_strip_prefixes(k): v for k, v in sd0.items()}
+        if not _ckpt_has_plausible_heads(cleaned):
+            continue
+
+        vit_sd, eff_sd, head_sd, other_sd = {}, {}, {}, {}
+        for k, v in cleaned.items():
+            if k.startswith(("vit_model.", "vit.")):
+                vit_sd[k.split(".", 1)[1]] = v
+            elif k.startswith(("eff_model.", "eff.", "efficientnet.", "enet.")):
+                eff_sd[k.split(".", 1)[1]] = v
+            elif k.startswith(
+                ("linear_head.", "head.", "fusion_head.", "classifier_head.")
+            ):
+                head_sd[k.split(".", 1)[1]] = v
+            else:
+                other_sd[k] = v
+
+        loaded_any = False
+
+        if vit_sd or eff_sd or head_sd:
+            loaded_any = _try_load(vit_model, vit_sd, "vit(prefixed)") or loaded_any
+            loaded_any = _try_load(eff_model, eff_sd, "eff(prefixed)") or loaded_any
+            loaded_any = _try_load(linear_head, head_sd, "head(prefixed)") or loaded_any
+            if loaded_any:
+                return True
+
+        routed_vit, routed_eff, routed_head = {}, {}, {}
+
+        for wk in (
+            "heads.head.weight",
+            "vit_model.heads.head.weight",
+            "vit.heads.head.weight",
+            "heads.weight",
+            "head.weight",
+            "classifier.weight",
+            "fc.weight",
+        ):
+            if wk in other_sd and _shape_eq(
+                other_sd[wk], vit_model.heads.head.weight.shape
+            ):
+                routed_vit["heads.head.weight"] = other_sd[wk]
+                break
+        for bk in (
+            "heads.head.bias",
+            "vit_model.heads.head.bias",
+            "vit.heads.head.bias",
+            "heads.bias",
+            "head.bias",
+            "classifier.bias",
+            "fc.bias",
+        ):
+            if bk in other_sd and _shape_eq(
+                other_sd[bk], vit_model.heads.head.bias.shape
+            ):
+                routed_vit["heads.head.bias"] = other_sd[bk]
+                break
+
+        for wk in (
+            "classifier.1.weight",
+            "eff_model.classifier.1.weight",
+            "eff.classifier.1.weight",
+            "classifier.weight",
+            "fc.weight",
+            "head.weight",
+        ):
+            if wk in other_sd and _shape_eq(
+                other_sd[wk], eff_model.classifier[1].weight.shape
+            ):
+                routed_eff["classifier.1.weight"] = other_sd[wk]
+                break
+        for bk in (
+            "classifier.1.bias",
+            "eff_model.classifier.1.bias",
+            "eff.classifier.1.bias",
+            "classifier.bias",
+            "fc.bias",
+            "head.bias",
+        ):
+            if bk in other_sd and _shape_eq(
+                other_sd[bk], eff_model.classifier[1].bias.shape
+            ):
+                routed_eff["classifier.1.bias"] = other_sd[bk]
+                break
+
+        for wk in (
+            "linear_head.weight",
+            "fusion_head.weight",
+            "fusion.weight",
+            "classifier.weight",
+            "fc.weight",
+            "head.weight",
+        ):
+            if wk in other_sd and _shape_eq(other_sd[wk], linear_head.weight.shape):
+                routed_head["weight"] = other_sd[wk]
+                break
+        for bk in (
+            "linear_head.bias",
+            "fusion_head.bias",
+            "fusion.bias",
+            "classifier.bias",
+            "fc.bias",
+            "head.bias",
+        ):
+            if bk in other_sd and _shape_eq(other_sd[bk], linear_head.bias.shape):
+                routed_head["bias"] = other_sd[bk]
+                break
+
+        vit_loaded = _try_load(vit_model, routed_vit, "shape_route->vit")
+        eff_loaded = _try_load(eff_model, routed_eff, "shape_route->eff")
+        head_loaded = _try_load(linear_head, routed_head, "shape_route->head")
+
+        loaded_count = int(vit_loaded) + int(eff_loaded) + int(head_loaded)
+        if loaded_count >= 2:
+            print(
+                f"[ckpt:{os.path.basename(ckpt_path)}] accepted shape-routed load: vit={vit_loaded} eff={eff_loaded} head={head_loaded}"
+            )
+            return True
+        else:
+            print(
+                f"[ckpt:{os.path.basename(ckpt_path)}] rejected: insufficient head tensors loaded (vit={vit_loaded} eff={eff_loaded} head={head_loaded})"
+            )
+
+        for name, module in (
+            ("vit", vit_model),
+            ("eff", eff_model),
+            ("head", linear_head),
+        ):
+            try:
+                m, u = module.load_state_dict(other_sd, strict=False)
+                useful = (len(other_sd) > 0) and (len(u) < len(other_sd))
+                print(
+                    f"[ckpt:{os.path.basename(ckpt_path)}] direct->{name} attempted. missing={len(m)} unexpected={len(u)} useful={useful}"
+                )
+                loaded_any = loaded_any or useful
+            except Exception:
+                pass
+
+        if loaded_any:
+            return True
+
+    return False
+
+
+def _gather_ckpts(root: str):
+    pats = [os.path.join(root, "**", "*.pth"), os.path.join(root, "**", "*.pt")]
+    files = set()
+    for p in pats:
+        files.update(glob.glob(p, recursive=True))
+    return sorted(files)
+
+
+def _score_ckpt_name(p: str) -> int:
+    name = os.path.basename(p).lower()
+    full = p.lower()
+    score = 0
+
+    for kw, s in (
+        ("cassava", 12),
+        ("leaf", 6),
+        ("disease", 6),
+        ("best", 20),
+        ("last", 12),
+        ("final", 10),
+        ("fold", 6),
+        ("epoch", 2),
+        ("checkpoint", 4),
+        ("ckpt", 4),
+    ):
+        if kw in name or kw in full:
+            score += s
+
+    for kw, s in (
+        ("optimizer", -10),
+        ("optim", -10),
+        ("sched", -8),
+        ("scheduler", -8),
+        ("ema", -2),
+    ):
+        if kw in name:
+            score += s
+
+    try:
+        size_mb = os.path.getsize(p) / (1024 * 1024)
+        if size_mb < 5:
+            score -= 25
+        elif size_mb < 20:
+            score -= 10
+        elif size_mb > 50:
+            score += 5
+    except Exception:
+        pass
+
+    if full.startswith("/kaggle/working"):
+        score += 3
+
+    if "/cassava-leaf-disease-classification" in full:
+        score += 8
+
+    return score
+
+
+def _score_ckpt_by_content(p: str) -> int:
+    base = _score_ckpt_name(p)
+    try:
+        sd_raw = torch.load(p, map_location="cpu")
+
+        if isinstance(sd_raw, dict):
+            any_dicts = any(isinstance(v, dict) for v in sd_raw.values())
+            if any_dicts:
+                base += 5
+
+        sds = _flatten_possible_state_dicts(sd_raw)
+        if not sds:
+            sd = _peek_state_dict(sd_raw)
+            if isinstance(sd, dict):
+                sds = [sd]
+
+        best = base - 50
+        for sd in sds:
+            if sd is None or not isinstance(sd, dict):
+                continue
+            cleaned = {_strip_prefixes(k): v for k, v in sd.items()}
+            if not _ckpt_has_plausible_heads(cleaned):
+                continue
+
+            boost = 0
+            for _, v in cleaned.items():
+                sh = _tensor_shape(v)
+                if sh == tuple(linear_head.weight.shape) or sh == tuple(
+                    linear_head.bias.shape
+                ):
+                    boost += 80  # fusion is most important for your architecture
+                if sh == tuple(vit_model.heads.head.weight.shape) or sh == tuple(
+                    vit_model.heads.head.bias.shape
+                ):
+                    boost += 15
+                if sh == tuple(eff_model.classifier[1].weight.shape) or sh == tuple(
+                    eff_model.classifier[1].bias.shape
+                ):
+                    boost += 15
+            best = max(best, base + boost)
+        return best
+    except Exception:
+        return base - 10
+
+
+scan_roots = [
+    "/kaggle/working",
+    "/kaggle/input",
+    DATA_DIR,
+    f"{DATA_DIR}/cassava-leaf-disease-classification",
+]
+all_ckpt_files = []
+for r in scan_roots:
+    all_ckpt_files.extend(_gather_ckpts(r))
+
+unique_ckpts = sorted(set(all_ckpt_files))
+shortlist = sorted(unique_ckpts, key=lambda x: _score_ckpt_name(x), reverse=True)[:400]
+all_ckpt_files = sorted(
+    shortlist, key=lambda x: _score_ckpt_by_content(x), reverse=True
+)
+
+vit_model.eval()
+eff_model.eval()
+linear_head.eval()
+
+loaded_any = False
+
+common_candidates = [
+    "/kaggle/working/vit_model.pth",
+    "/kaggle/working/eff_model.pth",
+    "/kaggle/working/linear_head.pth",
+    "/kaggle/working/vit.pth",
+    "/kaggle/working/eff.pth",
+    "/kaggle/working/head.pth",
+    "/kaggle/working/model.pth",
+    "/kaggle/working/model.pt",
+    f"{DATA_DIR}/vit_model.pth",
+    f"{DATA_DIR}/eff_model.pth",
+    f"{DATA_DIR}/linear_head.pth",
+    f"{DATA_DIR}/model.pth",
+    f"{DATA_DIR}/model.pt",
+    f"{DATA_DIR}/checkpoint.pth",
+    f"{DATA_DIR}/best.pth",
+    f"{DATA_DIR}/best.pt",
+]
+for p in common_candidates:
+    if _load_any_checkpoint(vit_model, eff_model, linear_head, p):
+        print("Loaded checkpoint from:", p)
+        loaded_any = True
+        break
+
+if not loaded_any:
+    for p in all_ckpt_files[:250]:
+        if _load_any_checkpoint(vit_model, eff_model, linear_head, p):
+            print("Loaded checkpoint from scan:", p)
+            loaded_any = True
+            break
+
+if not loaded_any:
+    print(
+        "No trained weight files found; running with ImageNet-pretrained backbones and randomly initialized heads."
+    )
+
+print("ViT head:", vit_model.heads.head)
+print("Eff head:", eff_model.classifier[1])
+print("Fusion head:", linear_head)
+
+
+
+
+## === cell 1
+class CassavaDataset(VisionDataset):
+    """Custom dataset for the Cassava test data (image_id only)."""
+
+    def __init__(
+        self,
+        data_dir,
+        vit_transform=None,
+        eff_transform=None,
+        ttas=None,
+    ):
+        super().__init__(root=data_dir)
+
+        exts = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
+        self.images = sorted(
+            [f for f in os.listdir(data_dir) if f.lower().endswith(exts)]
+        )
+        self.ttas = ttas
+
+        self.vit_transform = vit_transform
+        self.eff_transform = eff_transform
+
+    def __getitem__(self, idx):
+        filename = self.images[idx]
+        img = Image.open(os.path.join(self.root, filename)).convert("RGB")
+
+        vit_img = img
+        eff_img = img
+
+        if self.ttas is not None:
+            vit_img = (
+                [self.vit_transform(t(vit_img)) for t in self.ttas]
+                if self.vit_transform
+                else [t(vit_img) for t in self.ttas]
+            )
+            eff_img = (
+                [self.eff_transform(t(eff_img)) for t in self.ttas]
+                if self.eff_transform
+                else [t(eff_img) for t in self.ttas]
+            )
+        else:
+            if self.vit_transform:
+                vit_img = self.vit_transform(vit_img)
+            if self.eff_transform:
+                eff_img = self.eff_transform(eff_img)
+
+        return vit_img, eff_img, filename
+
+    def __len__(self):
+        return len(self.images)
+
+
+
+
+## === cell 2
+def _resolve_image_dir(base_dir: str) -> str:
+    exts = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
+    if os.path.isdir(base_dir):
+        files = [f for f in os.listdir(base_dir) if f.lower().endswith(exts)]
+        if len(files) > 0:
+            return base_dir
+        nested = os.path.join(base_dir, os.path.basename(os.path.normpath(base_dir)))
+        if os.path.isdir(nested):
+            files2 = [f for f in os.listdir(nested) if f.lower().endswith(exts)]
+            if len(files2) > 0:
+                return nested
+    return base_dir
+
+
+test_dir = _resolve_image_dir(test_dir)
+print("Using test_dir:", test_dir)
+
+vit_preprocess_base = weights_vit.transforms()
+eff_preprocess_base = weights_eff.transforms()
+
+
+def _extract_norm_only(tf):
+    if hasattr(tf, "transforms"):
+        kept = []
+        for t in tf.transforms:
+            name = type(t).__name__.lower()
+            if "resize" in name or "centercrop" in name:
+                continue
+            kept.append(t)
+        return v2.Compose(kept) if kept else tf
+    return tf
+
+
+vit_norm_only = _extract_norm_only(vit_preprocess_base)
+eff_norm_only = _extract_norm_only(eff_preprocess_base)
+
+vit_preprocess = v2.Compose(
+    [
+        v2.Resize((vit_img_size, vit_img_size), antialias=True),
+        vit_norm_only,
+    ]
+)
+eff_preprocess = v2.Compose(
+    [
+        v2.Resize((eff_img_size, eff_img_size), antialias=True),
+        eff_norm_only,
+    ]
+)
+
+if tta:
+    ttas = [
+        v2.RandomRotation(180),
+        v2.RandomVerticalFlip(1),
+        v2.RandomPerspective(p=1),
+    ]
+else:
+    ttas = None
+
+test_dataset = CassavaDataset(
+    test_dir,
+    vit_transform=vit_preprocess,
+    eff_transform=eff_preprocess,
+    ttas=ttas,
+)
+
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=batch_size,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=True,
+)
+
+normalizer = torch.nn.Softmax(dim=1)
+
+
+
+## === cell 3
+all_names = []
+all_preds = []
+
+vit_model.eval()
+eff_model.eval()
+linear_head.eval()
+
+with torch.inference_mode():
+    for vit_inputs, eff_inputs, filenames in test_loader:
+        batch_n = len(filenames)
+
+        if tta:
+            vit_inputs = torch.cat(vit_inputs, dim=0).to(device)
+            eff_inputs = torch.cat(eff_inputs, dim=0).to(device)
+            filenames = list(filenames)
+
+            vit_logits = vit_model(vit_inputs)
+            eff_logits = eff_model(eff_inputs)
+
+            vit_batch_logits = torch.stack(torch.split(vit_logits, batch_n), dim=0)
+            vit_mean_logits = torch.mean(vit_batch_logits, dim=0)
+
+            eff_batch_logits = torch.stack(torch.split(eff_logits, batch_n), dim=0)
+            eff_mean_logits = torch.mean(eff_batch_logits, dim=0)
+
+            logit_inputs = torch.cat([vit_mean_logits, eff_mean_logits], dim=1)
+            outputs = linear_head(logit_inputs)
+
+            mean_preds = normalizer(outputs)
+            pred_labels = torch.argmax(mean_preds, 1).tolist()
+        else:
+            vit_inputs = vit_inputs.to(device, non_blocking=True)
+            eff_inputs = eff_inputs.to(device, non_blocking=True)
+            filenames = list(filenames)
+
+            vit_logits = vit_model(vit_inputs)
+            eff_logits = eff_model(eff_inputs)
+
+            logit_inputs = torch.cat([vit_logits, eff_logits], dim=1)
+            outputs = linear_head(logit_inputs)
+
+            preds = normalizer(outputs)
+            pred_labels = torch.argmax(preds, 1).tolist()
+
+        all_names.extend(filenames)
+        all_preds.extend(pred_labels)
+
+assert len(all_names) == len(test_dataset), (len(all_names), len(test_dataset))
+assert len(all_preds) == len(test_dataset), (len(all_preds), len(test_dataset))
+
+
+
+## === cell 4
+sample_sub = pd.read_csv(sample_sub_path)
+pred_df = pd.DataFrame({"image_id": all_names, "label": all_preds})
+
+my_submission = sample_sub[["image_id"]].merge(pred_df, on="image_id", how="left")
+missing = my_submission["label"].isna().sum()
+assert missing == 0, f"Missing predictions for {missing} test images."
+
+my_submission["label"] = my_submission["label"].astype(int)
+my_submission.to_csv("submission.csv", index=False)
+
+print(my_submission.shape)
+print(my_submission.head())
+print("Wrote submission.csv")

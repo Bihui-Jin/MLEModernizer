@@ -1,0 +1,729 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.1373797655861054
+
+# 6. Current score
+
+1.96458
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 8.13623) has done: 'The crash happens because `g()` is trying to blend external submission files from a dataset path that doesn’t exist here, leaving `pred_list` with wrong-shaped arrays (or scalars), so the median becomes length 1 and can’t be assigned to 603600 rows. I make `g()` robust: it only use valid `.csv` prediction files that match the sample submission length; otherwise it fall back to a simple, legitimate baseline model (mean pressure per (R,C,time_step,u_out) with a safe global fallback) so a valid submission is always produced. I also ensure the output filename ends with `.csv` and is written to the working directory. This keeps the “blending then snap-to-nearest-pressure-grid” core idea, but guarantees end-to-end execution in this environment.'
+- What this solution (achieved 3.29709) has done: 'Your current score (8.136) is far worse than the target (0.137), so we should improve the fallback model that runs when no external blend files exist (which is the case here). I keep the blending/snap-to-pressure-grid core logic intact, but replace the weak group-mean fallback with a stronger, still-simple “u_in integration” baseline commonly used for this competition (using per-(R,C) linear calibration from train and applying it to test), then snap predictions to the nearest valid pressure. I also ensure the fallback trains only on inspiratory-phase rows (u_out==0) since the metric ignores expiratory phase, and I keep output format/id alignment identical so a valid `submission.csv` is always produced.'
+- What this solution (achieved 3.25605) has done: 'Your current score (3.29709 MAE; lower is better) is far worse than the target (0.13738), and the environment has no external blend files, so improving the fallback model is the most direct way to move the score toward the target without changing the overall “predict then snap-to-pressure-grid” semantics. I keep your blending logic intact and only upgrade `_baseline_predictions_from_train` to a stronger but still lightweight, fully legitimate baseline: a per-(R,C) ridge regression using time-step features (u_in, cumulative u_in, cumulative area, and u_out) trained on inspiratory rows (u_out==0). I also ensure expiratory-phase test rows are set to a stable baseline (the per-(R,C) intercept), which typically reduces error spillover after snapping. The rest of the pipeline (including snapping to the nearest valid pressure and writing `submission.csv`) remains unchanged.'
+- What this solution (achieved 3.03837) has done: 'Your current score (3.25605 MAE; lower is better) is still far from the target (0.13738), and in this environment the external blend directory doesn’t exist, so almost all performance comes from the fallback baseline. To move toward the target without changing the overall “predict then snap to valid pressure grid” core behavior, I keep your pipeline intact but strengthen the fallback by (1) training per-(R,C) ridge models on inspiratory rows and (2) predicting *only* inspiratory-phase test rows while setting expiratory rows (not scored) to a stable intercept. The key improvement is adding a few lightweight, competition-standard time-series features (lagged u_in/u_out, deltas, and cumulative sums) while keeping the same closed-form ridge approach. This should reduce MAE materially while staying minimal and fast, and still writes a valid `submission.csv` end-to-end.'
+- What this solution (achieved 2.25142) has done: 'Your current MAE (3.038) is far worse than the target (0.137) and this environment has no external blend files, so essentially all score comes from the fallback baseline inside `g()`. I keep your overall “predict then snap to nearest valid pressure” semantics intact, but make the fallback model more competition-appropriate by (1) adding a couple of standard cumulative/lag features that approximate the lung state (including cumulative time and rolling window sums) and (2) fitting the per-(R,C) ridge models only on inspiratory rows while using a global ridge only as a true fallback. These are minimal changes confined to feature engineering and the baseline fit, and they keep the same closed-form ridge approach (no new libraries, no new training loops) while improving generalization toward the target band. The script still always write a valid `submission.csv` in the working directory.'
+- What this solution (achieved 2.17624) has done: 'Your current score (2.25142 MAE; lower is better) is still far worse than the target (0.13738), and because the external blend directory won’t exist here, almost all performance depends on the fallback baseline inside `g()`. I keep your overall “predict then snap to nearest valid pressure grid” semantics intact, but make a minimal, score-relevant upgrade to the fallback by (1) adding a couple of competition-standard interaction/state proxy features while keeping the same per-(R,C) closed-form ridge model, and (2) fitting an additional “global correction” ridge on out-of-fold residuals to reduce systematic bias without changing the model family. This is still just linear ridge in closed form (no new libraries, no new training loops), and it keeps the same I/O and submission writing. The script still always write a valid `submission.csv` in the working directory.'
+- What this solution (achieved 2.17624) has done: 'Your current MAE (2.17624, lower is better) is still far from the target (0.13738), so we should improve only the fallback path that actually runs here (no external blend files). I keep your “engineer features → per-(R,C) closed-form ridge → predict → snap to nearest valid pressure grid” core logic intact, but make two minimal, score-relevant upgrades: (1) standardize features using train statistics (within each (R,C) model and global), which makes ridge behave better without changing the model family, and (2) apply the residual-correction model only on inspiratory-phase test rows (u_out==0) to avoid injecting noise where the metric doesn’t score. Everything else (I/O paths, blending robustness, snapping, and writing `submission.csv`) remains unchanged.'
+- What this solution (achieved 7.41921) has done: 'Your current MAE (2.176) is still far above the target (0.137), so we should improve only the fallback path that actually runs here (no external blend files). I keep your existing “engineer features → per-(R,C) closed-form ridge → optional residual correction → snap to nearest pressure grid → write submission.csv” core logic intact, but make two minimal upgrades: (1) train the ridge on a small *random subset* of breaths (to fit within time) and (2) add a tiny, legitimate *leak-free* “pressure memory” feature by mapping each `(R,C,u_in,u_out)` in train to the median pressure and using it as an extra input feature (fallbacks to NaN→0 and is standardized like the others). This adds signal strongly correlated with pressure without changing the model family or training approach, and should move the MAE meaningfully toward your target while still producing a valid `submission.csv` end-to-end within the 600s timeout.'
+- What this solution (achieved 14.43594) has done: 'Your current MAE (7.41921; lower is better) is still far worse than the target (0.13738), and in this environment the external blend directory doesn’t exist, so we should only improve the fallback baseline that actually generates your submission. I keep your exact pipeline structure (“fallback baseline → snap to nearest valid pressure → write submission.csv”) and the same closed-form ridge approach, but remove the breath subsampling (it hurts accuracy a lot) and make prediction faster via batched per-(R,C) matrix multiplies so using all training breaths still fits the time limit. I also keep the leak-free “pressure memory” feature but make it more informative by using a slightly richer key `(R,C,time_step,u_in,u_out)` with safe fallback to the simpler key when unseen. These are minimal, score-relevant changes confined to the fallback model internals; blending behavior and output format remain identical.'
+- What this solution (achieved 2.11115) has done: 'Your current MAE (14.43594; lower is better) is far above the target (0.13738), and in this environment you’re effectively always using the fallback baseline because the external blend directory doesn’t exist. The biggest score bug in your current fallback is that the “pressure memory” feature uses `time_step` and `u_in` as raw floats in the groupby key, which almost never matches between train and test due to tiny float differences—so it collapses to mostly zeros and harms performance. I fix this with a minimal, metric-aligned change: quantize `time_step` and `u_in` to the dataset’s natural grid within each breath (80 steps; u_in rounded to 0.1), and build the memory on those quantized keys so it actually transfers to test. Everything else (closed-form per-(R,C) ridge, residual correction, snapping to nearest valid pressure grid, and writing `submission.csv`) remains the same.'
+- What this solution (achieved 1.96493) has done: 'Your current score (2.11115 MAE; lower is better) is still far above the target (0.13738), and in this environment you aren’t actually blending because the external directory doesn’t exist—so the only way to move toward the target is to improve the fallback baseline while keeping the same “engineer features → per-(R,C) ridge → optional correction → snap to pressure grid” pipeline. The biggest remaining accuracy issue is that we never explicitly provide the model with the within-breath time index structure the pressure curve depends on; adding minimal step-based sinusoidal/time features and a couple of lagged cumulative features improves fit without changing the model family or training approach. I also align the “pressure memory” to use `step` only (already deterministic) and keep the richer key, but add a safe backoff to per-(R,C,step,u_out) median which transfers extremely well in this competition. Everything else (closed-form ridge, inspiratory-only training, residual correction only on inspiratory test rows, snapping, and writing `submission.csv`) remains unchanged and still runs end-to-end.'
+- What this solution (achieved 1.96453) has done: 'Your current score is far worse than the target, and in this environment you aren’t actually blending (the external directory won’t exist), so almost all performance comes from `_baseline_predictions_from_train`. To move the MAE down toward the target while preserving your core “engineer features → per-(R,C) closed-form ridge → residual correction → snap to valid pressure grid” logic, I make a minimal, competition-aligned change: train/predict the ridge (and residual correction) only on inspiratory-phase rows and explicitly set expiratory-phase predictions to a stable value (per-(R,C,step) median from train), since expiratory isn’t scored and this prevents the model from being distorted by mixed-phase dynamics. I also add a tiny per-step median “shape prior” feature (per (R,C,step) median pressure) that transfers strongly and is leak-free, without changing the model family. Everything else (blending behavior, snapping, and writing `submission.csv`) stays the same.'
+- What this solution (achieved 1.96453) has done: 'Your current MAE (1.96453; lower is better) is still far above the target (0.13738), so we should improve only the fallback path that actually runs here (no external blend files) while keeping your existing “engineer features → per-(R,C) closed-form ridge → residual correction → snap to valid pressure grid” pipeline intact. The smallest high-impact fix is to use the competition’s scoring rule explicitly: train the ridge and residual correction on inspiratory rows (u_out==0) as you already do, but also make the correction model *only see inspiratory targets and not be influenced by expiratory dynamics*, and set expiratory predictions to a stable, leak-free per-(R,C,step,u_out) median (instead of per-(R,C,step) alone) to better match phase behavior. Additionally, we add one minimal, score-aligned feature that captures within-breath valve state history: a cumulative count of u_out transitions and a lagged cumulative u_out, which helps around the inspiratory/expiratory boundary without changing the model family. Everything else (blending robustness, snapping to nearest valid pressure grid, output file name/format) remains the same, and the script still writes `submission.csv` end-to-end.'
+- What this solution (achieved 1.96458) has done: 'Your current score (1.96453 MAE; lower is better) is still far above the target (0.13738), and in this environment you’re effectively always using the fallback baseline (no external blend files), so the smallest impactful improvement is to make that fallback more metric-aligned without changing the ridge-based core pipeline. I keep your exact “engineer features → per-(R,C) closed-form ridge → residual correction → snap-to-pressure-grid” structure, but (1) ensure the per-(R,C,step,u_out) medians used for expiratory rows are computed from all rows (not just inspiratory), and (2) add one leak-free, competition-standard state proxy: a per-(R,C,step) median of **inspiratory u_in** as an additional feature so the linear model better captures the typical valve pattern over time. These changes are confined to the fallback model internals, preserve evaluation semantics, and should reduce MAE toward the target while still writing a valid `submission.csv` end-to-end.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+import os
+import copy
+import glob
+import random
+from random import random as rd
+import gc
+
+
+
+## === cell 1
+df_train = pd.read_csv("../input/ventilator-pressure-prediction/train.csv")
+
+unique_pressures = df_train["pressure"].unique()
+sorted_pressures = np.sort(unique_pressures)
+total_pressures_len = len(sorted_pressures)
+
+
+def find_nearest(prediction):
+    insert_idx = np.searchsorted(sorted_pressures, prediction)
+    if insert_idx == total_pressures_len:
+        return sorted_pressures[-1]
+    elif insert_idx == 0:
+        return sorted_pressures[0]
+    lower_val = sorted_pressures[insert_idx - 1]
+    upper_val = sorted_pressures[insert_idx]
+    return (
+        lower_val
+        if abs(lower_val - prediction) < abs(upper_val - prediction)
+        else upper_val
+    )
+
+
+def set_seed(seed=2021):
+    np.random.seed(seed)
+    random_state = np.random.RandomState(seed)
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    return random_state
+
+
+def wc(input_list):
+    """
+    Weighted combine for 1-2 files. Original notebook expects a special filename format
+    containing a score; keep behavior but make it robust if parsing fails.
+    """
+    l = []
+    arrs = []
+    for i in range(len(input_list)):
+        fn = input_list[i]
+        try:
+            public_lb_score = int(fn.split("/")[-1].split(".")[1].split(" ")[0])
+        except Exception:
+            public_lb_score = 1
+        l.append(public_lb_score)
+        arrs.append(pd.read_csv(fn)["pressure"].to_numpy().ravel())
+
+    l_sum = sum(l) if sum(l) != 0 else 1
+    if len(arrs) == 1:
+        return arrs[0]
+    else:
+        weight1 = (l[1] / l_sum) + 0.1
+        weight2 = 1 - weight1
+        return arrs[0] * weight1 + arrs[1] * weight2
+
+
+def _add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    df["area"] = df["u_in"] * df["time_step"]
+    gb = df.groupby("breath_id", sort=False)
+
+    df["u_in_cumsum"] = gb["u_in"].cumsum()
+    df["area_cumsum"] = gb["area"].cumsum()
+
+    df["u_in_lag1"] = gb["u_in"].shift(1).fillna(0.0)
+    df["u_out_lag1"] = gb["u_out"].shift(1).fillna(0).astype(df["u_out"].dtype)
+    df["u_in_diff1"] = df["u_in"] - df["u_in_lag1"]
+
+    df["u_out_cumsum"] = gb["u_out"].cumsum()
+
+    df["time_step_lag1"] = gb["time_step"].shift(1).fillna(0.0)
+    df["dt"] = (df["time_step"] - df["time_step_lag1"]).fillna(0.0)
+    df["t_cumsum"] = gb["dt"].cumsum()
+
+    df["u_in_roll3"] = (
+        gb["u_in"]
+        .rolling(window=3, min_periods=1)
+        .sum()
+        .reset_index(level=0, drop=True)
+    )
+    df["u_in_roll5"] = (
+        gb["u_in"]
+        .rolling(window=5, min_periods=1)
+        .sum()
+        .reset_index(level=0, drop=True)
+    )
+
+    df["u_in_x_R"] = df["u_in"] * df["R"]
+    df["u_in_x_C"] = df["u_in"] * df["C"]
+    df["uin_cumsum_x_R"] = df["u_in_cumsum"] * df["R"]
+    df["uin_cumsum_x_C"] = df["u_in_cumsum"] * df["C"]
+    df["area_cumsum_x_R"] = df["area_cumsum"] * df["R"]
+    df["area_cumsum_x_C"] = df["area_cumsum"] * df["C"]
+
+    df["u_in_sq"] = df["u_in"] ** 2
+
+    df["step"] = gb.cumcount().astype(np.int16)
+    df["step_f"] = df["step"].astype(np.float64) / 79.0
+    df["step_f2"] = df["step_f"] ** 2
+    df["step_sin"] = np.sin(2.0 * np.pi * df["step_f"])
+    df["step_cos"] = np.cos(2.0 * np.pi * df["step_f"])
+
+    df["u_in_q"] = (df["u_in"] * 10.0).round().astype(np.int16)  # u_in rounded to 0.1
+
+    df["u_in_cumsum_lag1"] = gb["u_in_cumsum"].shift(1).fillna(0.0)
+    df["area_cumsum_lag1"] = gb["area_cumsum"].shift(1).fillna(0.0)
+
+    df["u_out_cumsum_lag1"] = gb["u_out_cumsum"].shift(1).fillna(0).astype(np.int16)
+    df["u_out_change"] = (df["u_out"] != df["u_out_lag1"]).astype(np.int8)
+    df["u_out_change_cumsum"] = gb["u_out_change"].cumsum().astype(np.int16)
+
+    return df
+
+
+def _fit_ridge_closed_form(X: np.ndarray, y: np.ndarray, alpha: float) -> np.ndarray:
+    """
+    Closed-form ridge regression coefficients:
+      beta = (X^T X + alpha I)^(-1) X^T y
+    """
+    XtX = X.T @ X
+    n_feat = XtX.shape[0]
+    XtX_reg = XtX + alpha * np.eye(n_feat, dtype=X.dtype)
+    Xty = X.T @ y
+    return np.linalg.solve(XtX_reg, Xty)
+
+
+def _standardize_fit(X: np.ndarray):
+    """
+    Standardize features so ridge regularization is well-scaled across mixed-magnitude features.
+    """
+    mu = X.mean(axis=0)
+    sigma = X.std(axis=0)
+    sigma = np.where(sigma < 1e-12, 1.0, sigma)
+    return mu, sigma
+
+
+def _standardize_apply(X: np.ndarray, mu: np.ndarray, sigma: np.ndarray) -> np.ndarray:
+    return (X - mu) / sigma
+
+
+def _baseline_predictions_from_train(train_df, test_df):
+    """
+    Fallback baseline when no external blend files exist.
+
+    Core logic preserved:
+      - engineer features
+      - fit per-(R,C) ridge in closed form
+      - residual correction ridge
+      - snap to nearest valid pressure grid in g()
+
+    Minimal score-relevant changes in this version:
+      1) Compute per-(R,C,step,u_out) median pressures from ALL rows (not only inspiratory),
+         because we use it specifically to set expiratory predictions (u_out==1) and this
+         makes that stable baseline phase-correct.
+      2) Add a leak-free per-(R,C,step) median of inspiratory u_in ("uin_step_med") as a
+         simple state/trajectory prior feature; it transfers well and keeps the linear model.
+    """
+    key_cols = ["R", "C"]
+
+    tr = _add_engineered_features(train_df)
+    te = _add_engineered_features(test_df)
+
+    step_med_phase = (
+        tr.loc[:, ["R", "C", "step", "u_out", "pressure"]]
+        .groupby(["R", "C", "step", "u_out"], sort=False)["pressure"]
+        .median()
+        .rename("p_step_med_phase")
+        .reset_index()
+    )
+    tr = tr.merge(step_med_phase, on=["R", "C", "step", "u_out"], how="left")
+    te = te.merge(step_med_phase, on=["R", "C", "step", "u_out"], how="left")
+    tr["p_step_med_phase"] = tr["p_step_med_phase"].fillna(0.0)
+    te["p_step_med_phase"] = te["p_step_med_phase"].fillna(0.0)
+
+    step_med_insp = (
+        tr.loc[tr["u_out"] == 0, ["R", "C", "step", "pressure"]]
+        .groupby(["R", "C", "step"], sort=False)["pressure"]
+        .median()
+        .rename("p_step_med")
+        .reset_index()
+    )
+    tr = tr.merge(step_med_insp, on=["R", "C", "step"], how="left")
+    te = te.merge(step_med_insp, on=["R", "C", "step"], how="left")
+    tr["p_step_med"] = tr["p_step_med"].fillna(0.0)
+    te["p_step_med"] = te["p_step_med"].fillna(0.0)
+
+    uin_step_med = (
+        tr.loc[tr["u_out"] == 0, ["R", "C", "step", "u_in"]]
+        .groupby(["R", "C", "step"], sort=False)["u_in"]
+        .median()
+        .rename("uin_step_med")
+        .reset_index()
+    )
+    tr = tr.merge(uin_step_med, on=["R", "C", "step"], how="left")
+    te = te.merge(uin_step_med, on=["R", "C", "step"], how="left")
+    global_uin_med = float(tr.loc[tr["u_out"] == 0, "u_in"].median())
+    tr["uin_step_med"] = tr["uin_step_med"].fillna(global_uin_med)
+    te["uin_step_med"] = te["uin_step_med"].fillna(global_uin_med)
+
+    mem_cols_rich = ["R", "C", "step", "u_in_q", "u_out"]
+    mem_rich = (
+        tr.loc[tr["u_out"] == 0, mem_cols_rich + ["pressure"]]
+        .groupby(mem_cols_rich, sort=False)["pressure"]
+        .median()
+        .rename("p_mem_rich")
+        .reset_index()
+    )
+    tr = tr.merge(mem_rich, on=mem_cols_rich, how="left")
+    te = te.merge(mem_rich, on=mem_cols_rich, how="left")
+
+    mem_cols_step = ["R", "C", "step", "u_out"]
+    mem_step = (
+        tr.loc[tr["u_out"] == 0, mem_cols_step + ["pressure"]]
+        .groupby(mem_cols_step, sort=False)["pressure"]
+        .median()
+        .rename("p_mem_step")
+        .reset_index()
+    )
+    tr = tr.merge(mem_step, on=mem_cols_step, how="left")
+    te = te.merge(mem_step, on=mem_cols_step, how="left")
+
+    mem_cols_simple = ["R", "C", "u_in_q", "u_out"]
+    mem_simple = (
+        tr.loc[tr["u_out"] == 0, mem_cols_simple + ["pressure"]]
+        .groupby(mem_cols_simple, sort=False)["pressure"]
+        .median()
+        .rename("p_mem")
+        .reset_index()
+    )
+    tr = tr.merge(mem_simple, on=mem_cols_simple, how="left")
+    te = te.merge(mem_simple, on=mem_cols_simple, how="left")
+
+    tr["p_mem_rich"] = (
+        tr["p_mem_rich"].fillna(tr["p_mem_step"]).fillna(tr["p_mem"]).fillna(0.0)
+    )
+    te["p_mem_rich"] = (
+        te["p_mem_rich"].fillna(te["p_mem_step"]).fillna(te["p_mem"]).fillna(0.0)
+    )
+
+    tr_fit = tr.loc[
+        tr["u_out"] == 0,
+        [
+            "R",
+            "C",
+            "u_in",
+            "u_in_sq",
+            "u_in_lag1",
+            "u_in_diff1",
+            "u_in_cumsum",
+            "u_in_cumsum_lag1",
+            "area_cumsum",
+            "area_cumsum_lag1",
+            "u_out",
+            "u_out_lag1",
+            "u_out_cumsum",
+            "u_out_cumsum_lag1",
+            "u_out_change_cumsum",
+            "dt",
+            "t_cumsum",
+            "u_in_roll3",
+            "u_in_roll5",
+            "u_in_x_R",
+            "u_in_x_C",
+            "uin_cumsum_x_R",
+            "uin_cumsum_x_C",
+            "area_cumsum_x_R",
+            "area_cumsum_x_C",
+            "step_f",
+            "step_f2",
+            "step_sin",
+            "step_cos",
+            "uin_step_med",
+            "p_mem_rich",
+            "p_step_med",
+            "p_step_med_phase",
+            "pressure",
+        ],
+    ].copy()
+
+    feat_cols = [
+        "u_in",
+        "u_in_sq",
+        "u_in_lag1",
+        "u_in_diff1",
+        "u_in_cumsum",
+        "u_in_cumsum_lag1",
+        "area_cumsum",
+        "area_cumsum_lag1",
+        "u_out",
+        "u_out_lag1",
+        "u_out_cumsum",
+        "u_out_cumsum_lag1",
+        "u_out_change_cumsum",
+        "dt",
+        "t_cumsum",
+        "u_in_roll3",
+        "u_in_roll5",
+        "u_in_x_R",
+        "u_in_x_C",
+        "uin_cumsum_x_R",
+        "uin_cumsum_x_C",
+        "area_cumsum_x_R",
+        "area_cumsum_x_C",
+        "step_f",
+        "step_f2",
+        "step_sin",
+        "step_cos",
+        "uin_step_med",
+        "p_mem_rich",
+        "p_step_med",
+        "p_step_med_phase",
+    ]
+
+    Xg_raw = tr_fit[feat_cols].to_numpy(dtype=np.float64)
+    yg = tr_fit["pressure"].to_numpy(dtype=np.float64)
+    mu_g, sig_g = _standardize_fit(Xg_raw)
+    Xg = _standardize_apply(Xg_raw, mu_g, sig_g)
+    Xg = np.c_[Xg, np.ones(len(Xg), dtype=np.float64)]
+    alpha = 2e-3
+    coef_g = _fit_ridge_closed_form(Xg, yg, alpha=alpha)
+
+    coef_map = {}
+    scaler_map = {}
+    for (r, c), grp in tr_fit.groupby(key_cols, sort=False):
+        X_raw = grp[feat_cols].to_numpy(dtype=np.float64)
+        y = grp["pressure"].to_numpy(dtype=np.float64)
+        mu, sig = _standardize_fit(X_raw)
+        X = _standardize_apply(X_raw, mu, sig)
+        X = np.c_[X, np.ones(len(X), dtype=np.float64)]
+        coef = _fit_ridge_closed_form(X, y, alpha=alpha)
+        key = (int(r), int(c))
+        coef_map[key] = coef
+        scaler_map[key] = (mu, sig)
+
+    pred = np.empty(len(te), dtype=np.float64)
+    te_rc = list(zip(te["R"].astype(int).to_numpy(), te["C"].astype(int).to_numpy()))
+    te_idx = np.arange(len(te))
+    te_rc_arr = np.array(te_rc, dtype=np.int32)
+    Xte_raw_all = te[feat_cols].to_numpy(dtype=np.float64)
+
+    unique_keys = {(int(r), int(c)) for r, c in te_rc}
+    for k in unique_keys:
+        mask = (te_rc_arr[:, 0] == k[0]) & (te_rc_arr[:, 1] == k[1])
+        idx = te_idx[mask]
+        if len(idx) == 0:
+            continue
+        X_raw = Xte_raw_all[idx]
+        if k in coef_map:
+            mu, sig = scaler_map[k]
+            Xs = _standardize_apply(X_raw, mu, sig)
+            Xs = np.c_[Xs, np.ones(len(idx), dtype=np.float64)]
+            pred[idx] = Xs @ coef_map[k]
+        else:
+            Xs = _standardize_apply(X_raw, mu_g, sig_g)
+            Xs = np.c_[Xs, np.ones(len(idx), dtype=np.float64)]
+            pred[idx] = Xs @ coef_g
+
+    u_out_te = te["u_out"].to_numpy()
+    idx_exp = np.where(u_out_te == 1)[0]
+    if len(idx_exp) > 0:
+        p_exp = te.loc[idx_exp, "p_step_med_phase"].to_numpy(dtype=np.float64)
+        miss = ~np.isfinite(p_exp) | (p_exp == 0.0)
+        pred[idx_exp] = p_exp
+        if miss.any():
+            idx_m = idx_exp[miss]
+            rc_exp = te_rc_arr[idx_m]
+            for i, (rr, cc) in zip(idx_m, rc_exp):
+                k = (int(rr), int(cc))
+                pred[i] = float(coef_map[k][-1]) if k in coef_map else float(coef_g[-1])
+
+    tr_pred = np.empty(len(tr_fit), dtype=np.float64)
+    tr_fit_rc_arr = tr_fit[["R", "C"]].astype(int).to_numpy(dtype=np.int32)
+    Xtr_raw_all = tr_fit[feat_cols].to_numpy(dtype=np.float64)
+    tr_idx = np.arange(len(tr_fit))
+    for k, coef in coef_map.items():
+        mask = (tr_fit_rc_arr[:, 0] == k[0]) & (tr_fit_rc_arr[:, 1] == k[1])
+        idx = tr_idx[mask]
+        if len(idx) == 0:
+            continue
+        mu, sig = scaler_map[k]
+        Xs = _standardize_apply(Xtr_raw_all[idx], mu, sig)
+        Xs = np.c_[Xs, np.ones(len(idx), dtype=np.float64)]
+        tr_pred[idx] = Xs @ coef
+
+    resid = (tr_fit["pressure"].to_numpy(dtype=np.float64) - tr_pred).astype(np.float64)
+
+    corr_cols = [
+        "u_in",
+        "u_in_cumsum",
+        "area_cumsum",
+        "t_cumsum",
+        "u_in_x_R",
+        "u_in_x_C",
+        "area_cumsum_x_R",
+        "area_cumsum_x_C",
+        "step_f",
+        "step_sin",
+        "step_cos",
+        "uin_step_med",
+        "p_mem_rich",
+        "p_step_med",
+        "p_step_med_phase",
+        "u_out_cumsum_lag1",
+        "u_out_change_cumsum",
+    ]
+
+    Xcorr_raw = tr_fit[corr_cols].to_numpy(dtype=np.float64)
+    mu_c, sig_c = _standardize_fit(Xcorr_raw)
+    Xcorr = _standardize_apply(Xcorr_raw, mu_c, sig_c)
+    Xcorr = np.c_[Xcorr, np.ones(len(Xcorr), dtype=np.float64)]
+    coef_corr = _fit_ridge_closed_form(Xcorr, resid, alpha=1e-2)
+
+    Xcorr_te_raw = te[corr_cols].to_numpy(dtype=np.float64)
+    Xcorr_te = _standardize_apply(Xcorr_te_raw, mu_c, sig_c)
+    Xcorr_te = np.c_[Xcorr_te, np.ones(len(Xcorr_te), dtype=np.float64)]
+
+    idx_insp = np.where(u_out_te == 0)[0]
+    pred[idx_insp] = pred[idx_insp] + (Xcorr_te[idx_insp] @ coef_corr)
+
+    pred = np.clip(pred, float(sorted_pressures[0]), float(sorted_pressures[-1]))
+    return pred
+
+
+def g(dp):
+    """
+    Blend external prediction csvs from dp if present; otherwise run fallback baseline.
+    Always outputs a valid submission.csv.
+    """
+    sample_path = "../input/ventilator-pressure-prediction/sample_submission.csv"
+    test_path = "../input/ventilator-pressure-prediction/test.csv"
+
+    output = pd.read_csv(sample_path)
+    n = len(output)
+
+    files = []
+    if isinstance(dp, str) and os.path.isdir(dp):
+        for fp in glob.iglob(os.path.join(dp, "*")):
+            if fp.lower().endswith(".csv"):
+                files.append(fp)
+    files.sort()
+
+    valid_preds = []
+    for fp in files:
+        try:
+            dfp = pd.read_csv(fp, usecols=["pressure"])
+            arr = dfp["pressure"].to_numpy().ravel()
+            if len(arr) == n and np.isfinite(arr).all():
+                valid_preds.append(arr)
+        except Exception:
+            continue
+
+    if len(valid_preds) == 0:
+        df_test = pd.read_csv(test_path)
+        pred = _baseline_predictions_from_train(df_train, df_test)
+        output["pressure"] = pred
+        output["pressure"] = output["pressure"].apply(find_nearest)
+        output.to_csv("submission.csv", index=False)
+        return output
+
+    loop_time = 154
+    splits = max(1, len(valid_preds) // 2)
+
+    flist = []
+    if splits == 1:
+        flist = [np.mean(np.vstack(valid_preds), axis=0)]
+    else:
+        half = len(valid_preds) // 2
+        flist = [
+            np.mean(np.vstack(valid_preds[:half]), axis=0),
+            np.mean(np.vstack(valid_preds[half:]), axis=0),
+        ]
+
+    pred_list = []
+    for seed in range(loop_time):
+        set_seed(seed)
+        weight = [rd() for _ in range(len(flist))]
+        weight_sum = sum(weight) if sum(weight) != 0 else 1.0
+        weight = [w / weight_sum for w in weight]
+        weight.sort(reverse=True)
+
+        temp = np.zeros(n, dtype=np.float64)
+        for j in range(len(flist)):
+            temp += flist[j] * weight[j]
+        pred_list.append(temp)
+        del temp
+        gc.collect()
+
+    blended = np.median(np.vstack(pred_list), axis=0)
+    output["pressure"] = blended
+    output["pressure"] = output["pressure"].apply(find_nearest)
+
+    output.to_csv("submission.csv", index=False)
+    return output
+
+
+def blend(a, b):
+    a = pd.read_csv(a)
+    b = pd.read_csv(b)
+    a.pressure = a.pressure * 0.7 + b.pressure * 0.3
+    a["pressure"] = a["pressure"].apply(find_nearest)
+    a.to_csv("blend.csv", index=False)
+    return a
+
+
+def avg(input_list):
+    for i in range(len(input_list)):
+        input_list[i] = (pd.read_csv(input_list[i]).pressure).ravel()
+    output = sum(input_list) / len(input_list)
+    return output
+
+
+
+
+## === cell 2
+g("../input/gb-data-blending-recover")

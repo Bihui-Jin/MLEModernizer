@@ -1,0 +1,340 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the `scalar_coupling_constant` between atom pairs in molecules, given the two atom types (e.g., C and H), the coupling type (e.g., `2JHC`), and any features you are able to create from the molecule structure (`xyz`) files.
+
+## Metric
+Log of the Mean Absolute Error, calculated for each scalar coupling type, and then averaged across types.
+
+## Submission Format
+```
+id,scalar_coupling_constant
+2324604,0.0
+2324605,0.0
+2324606,0.0
+etc.
+```
+
+## Dataset
+The training and test splits are by *molecule*, so that no molecule in the training data is found in the test data.
+
+- **train.csv** - the training set, where the first column (`molecule_name`) is the name of the molecule where the coupling constant originates (the corresponding XYZ file is located at ./structures/.xyz), the second (`atom_index_0`) and third column (`atom_index_1`) is the atom indices of the atom-pair creating the coupling and the fourth column (`scalar_coupling_constant`) is the scalar coupling constant that we want to be able to predict
+- **test.csv** - the test set; same info as train, without the target variable
+- **sample_submission.csv** - a sample submission file in the correct format
+- **structures.zip** - folder containing molecular structure (xyz) files, where the first line is the number of atoms in the molecule, followed by a blank line, and then a line for every atom, where the first column contains the atomic element (H for hydrogen, C for carbon etc.) and the remaining columns contain the X, Y and Z cartesian coordinates (a standard format for chemists and molecular visualization programs)
+- **structures.csv** - this file contains the **same** information as the individual xyz structure files, but in a single file
+- **dipole_moments.csv** - contains the molecular electric dipole moments. These are three dimensional vectors that indicate the charge distribution in the molecule. The first column (`molecule_name`) are the names of the molecule, the second to fourth column are the `X`, `Y` and `Z` components respectively of the dipole moment.
+- **magnetic_shielding_tensors.csv** - contains the magnetic shielding tensors for all atoms in the molecules. The first column (`molecule_name`) contains the molecule name, the second column (`atom_index`) contains the index of the atom in the molecule, the third to eleventh columns contain the `XX`, `YX`, `ZX`, `XY`, `YY`, `ZY`, `XZ`, `YZ` and `ZZ` elements of the tensor/matrix respectively.
+- **mulliken_charges.csv** - contains the mulliken charges for all atoms in the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`atom_index`) contains the index of the atom in the molecule, the third column (`mulliken_charge`) contains the mulliken charge of the atom.
+- **potential_energy.csv** - contains the potential energy of the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`potential_energy`) contains the potential energy of the molecule.
+- **scalar_coupling_contributions.csv** - The scalar coupling constants in `train.csv` (or corresponding files) are a sum of four terms. `scalar_coupling_contributions.csv` contain all these terms. The first column (`molecule_name`) are the name of the molecule, the second (`atom_index_0`) and third column (`atom_index_1`) are the atom indices of the atom-pair, the fourth column indicates the type of coupling, the fifth column (`fc`) is the Fermi Contact contribution, the sixth column (`sd`) is the Spin-dipolar contribution, the seventh column (`pso`) is the Paramagnetic spin-orbit contribution and the eighth column (`dso`) is the Diamagnetic spin-orbit contribution.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        input/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        working/
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+```
+
+-> data/champs-scalar-coupling/dipole_moments.csv has 76510 rows and 4 columns.
+The columns are: molecule_name, X, Y, Z
+
+-> data/champs-scalar-coupling/magnetic_shielding_tensors.csv has 1379964 rows and 11 columns.
+The columns are: molecule_name, atom_index, XX, YX, ZX, XY, YY, ZY, XZ, YZ, ZZ
+
+-> data/champs-scalar-coupling/mulliken_charges.csv has 1379964 rows and 3 columns.
+The columns are: molecule_name, atom_index, mulliken_charge
+
+-> data/champs-scalar-coupling/potential_energy.csv has 76510 rows and 2 columns.
+The columns are: molecule_name, potential_energy
+
+-> data/champs-scalar-coupling/sample_submission.csv has 467813 rows and 2 columns.
+The columns are: id, scalar_coupling_constant
+
+-> data/champs-scalar-coupling/scalar_coupling_contributions.csv has 4191263 rows and 8 columns.
+The columns are: molecule_name, atom_index_0, atom_index_1, type, fc, sd, pso, dso
+
+-> data/champs-scalar-coupling/structures.csv has 1379964 rows and 6 columns.
+The columns are: molecule_name, atom_index, atom, x, y, z
+
+-> data/champs-scalar-coupling/test.csv has 467813 rows and 5 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type
+
+-> data/champs-scalar-coupling/train.csv has 4191263 rows and 6 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type, scalar_coupling_constant
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-2.058625093818288
+
+# 6. Current score
+
+1.18497
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.23566) has done: 'I remove the dependency on missing external input folders (`../input/champ-preds` and `../input/1-mpnn`) that cause the `FileNotFoundError`, and instead build a simple, valid baseline submission directly from the provided competition data. To keep the change minimal and score-stable, the script use the per-`type` mean target computed from `train.csv` and apply it to `test.csv`, which is a standard baseline for this competition. I also make the path handling robust to the provided directory layout and ensure the output file is a valid `.csv` with the required columns (`id,scalar_coupling_constant`). This guarantees an end-to-end run and a submission artifact without changing any hidden evaluation semantics.'
+- What this solution (achieved 1.18497) has done: 'You’re currently far better than the target (lower is better, and 1.23566 is much lower than -2.0586 is not possible because the metric is log(MAE) and should be negative for good models; this indicates your score is being *worse* than target because 1.23566 > -2.0586). To move toward the target, we should legitimately reduce MAE by making a minimal upgrade over the per-type mean baseline without changing the overall “simple tabular baseline” core approach. The smallest meaningful gain here is to use per-`type` **median** (more robust than mean) and add a single strong physics feature: the inter-atomic distance computed from `structures.csv`, then fit a separate **per-type** linear regression on distance only (very lightweight, fast, and stays within the same simple supervised tabular paradigm). We keep safe fallbacks (median) for any missing merges so the script always produces a valid submission CSV.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+
+CANDIDATE_ROOTS = [
+    "/kaggle/data/champs-scalar-coupling",
+    "/kaggle/input/champs-scalar-coupling",
+    "/kaggle/data",
+    "/kaggle/input",
+]
+DATA_ROOT = None
+for p in CANDIDATE_ROOTS:
+    if os.path.exists(os.path.join(p, "train.csv")) and os.path.exists(
+        os.path.join(p, "test.csv")
+    ):
+        DATA_ROOT = p
+        break
+
+if DATA_ROOT is None:
+    raise FileNotFoundError(
+        "Could not find train.csv/test.csv in expected locations. "
+        f"Tried: {CANDIDATE_ROOTS}"
+    )
+
+print("Using DATA_ROOT =", DATA_ROOT)
+print(
+    "Files:",
+    [
+        f
+        for f in ["train.csv", "test.csv", "sample_submission.csv", "structures.csv"]
+        if os.path.exists(os.path.join(DATA_ROOT, f))
+    ],
+)
+
+
+
+## === cell 1
+train = pd.read_csv(
+    os.path.join(DATA_ROOT, "train.csv"),
+    usecols=[
+        "id",
+        "molecule_name",
+        "atom_index_0",
+        "atom_index_1",
+        "type",
+        "scalar_coupling_constant",
+    ],
+)
+test = pd.read_csv(
+    os.path.join(DATA_ROOT, "test.csv"),
+    usecols=["id", "molecule_name", "atom_index_0", "atom_index_1", "type"],
+)
+
+structures = pd.read_csv(
+    os.path.join(DATA_ROOT, "structures.csv"),
+    usecols=["molecule_name", "atom_index", "x", "y", "z"],
+)
+
+s0 = structures.rename(
+    columns={"atom_index": "atom_index_0", "x": "x0", "y": "y0", "z": "z0"}
+)
+s1 = structures.rename(
+    columns={"atom_index": "atom_index_1", "x": "x1", "y": "y1", "z": "z1"}
+)
+
+train = train.merge(s0, on=["molecule_name", "atom_index_0"], how="left")
+train = train.merge(s1, on=["molecule_name", "atom_index_1"], how="left")
+test = test.merge(s0, on=["molecule_name", "atom_index_0"], how="left")
+test = test.merge(s1, on=["molecule_name", "atom_index_1"], how="left")
+
+for df in (train, test):
+    dx = df["x0"] - df["x1"]
+    dy = df["y0"] - df["y1"]
+    dz = df["z0"] - df["z1"]
+    df["dist"] = (dx * dx + dy * dy + dz * dz) ** 0.5
+
+type_median = train.groupby("type", sort=False)["scalar_coupling_constant"].median()
+global_median = float(train["scalar_coupling_constant"].median())
+
+
+
+## === cell 2
+models = {}
+for t, g in (
+    train[["type", "dist", "scalar_coupling_constant"]]
+    .dropna()
+    .groupby("type", sort=False)
+):
+    x = g["dist"].to_numpy()
+    y = g["scalar_coupling_constant"].to_numpy()
+    n = len(g)
+    if n < 2:
+        continue
+    x_mean = x.mean()
+    y_mean = y.mean()
+    denom = ((x - x_mean) ** 2).sum()
+    if denom == 0.0:
+        models[t] = (0.0, y_mean)
+    else:
+        a = (((x - x_mean) * (y - y_mean)).sum()) / denom  # slope
+        b = y_mean - a * x_mean  # intercept
+        models[t] = (float(a), float(b))
+
+pred = pd.Series(index=test.index, dtype="float64")
+test_dist = test["dist"]
+
+for t, (a, b) in models.items():
+    mask = (test["type"] == t) & test_dist.notna()
+    if mask.any():
+        pred.loc[mask] = a * test_dist.loc[mask].astype("float64") + b
+
+pred = (
+    pred.fillna(test["type"].map(type_median)).fillna(global_median).astype("float64")
+)
+
+submission = pd.DataFrame(
+    {"id": test["id"].astype("int64"), "scalar_coupling_constant": pred}
+)
+
+out_path = "sub_ensemble.csv"
+submission.to_csv(out_path, index=False)
+print("Wrote submission:", out_path, "shape=", submission.shape)
+print(submission.head())
+
+
+
+## === cell 3
+assert list(submission.columns) == ["id", "scalar_coupling_constant"]
+assert submission["scalar_coupling_constant"].isna().sum() == 0
+assert submission["id"].isna().sum() == 0
+assert submission["id"].is_unique
+
+submission.head(20)
+
+
+
+## === cell 4
+sample_path = os.path.join(DATA_ROOT, "sample_submission.csv")
+if os.path.exists(sample_path):
+    sample = pd.read_csv(sample_path)
+    print("sample_submission.csv shape=", sample.shape)
+    print("submission shape=", submission.shape)
+    if len(sample) == len(submission):
+        print("Same number of rows as sample submission.")
+    else:
+        print("Warning: Row count differs from sample submission.")
+else:
+    print("sample_submission.csv not found; skipping comparison.")

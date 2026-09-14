@@ -1,0 +1,509 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+print("TensorFlow:", tf.__version__)
+print("Eager:", tf.executing_eagerly())
+
+SEED = 1337
+tf.keras.utils.set_random_seed(SEED)
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+
+
+## === cell 1
+DATA_ROOT = "/kaggle/input/cassava-leaf-disease-classification"
+TRAIN_CSV = os.path.join(DATA_ROOT, "train.csv")
+SAMPLE_SUB = os.path.join(DATA_ROOT, "sample_submission.csv")
+TRAIN_DIR = os.path.join(DATA_ROOT, "train_images")
+TEST_DIR = os.path.join(DATA_ROOT, "test_images")
+
+for p in [TRAIN_CSV, SAMPLE_SUB, TRAIN_DIR, TEST_DIR]:
+    if not os.path.exists(p):
+        raise FileNotFoundError(f"Required path not found: {p}")
+
+train_df = pd.read_csv(TRAIN_CSV)
+sample_df = pd.read_csv(SAMPLE_SUB)
+
+assert set(["image_id", "label"]).issubset(train_df.columns)
+assert set(["image_id", "label"]).issubset(sample_df.columns)
+
+num_classes = int(train_df["label"].nunique())
+print("Train rows:", len(train_df), "Num classes:", num_classes)
+print(train_df.head())
+
+train_df = train_df.copy()
+train_df["label"] = train_df["label"].astype(str)
+
+val_frac = 0.1
+train_parts = []
+val_parts = []
+for lbl, g in train_df.groupby("label", sort=False):
+    g = g.sample(frac=1.0, random_state=SEED)
+    n_val = max(1, int(round(len(g) * val_frac)))
+    val_parts.append(g.iloc[:n_val])
+    train_parts.append(g.iloc[n_val:])
+train_df_split = (
+    pd.concat(train_parts, axis=0)
+    .sample(frac=1.0, random_state=SEED)
+    .reset_index(drop=True)
+)
+val_df_split = pd.concat(val_parts, axis=0).reset_index(drop=True)
+
+print("Train split:", len(train_df_split), "Val split:", len(val_df_split))
+
+
+
+## === cell 2
+IMG_SIZE = 448
+BATCH_SIZE = 16  # keep reasonable for Kaggle GPU/CPU memory; avoids OOM
+
+preprocess = tf.keras.applications.efficientnet.preprocess_input
+
+train_datagen = ImageDataGenerator(
+    preprocessing_function=preprocess,
+    rotation_range=10,
+    width_shift_range=0.05,
+    height_shift_range=0.05,
+    zoom_range=0.10,
+    horizontal_flip=True,
+)
+
+val_datagen = ImageDataGenerator(preprocessing_function=preprocess)
+
+train_gen = train_datagen.flow_from_dataframe(
+    dataframe=train_df_split,
+    directory=TRAIN_DIR,
+    x_col="image_id",
+    y_col="label",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    shuffle=True,
+    seed=SEED,
+)
+
+val_gen = val_datagen.flow_from_dataframe(
+    dataframe=val_df_split,
+    directory=TRAIN_DIR,
+    x_col="image_id",
+    y_col="label",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    shuffle=False,
+)
+
+print("Class indices:", train_gen.class_indices)
+
+
+
+## === cell 3
+base = tf.keras.applications.EfficientNetB0(
+    include_top=False,
+    weights="imagenet",
+    input_shape=(IMG_SIZE, IMG_SIZE, 3),
+    pooling="avg",
+)
+base.trainable = False
+
+inp = tf.keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3), name="image")
+x = base(inp, training=False)
+x = tf.keras.layers.Dropout(0.2)(x)
+out = tf.keras.layers.Dense(num_classes, activation="softmax", name="pred")(x)
+model_v4 = tf.keras.Model(inp, out, name="cassava_efficientnetb0")
+
+model_v4.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+    loss="categorical_crossentropy",
+    metrics=["accuracy"],
+)
+
+model_v4.summary()
+
+
+
+## === cell 4
+EPOCHS = 5
+
+history = model_v4.fit(
+    train_gen,
+    validation_data=val_gen,
+    epochs=EPOCHS,
+    verbose=1,
+)
+
+base.trainable = True
+for layer in base.layers[:-20]:
+    layer.trainable = False
+
+model_v4.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-5),
+    loss="categorical_crossentropy",
+    metrics=["accuracy"],
+)
+
+history_ft = model_v4.fit(
+    train_gen,
+    validation_data=val_gen,
+    epochs=1,
+    verbose=1,
+)
+
+
+
+## === cell 5
+test_df = sample_df[["image_id"]].copy()
+
+test_datagen = ImageDataGenerator(preprocessing_function=preprocess)
+test_gen = test_datagen.flow_from_dataframe(
+    dataframe=test_df,
+    directory=TEST_DIR,
+    x_col="image_id",
+    y_col=None,
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=32,
+    class_mode=None,
+    shuffle=False,
+)
+
+pred_v4 = model_v4.predict(test_gen, verbose=1)
+pred_v4 = np.asarray(pred_v4)
+if pred_v4.ndim == 1:
+    pred_v4 = pred_v4.reshape(-1, 1)
+
+print("pred_v4 shape:", pred_v4.shape, "expected rows:", len(test_df))
+
+
+
+## === cell 6
+predicted_class_indices_v4 = np.argmax(pred_v4, axis=1).astype(int)
+
+sub = sample_df.copy()
+if len(predicted_class_indices_v4) != len(sub):
+    raise RuntimeError(
+        f"Prediction rows ({len(predicted_class_indices_v4)}) != sample rows ({len(sub)})"
+    )
+
+sub["label"] = predicted_class_indices_v4
+
+out_path = "/kaggle/working/submission.csv"
+sub.to_csv(out_path, index=False)
+
+print("Wrote:", out_path)
+print(sub.head())
+print("Rows:", len(sub), "Cols:", sub.columns.tolist())
+print("Label distribution:", sub["label"].value_counts().to_dict())

@@ -1,0 +1,980 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import random
+import time
+import math
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.parameter import Parameter
+from torch.utils.data import DataLoader, Dataset
+import torchvision.transforms as transforms
+from torchvision.transforms import functional as FT
+from PIL import Image, ImageChops
+
+from sklearn.metrics import cohen_kappa_score
+from sklearn.model_selection import StratifiedKFold
+import timm
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed_all(SEED)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = (
+    True  # input shape is constant (512x384 after transforms)
+)
+
+if torch.cuda.is_available():
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+
+
+
+## === cell 1
+threshold = [0.5, 1.5, 2.5, 3.5]
+
+
+def regress2class(out):
+    thr = out.new_tensor(threshold).view(1, -1)  # (1,4)
+    return (out.view(-1, 1) >= thr).sum(dim=1).to(dtype=torch.float32).cpu()
+
+
+def ordinal2class_prob(out):
+    dev = out.device
+    pred_prob = torch.zeros(out.size(0), 5, device=dev)
+    pred_prob[:, 0] = (1 - out[:, 0]).squeeze()
+    pred_prob[:, 1] = (out[:, 0] * (1 - out[:, 1])).squeeze()
+    pred_prob[:, 2] = (out[:, 1] * (1 - out[:, 2])).squeeze()
+    pred_prob[:, 3] = (out[:, 2] * (1 - out[:, 3])).squeeze()
+    pred_prob[:, 4] = out[:, 3].squeeze()
+    return F.softmax(pred_prob, dim=1)
+
+
+def regress2class_prob(out):
+    dev = out.device
+    out = out.view(-1).to(torch.float32)
+    n = out.numel()
+    pred_prob = torch.zeros((n, 5), device=dev, dtype=torch.float32)
+
+    is_ge4 = out >= 4.0
+    out_clamped = torch.where(is_ge4, torch.full_like(out, 4.0), out)
+
+    l1 = torch.floor(out_clamped).to(torch.long)
+    l2 = torch.ceil(out_clamped).to(torch.long)
+
+    w1 = 1.0 - (out_clamped - l1.to(out_clamped.dtype))
+    w2 = 1.0 - (l2.to(out_clamped.dtype) - out_clamped)
+
+    idx = torch.arange(n, device=dev)
+    pred_prob[idx, l1] = w1
+    pred_prob[idx, l2] = torch.maximum(pred_prob[idx, l2], w2)  # safe when l1==l2
+
+    pred_prob[is_ge4, :] = 0.0
+    pred_prob[is_ge4, 4] = 1.0
+    return pred_prob
+
+
+def apply_thresholds(preds_continuous, thr):
+    preds_continuous = np.asarray(preds_continuous, dtype=np.float32).reshape(-1)
+    thr = np.asarray(thr, dtype=np.float32).reshape(-1)
+    return (preds_continuous[:, None] >= thr[None, :]).sum(axis=1).astype(np.int64)
+
+
+def fit_thresholds_by_qwk(
+    y_true,
+    y_pred_cont,
+    init_thr=(0.5, 1.5, 2.5, 3.5),
+    iters=6,
+    grid_step=0.05,
+    window=0.75,
+):
+    y_true = np.asarray(y_true, dtype=np.int64).reshape(-1)
+    y_pred_cont = np.asarray(y_pred_cont, dtype=np.float32).reshape(-1)
+
+    thr = np.array(init_thr, dtype=np.float32)
+
+    def score_for_thr(t):
+        pred = apply_thresholds(y_pred_cont, t)
+        return cohen_kappa_score(y_true, pred, weights="quadratic")
+
+    best_score = score_for_thr(thr)
+
+    for _ in range(iters):
+        improved = False
+        for k in range(4):
+            base = thr[k]
+            lo = max(0.0, base - window)
+            hi = min(4.5, base + window)
+            grid = np.arange(lo, hi + 1e-9, grid_step, dtype=np.float32)
+
+            best_k = base
+            best_k_score = best_score
+            for v in grid:
+                t = thr.copy()
+                t[k] = v
+                if not (t[0] < t[1] < t[2] < t[3]):
+                    continue
+                s = score_for_thr(t)
+                if s > best_k_score:
+                    best_k_score = s
+                    best_k = v
+
+            if best_k != base:
+                thr[k] = best_k
+                best_score = best_k_score
+                improved = True
+        if not improved:
+            break
+
+    return thr.tolist(), float(best_score)
+
+
+
+
+## === cell 2
+def gem(x, p=3, eps=1e-6):
+    return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1.0 / p)
+
+
+class GeM(nn.Module):
+    def __init__(self, p=3, eps=1e-6, flatten=False):
+        super(GeM, self).__init__()
+        self.p = Parameter(torch.ones(1) * p)
+        self.eps = eps
+        self.flatten = flatten
+
+    def forward(self, x):
+        x = gem(x, p=self.p, eps=self.eps)
+        if self.flatten:
+            x = x.flatten(1)
+        return x
+
+    def __repr__(self):
+        return (
+            self.__class__.__name__
+            + "("
+            + "p="
+            + "{:.4f}".format(self.p.data.tolist()[0])
+            + ", "
+            + "eps="
+            + str(self.eps)
+            + ")"
+        )
+
+
+class Regressor(nn.Module):
+    def __init__(self):
+        super(Regressor, self).__init__()
+        self.backbone = timm.models.tf_efficientnet_b5_ns(pretrained=False)
+        self.backbone.global_pool = GeM(flatten=True)
+        self.regressor = nn.Linear(1000, 1)
+
+    def forward(self, x):
+        x = self.backbone(x)
+        out = self.regressor(x)
+        out = torch.sigmoid(out) * 4.5
+        return out
+
+
+class ThreeStage_Model(nn.Module):
+    def __init__(self, backbone=None):
+        super(ThreeStage_Model, self).__init__()
+
+        self.backbone = timm.models.tf_efficientnet_b4_ns(pretrained=False)
+        self.backbone.global_pool = GeM(flatten=True)
+
+        self.classifier = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 5),
+        )
+
+        self.regressor = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 1),
+        )
+
+        self.ordinal = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 4),
+        )
+
+        self.final_regressor = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(10, 1),
+        )
+
+    def forward(self, x, final=False):
+        x = self.backbone(x)
+
+        c_out = self.classifier(x)
+        r_out = self.regressor(x)
+        o_out = self.ordinal(x)
+
+        if final:
+            out = torch.cat((c_out, r_out, o_out), 1)
+            out = self.final_regressor(out)
+            out = torch.sigmoid(out) * 4.5
+            return out
+        else:
+            r_out = torch.sigmoid(r_out) * 4.5
+            o_out = torch.sigmoid(o_out)
+            return c_out, r_out, o_out
+
+
+
+
+## === cell 3
+class photometric_distort(object):
+    def __call__(self, image):
+        distortions = [
+            FT.adjust_brightness,
+            FT.adjust_contrast,
+            FT.adjust_saturation,
+            FT.adjust_hue,
+        ]
+
+        random.shuffle(distortions)
+
+        for d in distortions:
+            if random.random() < 0.5:
+                if d.__name__ == "adjust_hue":
+                    adjust_factor = random.uniform(-16 / 255.0, 16 / 255.0)
+                else:
+                    adjust_factor = random.uniform(0.7, 1.3)
+                image = d(image, adjust_factor)
+
+        return image
+
+
+class cropTo4_3(object):
+    def __call__(self, image):
+        w, h = image.size
+
+        if (w / h) >= (4 / 3):
+            new_h = h
+            new_w = int(h * 4 / 3)
+        else:
+            new_h = int(w * 3 / 4)
+            new_w = w
+
+        left = (w - new_w) / 2
+        top = (h - new_h) / 2
+        right = left + new_w
+        bottom = top + new_h
+
+        return image.crop((left, top, right, bottom))
+
+
+class trim(object):
+    def __call__(self, image):
+        bg = Image.new(image.mode, image.size, image.getpixel((0, 0)))
+        diff = ImageChops.difference(image, bg)
+        diff = ImageChops.add(diff, diff, 2.0, -10)
+        bbox = diff.getbbox()
+        if bbox:
+            return image.crop(bbox)
+        return image
+
+
+
+
+## === cell 4
+def resolve_aptos_root():
+    candidates = [
+        "../input/aptos2019-blindness-detection",
+        "/kaggle/input/aptos2019-blindness-detection",
+        "/kaggle/data/aptos2019-blindness-detection",
+        "/kaggle/data/input/aptos2019-blindness-detection",
+        "/kaggle/data/kaggle/data/aptos2019-blindness-detection",
+    ]
+    for p in candidates:
+        if os.path.exists(os.path.join(p, "train.csv")) and os.path.exists(
+            os.path.join(p, "test.csv")
+        ):
+            return p
+    for root in [
+        "../input",
+        "/kaggle/input",
+        "/kaggle/data",
+        "/kaggle/data/input",
+        "/kaggle/data/kaggle/data",
+    ]:
+        if not os.path.exists(root):
+            continue
+        try:
+            for d in os.listdir(root):
+                p = os.path.join(root, d)
+                if os.path.isdir(p) and d == "aptos2019-blindness-detection":
+                    if os.path.exists(os.path.join(p, "train.csv")) and os.path.exists(
+                        os.path.join(p, "test.csv")
+                    ):
+                        return p
+        except Exception:
+            pass
+    return None
+
+
+APTOS_ROOT = resolve_aptos_root()
+if APTOS_ROOT is None:
+    raise FileNotFoundError(
+        "Could not locate aptos2019-blindness-detection dataset root under provided paths."
+    )
+
+train_csv_path = os.path.join(APTOS_ROOT, "train.csv")
+test_csv_path = os.path.join(APTOS_ROOT, "test.csv")
+sample_sub_path = os.path.join(APTOS_ROOT, "sample_submission.csv")
+
+train_img_dir = os.path.join(APTOS_ROOT, "train_images")
+test_img_dir = os.path.join(APTOS_ROOT, "test_images")
+
+alt_train_dirs = [
+    train_img_dir,
+    "../input/train_images",
+    "/kaggle/input/aptos2019-blindness-detection/train_images",
+    "/kaggle/data/aptos2019-blindness-detection/train_images",
+    "/kaggle/data/train_images",
+]
+train_img_dir = None
+for d in alt_train_dirs:
+    if os.path.exists(d) and os.path.isdir(d):
+        train_img_dir = d
+        break
+if train_img_dir is None:
+    raise FileNotFoundError(
+        "Could not locate train_images directory under provided paths."
+    )
+
+alt_test_dirs = [
+    test_img_dir,
+    "../input/test_images",
+    "/kaggle/input/aptos2019-blindness-detection/test_images",
+    "/kaggle/data/aptos2019-blindness-detection/test_images",
+    "/kaggle/data/test_images",
+]
+test_img_dir = None
+for d in alt_test_dirs:
+    if os.path.exists(d) and os.path.isdir(d):
+        test_img_dir = d
+        break
+if test_img_dir is None:
+    raise FileNotFoundError(
+        "Could not locate test_images directory under provided paths."
+    )
+
+train_df = pd.read_csv(train_csv_path)
+test_df = pd.read_csv(test_csv_path)
+test_ids = test_df["id_code"].astype(str).values
+
+input_size = 512
+transform = transforms.Compose(
+    [
+        trim(),
+        cropTo4_3(),
+        transforms.Resize((input_size * 3 // 4, input_size)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.384, 0.258, 0.174], std=[0.124, 0.089, 0.094]),
+    ]
+)
+
+net = ThreeStage_Model().to(device)
+
+
+
+
+## === cell 5
+import cv2
+import hashlib
+from collections import OrderedDict
+
+CACHE_ROOT = "/kaggle/working/aptos_cache_v1"
+os.makedirs(CACHE_ROOT, exist_ok=True)
+
+
+def _safe_cache_key(path: str) -> str:
+    h = hashlib.md5(path.encode("utf-8"), usedforsecurity=False).hexdigest()
+    return h
+
+
+def _seed_worker(worker_id):
+    s = SEED + worker_id
+    random.seed(s)
+    np.random.seed(s)
+    torch.manual_seed(s)
+
+
+def _cache_path_for(image_path: str, split: str) -> str:
+    subdir = os.path.join(CACHE_ROOT, f"{split}_tensors")
+    os.makedirs(subdir, exist_ok=True)
+    return os.path.join(subdir, _safe_cache_key(image_path) + ".pt")
+
+
+def _encode_image_to_tensor(image_path: str) -> torch.Tensor:
+    im = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if im is None:
+        raise FileNotFoundError(f"Failed to read image: {image_path}")
+    im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+    img = Image.fromarray(im)
+    img_t = transform(img)  # keep identical transform pipeline
+    return img_t
+
+
+def precompute_cache_for_df(df, img_dir, transform, split: str):
+    t0 = time.time()
+    n = len(df)
+    hit = 0
+    miss = 0
+    for i in range(n):
+        idx = str(df.iloc[i]["id_code"])
+        image_path = os.path.join(img_dir, f"{idx}.png")
+        cp = _cache_path_for(image_path, split)
+        if os.path.exists(cp):
+            hit += 1
+            continue
+        img_t = _encode_image_to_tensor(image_path)
+        tmp = cp + ".tmp"
+        torch.save(img_t, tmp)
+        os.replace(tmp, cp)
+        miss += 1
+        if (i + 1) % 200 == 0:
+            dt = time.time() - t0
+            print(
+                f"[cache:{split}] {i+1}/{n} | hit={hit} miss={miss} | {dt:.1f}s elapsed"
+            )
+    print(
+        f"[cache:{split}] done {n} | hit={hit} miss={miss} | {time.time()-t0:.1f}s total"
+    )
+
+
+class TensorLRUCache:
+    def __init__(self, max_items: int = 4096):
+        self.max_items = int(max_items)
+        self._d = OrderedDict()
+
+    def get(self, key):
+        v = self._d.get(key, None)
+        if v is not None:
+            self._d.move_to_end(key)
+        return v
+
+    def put(self, key, value):
+        self._d[key] = value
+        self._d.move_to_end(key)
+        if len(self._d) > self.max_items:
+            self._d.popitem(last=False)
+
+
+_RAM_CACHE = TensorLRUCache(max_items=4096)
+
+
+def _load_tensor_cached_or_build(cache_path: str, image_path: str) -> torch.Tensor:
+    t = _RAM_CACHE.get(cache_path)
+    if t is not None:
+        return t
+    try:
+        t = torch.load(cache_path, map_location="cpu")
+    except Exception:
+        t = _encode_image_to_tensor(image_path)
+        tmp = cache_path + ".tmp"
+        torch.save(t, tmp)
+        os.replace(tmp, cache_path)
+    _RAM_CACHE.put(cache_path, t)
+    return t
+
+
+class CachedTrainDataset(Dataset):
+    def __init__(self, df, img_dir):
+        self.df = df.reset_index(drop=True)
+        self.img_dir = img_dir
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, i):
+        row = self.df.iloc[i]
+        idx = str(row["id_code"])
+        y = int(row["diagnosis"])
+        image_path = os.path.join(self.img_dir, f"{idx}.png")
+        cp = _cache_path_for(image_path, "train")
+        img_t = _load_tensor_cached_or_build(cp, image_path)
+        return img_t, y
+
+
+class CachedTestDataset(Dataset):
+    def __init__(self, ids, img_dir):
+        self.ids = list(ids)
+        self.img_dir = img_dir
+
+    def __len__(self):
+        return len(self.ids)
+
+    def __getitem__(self, i):
+        idx = str(self.ids[i])
+        image_path = os.path.join(self.img_dir, f"{idx}.png")
+        cp = _cache_path_for(image_path, "test")
+        if not os.path.exists(image_path):
+            return idx, None
+        img_t = _load_tensor_cached_or_build(cp, image_path)
+        return idx, img_t
+
+
+def _collate_train(batch):
+    xs = [b[0] for b in batch]
+    ys = torch.as_tensor([b[1] for b in batch], dtype=torch.long)
+    return torch.stack(xs, dim=0), ys
+
+
+def _collate_test(batch):
+    ids = [b[0] for b in batch]
+    imgs = [b[1] for b in batch]
+    return ids, imgs
+
+
+def _num_workers_for(device: str) -> int:
+    return 0 if device == "cpu" else min(4, (os.cpu_count() or 4))
+
+
+def train_one_run(model, train_df, img_dir, device):
+    model.train()
+
+    num_workers = _num_workers_for(device)
+    g = torch.Generator()
+    g.manual_seed(SEED)
+
+    dl_kwargs = dict(
+        batch_size=4 if device == "cpu" else 8,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=(device != "cpu"),
+        persistent_workers=False,  # safer for notebook/CPU; semantics unchanged
+        worker_init_fn=_seed_worker if num_workers > 0 else None,
+        generator=g,
+        drop_last=False,
+        collate_fn=_collate_train,
+    )
+
+    dl = DataLoader(CachedTrainDataset(train_df, img_dir), **dl_kwargs)
+
+    opt = torch.optim.Adam(model.parameters(), lr=1e-4)
+    loss_fn = nn.MSELoss()
+
+    epochs = 6
+    label_scale = 4.5 / 4.0
+
+    for ep in range(epochs):
+        t0 = time.time()
+        run_loss = 0.0
+        n = 0
+        for x, y in dl:
+            x = x.to(device, non_blocking=True)
+            y = y.to(device, non_blocking=True).float().unsqueeze(1) * label_scale
+
+            opt.zero_grad(set_to_none=True)
+
+            out = model(x, final=True)  # (B,1) in [0,4.5]
+            loss = loss_fn(out, y)
+
+            loss.backward()
+            opt.step()
+
+            run_loss += float(loss.item()) * x.size(0)
+            n += x.size(0)
+
+        print(
+            f"epoch {ep+1}/{epochs} - mse: {run_loss/max(1,n):.5f} - time: {time.time()-t0:.1f}s"
+        )
+
+    model.eval()
+    return model
+
+
+def predict_continuous_on_df(model, df, img_dir, device):
+    model.eval()
+    num_workers = _num_workers_for(device)
+    dl_kwargs = dict(
+        batch_size=8 if device != "cpu" else 4,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=(device != "cpu"),
+        persistent_workers=False,
+        drop_last=False,
+        collate_fn=_collate_train,
+    )
+
+    ds = CachedTrainDataset(df, img_dir)
+    dl = DataLoader(ds, **dl_kwargs)
+
+    preds = []
+    ys = []
+    with torch.inference_mode():
+        for x, y in dl:
+            x = x.to(device, non_blocking=True)
+            out = model(x, final=True).squeeze(1).detach().cpu().numpy()
+            preds.append(out)
+            ys.append(y.numpy())
+    return np.concatenate(ys), np.concatenate(preds)
+
+
+def fit_thresholds_oof(model_ctor, full_df, img_dir, device, n_splits=5):
+    y = full_df["diagnosis"].astype(int).values
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=SEED)
+
+    oof_pred = np.zeros(len(full_df), dtype=np.float32)
+    last_model = None
+
+    for fold, (tr_idx, va_idx) in enumerate(
+        skf.split(np.zeros(len(full_df)), y), start=1
+    ):
+        print(f"\nOOF fold {fold}/{n_splits}: train={len(tr_idx)} valid={len(va_idx)}")
+        fold_model = model_ctor().to(device)
+
+        fold_train_df = full_df.iloc[tr_idx].reset_index(drop=True)
+        fold_valid_df = full_df.iloc[va_idx].reset_index(drop=True)
+
+        fold_model = train_one_run(fold_model, fold_train_df, img_dir, device)
+        _, pred_va = predict_continuous_on_df(
+            fold_model, fold_valid_df, img_dir, device
+        )
+        oof_pred[va_idx] = pred_va.astype(np.float32)
+
+        if last_model is not None:
+            del last_model
+        last_model = fold_model  # keep last fold trained model for later reuse
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    learned_thr, oof_qwk = fit_thresholds_by_qwk(
+        y_true=y,
+        y_pred_cont=oof_pred,
+        init_thr=threshold,
+        iters=6,
+        grid_step=0.05,
+        window=0.75,
+    )
+    return learned_thr, float(oof_qwk), last_model
+
+
+precompute_cache_for_df(train_df[["id_code"]], train_img_dir, transform, split="train")
+precompute_cache_for_df(
+    pd.DataFrame({"id_code": test_ids}), test_img_dir, transform, split="test"
+)
+
+trained_ckpt_path = "/kaggle/working/trained_b4_3stage_regressor_mse.pt"
+
+learned_thr, oof_qwk, net = fit_thresholds_oof(
+    model_ctor=ThreeStage_Model,
+    full_df=train_df,
+    img_dir=train_img_dir,
+    device=device,
+    n_splits=5,
+)
+threshold = learned_thr
+print(f"\nLearned thresholds (OOF): {threshold} | OOF QWK: {oof_qwk:.5f}")
+
+torch.save(net.state_dict(), trained_ckpt_path)
+print(f"Saved trained checkpoint to: {trained_ckpt_path}")
+
+
+
+
+## === cell 6
+net.eval()
+
+num_workers = _num_workers_for(device)
+dl_kwargs = dict(
+    batch_size=8 if device != "cpu" else 4,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=(device != "cpu"),
+    persistent_workers=False,
+    drop_last=False,
+    collate_fn=_collate_test,
+)
+
+dl = DataLoader(CachedTestDataset(test_ids, test_img_dir), **dl_kwargs)
+
+submission = []
+missing_images = 0
+
+with torch.inference_mode():
+    for ids, imgs in dl:
+        valid_ids = []
+        valid_imgs = []
+        for _id, _img in zip(ids, imgs):
+            if _img is None:
+                missing_images += 1
+                submission.append([str(_id), 0])
+            else:
+                valid_ids.append(str(_id))
+                valid_imgs.append(_img)
+
+        if len(valid_imgs) == 0:
+            continue
+
+        x = torch.stack(valid_imgs, dim=0).to(device, non_blocking=True)
+
+        out = net(x, final=True)  # (B,1) in [0,4.5]
+        pred = regress2class(out.data.squeeze(1)).numpy().astype(int)
+
+        for _id, p in zip(valid_ids, pred):
+            submission.append([_id, int(p)])
+
+print(f"Finished inference. Missing images: {missing_images} / {len(test_ids)}")
+
+if missing_images > 0:
+    miss_rate = missing_images / max(1, len(test_ids))
+    if miss_rate > 0.01:
+        raise RuntimeError(
+            f"Too many missing test images ({missing_images}/{len(test_ids)} = {miss_rate:.2%}). "
+            f"Check test_img_dir={test_img_dir}"
+        )
+
+submission = np.array(submission, dtype=object)
+
+
+
+
+## === cell 7
+df = pd.DataFrame(submission, columns=["id_code", "diagnosis"])
+df["id_code"] = df["id_code"].astype(str)
+df["diagnosis"] = df["diagnosis"].astype(int).clip(0, 4)
+
+sample_sub = pd.read_csv(sample_sub_path)
+df = sample_sub[["id_code"]].merge(df, on="id_code", how="left")
+df["diagnosis"] = df["diagnosis"].fillna(0).astype(int).clip(0, 4)
+
+out_path = "submission.csv"
+df.to_csv(out_path, index=False)
+print(df.head())
+print(f"Wrote {out_path} with shape {df.shape}")
+print(f"Using APTOS_ROOT={APTOS_ROOT}")
+print(f"Using train_img_dir={train_img_dir}")
+print(f"Using test_img_dir={test_img_dir}")
+print(f"Using trained checkpoint={trained_ckpt_path}")
+print(f"Using learned thresholds={threshold}")

@@ -1,0 +1,945 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a model to automatically segment the stomach and intestines on MRI scans.
+
+## Metric
+Mean Dice coefficient and 3D Hausdorff distance. 
+
+The Dice coefficient can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:
+
+$$
+\frac{2 \cdot |X \cap Y|}{|X| + |Y|}
+$$
+
+where $X$ is the predicted set of pixels and $Y$ is the ground truth. The Dice coefficient is defined to be 0 when both $X$ and $Y$ are empty. 
+
+Hausdorff distance is a method for calculating the distance between segmentation objects A and B, by calculating the furthest point on object A from the nearest point on object B. For 3D Hausdorff, we construct 3D volumes by combining each 2D segmentation with slice depth as the Z coordinate and then find the Hausdorff distance between them. (Here the slice depth for all scans is set to 1). The expected / predicted pixel locations are normalized by image size to create a bounded 0-1 score.
+
+The two metrics are combined, with a weight of 0.4 for the Dice metric and 0.6 for the Hausdorff distance.
+
+## Submission Format
+Use run-length encoding on the pixel values.  Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+Note that, at the time of encoding, the mask should be binary, meaning the masks for all objects in an image are joined into a single large mask. A value of 0 should indicate pixels that are not masked, and a value of 1 will indicate pixels that are masked.
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. The pixels are numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The file should contain a header and have the following format:
+
+```
+id,class,predicted
+1,large_bowel,1 1 5 1
+1,small_bowel,1 1
+1,stomach,1 1
+2,large_bowel,1 5 2 17
+etc.
+```
+
+## Dataset
+Each case is represented by multiple sets of scan slices (each set is identified by the day the scan took place). Some cases are split by time (early days are in train, later days are in test) while some cases are split by case - the entirety of the case is in train or test. The goal is to be able to generalize to both partially and wholly unseen cases.
+
+### Files
+- train.csv - IDs and masks for all training objects.
+- sample_submission.csv - a sample submission file in the correct format
+- train - a folder of case/day folders, each containing slice images for a particular case on a given day.
+
+Note that the image filenames include 4 numbers (ex. 276_276_1.63_1.63.png). These four numbers are slice width / height (integers in pixels) and width/height pixel spacing (floating points in mm). The first two defines the resolution of the slide. The last two record the physical size of each pixel.
+
+Physical pixel thickness in superior-inferior direction is 3mm.
+
+### Columns
+- `id` - unique identifier for object
+- `class` - the predicted class for the object
+- `segmentation` - RLE-encoded pixels for the identified object
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        input/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        working/
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+```
+
+-> data/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> data/uw-madison-gi-tract-image-segmentation/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/uw-madison-gi-tract-image-segmentation/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/uw-madison-gi-tract-image-segmentation/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> input/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.3344721353175812
+
+# 6. Current score
+
+0.07412
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.24608) has done: 'I fix the import/runtime failures by removing the conflicting `tensorflow`/`keras` mixed imports that trigger the protobuf `MessageFactory.GetPrototype` error, and by consistently using `tf.keras` APIs (including `load_model`). I also fix the data generator to output 3-channel images (your current code allocates `(…,128,128,3)` but loads only 1 channel), and correct dtype scaling to `float32`. For inference, I replace deprecated `predict_generator` with `model.predict`, ensure predictions align with the number of test images, and fix the `cv2.resize` argument order (OpenCV expects `(width,height)`), which was producing wrong shapes and downstream indexing issues. Finally, I generate the submission by starting from `sample_submission.csv` and filling `predicted` in the correct row order to guarantee a valid 20400-row submission CSV.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow import crash by setting the protobuf implementation to the pure-Python fallback before importing `tensorflow`, which resolves the `MessageFactory.GetPrototype` error in Kaggle environments. Then I fix the missing pretrained model path by searching for an available `.h5/.keras` model under `../input` and load it; if none is found, the script fall back to producing a valid (empty-mask) submission rather than crashing, ensuring end-to-end execution. I also make the `DataGenerator` robust to missing/NaN class columns during test-time inference (so it won’t KeyError), while preserving the same preprocessing and inference logic. Finally, I always write a correctly formatted `submission.csv` (20400 rows, columns `id,class,predicted`) aligned to `sample_submission.csv`.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/protobuf crash by setting the protobuf Python implementation *and* forcing the pure-Python backend before TensorFlow is imported, plus adding a safe fallback to continue even if TF still cannot import (so you always get a valid `submission.csv`). I also fix an inference-length bug: your `DataGenerator.__len__` drops the remainder, causing fewer predictions than test images and leaving most rows blank, which can yield a near-zero score; switching to `ceil` and predicting without an explicit `steps` makes predictions cover the full test set. Finally, I keep your model, preprocessing, and RLE logic intact while making the submission mapping robust to ensure all 20400 rows are filled in the correct order.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/protobuf import crash that currently prevents any model inference by setting the additional protobuf/TensorFlow env flags that are needed in Kaggle’s TF+protobuf combination and ensuring they are applied before importing TensorFlow. If TensorFlow still cannot import, the script still complete and write a valid `submission.csv`, but with the TF import fixed it should load the pretrained model and generate non-empty predictions, improving the score from 0.0 toward your target. I keep your model loading, generator, resizing, thresholding (rounding), and submission mapping logic the same, only touching what’s necessary for runtime stability and end-to-end output. I also add a safe fallback to guarantee the `predicted` column is fully populated (never NaN) and the submission has exactly the sample submission’s row order.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/protobuf crash that currently prevents any model from running by setting the additional environment flags that are required in Kaggle’s TF+protobuf combination *before* importing TensorFlow. To keep end-to-end execution guaranteed, I also keep a safe fallback path that still writes a valid `submission.csv` even if TensorFlow cannot import or a model file cannot be found. I preserve your core inference logic (generator → `model.predict` → resize → `np.round` → RLE) and only make minimal robustness fixes around imports and submission completeness so you don’t end up with missing/NaN predictions that can tank the score. No architecture/training logic is changed.'
+- What this solution (achieved 0.07411) has done: 'I fix the TensorFlow/protobuf import crash by forcing the pure-Python protobuf backend earlier and adding the additional env flags commonly required in Kaggle’s TF+protobuf combos, so the model can actually load and run inference (instead of producing empty masks and scoring 0.0). I also add a safe, score-positive fallback: if TF still can’t import or no model is found, the script generate a simple non-empty segmentation (via image-threshold-based mask) rather than all-empty RLEs, which should move the score up toward your target while keeping the rest of your pipeline (paths, resizing, RLE, submission mapping) intact. Finally, I keep the submission aligned to `sample_submission.csv` and ensure every row has a valid string in `predicted`.'
+- What this solution (achieved 0.07411) has done: 'I fix the TensorFlow/protobuf import crash that stops the notebook at cell 0 by applying the one reliable workaround in Kaggle: use the pure-Python protobuf backend and also pre-import `google.protobuf.message_factory` to force the correct symbol binding before `tensorflow` loads. Then, to move the score toward your target (your current 0.074 is far below 0.334), I keep your existing inference pipeline but replace the overly-harsh `np.round` binarization with a small, safer probability threshold (still a binary mask, same model outputs) and add a tiny per-class threshold list; this typically increases Dice a lot without changing core architecture/training. Finally, I keep the submission generation exactly aligned to `sample_submission.csv` and ensure all rows are populated with valid strings.'
+- What this solution (achieved 0.07411) has done: 'I fix the TensorFlow/protobuf crash that currently stops execution by patching the protobuf `MessageFactory` API mismatch before importing TensorFlow (this is the root cause of the `GetPrototype` AttributeError). To keep the solution end-to-end robust, the code still fall back to the existing heuristic-mask path if TensorFlow or the model cannot be loaded, but with the import fix it should actually run model inference and improve score toward your target. I also keep your existing generator/model/prediction logic intact and only add small safety around inference length/alignment so all 20400 submission rows are always populated. Finally, I preserve the exact submission format and write `submission.csv`.'
+- What this solution (achieved 0.07412) has done: 'I keep your model inference and RLE pipeline intact, but fix two issues that commonly suppress this competition’s score: (1) your image normalization is inconsistent with 16-bit MRI PNGs (dividing by 255 can saturate inputs), and (2) your test set ordering can silently mismatch the submission row order, hurting Dice/Hausdorff even if predictions are reasonable. Concretely, I normalize images using per-slice min–max (0–1) in both the generator and heuristic path (same core logic; just correct scaling), and I sort `df_train` by `id` to align with `sample_submission.csv` ordering before predicting and mapping. These are minimal, metric-relevant changes intended to move your score upward from 0.074 toward the 0.334 target without altering architecture, loss, or training. The script still always write a valid `submission.csv`.'
+- What this solution (achieved 0.07412) has done: 'I make two minimal, metric-relevant fixes that should improve your score from 0.074 toward the 0.334 target without changing your model, loss, training, or overall inference structure. First, I stop sorting `df_train` by `id`, because it breaks the required alignment between the generator’s prediction order and the submission’s `id,class` rows (this can severely tank Dice/Hausdorff even if masks look reasonable). Second, I ensure the number/order of predictions exactly matches `sample_submission.csv` by building `df_train` directly from `test.csv`/`sample_submission.csv` ids (not from a merge-derived order that can silently reorder rows), while keeping the same path-derivation logic and preprocessing. These are small ordering/alignment corrections that typically yield a large jump in this competition when the model is otherwise working.'
+- What this solution (achieved 0.07412) has done: 'I keep your current model/generator/inference/RLE pipeline, but fix one high-impact alignment issue: building `df_train` via `[::3]` from a merged dataframe can silently drop or reorder slices relative to `sample_submission.csv`, which severely hurts Dice/Hausdorff. Instead, I construct `df_train` directly from `test.csv` (unique slice ids) and map each id to its scan path by a single merge on `path_partial`, preserving exact row order and ensuring we predict for every test id. I also switch the resize used for probability maps from `INTER_NEAREST` to `INTER_LINEAR` (still followed by thresholding to binary) to reduce aliasing artifacts when upsampling, which typically improves segmentation boundary quality without changing the core logic. Finally, I ensure we always generate predictions for all test ids (20400 rows) and keep the submission mapping exactly aligned to `sample_submission.csv`.'
+- What this solution (achieved 0.07412) has done: 'Your current score (0.074) is far below the target (0.334), so the smallest safe way to move upward is to fix post-processing to better match the competition’s metric without changing your model or training. I keep the same inference pipeline, but (1) apply a per-class “keep only the largest connected component” cleanup to reduce false positives (helps both Dice and Hausdorff), and (2) add a very small per-class morphological closing to fill holes and improve boundary continuity after resizing. These changes are purely binary-mask post-processing (no architecture/loss/training changes) and should improve segmentation quality while keeping runtime under the limit and preserving submission alignment/format.'
+- What this solution (achieved 0.07412) has done: 'We need to move your score upward (0.07412 → target 0.33447), so we keep the same model inference pipeline and only adjust post-processing in a minimal, metric-aligned way. The biggest safe lever here is binarization + cleanup: instead of fixed per-class thresholds, we choose a per-class threshold using a small fixed grid and the model’s own output distribution (keeps semantics: still thresholding to binary, just calibrated). We also slightly relax the “largest connected component” step for small_bowel (it can be multi-lobed), keeping it for stomach/large_bowel to reduce false positives and improve Hausdorff. These changes are lightweight, deterministic, and preserve your architecture/training/inference structure while typically improving Dice/Hausdorff.'
+- What this solution (achieved 0.07412) has done: 'Your current score (0.07412) is far below the target (0.33447), so we should make small, metric-aligned post-processing changes that are likely to improve segmentation quality without touching your model, loss, or inference loop. I keep your existing threshold calibration logic, but add a lightweight per-class removal of tiny connected components (reduces false positives and improves Hausdorff) and a small “fill small holes” step (improves Dice) while keeping `small_bowel` less aggressive to avoid deleting multi-lobed anatomy. I also ensure the post-processing is applied after resizing in the same place you already do it, so ordering and submission mapping stay identical. These changes are deterministic, fast under 600s, and should move the score upward toward the target.'
+- What this solution (achieved 0.07412) has done: 'Your current score (0.07412) is far below the target (0.33447), so we should make small, metric-aligned post-processing adjustments that typically improve Dice/Hausdorff without touching the model or training. I keep your inference pipeline exactly the same, but (1) stop RLE-encoding completely empty masks (write `""` instead) to match the competition’s empty-mask convention, and (2) slightly reduce over-aggressive cleanup for `large_bowel`/`stomach` (removing the “keep only largest CC” step) because it can delete true multi-component anatomy and hurt Dice badly. These are minimal, deterministic changes applied only after thresholding/resizing, and they preserve your submission row alignment/format.'
+
+# 9. Code solution
+
+## === cell 0
+import os, random
+import numpy as np
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "2"
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "0")
+os.environ.setdefault("TF_FORCE_GPU_ALLOW_GROWTH", "true")
+os.environ.setdefault("CUDA_DEVICE_ORDER", "PCI_BUS_ID")
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+os.environ.setdefault("TF_XLA_FLAGS", "--tf_xla_enable_xla_devices=false")
+
+seed = 42
+random.seed(seed)
+np.random.seed(seed)
+
+TF_AVAILABLE = False
+TF_IMPORT_ERROR = None
+tf = None
+
+try:
+    import google.protobuf  # noqa: F401
+    from google.protobuf import message_factory as _message_factory  # noqa: E402
+
+    if hasattr(_message_factory, "MessageFactory") and not hasattr(
+        _message_factory.MessageFactory, "GetPrototype"
+    ):
+
+        def _GetPrototype(self, descriptor):
+            if hasattr(self, "GetMessageClass"):
+                return self.GetMessageClass(descriptor)
+            raise AttributeError(
+                "Neither GetPrototype nor GetMessageClass is available."
+            )
+
+        _message_factory.MessageFactory.GetPrototype = _GetPrototype
+
+    import tensorflow as tf  # noqa: E402
+
+    tf.random.set_seed(seed)
+    TF_AVAILABLE = True
+except Exception as e:
+    TF_AVAILABLE = False
+    TF_IMPORT_ERROR = repr(e)
+    tf = None
+    print("WARNING: TensorFlow failed to import; will fall back to heuristic masks.")
+    print("TF import error:", TF_IMPORT_ERROR)
+
+
+
+## === cell 1
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import pandas as pd
+import gc
+import cv2
+from glob import glob
+from tqdm import tqdm
+import math
+
+if TF_AVAILABLE:
+    from tensorflow.keras import backend as K
+    from tensorflow.keras.models import load_model
+    from tensorflow.keras.losses import binary_crossentropy
+
+
+
+## === cell 2
+BATCH_SIZE = 16
+EPOCHS = 30
+n_splits = 5
+fold_selected = 1  # 1..5
+
+
+
+## === cell 3
+df = pd.read_csv(
+    "../input/uw-madison-gi-tract-image-segmentation/sample_submission.csv"
+)
+DEBUG = False
+if df.shape[0] == 0:
+    DEBUG = True
+if DEBUG == True:
+    df = pd.read_csv("../input/uw-madison-gi-tract-image-segmentation/train.csv")
+    df.pop("segmentation")
+    df["predicted"] = ""
+
+
+
+## === cell 4
+df.rename(columns={"class": "class_name"}, inplace=True)
+df["case"] = df["id"].apply(lambda x: int(x.split("_")[0].replace("case", "")))
+df["day"] = df["id"].apply(lambda x: int(x.split("_")[1].replace("day", "")))
+df["slice"] = df["id"].apply(lambda x: x.split("_")[3])
+
+if DEBUG:
+    TRAIN_DIR = "../input/uw-madison-gi-tract-image-segmentation/train"
+else:
+    TRAIN_DIR = "../input/uw-madison-gi-tract-image-segmentation/test"
+
+all_train_images = glob(os.path.join(TRAIN_DIR, "**", "*.png"), recursive=True)
+
+if len(all_train_images) == 0:
+    raise RuntimeError(f"No PNG images found under {TRAIN_DIR}. Check dataset path.")
+
+x = all_train_images[0].rsplit("/", 4)[0]
+
+path_partial_list = []
+for i in range(0, df.shape[0]):
+    path_partial_list.append(
+        os.path.join(
+            x,
+            "case" + str(df["case"].values[i]),
+            "case" + str(df["case"].values[i]) + "_" + "day" + str(df["day"].values[i]),
+            "scans",
+            "slice_" + str(df["slice"].values[i]),
+        )
+    )
+df["path_partial"] = path_partial_list
+
+path_partial_list = []
+for i in range(0, len(all_train_images)):
+    path_partial_list.append(str(all_train_images[i].rsplit("_", 4)[0]))
+
+tmp_df = pd.DataFrame()
+tmp_df["path_partial"] = path_partial_list
+tmp_df["path"] = all_train_images
+
+df = df.merge(tmp_df, on="path_partial").drop(columns=["path_partial"])
+df["width"] = df["path"].apply(lambda x: int(x[:-4].rsplit("_", 4)[1]))
+df["height"] = df["path"].apply(lambda x: int(x[:-4].rsplit("_", 4)[2]))
+
+del x, path_partial_list, tmp_df
+df.head(5)
+
+
+
+## === cell 5
+if DEBUG:
+    df_train = pd.DataFrame({"id": df["id"][::3].values})
+    df_train["path"] = df["path"][::3].values
+    df_train["predicted"] = df["predicted"][::3].values
+    df_train["case"] = df["case"][::3].values
+    df_train["day"] = df["day"][::3].values
+    df_train["slice"] = df["slice"][::3].values
+    df_train["width"] = df["width"][::3].values
+    df_train["height"] = df["height"][::3].values
+else:
+    test_df = pd.read_csv("../input/uw-madison-gi-tract-image-segmentation/test.csv")
+    test_df = test_df.copy()
+    test_df.rename(columns={"class": "class_name"}, inplace=True)
+
+    test_df["case"] = test_df["id"].apply(
+        lambda x: int(x.split("_")[0].replace("case", ""))
+    )
+    test_df["day"] = test_df["id"].apply(
+        lambda x: int(x.split("_")[1].replace("day", ""))
+    )
+    test_df["slice"] = test_df["id"].apply(lambda x: x.split("_")[3])
+
+    df_train = test_df.drop_duplicates("id").reset_index(drop=True)
+
+    path_lookup = df[["id", "path", "width", "height"]].drop_duplicates("id")
+    df_train = df_train.merge(path_lookup, on="id", how="left")
+
+    if df_train["path"].isna().any():
+        missing = int(df_train["path"].isna().sum())
+        raise RuntimeError(
+            f"Missing image paths for {missing} test ids after merge. Check path construction/merge keys."
+        )
+
+    df_train["predicted"] = ""
+
+del df
+df_train.reset_index(inplace=True, drop=True)
+df_train.fillna("", inplace=True)
+df_train.head(5)
+
+
+
+## === cell 6
+print(df_train.shape)
+if DEBUG:
+    df_train = df_train.sample(frac=0.05, random_state=seed).reset_index(drop=True)
+print(df_train.shape)
+
+
+
+## === cell 7
+gc.collect()
+
+
+
+
+## === cell 8
+def rle_encode(img):
+    """
+    img: numpy array, 1 - mask, 0 - background
+    Returns run length as string formatted.
+    """
+    pixels = img.flatten(order="F")
+    pixels = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
+    runs[1::2] -= runs[::2]
+    return " ".join(str(x) for x in runs)
+
+
+def rle_encode_or_empty(mask01: np.ndarray) -> str:
+    m = (mask01 > 0).astype(np.uint8)
+    if m.sum() == 0:
+        return ""
+    return rle_encode(m)
+
+
+def rle_decode(mask_rle, shape, color=1):
+    """
+    mask_rle: run-length as string formatted (start length)
+    shape: (height,width,channels) of array to return
+    Returns numpy array.
+    """
+    if (
+        mask_rle is None
+        or mask_rle == ""
+        or (isinstance(mask_rle, float) and np.isnan(mask_rle))
+    ):
+        return np.zeros(shape, dtype=np.float32)
+
+    s = mask_rle.split()
+    starts, lengths = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
+    starts -= 1
+    ends = starts + lengths
+
+    img = np.zeros((shape[0] * shape[1], shape[2]), dtype=np.float32)
+    for lo, hi in zip(starts, ends):
+        img[lo:hi] = color
+    return img.reshape(shape, order="F")
+
+
+def build_masks(labels, input_shape, colors=True):
+    height, width = input_shape
+    if colors:
+        mask = np.zeros((height, width, 3), dtype=np.float32)
+        for label in labels:
+            mask += rle_decode(label, shape=(height, width, 3), color=np.random.rand(3))
+    else:
+        mask = np.zeros((height, width, 1), dtype=np.float32)
+        for label in labels:
+            mask += rle_decode(label, shape=(height, width, 1))
+    mask = mask.clip(0, 1)
+    return mask
+
+
+
+
+## === cell 9
+if TF_AVAILABLE:
+
+    class DataGenerator(tf.keras.utils.Sequence):
+        def __init__(self, df, batch_size=BATCH_SIZE, subset="train", shuffle=False):
+            super().__init__()
+            self.df = df.reset_index(drop=True)
+            self.shuffle = shuffle
+            self.subset = subset
+            self.batch_size = batch_size
+            self.on_epoch_end()
+
+        def __len__(self):
+            return int(math.ceil(len(self.df) / self.batch_size))
+
+        def on_epoch_end(self):
+            self.indexes = np.arange(len(self.df))
+            if self.shuffle:
+                np.random.shuffle(self.indexes)
+
+        def __getitem__(self, index):
+            start = index * self.batch_size
+            end = min((index + 1) * self.batch_size, len(self.df))
+            indexes = self.indexes[start:end]
+            cur_bs = len(indexes)
+
+            X = np.empty((cur_bs, 128, 128, 3), dtype=np.float32)
+            y = np.empty((cur_bs, 128, 128, 3), dtype=np.float32)
+
+            for i, img_path in enumerate(self.df.loc[indexes, "path"].values):
+                w = int(self.df.loc[indexes[i], "width"])
+                h = int(self.df.loc[indexes[i], "height"])
+
+                img = self.__load_grayscale_as_3ch(img_path)
+                X[i] = img
+
+                if self.subset == "train":
+                    for k, j in zip(
+                        [0, 1, 2], ["large_bowel", "small_bowel", "stomach"]
+                    ):
+                        rles = ""
+                        if j in self.df.columns:
+                            rles = self.df.loc[indexes[i], j]
+                        masks = rle_decode(rles, shape=(h, w, 1))
+                        masks = cv2.resize(
+                            masks, (128, 128), interpolation=cv2.INTER_NEAREST
+                        )
+                        y[i, :, :, k] = masks[:, :, 0]
+
+            if self.subset == "train":
+                return X, y
+            else:
+                return X
+
+        def __load_grayscale_as_3ch(self, img_path):
+            img = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH)
+            if img is None:
+                raise FileNotFoundError(f"Could not read image: {img_path}")
+            img = cv2.resize(img, (128, 128), interpolation=cv2.INTER_AREA)
+
+            img = img.astype(np.float32)
+            mn = float(img.min())
+            mx = float(img.max())
+            if mx > mn:
+                img = (img - mn) / (mx - mn)
+            else:
+                img = np.zeros_like(img, dtype=np.float32)
+
+            img = np.expand_dims(img, axis=-1)
+            img = np.repeat(img, 3, axis=-1)
+            return img
+
+
+
+
+## === cell 10
+gc.collect()
+
+
+
+## === cell 11
+if TF_AVAILABLE:
+
+    def dice_coef(y_true, y_pred, smooth=1.0):
+        y_true_f = K.flatten(y_true)
+        y_pred_f = K.flatten(y_pred)
+        intersection = K.sum(y_true_f * y_pred_f)
+        return (2.0 * intersection + smooth) / (
+            K.sum(y_true_f) + K.sum(y_pred_f) + smooth
+        )
+
+    def iou_coef(y_true, y_pred, smooth=1.0):
+        intersection = K.sum(K.abs(y_true * y_pred), axis=[1, 2, 3])
+        union = K.sum(y_true, [1, 2, 3]) + K.sum(y_pred, [1, 2, 3]) - intersection
+        iou = K.mean((intersection + smooth) / (union + smooth), axis=0)
+        return iou
+
+    def dice_loss(y_true, y_pred):
+        smooth = 1.0
+        y_true_f = K.flatten(y_true)
+        y_pred_f = K.flatten(y_pred)
+        intersection = y_true_f * y_pred_f
+        score = (2.0 * K.sum(intersection) + smooth) / (
+            K.sum(y_true_f) + K.sum(y_pred_f) + smooth
+        )
+        return 1.0 - score
+
+    def bce_dice_loss(y_true, y_pred):
+        y_true = tf.cast(y_true, tf.float32)
+        return binary_crossentropy(y_true, y_pred) + 0.5 * dice_loss(y_true, y_pred)
+
+    class FixedDropout(tf.keras.layers.Dropout):
+        def _get_noise_shape(self, inputs):
+            if self.noise_shape is None:
+                return self.noise_shape
+            symbolic_shape = K.shape(inputs)
+            noise_shape = [
+                symbolic_shape[axis] if shape is None else shape
+                for axis, shape in enumerate(self.noise_shape)
+            ]
+            return tuple(noise_shape)
+
+
+
+
+## === cell 12
+gc.collect()
+
+model = None
+if TF_AVAILABLE:
+    custom_objects = {
+        "FixedDropout": FixedDropout,
+        "dice_coef": dice_coef,
+        "iou_coef": iou_coef,
+        "bce_dice_loss": bce_dice_loss,
+    }
+
+    def find_first_model_file():
+        candidates = []
+        for pattern in [
+            "../input/**/model.h5",
+            "../input/**/*.h5",
+            "../input/**/*.keras",
+        ]:
+            candidates.extend(glob(pattern, recursive=True))
+        candidates_sorted = sorted(
+            candidates, key=lambda p: (os.path.basename(p) != "model.h5", len(p), p)
+        )
+        return candidates_sorted[0] if candidates_sorted else None
+
+    model_path = "../input/uwmgi-unet-keras/model.h5"
+    if not os.path.exists(model_path):
+        alt = find_first_model_file()
+        if alt is not None:
+            model_path = alt
+
+    if os.path.exists(model_path):
+        model = load_model(model_path, custom_objects=custom_objects, compile=False)
+        print("Loaded model from:", model_path)
+    else:
+        print(
+            "WARNING: No pretrained model file found under ../input. Will fall back to heuristic masks."
+        )
+
+gc.collect()
+
+
+
+## === cell 13
+LOGITS = None
+if TF_AVAILABLE and model is not None:
+    pred_batches = DataGenerator(df_train, batch_size=1, subset="test", shuffle=False)
+    gc.collect()
+    LOGITS = model.predict(pred_batches, verbose=1)
+    gc.collect()
+else:
+    pred_batches = None
+
+
+
+## === cell 14
+if LOGITS is None:
+    print("LOGITS: None (no model or TF unavailable). Using heuristic masks.")
+else:
+    print("LOGITS shape:", LOGITS.shape)
+print("df_train shape:", df_train.shape)
+
+
+
+
+## === cell 15
+def heuristic_mask_from_path(img_path, root_h, root_w):
+    img = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH)
+    if img is None:
+        return np.zeros((root_h, root_w), dtype=np.uint8)
+    if img.shape[0] != root_h or img.shape[1] != root_w:
+        img = cv2.resize(img, (root_w, root_h), interpolation=cv2.INTER_AREA)
+
+    img = img.astype(np.float32)
+    mn = float(img.min())
+    mx = float(img.max())
+    if mx > mn:
+        img = (img - mn) / (mx - mn)
+    else:
+        img = np.zeros_like(img, dtype=np.float32)
+    img8 = (img * 255.0).clip(0, 255).astype(np.uint8)
+
+    _, m = cv2.threshold(img8, 0, 1, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    if m.mean() < 0.01:  # almost empty -> invert
+        m = 1 - m
+    m = cv2.morphologyEx(m, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8), iterations=1)
+    return m.astype(np.uint8)
+
+
+def keep_largest_cc(mask01: np.ndarray) -> np.ndarray:
+    mask01 = (mask01 > 0).astype(np.uint8)
+    if mask01.sum() == 0:
+        return mask01
+    nlab, labels, stats, _ = cv2.connectedComponentsWithStats(mask01, connectivity=8)
+    if nlab <= 1:
+        return mask01
+    largest = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA])
+    return (labels == largest).astype(np.uint8)
+
+
+def remove_small_cc(mask01: np.ndarray, min_area: int) -> np.ndarray:
+    m = (mask01 > 0).astype(np.uint8)
+    if m.sum() == 0:
+        return m
+    nlab, labels, stats, _ = cv2.connectedComponentsWithStats(m, connectivity=8)
+    if nlab <= 1:
+        return m
+    out = np.zeros_like(m, dtype=np.uint8)
+    for lab in range(1, nlab):
+        if stats[lab, cv2.CC_STAT_AREA] >= int(min_area):
+            out[labels == lab] = 1
+    return out
+
+
+def fill_holes(mask01: np.ndarray) -> np.ndarray:
+    m = (mask01 > 0).astype(np.uint8)
+    if m.sum() == 0:
+        return m
+    h, w = m.shape
+    inv = (1 - m).astype(np.uint8)  # background as 1
+    ff = inv.copy()
+    flood_mask = np.zeros((h + 2, w + 2), np.uint8)
+    cv2.floodFill(ff, flood_mask, (0, 0), 0)  # remove outer background
+    holes = (ff > 0).astype(np.uint8)  # remaining are holes
+    return (m | holes).astype(np.uint8)
+
+
+def postprocess_mask(mask01: np.ndarray, cls: str) -> np.ndarray:
+    m = (mask01 > 0).astype(np.uint8)
+    if m.sum() == 0:
+        return m
+
+    if cls in ("large_bowel", "stomach"):
+        m = remove_small_cc(m, min_area=80)
+        m = cv2.morphologyEx(
+            m, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8), iterations=1
+        )
+        m = fill_holes(m)
+    else:  # small_bowel
+        m = remove_small_cc(m, min_area=40)
+        m = cv2.morphologyEx(
+            m, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8), iterations=1
+        )
+
+    return m.astype(np.uint8)
+
+
+def calibrate_thresholds_from_logits(logits: np.ndarray) -> dict:
+    if logits is None or logits.size == 0:
+        return {"large_bowel": 0.35, "small_bowel": 0.30, "stomach": 0.35}
+
+    n = logits.shape[0]
+    take = min(n, 256)
+    idx = np.linspace(0, n - 1, take, dtype=int)
+    sample = logits[idx]
+
+    candidates = np.array([0.20, 0.25, 0.30, 0.35, 0.40], dtype=np.float32)
+
+    out = {}
+    for ci, cls in enumerate(["large_bowel", "small_bowel", "stomach"]):
+        p = sample[..., ci].astype(np.float32).reshape(-1)
+
+        target_band = (0.002, 0.08) if cls != "small_bowel" else (0.003, 0.12)
+        best_t = float(candidates[2])
+        best_pen = 1e9
+        for t in candidates:
+            frac = float((p > t).mean())
+            if frac < target_band[0]:
+                pen = target_band[0] - frac
+            elif frac > target_band[1]:
+                pen = frac - target_band[1]
+            else:
+                pen = 0.0
+            pen = pen + 1e-4 * float(t)
+            if pen < best_pen:
+                best_pen = pen
+                best_t = float(t)
+        out[cls] = best_t
+    return out
+
+
+CLASS_THRESH = calibrate_thresholds_from_logits(LOGITS)
+print("Using CLASS_THRESH:", CLASS_THRESH)
+
+n_pred = len(df_train) if LOGITS is None else min(len(LOGITS), len(df_train))
+
+lbs, sbs, sts = [], [], []
+for index in tqdm(range(n_pred), total=n_pred):
+    root_h = int(df_train.iloc[index]["height"])
+    root_w = int(df_train.iloc[index]["width"])
+
+    if LOGITS is None:
+        m = heuristic_mask_from_path(df_train.iloc[index]["path"], root_h, root_w)
+        r = rle_encode_or_empty(m)
+        lbs.append(r)
+        sbs.append(r)
+        sts.append(r)
+        continue
+
+    pred0 = cv2.resize(
+        LOGITS[index, :, :, 0], (root_w, root_h), interpolation=cv2.INTER_LINEAR
+    )
+    pred1 = cv2.resize(
+        LOGITS[index, :, :, 1], (root_w, root_h), interpolation=cv2.INTER_LINEAR
+    )
+    pred2 = cv2.resize(
+        LOGITS[index, :, :, 2], (root_w, root_h), interpolation=cv2.INTER_LINEAR
+    )
+
+    pred_arr = (pred0 > CLASS_THRESH["large_bowel"]).astype(np.uint8)
+    pred_arr = postprocess_mask(pred_arr, "large_bowel")
+    lbs.append(rle_encode_or_empty(pred_arr))
+
+    pred_arr = (pred1 > CLASS_THRESH["small_bowel"]).astype(np.uint8)
+    pred_arr = postprocess_mask(pred_arr, "small_bowel")
+    sbs.append(rle_encode_or_empty(pred_arr))
+
+    pred_arr = (pred2 > CLASS_THRESH["stomach"]).astype(np.uint8)
+    pred_arr = postprocess_mask(pred_arr, "stomach")
+    sts.append(rle_encode_or_empty(pred_arr))
+
+del LOGITS
+gc.collect()
+
+
+
+## === cell 16
+df_ids = df_train[["id"]].iloc[:n_pred].reset_index(drop=True)
+gc.collect()
+
+
+
+## === cell 17
+sub = pd.read_csv(
+    "../input/uw-madison-gi-tract-image-segmentation/sample_submission.csv"
+)
+
+pred_map = {}
+for i in range(n_pred):
+    pred_map[(df_ids.loc[i, "id"], "large_bowel")] = lbs[i]
+    pred_map[(df_ids.loc[i, "id"], "small_bowel")] = sbs[i]
+    pred_map[(df_ids.loc[i, "id"], "stomach")] = sts[i]
+
+sub["predicted"] = [
+    pred_map.get((row_id, cls), "")
+    for row_id, cls in zip(sub["id"].values, sub["class"].values)
+]
+sub["predicted"] = sub["predicted"].fillna("").astype(str)
+
+sub.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", sub.shape)
+print(sub.head())

@@ -1,0 +1,286 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the sentiment of phrases.
+
+## Metric
+Classification accuracy.
+
+## Submission Format
+For each phrase in the test set, predict a label for the sentiment. Your submission should have a header and look like the following:
+
+```
+PhraseId,Sentiment
+156061,2
+156062,2
+156063,2
+...
+```
+
+## Dataset
+The dataset is comprised of tab-separated files with phrases. Each phrase has a PhraseId. Each sentence has a SentenceId.
+
+The sentiment labels are:
+
+0 - negative
+
+1 - somewhat negative
+
+2 - neutral
+
+3 - somewhat positive
+
+4 - positive
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (72 lines)
+            sampleSubmission.csv (46819 lines)
+            sampleSubmission.csv.zip (146.0 kB)
+            test.tsv (46819 lines)
+            test.tsv.zip (1.1 MB)
+            train.tsv (109243 lines)
+            train.tsv.zip (2.7 MB)
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+        input/
+            description.md (72 lines)
+            sampleSubmission.csv (46819 lines)
+            sampleSubmission.csv.zip (146.0 kB)
+            test.tsv (46819 lines)
+            test.tsv.zip (1.1 MB)
+            train.tsv (109243 lines)
+            train.tsv.zip (2.7 MB)
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+        working/
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+```
+
+-> data/movie-review-sentiment-analysis-kernels-only/sampleSubmission.csv has 46818 rows and 2 columns.
+Here is some information about the columns:
+PhraseId (int64) has range: 29.00 - 156030.00, 0 nan values
+Sentiment (int64) has 1 unique values: [2]
+
+-> data/sampleSubmission.csv has 46818 rows and 2 columns.
+Here is some information about the columns:
+PhraseId (int64) has range: 29.00 - 156030.00, 0 nan values
+Sentiment (int64) has 1 unique values: [2]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.51789
+
+# 6. Current score
+
+0.6656
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.66391) has done: 'I fix the runtime errors caused by incompatible `keras` imports (use `tf_keras` consistently) and the deprecated `to_categorical` import that triggers the protobuf `MessageFactory` issue in this Kaggle environment. I also restore the originally intended neural-text pipeline by actually creating `xtrain/xtest` with `Tokenizer.texts_to_matrix`, since the current model expects dense inputs but you currently feed sparse TF-IDF matrices. Finally, I correct the Embedding configuration (it was using number of samples as vocab size) and ensure the script always writes a valid `submission.csv` with `PhraseId,Sentiment`.'
+- What this solution (achieved 0.6656) has done: 'I fix the protobuf-related crash by avoiding `tf_keras.utils.to_categorical` (which triggers the `MessageFactory.GetPrototype` issue here) and instead create the one-hot labels with NumPy, keeping the same loss/metric semantics. I also make the TF-IDF/Tokenizer feature generation consistent and ensure the matrices are `float32` for stability and speed, without changing the model or training loop. Finally, I harden submission creation to always align predictions to `PhraseId` from the test file and write a valid `submission.csv` with the required columns.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import os
+
+print(os.listdir("../input"))
+
+
+
+## === cell 1
+train = pd.read_csv("../input/train.tsv", sep="\t")
+test = pd.read_csv("../input/test.tsv", sep="\t")
+submission = pd.read_csv("../input/sampleSubmission.csv")
+
+
+
+## === cell 2
+ytrain = train["Sentiment"].to_numpy(dtype=np.int64)
+
+
+
+## === cell 3
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfid_vector = TfidfVectorizer(analyzer="word", max_features=4000)
+tfid_vector.fit(train["Phrase"])
+
+_ = tfid_vector.transform(train["Phrase"])
+_ = tfid_vector.transform(test["Phrase"])
+
+
+
+## === cell 4
+"""
+import xgboost as xgb
+
+model_xgb=xgb.XGBClassifier(eta=0.2)
+model_xgb.fit(xtrain,ytrain)
+
+ypred_xgb=model_xgb.predict(xtest)
+"""
+
+
+
+## === cell 5
+"""
+import lightgbm as lgb
+
+d_train = lgb.Dataset(xtrain, label=ytrain)
+
+params = {}
+params['learning_rate'] = 0.002
+params['boosting_type'] = 'gbdt'
+params['objective'] = 'multiclass'
+params['metric'] = 'multi_logloss'
+params['num_class'] = 5
+
+model_lgb = lgb.train(params, d_train, 100)
+
+ypred_lgb=model_lgb.predict(xtest)
+"""
+
+
+
+## === cell 6
+"""
+pred_lgb=[]
+
+for x in ypred_lgb:
+    pred_lgb.append(np.argmax(x))
+"""
+
+
+
+## === cell 7
+import tf_keras as keras
+from tf_keras.preprocessing.text import Tokenizer
+
+token = Tokenizer(num_words=20000)
+token.fit_on_texts(train["Phrase"].astype(str))
+
+xtrain = token.texts_to_matrix(train["Phrase"].astype(str), mode="tfidf").astype(
+    np.float32
+)
+xtest = token.texts_to_matrix(test["Phrase"].astype(str), mode="tfidf").astype(
+    np.float32
+)
+
+num_classes = 5
+ytrain_cat = np.eye(num_classes, dtype=np.float32)[ytrain]
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 8
+"""
+from keras.preprocessing.sequence import pad_sequences
+
+max_length=20
+vocab_size=20000
+
+xtrain=pad_sequences(xtrain,maxlen=max_length,padding='post')
+"""
+
+
+
+## === cell 9
+from tf_keras import models, layers, optimizers
+
+model_DL = models.Sequential()
+model_DL.add(layers.Input(shape=(xtrain.shape[1],)))
+model_DL.add(layers.Dense(256, activation="relu"))
+model_DL.add(layers.Dropout(0.2))
+model_DL.add(layers.Dense(256, activation="relu"))
+model_DL.add(layers.Dropout(0.2))
+model_DL.add(layers.Dense(256, activation="relu"))
+model_DL.add(layers.Dropout(0.2))
+model_DL.add(layers.Dense(5, activation="softmax"))
+
+rmsprop = optimizers.RMSprop(learning_rate=0.001)
+
+model_DL.compile(
+    optimizer=rmsprop, loss="categorical_crossentropy", metrics=["accuracy"]
+)
+model_DL.fit(xtrain, ytrain_cat, epochs=4, batch_size=512, verbose=2)
+
+ypred_nn = model_DL.predict(xtest, verbose=0)
+pred_nn = np.argmax(ypred_nn, axis=1).astype(int)
+
+
+
+## === cell 10
+out = pd.DataFrame(
+    {"PhraseId": test["PhraseId"].to_numpy(dtype=np.int64), "Sentiment": pred_nn}
+)
+out.to_csv("submission.csv", index=False)
+
+print(out.head())
+print("Wrote submission.csv with shape:", out.shape)
+print("Submission columns:", out.columns.tolist())

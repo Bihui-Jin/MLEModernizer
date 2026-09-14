@@ -1,0 +1,959 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a model to automatically segment the stomach and intestines on MRI scans.
+
+## Metric
+Mean Dice coefficient and 3D Hausdorff distance. 
+
+The Dice coefficient can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:
+
+$$
+\frac{2 \cdot |X \cap Y|}{|X| + |Y|}
+$$
+
+where $X$ is the predicted set of pixels and $Y$ is the ground truth. The Dice coefficient is defined to be 0 when both $X$ and $Y$ are empty. 
+
+Hausdorff distance is a method for calculating the distance between segmentation objects A and B, by calculating the furthest point on object A from the nearest point on object B. For 3D Hausdorff, we construct 3D volumes by combining each 2D segmentation with slice depth as the Z coordinate and then find the Hausdorff distance between them. (Here the slice depth for all scans is set to 1). The expected / predicted pixel locations are normalized by image size to create a bounded 0-1 score.
+
+The two metrics are combined, with a weight of 0.4 for the Dice metric and 0.6 for the Hausdorff distance.
+
+## Submission Format
+Use run-length encoding on the pixel values.  Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+Note that, at the time of encoding, the mask should be binary, meaning the masks for all objects in an image are joined into a single large mask. A value of 0 should indicate pixels that are not masked, and a value of 1 will indicate pixels that are masked.
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. The pixels are numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The file should contain a header and have the following format:
+
+```
+id,class,predicted
+1,large_bowel,1 1 5 1
+1,small_bowel,1 1
+1,stomach,1 1
+2,large_bowel,1 5 2 17
+etc.
+```
+
+## Dataset
+Each case is represented by multiple sets of scan slices (each set is identified by the day the scan took place). Some cases are split by time (early days are in train, later days are in test) while some cases are split by case - the entirety of the case is in train or test. The goal is to be able to generalize to both partially and wholly unseen cases.
+
+### Files
+- train.csv - IDs and masks for all training objects.
+- sample_submission.csv - a sample submission file in the correct format
+- train - a folder of case/day folders, each containing slice images for a particular case on a given day.
+
+Note that the image filenames include 4 numbers (ex. 276_276_1.63_1.63.png). These four numbers are slice width / height (integers in pixels) and width/height pixel spacing (floating points in mm). The first two defines the resolution of the slide. The last two record the physical size of each pixel.
+
+Physical pixel thickness in superior-inferior direction is 3mm.
+
+### Columns
+- `id` - unique identifier for object
+- `class` - the predicted class for the object
+- `segmentation` - RLE-encoded pixels for the identified object
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+albumentations==2.0.8
+cupy-cuda12x==13.6.0
+fastai==2.8.5
+more-itertools==10.7.0
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-image==0.25.2
+scipy==1.15.3
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        input/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        working/
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+```
+
+-> data/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> data/uw-madison-gi-tract-image-segmentation/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/uw-madison-gi-tract-image-segmentation/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/uw-madison-gi-tract-image-segmentation/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> input/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8582293164570355
+
+# 6. Current score
+
+0.0
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I fix the immediate runtime blocker by making model loading robust: if the external `/kaggle/input/uwm-models/*.pkl` isn’t available, the script fall back to a valid baseline submission (all-empty masks) so a `.csv` is always produced end-to-end. I also correct a shape bug in `CreateSample` where the merged array used `(w,h,channels)` instead of `(h,w,channels)`, which would break inference if a learner is available. Finally, I make the inference cell conditional on a successfully loaded learner, preventing the downstream `NameError` and ensuring the submission format matches `sample_submission.csv` exactly.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is coming from the fallback path producing an all-empty submission because the model file is missing at `/kaggle/input/uwm-models/{model_name}.pkl`. To move the score toward the 0.858 target with minimal change, I make model discovery robust by searching `/kaggle/input/**` for a matching `.pkl` (and optionally accept an environment override), so inference actually runs when the notebook has the model attached under a different dataset name/path. I also ensure the test set file listing matches `sample_submission.csv` IDs (filtering to `scans/` PNGs and building packs from those), preventing silent ID/path mismatches that can yield empty/incorrect predictions even with a loaded model. Core model/inference logic, thresholds, and RLE encoding remain unchanged.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is almost certainly because the fallback path is being used (no `.pkl` found), producing an all-empty submission. The smallest change to move toward the 0.858 target is to make model discovery more robust (also searching for any `.pkl` that looks like your model name, and allowing a directory override), so inference actually runs when a model dataset is attached under an unexpected path/name. In addition, I add a strict ID/file alignment check so we only predict for IDs present in `sample_submission.csv` and report how many are missing, preventing silent misalignment that can yield near-zero scores even with a loaded model. Core architecture/inference (threshold=0.5, padding/resize, RLE) is unchanged.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 score is consistent with the fallback path writing an all-empty submission because no `.pkl` model is found/loaded. The smallest change that should move the score toward the 0.858 target (without changing the model/inference core) is to (1) broaden model discovery to also pick up common fastai export names like `export.pkl`, and (2) ensure the test item pipeline matches what the exported learner expects by explicitly providing the same `CreateSample`/`valid_aug` transforms when building the test dataloader. I also add a strict alignment check so every `id,class` row in `sample_submission.csv` receives a prediction (or empty string), avoiding accidental missing merges that can crater the score. These are execution/IO and dataloader-compatibility fixes; thresholding, RLE, and the learner itself remain unchanged.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 is consistent with the “no model found” fallback producing an all-empty submission, so the smallest score-moving change is to reliably find and load the exported fastai learner when it exists (commonly named `export.pkl`), and to ensure the test dataloader uses the same item transforms (`CreateSample`, `valid_aug`, `NormalizeSample`, `ChannelsFirst`) the learner expects so inference actually produces meaningful masks. I also fix the ID construction in `Metadata.extract` (it was using the wrong parent folder, causing mismatches with `sample_submission.csv` IDs like `case110_day12_slice_0001`). Finally, I add a strict completion step to guarantee every `id,class` row in `sample_submission.csv` gets exactly one prediction (never missing due to pack/step grouping), preventing silent gaps that can crater the score. These changes preserve your core inference logic (sigmoid + 0.5 threshold, padding/resize, RLE), and only address path/ID/dataloader alignment so the model can score non-zero.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is coming from the all-empty fallback path when no exported fastai learner is found/loaded, so the smallest score-moving change is to make model discovery and loading more robust (also accepting `.pth` state dicts is out-of-scope, so we only improve `.pkl` discovery and loading). Next, I fix two inference/format issues that can silently yield near-empty or invalid masks even when a learner loads: ensuring the decoded masks are cropped back to the model’s 288×288 (because `valid_aug()` produces 288 crops), and resizing from that crop size to the original scan size (instead of padding to 320 then resizing). Finally, I guarantee that every `id,class` in `sample_submission.csv` gets exactly one prediction by de-duplicating on `id,class` deterministically and then merging onto the sample submission (preserving required ordering). These changes keep your core approach (fastai exported learner + sigmoid + 0.5 threshold + RLE) intact and are aimed purely at moving the score upward toward the target by avoiding the empty-submission and mis-sized-mask pitfalls.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is consistent with either (a) the fallback all-empty submission path (no model actually loaded) or (b) a silent test ID/path mismatch that makes most predictions missing/empty after the merge. I keep your model/inference core intact, but make two minimal fixes that directly unblock non-empty predictions: (1) use the correct test file root (`/kaggle/input/.../test/` rather than relying on `get_image_files` over nested folders that can miss/duplicate), and (2) fix `Metadata.extract` to reliably construct IDs matching `sample_submission.csv` by deriving `caseXXX_dayY` from the path string. I also ensure we always build `paths` in the exact `sample_submission` ID order (so every row gets a prediction when scans exist), and add a hard assertion/log for how many IDs are actually found to prevent another near-empty submission.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is almost certainly because the script is still hitting the empty-mask fallback (no exported fastai learner successfully loaded), so the smallest score-moving change is to (1) broaden model discovery to include common fastai export filenames (and also look in `/kaggle/working/**`), and (2) fail “loudly” into the fallback only if loading actually fails (catching exceptions and logging them). Next, to avoid a silent near-empty submission even when a model loads, I ensure we generate predictions in the exact `sample_submission.csv` `id` order by building packs directly from the ordered `paths` list (not from dict/group iteration order), while keeping the same packing logic and transforms. Finally, I keep your existing inference core (sigmoid + 0.5 threshold + RLE) intact, but guarantee every `id,class` row is present by merging onto `sample_submission.csv` as you already do.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is coming from the empty-mask fallback, which happens when no exported fastai learner is found/loaded; so the smallest score-moving change is to reliably locate an available `.pkl` by (a) checking the competition’s standard input directory as well as `/kaggle/input/**` and (b) preferring `export.pkl` (the most common fastai export name) when `model_name.pkl` isn’t present. Next, to prevent “near-empty” predictions even when the model loads, I make the `id_to_path` mapping deterministic by warning on duplicate IDs and keeping the first (stable) occurrence, and I assert that we found scan paths for essentially all `sample_submission` IDs (so we don’t silently predict for only a small subset). These are execution/path/alignment fixes only; model inference (sigmoid + 0.5 threshold), transforms, and RLE encoding are unchanged.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with producing mostly-empty predictions due to a test ID ↔ scan-path mismatch (so many/most rows never get inferred and end up blank after the merge), even if the learner loads. I make the scan discovery and ID parsing deterministic by building `id_to_path` directly from the `sample_submission.csv` ids (parsing `caseXXX_dayYY_slice_ZZZZ`), then locating the corresponding PNG in the `test/**/scans/` tree; this preserves your model/inference core while ensuring we actually predict for the right slices. I keep your packing/inference/RLE logic intact, but rebuild `packs` from the ordered `paths` list so that every submission id has a corresponding center-slice prediction. Finally, I add a strict check that we found (nearly) all scan paths; if not, we still produce a valid CSV but you immediately see why the score would remain low.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 score is consistent with still producing mostly-empty/wrongly-aligned predictions because the code predicts only for the *center slice of each pack* and then merges by `id`, leaving most `id,class` rows blank, which craters the metric. I keep your core fastai learner inference (same transforms, sigmoid, threshold=0.5, RLE) but change packing so that we generate exactly one pack per `sample_submission` id (centered on that slice), ensuring 1:1 coverage. To make this robust, I build each pack directly from the ordered `predicted_ids` and the `scan_index`, clamping at boundaries, so every row gets a prediction when its PNG exists. Finally, I keep the same submission merge but it should now be mostly filled, moving the score upward toward your target.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is consistent with producing essentially empty/wrong masks even when inference runs, most commonly caused here by post-processing the 3-class outputs as three independent binary masks instead of the required single binary mask per slice (union of all organs). I keep your learner/inference pipeline intact, but change only the submission-building step to (a) union the 3 predicted channels into one binary mask and (b) duplicate that same RLE for each `class` row (as the competition requires a binary mask “joined into a single large mask”). I also add a tiny safety check to ensure we generate exactly one prediction per `id` before merging into `sample_submission`, preventing silent gaps. These changes directly address evaluation semantics without altering the model, transforms, thresholding, or training approach.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 score is most consistent with the “learner loads but predictions don’t align with the required class semantics” issue: the competition expects a separate mask per class, while your current code unions all 3 channels and duplicates the same RLE for every class, which can collapse Dice/Hausdorff to ~0. I keep your model/inference pipeline intact (same learner, transforms, sigmoid, threshold=0.5, resize/RLE), but change only the submission-building step to emit per-class RLE from each output channel. To avoid silent format/ordering problems, I also enforce that we produce exactly one (id,class) prediction per row and keep the sample_submission ordering unchanged. These minimal changes should move the score upward toward the 0.858 target while preserving core logic.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import re
+import sys
+import gc
+import logging
+from dataclasses import dataclass
+from pathlib import Path
+from collections import defaultdict
+from functools import partial
+
+import numpy as np
+import pandas as pd
+import cv2 as cv
+import torch
+
+import albumentations as A
+from more_itertools import windowed, chunked
+
+from fastai.vision.all import (
+    Transform,
+    ItemTransform,
+    TensorImage,
+    TensorMask,
+    show_image,
+    get_image_files,
+    load_learner,
+    progress_bar,
+    noop,
+)
+
+logging.captureWarnings(True)
+logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
+
+
+def on_kaggle() -> bool:
+    return os.path.exists("/kaggle")
+
+
+def equalize(img: np.ndarray) -> np.ndarray:
+    if img is None:
+        return img
+    if img.dtype != np.uint8:
+        x = img.astype(np.float32)
+        x = x - x.min()
+        mx = x.max()
+        if mx > 0:
+            x = x / mx
+        img8 = (x * 255).astype(np.uint8)
+    else:
+        img8 = img
+    return cv.equalizeHist(img8)
+
+
+
+
+## === cell 1
+@dataclass
+class Metadata:
+    sample_id: str
+    full_path: str
+    h: int
+    w: int
+
+    @classmethod
+    def extract(cls, path: Path) -> "Metadata":
+        s = str(path).replace("\\", "/")
+        m = re.search(r"(case\d+_day\d+)", s)
+        case_and_day = m.group(1) if m else path.parents[2].stem
+
+        parts = path.stem.split("_")
+        slice_no = None
+        if len(parts) >= 2 and parts[0] == "slice" and parts[1].isdigit():
+            slice_no = int(parts[1])
+        else:
+            nums = re.findall(r"\d+", path.stem)
+            slice_no = int(nums[0]) if nums else 0
+
+        img = cv.imread(str(path), cv.IMREAD_UNCHANGED)
+        h, w = img.shape[:2]
+
+        sample_id = f"{case_and_day}_slice_{int(slice_no):04d}"
+        return Metadata(sample_id, str(path), int(h), int(w))
+
+
+
+
+## === cell 2
+DATA_DIR = Path("/kaggle/input/uw-madison-gi-tract-image-segmentation/")
+
+DEBUG = False
+
+df_sample = pd.read_csv(DATA_DIR / "sample_submission.csv")
+TEST_IDS = df_sample["id"].drop_duplicates().tolist()
+
+img_root = DATA_DIR / ("train" if DEBUG else "test")
+
+TEST_FILES = [
+    p for p in get_image_files(img_root) if "/scans/" in str(p).replace("\\", "/")
+]
+
+METADATA = {m.sample_id: m for m in pd.Series(TEST_FILES).map(Metadata.extract)}
+
+logging.warning(
+    f"IDs in sample_submission: {len(TEST_IDS)} | scan PNGs found: {len(TEST_FILES)} | metadata IDs: {len(METADATA)}"
+)
+len(TEST_IDS), len(TEST_FILES), len(METADATA)
+
+
+
+
+## === cell 3
+def get_size_from_scan_path(s: Path):
+    img = cv.imread(str(s), cv.IMREAD_UNCHANGED)
+    h, w = img.shape[:2]
+    return (h, w)
+
+
+class CreateSample(Transform):
+    def encodes(self, pack):
+        h, w = get_size_from_scan_path(pack[0])
+        merged = np.ndarray((h, w, len(pack)), dtype=np.uint8)
+
+        q = 0.01
+        for i, fn in enumerate(pack):
+            img = cv.imread(str(fn), cv.IMREAD_UNCHANGED)
+            lo, hi = np.percentile(img, [q * 100, (1 - q) * 100])
+            img = np.clip(img, lo, hi)
+            v_min, v_max = np.min(img), np.max(img)
+            if float(v_max - v_min) > 0:
+                img = (img - v_min) / float(v_max - v_min)
+            else:
+                img = img * 0.0
+            img = (img * 255).astype(np.uint8)
+            merged[:, :, i] = img
+        return merged
+
+
+class TensorImageNChannels(TensorImage):
+    def show(self, ctx=None, channels=(0, 1, 2), **kwargs):
+        assert len(channels) == 3
+        visible_image = TensorImage(
+            torch.cat([self[..., c, None] for c in channels], dim=-1)
+        )
+        return show_image(visible_image, ctx=ctx, **kwargs)
+
+
+class AugBase(ItemTransform):
+    def __init__(self, aug):
+        self.aug = aug
+
+    def encodes(self, x):
+        if len(x) == 2:
+            img, mask = x
+            result = self.aug(image=img, mask=mask)
+            return TensorImageNChannels(result["image"]), TensorMask(result["mask"])
+        else:
+            (img,) = x
+            return (TensorImageNChannels(self.aug(image=img)["image"]),)
+
+
+class AugTrain(AugBase):
+    split_idx, order = 0, 2
+
+
+class AugValid(AugBase):
+    split_idx, order = 1, 2
+
+
+class ChannelsFirst(ItemTransform):
+    def encodes(self, x):
+        return tuple(t.permute(0, 3, 1, 2) for t in x)
+
+    def decodes(self, x):
+        return tuple(t.permute(0, 2, 3, 1) for t in x)
+
+
+class FloatMask(Transform):
+    order = 99
+
+    def encodes(self, x: TensorMask):
+        return TensorImage(x.float())
+
+    def decodes(self, x: TensorMask):
+        return TensorMask(x.long())
+
+
+class NormalizeSample(Transform):
+    order = 99
+
+    def setups(self, *args, **kwargs):
+        self.mean, self.std = 0.18161897, 0.257913
+
+    def encodes(self, x: TensorImageNChannels):
+        return (x - self.mean) / self.std
+
+    def decodes(self, x: TensorImageNChannels):
+        return x * self.std + self.mean
+
+
+def train_aug():
+    return AugTrain(
+        A.Compose(
+            [
+                A.Resize(320, 320),
+                A.CoarseDropout(
+                    min_holes=1,
+                    max_holes=8,
+                    min_height=4,
+                    max_height=288 // 10,
+                    min_width=4,
+                    max_width=288 // 10,
+                    mask_fill_value=0,
+                    p=0.1,
+                ),
+                A.ShiftScaleRotate(
+                    shift_limit=0.0625,
+                    scale_limit=0.2,
+                    rotate_limit=25,
+                    interpolation=cv.INTER_AREA,
+                    p=0.2,
+                ),
+                A.RandomCrop(288, 288),
+                A.OneOf([A.HorizontalFlip(p=1), A.VerticalFlip(p=0.3)], p=0.5),
+                A.OneOf(
+                    [
+                        A.MotionBlur(p=0.2),
+                        A.MedianBlur(p=0.2),
+                        A.Blur(blur_limit=1, p=0.1),
+                    ],
+                    p=0.2,
+                ),
+                A.Perspective(p=0.3),
+                A.GaussNoise(var_limit=0.001, p=0.2),
+                A.OneOf(
+                    [
+                        A.OpticalDistortion(p=0.3),
+                        A.GridDistortion(p=0.2),
+                        A.PiecewiseAffine(p=0.3),
+                    ],
+                    p=0.2,
+                ),
+                A.OneOf(
+                    [
+                        A.Sharpen(p=0.1),
+                        A.Emboss(p=0.1),
+                        A.RandomBrightnessContrast(p=0.0),
+                    ]
+                ),
+                A.Cutout(p=0.3),
+            ]
+        )
+    )
+
+
+def valid_aug():
+    return AugValid(A.Compose([A.Resize(320, 320), A.CenterCrop(288, 288)]))
+
+
+
+
+## === cell 4
+model_name = "dataset_norm_e10_e15"
+
+
+
+
+## === cell 5
+def find_model_path(model_name: str) -> Path | None:
+    env_p = os.environ.get("UWM_MODEL_PATH", "").strip()
+    if env_p:
+        p = Path(env_p)
+        if p.exists() and p.suffix == ".pkl":
+            return p
+
+    env_dir = os.environ.get("UWM_MODEL_DIR", "").strip()
+    if env_dir:
+        d = Path(env_dir)
+        if d.exists() and d.is_dir():
+            candidates = sorted(d.rglob("*.pkl"), key=lambda p: str(p))
+            for p in candidates:
+                if p.name == f"{model_name}.pkl":
+                    return p
+            for p in candidates:
+                if p.name.lower() == "export.pkl":
+                    return p
+            for p in candidates:
+                if model_name in p.name:
+                    return p
+            if candidates:
+                return candidates[0]
+
+    explicit = [
+        Path(f"/kaggle/input/uwm-models/{model_name}.pkl"),
+        Path("/kaggle/input/uwm-models/export.pkl"),
+        DATA_DIR / f"{model_name}.pkl",
+        DATA_DIR / "export.pkl",
+    ]
+    for p in explicit:
+        if p.exists():
+            return p
+
+    roots = [Path("/kaggle/input"), Path("/kaggle/working")]
+    for root in roots:
+        if not root.exists():
+            continue
+
+        exact_hits = list(root.rglob(f"{model_name}.pkl"))
+        if exact_hits:
+            exact_hits = sorted(exact_hits, key=lambda p: (len(p.parts), str(p)))
+            return exact_hits[0]
+
+        export_hits = list(root.rglob("export.pkl"))
+        if export_hits:
+            export_hits = sorted(export_hits, key=lambda p: (len(p.parts), str(p)))
+            return export_hits[0]
+
+        partial_hits = [p for p in root.rglob("*.pkl") if model_name in p.name]
+        if partial_hits:
+            partial_hits = sorted(partial_hits, key=lambda p: (len(p.parts), str(p)))
+            return partial_hits[0]
+
+    return None
+
+
+MODEL_PATH = find_model_path(model_name)
+learn = None
+if MODEL_PATH is not None and MODEL_PATH.exists():
+    logging.warning(f"Loading model from: {MODEL_PATH}")
+    try:
+        learn = load_learner(MODEL_PATH)
+    except Exception as e:
+        logging.exception(f"Failed to load learner from {MODEL_PATH}: {e}")
+        learn = None
+else:
+    logging.warning(
+        f"Model '{model_name}.pkl' not found under /kaggle/input or /kaggle/working. Falling back to empty-mask submission."
+    )
+
+
+
+## === cell 6
+if DEBUG:
+    predicted_ids = [
+        id_
+        for id_ in TEST_IDS
+        if id_.startswith("case123_day20") or id_.startswith("case77_day20")
+    ]
+else:
+    predicted_ids = TEST_IDS
+
+len(predicted_ids)
+
+
+
+
+## === cell 7
+def get_case_day(s: Path) -> str:
+    return re.search(r"case\d+_day\d+", str(s)).group()
+
+
+def get_slice(s: Path, as_number=False):
+    m = re.search(r"slice_\d\d\d\d", str(s))
+    if m is None:
+        nums = re.findall(r"\d+", s.stem)
+        val = int(nums[0]) if nums else 0
+        return val if as_number else f"slice_{val:04d}"
+    slice_no = m.group()
+    return int(slice_no.split("_")[-1]) if as_number else slice_no
+
+
+def get_sample_id(s: Path) -> str:
+    return f"{get_case_day(s)}_{get_slice(s)}"
+
+
+def group_case_day_from_files(image_files):
+    groups = defaultdict(list)
+    for fn in image_files:
+        groups[get_case_day(fn)].append(fn)
+    groups = {
+        k: sorted(v, key=partial(get_slice, as_number=True)) for k, v in groups.items()
+    }
+    return groups
+
+
+def packed(groups, n_slices_to_merge=3, step_size=2):
+    assert n_slices_to_merge % 2 != 0
+    chunks = []
+    for case_day, files in groups.items():
+        files = [None] + files + [None]
+        for pack in windowed(files, n=n_slices_to_merge, step=step_size):
+            pack = list(pack)
+            last_not_none = [i for i, x in enumerate(pack) if x is not None][-1]
+            if last_not_none != (len(pack) - 1):
+                for i in range(last_not_none, len(pack)):
+                    pack[i] = pack[last_not_none]
+            first_not_none = [i for i, x in enumerate(pack) if x is not None][0]
+            if first_not_none != 0:
+                for i in range(0, first_not_none):
+                    pack[i] = pack[first_not_none]
+            chunks.append(pack)
+    return chunks
+
+
+def parse_case_day_slice_from_id(sample_id: str) -> tuple[str, int]:
+    m = re.match(r"^(case\d+_day\d+)_slice_(\d{4})$", sample_id)
+    if m is None:
+        raise ValueError(f"Unexpected id format: {sample_id}")
+    return m.group(1), int(m.group(2))
+
+
+
+
+## === cell 8
+scan_index = defaultdict(dict)  # scan_index[case_day][slice_int] = Path
+for p in TEST_FILES:
+    cd = get_case_day(p)
+    sl = get_slice(p, as_number=True)
+    if sl not in scan_index[cd]:
+        scan_index[cd][sl] = p  # keep first deterministically
+
+paths = []
+missing = []
+for sid in predicted_ids:
+    cd, sl = parse_case_day_slice_from_id(sid)
+    p = scan_index.get(cd, {}).get(sl, None)
+    if p is None:
+        missing.append(sid)
+    else:
+        paths.append(p)
+
+if missing:
+    logging.warning(
+        f"Missing {len(missing)}/{len(predicted_ids)} scan paths from ID lookup (showing up to 5): {missing[:5]}"
+    )
+logging.warning(f"Resolved scan paths for {len(paths)}/{len(predicted_ids)} IDs.")
+
+for p in paths:
+    sid = get_sample_id(p)
+    if sid not in METADATA:
+        METADATA[sid] = Metadata.extract(p)
+
+if not DEBUG and len(paths) < int(0.99 * len(predicted_ids)):
+    logging.warning(
+        "Too many missing scan paths vs sample_submission ids; submission will likely score poorly. "
+        "Check TEST_FILES discovery and ID parsing."
+    )
+
+len(paths), (paths[0] if len(paths) else None)
+
+
+
+## === cell 9
+N_SLICES_TO_MERGE = 5
+assert N_SLICES_TO_MERGE % 2 == 1
+RADIUS = N_SLICES_TO_MERGE // 2
+
+packs = []
+pack_center_ids = []
+missing_for_packing = []
+
+for sid in predicted_ids:
+    cd, sl = parse_case_day_slice_from_id(sid)
+    sdict = scan_index.get(cd, {})
+    if sl not in sdict:
+        missing_for_packing.append(sid)
+        continue
+
+    available_slices = sorted(sdict.keys())
+    chosen = []
+    for off in range(-RADIUS, RADIUS + 1):
+        target = sl + off
+        if target in sdict:
+            chosen.append(sdict[target])
+        else:
+            nearest = min(available_slices, key=lambda x: (abs(x - target), x))
+            chosen.append(sdict[nearest])
+
+    packs.append(chosen)
+    pack_center_ids.append(sid)
+
+logging.warning(
+    f"Built packs: {len(packs)} (should match resolved IDs) | missing_for_packing: {len(missing_for_packing)}"
+)
+len(packs), (packs[0] if len(packs) else None), (
+    pack_center_ids[0] if len(pack_center_ids) else None
+)
+
+
+
+## === cell 10
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+device
+
+
+
+
+## === cell 11
+def mask2rle(mask: np.ndarray) -> str:
+    """
+    mask: 2D numpy array, 1 - mask, 0 - background
+    RLE encoding with pixels numbered top-to-bottom then left-to-right.
+    Achieved by flattening mask.T in C order.
+    """
+    if mask is None:
+        return ""
+    mask = mask.astype(np.uint8)
+    pixels = mask.T.flatten()
+    pixels = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
+    runs[1::2] -= runs[::2]
+    return " ".join(str(x) for x in runs)
+
+
+def rle2mask(mask_rle: str, shape):
+    s = np.asarray(mask_rle.split(), dtype=int)
+    starts = s[0::2] - 1
+    lengths = s[1::2]
+    ends = starts + lengths
+    img = np.zeros(shape[0] * shape[1], dtype=np.uint8)
+    for lo, hi in zip(starts, ends):
+        img[lo:hi] = 1
+    return img.reshape((shape[1], shape[0])).T
+
+
+def pad_mask(mask, image_size):
+    padded = np.zeros((image_size, image_size), dtype=mask.dtype)
+    dh = image_size - mask.shape[0]
+    dw = image_size - mask.shape[1]
+    top = dh // 2
+    left = dw // 2
+    padded[top : top + mask.shape[0], left : left + mask.shape[1]] = mask
+    return padded
+
+
+def center_crop_2d(x: np.ndarray, out_h: int, out_w: int) -> np.ndarray:
+    """Center crop a 2D array (used to align post-processing with valid_aug CenterCrop(288,288))."""
+    h, w = x.shape[:2]
+    if h == out_h and w == out_w:
+        return x
+    top = max((h - out_h) // 2, 0)
+    left = max((w - out_w) // 2, 0)
+    return x[top : top + out_h, left : left + out_w]
+
+
+
+
+## === cell 12
+preds = []
+
+if learn is not None:
+    learn.dls.to(device)
+    learn.eval()
+
+    item_tfms = [CreateSample(), valid_aug(), NormalizeSample(), ChannelsFirst()]
+
+    class_names = ("large_bowel", "small_bowel", "stomach")
+
+    with learn.no_bar():
+        batch_size = 64
+        for i0 in progress_bar(range(0, len(packs), batch_size)):
+            subset = packs[i0 : i0 + batch_size]
+            subset_center_ids = pack_center_ids[i0 : i0 + batch_size]
+
+            test_dl = learn.dls.test_dl(
+                subset,
+                batch_size=batch_size,
+                device=device,
+                rm_type_tfms=None,
+                num_workers=0,
+                item_tfms=item_tfms,
+            )
+
+            logits, *_ = learn.get_preds(dl=test_dl, act=noop)
+
+            labels = (
+                (torch.sigmoid(logits) >= 0.5).detach().cpu().numpy().astype(np.uint8)
+            )  # expected shape: (bs, 3, 288, 288)
+
+            for test_id, pack, mask in zip(subset_center_ids, subset, labels):
+                if test_id not in METADATA:
+                    center_p = pack[len(pack) // 2]
+                    METADATA[test_id] = Metadata.extract(center_p)
+
+                m = METADATA[test_id]
+                h, w = cv.imread(m.full_path, cv.IMREAD_UNCHANGED).shape[:2]
+
+                for ci, name in enumerate(class_names):
+                    cls_mask = mask[ci].astype(np.uint8)
+
+                    if cls_mask.shape[0] != 288 or cls_mask.shape[1] != 288:
+                        cls_mask = center_crop_2d(cls_mask, 288, 288)
+
+                    cls_mask = cv.resize(cls_mask, (w, h), cv.INTER_NEAREST)
+                    rle = mask2rle(cls_mask)
+
+                    preds.append({"id": test_id, "class": name, "predicted": rle})
+
+            del logits, labels, test_dl
+            gc.collect()
+else:
+    df_submit = pd.read_csv(DATA_DIR / "sample_submission.csv")
+    preds = df_submit.assign(predicted="").to_dict("records")
+
+len(preds), preds[0] if len(preds) else None
+
+
+
+## === cell 13
+df_preds = pd.DataFrame(preds)
+df_submit = pd.read_csv(DATA_DIR / "sample_submission.csv")
+
+if len(df_preds) > 0:
+    df_preds = (
+        df_preds.groupby(["id", "class"], as_index=False)["predicted"]
+        .last()
+        .reset_index(drop=True)
+    )
+
+df_submit = df_submit.drop(columns="predicted").merge(
+    df_preds, on=["id", "class"], how="left", validate="one_to_one"
+)
+df_submit["predicted"] = df_submit["predicted"].fillna("")
+df_submit = df_submit[["id", "class", "predicted"]]
+
+out_path = Path("submission.csv")
+df_submit.to_csv(out_path, index=False)
+
+non_empty = int((df_submit["predicted"].str.len() > 0).sum())
+logging.warning(f"Submission rows: {len(df_submit)} | non-empty RLE rows: {non_empty}")
+
+df_submit.head(), out_path, out_path.exists(), out_path.stat().st_size

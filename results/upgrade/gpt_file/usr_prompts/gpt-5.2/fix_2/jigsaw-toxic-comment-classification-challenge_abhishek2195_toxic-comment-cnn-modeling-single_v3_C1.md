@@ -1,0 +1,408 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of comments from Wikipedia's talk page edits, predict the probability of each comment being toxic.
+
+## Metric
+Mean column-wise ROC AUC; the average of the individual AUCs of each predicted column.
+
+## Submission Format
+For each `id` in the test set, you must predict a probability for each of the six possible types of comment toxicity (toxic, severe_toxic, obscene, threat, insult, identity_hate). The columns must be in the same order as shown below. The file should contain a header and have the following format:
+
+```
+id,toxic,severe_toxic,obscene,threat,insult,identity_hate
+00001cee341fdb12,0.5,0.5,0.5,0.5,0.5,0.5
+0000247867823ef7,0.5,0.5,0.5,0.5,0.5,0.5
+etc.
+```
+
+## Dataset 
+- **train.csv** - the training set, contains comments with their binary labels
+- **test.csv** - the test set, you must predict the toxicity probabilities for these comments.
+- **sample_submission.csv** - a sample submission file in the correct format
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (69 lines)
+            sample_submission.csv (153165 lines)
+            sample_submission.csv.zip (1.5 MB)
+            test.csv (552889 lines)
+            test.csv.zip (24.6 MB)
+            train.csv (561809 lines)
+            train.csv.zip (27.7 MB)
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+        input/
+            description.md (69 lines)
+            sample_submission.csv (153165 lines)
+            sample_submission.csv.zip (1.5 MB)
+            test.csv (552889 lines)
+            test.csv.zip (24.6 MB)
+            train.csv (561809 lines)
+            train.csv.zip (27.7 MB)
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+        working/
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+```
+
+-> data/jigsaw-toxic-comment-classification-challenge/sample_submission.csv has 153164 rows and 7 columns.
+The columns are: id, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/jigsaw-toxic-comment-classification-challenge/test.csv has 552888 rows and 2 columns.
+The columns are: id, comment_text
+
+-> data/jigsaw-toxic-comment-classification-challenge/train.csv has 561808 rows and 8 columns.
+The columns are: id, comment_text, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/sample_submission.csv has 153164 rows and 7 columns.
+The columns are: id, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/test.csv has 552888 rows and 2 columns.
+The columns are: id, comment_text
+
+-> data/train.csv has 561808 rows and 8 columns.
+The columns are: id, comment_text, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.959812062291402
+
+# 6. Current score
+
+0.50865
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.50865) has done: 'I fix the environment-breaking import issue by using `tf.keras` consistently (the protobuf `GetPrototype` error is triggered by legacy `keras` in some Kaggle images). I also fix the data loading paths by reading the provided `train.csv`/`test.csv` and creating the expected `cleaned` text column from `comment_text` so the existing tokenizer/model pipeline remains unchanged. Then I ensure all previously failing NameErrors disappear by defining variables in-order and keeping the same CNN architecture/training semantics. Finally, I write a valid `submission.csv` with the exact required columns and row alignment.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import os
+
+for dirname, _, filenames in os.walk("/kaggle/input"):
+    for filename in filenames[:5]:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 1
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
+
+import tensorflow as tf
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import (
+    Input,
+    Dense,
+    Embedding,
+    Dropout,
+    Conv1D,
+    GlobalMaxPooling1D,
+)
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.utils import plot_model
+from sklearn.metrics import roc_auc_score
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 2
+try:
+    tpu = tf.distribute.cluster_resolver.TPUClusterResolver()
+    print("Running on TPU ", tpu.master())
+except Exception:
+    tpu = None
+
+if tpu:
+    tf.config.experimental_connect_to_cluster(tpu)
+    tf.tpu.experimental.initialize_tpu_system(tpu)
+    strategy = tf.distribute.experimental.TPUStrategy(tpu)
+else:
+    strategy = tf.distribute.get_strategy()
+
+print("REPLICAS: ", strategy.num_replicas_in_sync)
+
+
+
+## === cell 3
+AUTO = tf.data.experimental.AUTOTUNE
+BATCH_SIZE = 8
+TOTAL_BATCH_SIZE = BATCH_SIZE * strategy.num_replicas_in_sync
+print("Total Batch Size:", TOTAL_BATCH_SIZE)
+
+
+
+## === cell 4
+BASE_DIR = "/kaggle/input/jigsaw-toxic-comment-classification-challenge"
+if not os.path.exists(BASE_DIR):
+    BASE_DIR = "/kaggle/input"
+
+train_path = os.path.join(BASE_DIR, "train.csv")
+test_path = os.path.join(BASE_DIR, "test.csv")
+sample_path = os.path.join(BASE_DIR, "sample_submission.csv")
+
+print("Using paths:")
+print(" train:", train_path, os.path.exists(train_path))
+print(" test :", test_path, os.path.exists(test_path))
+print(" sample:", sample_path, os.path.exists(sample_path))
+
+
+
+## === cell 5
+df_train = pd.read_csv(train_path)
+print("Shape=>", df_train.shape)
+df_train.head()
+
+
+
+## === cell 6
+df_test = pd.read_csv(test_path)
+print("Shape=>", df_test.shape)
+df_test.head()
+
+
+
+## === cell 7
+df_train["cleaned"] = df_train["comment_text"].fillna("").astype(str)
+df_test["cleaned"] = df_test["comment_text"].fillna("").astype(str)
+
+TARGET_COLS = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
+
+assert all(
+    c in df_train.columns for c in TARGET_COLS
+), "Missing target columns in train.csv"
+assert "id" in df_test.columns and "cleaned" in df_test.columns
+
+
+
+## === cell 8
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(df_train["cleaned"])
+
+
+
+## === cell 9
+print("Vocabulary Size=>", len(tokenizer.word_index))
+
+
+
+## === cell 10
+train_seq = tokenizer.texts_to_sequences(df_train["cleaned"])
+test_seq = tokenizer.texts_to_sequences(df_test["cleaned"])
+
+
+
+## === cell 11
+MAXLEN = 75
+
+
+
+## === cell 12
+train_seq = pad_sequences(train_seq, maxlen=MAXLEN, padding="post")
+test_seq = pad_sequences(test_seq, maxlen=MAXLEN, padding="post")
+
+
+
+## === cell 13
+vocabulary = len(tokenizer.word_index) + 1
+print("Vocabulary Size=>", vocabulary)
+
+
+
+## === cell 14
+print("Shape of train_sequence=>", train_seq.shape)
+print("Shape of test_sequence=>", test_seq.shape)
+
+
+
+## === cell 15
+y_train = df_train[TARGET_COLS].values.astype(np.float32)
+print(y_train.shape)
+
+
+
+## === cell 16
+print(df_train[TARGET_COLS].mean().to_dict())
+
+
+
+## === cell 17
+train_dataset = (
+    tf.data.Dataset.from_tensor_slices((train_seq, y_train))
+    .repeat()
+    .shuffle(42)
+    .batch(TOTAL_BATCH_SIZE)
+    .cache()
+    .prefetch(AUTO)
+)
+test_dataset = (
+    tf.data.Dataset.from_tensor_slices(test_seq)
+    .batch(TOTAL_BATCH_SIZE)
+    .cache()
+    .prefetch(AUTO)
+)
+
+
+
+## === cell 18
+print(train_dataset)
+print(test_dataset)
+
+
+
+## === cell 19
+np.random.seed(42)
+tf.random.set_seed(42)
+
+
+
+## === cell 20
+with strategy.scope():
+    input_1 = Input(shape=(MAXLEN,))
+    embedding_1 = Embedding(vocabulary, 50)(input_1)
+    conv_1 = Conv1D(filters=64, kernel_size=3, padding="same")(embedding_1)
+    dropout_1 = Dropout(0.2)(conv_1)
+    pool_1 = GlobalMaxPooling1D()(dropout_1)
+
+    dense = Dense(128, activation="relu")(pool_1)
+    output = Dense(6, activation="sigmoid")(dense)
+
+    model = Model(inputs=[input_1], outputs=output)
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(1e-3),
+        loss=tf.keras.losses.BinaryCrossentropy(),
+        metrics=["accuracy"],
+    )
+
+model.summary()
+try:
+    plot_model(model, to_file="model.png", show_shapes=True)
+    print("Saved model.png")
+except Exception as e:
+    print("plot_model skipped:", repr(e))
+
+
+
+## === cell 21
+es = EarlyStopping(
+    monitor="val_loss", mode="min", verbose=1, patience=5, min_delta=1e-5
+)
+mc = ModelCheckpoint(
+    "/kaggle/working/model.hdf5",
+    monitor="val_loss",
+    verbose=1,
+    save_best_only=True,
+    mode="min",
+)
+
+history = model.fit(
+    train_seq,
+    y_train,
+    batch_size=64,
+    epochs=100,
+    verbose=1,
+    validation_split=0.1,
+    callbacks=[es, mc],
+)
+
+
+
+## --- ERROR in cell 21, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/343241510.py in <cell line: 0>()
+      2     monitor="val_loss", mode="min", verbose=1, patience=5, min_delta=1e-5
+      3 )
+----> 4 mc = ModelCheckpoint(
+      5     "/kaggle/working/model.hdf5",
+      6     monitor="val_loss",
+
+/usr/local/lib/python3.11/dist-packages/keras/src/callbacks/model_checkpoint.py in __init__(self, filepath, monitor, verbose, save_best_only, save_weights_only, mode, save_freq, initial_value_threshold)
+    192                 self.filepath.endswith(ext) for ext in (".keras", ".h5")
+    193             ):
+--> 194                 raise ValueError(
+    195                     "The filepath provided must end in `.keras` "
+    196                     "(Keras model format). Received: "
+
+ValueError: The filepath provided must end in `.keras` (Keras model format). Received: filepath=/kaggle/working/model.hdf5
+
+## === cell 22
+train_pred = model.predict(train_seq, batch_size=256, verbose=1)
+print("In-sample Evaluation ROC-AUC Score:\n", roc_auc_score(y_train, train_pred))
+
+
+
+## === cell 23
+final_pred = model.predict(test_seq, batch_size=256, verbose=1)
+
+
+
+## === cell 24
+prob = pd.DataFrame(final_pred, columns=TARGET_COLS)
+prob.insert(0, "id", df_test["id"].values)
+
+
+
+## === cell 25
+prob.head()
+
+
+
+## === cell 26
+out_path = "/kaggle/working/submission.csv"
+prob.to_csv(out_path, index=False)
+print("Wrote:", out_path, "shape:", prob.shape)
+print(prob.columns.tolist())

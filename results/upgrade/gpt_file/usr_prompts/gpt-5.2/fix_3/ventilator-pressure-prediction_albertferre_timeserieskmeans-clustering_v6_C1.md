@@ -1,0 +1,343 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+6.162
+
+# 6. Current score
+
+5.35279
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 4.11712) has done: 'Your code currently can’t yield a Kaggle score reliably because it depends on `tslearn` (not available/offline here) and also does a very slow elbow loop; we remove the `tslearn` dependency and skip the elbow search while keeping your core idea: make per-time-step predictions using groupwise average pressures. To move the score toward your target (lower is better), we also fix a key issue: you compute clusters but never actually use them in the averaging; we include `cluster` in the aggregation/merge so the model has more signal than just `(R, C, step)`. Finally, we ensure the test merge can’t produce NaNs by adding a simple hierarchical fallback (cluster-specific mean → overall mean) so the submission is always valid.'
+- What this solution (achieved 5.35279) has done: 'Your current score (4.11712 MAE, lower is better) is better than the target (6.162), so we should *decrease* performance slightly to move closer to the target without changing the core “groupwise average pressure” logic. The smallest reliable way is to make predictions less specific by reducing reliance on the most granular aggregate (`R,C,cluster,step`) and leaning more on broader baselines (`R,C,step` and `step`). Concretely, we keep all the same features/aggregations, but we blend them with fixed weights so the output shifts toward a simpler mean model, which should raise MAE toward the target band. We keep the submission format and all paths intact.'
+
+# 9. Code solution
+
+## === cell 0
+import pandas as pd
+import numpy as np
+import os
+
+
+
+## === cell 1
+path = "../input/ventilator-pressure-prediction"
+train = pd.read_csv(os.path.join(path, "train.csv"))
+test = pd.read_csv(os.path.join(path, "test.csv"))
+sub = pd.read_csv(os.path.join(path, "sample_submission.csv"))
+
+
+
+## === cell 2
+train_ts = train["u_in"].values.reshape(-1, 80)
+test_ts = test["u_in"].values.reshape(-1, 80)
+
+
+
+## === cell 3
+N_CLUSTERS = 60
+
+
+def make_signature(ts_2d: np.ndarray) -> np.ndarray:
+    q20 = np.quantile(ts_2d, 0.20, axis=1)
+    q50 = np.quantile(ts_2d, 0.50, axis=1)
+    q80 = np.quantile(ts_2d, 0.80, axis=1)
+    mean = ts_2d.mean(axis=1)
+    slope = ts_2d[:, -1] - ts_2d[:, 0]
+    sig = np.vstack([q20, q50, q80, mean, slope]).T
+    return sig
+
+
+train_sig = make_signature(train_ts)
+test_sig = make_signature(test_ts)
+
+w = np.array([1.0, 1.5, 1.0, 1.2, 0.5], dtype=np.float64)
+train_score = (train_sig * w).sum(axis=1)
+test_score = (test_sig * w).sum(axis=1)
+
+cuts = np.quantile(train_score, np.linspace(0, 1, N_CLUSTERS + 1))
+cuts = np.unique(cuts)
+if len(cuts) < 3:
+    train_clusters = np.zeros(train_score.shape[0], dtype=np.int64)
+    test_clusters = np.zeros(test_score.shape[0], dtype=np.int64)
+else:
+    train_clusters = np.digitize(train_score, cuts[1:-1], right=True).astype(np.int64)
+    test_clusters = np.digitize(test_score, cuts[1:-1], right=True).astype(np.int64)
+
+
+
+## === cell 4
+pass
+
+
+
+## === cell 5
+train = train.copy()
+test = test.copy()
+
+train["cluster"] = np.repeat(train_clusters, 80)
+test["cluster"] = np.repeat(test_clusters, 80)
+
+train["step"] = train.groupby(["breath_id"]).cumcount()
+test["step"] = test.groupby(["breath_id"]).cumcount()
+
+avg_pressure_cluster = (
+    train.groupby(["R", "C", "cluster", "step"], as_index=False)["pressure"]
+    .mean()
+    .rename(columns={"pressure": "pressure_mean"})
+)
+
+
+
+## === cell 6
+assert train["step"].max() == 79
+assert test["step"].max() == 79
+avg_pressure_cluster.head()
+
+
+
+## === cell 7
+avg_rc_step = (
+    train.groupby(["R", "C", "step"], as_index=False)["pressure"]
+    .mean()
+    .rename(columns={"pressure": "pressure_mean_rc"})
+)
+
+avg_step = (
+    train.groupby(["step"], as_index=False)["pressure"]
+    .mean()
+    .rename(columns={"pressure": "pressure_mean_step"})
+)
+
+global_mean = float(train["pressure"].mean())
+
+
+
+## === cell 8
+pass
+
+
+
+## === cell 9
+test_pred = test[["id", "R", "C", "cluster", "step"]].merge(
+    avg_pressure_cluster, how="left", on=["R", "C", "cluster", "step"]
+)
+
+test_pred = test_pred.merge(avg_rc_step, how="left", on=["R", "C", "step"]).merge(
+    avg_step, how="left", on=["step"]
+)
+
+p_cluster = test_pred["pressure_mean"]
+p_rc = test_pred["pressure_mean_rc"]
+p_step = test_pred["pressure_mean_step"]
+
+p_cluster = p_cluster.fillna(p_rc)
+p_rc = p_rc.fillna(p_step)
+p_step = p_step.fillna(global_mean)
+
+W_CLUSTER = 0.30
+W_RC = 0.50
+W_STEP = 0.20
+
+pred = W_CLUSTER * p_cluster + W_RC * p_rc + W_STEP * p_step
+pred = pred.fillna(global_mean)
+
+
+
+## === cell 10
+sub = sub.merge(test_pred[["id"]], on="id", how="left")
+sub["pressure"] = pred.values
+
+sub["pressure"] = sub["pressure"].astype(np.float64).fillna(global_mean)
+
+sub.head()
+
+
+
+## === cell 11
+sub.to_csv("submission.csv", index=False)
+
+assert list(sub.columns) == ["id", "pressure"]
+assert len(sub) == len(test)
+print("Wrote submission.csv with shape:", sub.shape)
+
+
+
+## === cell 12
+pass
+
+
+
+## === cell 13
+pass
+
+
+
+## === cell 14
+print(sub.head(10))

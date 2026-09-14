@@ -1,0 +1,354 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Develop a model to classify paddy leaf images into one of the nine disease categories or normal leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+200001.jpg,normal
+200002.jpg,blast
+etc.
+```
+
+## Dataset
+**train.csv** - The training set
+
+- `image_id` - Unique image identifier corresponds to image file names (.jpg) found in the train_images directory.
+- `label` - Type of paddy disease, also the target class. There are ten categories, including the normal leaf.
+- `variety` - The name of the paddy variety.
+- `age` - Age of the paddy in days.
+
+**sample_submission.csv** - Sample submission file.
+
+**train_images** - Training images stored under different sub-directories corresponding to ten target classes. Filename corresponds to the `image_id` column of `train.csv`.
+
+**test_images** - Test set images.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (72 lines)
+            sample_submission.csv (2603 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (205.2 MB)
+            train.csv (7806 lines)
+            train.csv.zip (40.1 kB)
+            train.zip (162 Bytes)
+            train_images.zip (614.5 MB)
+            paddy-disease-classification/
+                description.md (72 lines)
+                sample_submission.csv (2603 lines)
+                ... and 7 other files
+                paddy-disease-classification/
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+                train_images/
+                    bacterial_leaf_blight/
+                        109831.jpg (91.1 kB)
+                        109785.jpg (81.8 kB)
+                        ... and 356 other files
+                    bacterial_leaf_streak/
+                        100394.jpg (99.7 kB)
+                        103308.jpg (104.3 kB)
+                        ... and 295 other files
+                    ... and 9 other folders
+            test_images/
+                102916.jpg (92.1 kB)
+                100596.jpg (83.9 kB)
+                ... and 2600 other files
+                test_images/
+            train_images/
+                bacterial_leaf_blight/
+                    109831.jpg (91.1 kB)
+                    109785.jpg (81.8 kB)
+                    ... and 356 other files
+                bacterial_leaf_streak/
+                    100394.jpg (99.7 kB)
+                    103308.jpg (104.3 kB)
+                    ... and 295 other files
+                ... and 9 other folders
+        input/
+            description.md (72 lines)
+            sample_submission.csv (2603 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (205.2 MB)
+            train.csv (7806 lines)
+            train.csv.zip (40.1 kB)
+            train.zip (162 Bytes)
+            train_images.zip (614.5 MB)
+            paddy-disease-classification/
+                description.md (72 lines)
+                sample_submission.csv (2603 lines)
+                ... and 7 other files
+                paddy-disease-classification/
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+                train_images/
+                    bacterial_leaf_blight/
+                        109831.jpg (91.1 kB)
+                        109785.jpg (81.8 kB)
+                        ... and 356 other files
+                    bacterial_leaf_streak/
+                        100394.jpg (99.7 kB)
+                        103308.jpg (104.3 kB)
+                        ... and 295 other files
+                    ... and 9 other folders
+            test_images/
+                102916.jpg (92.1 kB)
+                100596.jpg (83.9 kB)
+                ... and 2600 other files
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+            train_images/
+                bacterial_leaf_blight/
+                    109831.jpg (91.1 kB)
+                    109785.jpg (81.8 kB)
+                    ... and 356 other files
+                bacterial_leaf_streak/
+                    100394.jpg (99.7 kB)
+                    103308.jpg (104.3 kB)
+                    ... and 295 other files
+                ... and 9 other folders
+        working/
+            paddy-disease-classification/
+                description.md (72 lines)
+                sample_submission.csv (2603 lines)
+                ... and 7 other files
+                paddy-disease-classification/
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+                train_images/
+                    bacterial_leaf_blight/
+                        109831.jpg (91.1 kB)
+                        109785.jpg (81.8 kB)
+                        ... and 356 other files
+                    bacterial_leaf_streak/
+                        100394.jpg (99.7 kB)
+                        103308.jpg (104.3 kB)
+                        ... and 295 other files
+                    ... and 9 other folders
+```
+
+-> data/paddy-disease-classification/sample_submission.csv has 2602 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/paddy-disease-classification/train.csv has 7805 rows and 4 columns.
+The columns are: image_id, label, variety, age
+
+-> data/sample_submission.csv has 2602 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 7805 rows and 4 columns.
+The columns are: image_id, label, variety, age
+
+-> input/paddy-disease-classification/sample_submission.csv has 2602 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/paddy-disease-classification/train.csv has 7805 rows and 4 columns.
+The columns are: image_id, label, variety, age
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8778801843317973
+
+# 6. Current score
+
+0.17487
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.17487) has done: 'I remove the internet/Kaggle-API dependent setup (rustup/curl, fastkaggle setup_comp, competition_submit, push_notebook) and instead point the code directly at the already-present dataset directory under `/kaggle/input/paddy-disease-classification`. I also fix the broken environment issues by avoiding runtime `pip install` and by using a lightweight, no-external-packages classifier based on the provided `train.csv` metadata (variety + age) so it runs reliably in this Kaggle environment. The script still produce a valid `submission.csv` with the required `image_id,label` columns and correct row alignment to `sample_submission.csv`. This is primarily a correctness/stability fix so you get a valid submission; without fastai/timm available by default, the original image model can’t run end-to-end here.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+from pathlib import Path
+import numpy as np
+import pandas as pd
+
+RNG = np.random.default_rng(42)
+
+BASE = Path("/kaggle/input/paddy-disease-classification")
+if not BASE.exists():
+    BASE = Path("/kaggle/data/paddy-disease-classification")
+
+train_csv = BASE / "train.csv"
+sample_csv = BASE / "sample_submission.csv"
+
+assert train_csv.exists(), f"Missing train.csv at {train_csv}"
+assert sample_csv.exists(), f"Missing sample_submission.csv at {sample_csv}"
+
+train_df = pd.read_csv(train_csv)
+ss = pd.read_csv(sample_csv)
+
+assert {"image_id", "label", "variety", "age"}.issubset(train_df.columns)
+assert {"image_id", "label"}.issubset(ss.columns)
+
+train_df["age"] = pd.to_numeric(train_df["age"], errors="coerce")
+train_df["variety"] = train_df["variety"].astype("string")
+train_df["label"] = train_df["label"].astype("string")
+
+
+
+## === cell 1
+
+labels = sorted(train_df["label"].dropna().unique().tolist())
+label_to_idx = {c: i for i, c in enumerate(labels)}
+idx_to_label = {i: c for c, i in label_to_idx.items()}
+n_classes = len(labels)
+
+age = train_df["age"].fillna(train_df["age"].median())
+age_bins = pd.cut(age, bins=[-np.inf, 40, 60, 80, 100, 120, np.inf], labels=False)
+train_df = train_df.copy()
+train_df["age_bin"] = age_bins.astype("Int64")
+
+alpha = 1.0  # Laplace smoothing
+class_counts = (
+    train_df["label"].value_counts().reindex(labels, fill_value=0).astype(float).values
+)
+log_prior = np.log((class_counts + alpha) / (class_counts.sum() + alpha * n_classes))
+
+varieties = train_df["variety"].fillna("UNK").unique().tolist()
+var_to_idx = {v: i for i, v in enumerate(varieties)}
+n_var = len(varieties)
+
+agebin_values = sorted(train_df["age_bin"].dropna().unique().astype(int).tolist())
+all_agebins = list(range(6))
+n_agebin = len(all_agebins)
+
+var_counts = np.zeros((n_classes, n_var), dtype=np.float64)
+age_counts = np.zeros((n_classes, n_agebin), dtype=np.float64)
+
+for _, r in train_df.iterrows():
+    c = label_to_idx.get(str(r["label"]))
+    v = str(r["variety"]) if pd.notna(r["variety"]) else "UNK"
+    a = int(r["age_bin"]) if pd.notna(r["age_bin"]) else None
+    if c is None:
+        continue
+    if v not in var_to_idx:
+        continue
+    var_counts[c, var_to_idx[v]] += 1.0
+    if a is not None and 0 <= a < n_agebin:
+        age_counts[c, a] += 1.0
+
+log_var_lik = np.log(
+    (var_counts + alpha) / (var_counts.sum(axis=1, keepdims=True) + alpha * n_var)
+)
+log_age_lik = np.log(
+    (age_counts + alpha) / (age_counts.sum(axis=1, keepdims=True) + alpha * n_agebin)
+)
+
+
+
+## === cell 2
+
+test_csv = BASE / "test.csv"
+if test_csv.exists():
+    test_df = pd.read_csv(test_csv)
+    test_df["variety"] = test_df.get(
+        "variety", pd.Series(["UNK"] * len(test_df))
+    ).astype("string")
+    test_df["age"] = pd.to_numeric(
+        test_df.get("age", pd.Series([np.nan] * len(test_df))), errors="coerce"
+    )
+    test_df["age"] = test_df["age"].fillna(train_df["age"].median())
+    test_df["age_bin"] = pd.cut(
+        test_df["age"], bins=[-np.inf, 40, 60, 80, 100, 120, np.inf], labels=False
+    ).astype("Int64")
+else:
+    test_df = ss[["image_id"]].copy()
+    test_df["variety"] = "UNK"
+    test_df["age_bin"] = pd.NA
+
+if "UNK" not in var_to_idx:
+    var_to_idx["UNK"] = n_var
+    n_var += 1
+    var_counts = np.pad(var_counts, ((0, 0), (0, 1)))
+    log_var_lik = np.log(
+        (var_counts + alpha) / (var_counts.sum(axis=1, keepdims=True) + alpha * n_var)
+    )
+
+pred_labels = []
+for _, r in test_df.iterrows():
+    v = str(r["variety"]) if pd.notna(r["variety"]) else "UNK"
+    vi = var_to_idx.get(v, var_to_idx["UNK"])
+    if pd.notna(r.get("age_bin", pd.NA)):
+        ai = int(r["age_bin"])
+        ai = ai if 0 <= ai < n_agebin else None
+    else:
+        ai = None
+
+    scores = log_prior.copy()
+    scores = scores + log_var_lik[:, vi]
+    if ai is not None:
+        scores = scores + log_age_lik[:, ai]
+
+    pred = idx_to_label[int(np.argmax(scores))]
+    pred_labels.append(pred)
+
+
+
+## === cell 3
+sub = ss.copy()
+pred_map = dict(zip(test_df["image_id"].tolist(), pred_labels))
+sub["label"] = sub["image_id"].map(pred_map)
+
+mode_label = train_df["label"].mode().iloc[0]
+sub["label"] = sub["label"].fillna(mode_label)
+
+out_path = Path("submission.csv")
+sub.to_csv(out_path, index=False)
+
+assert out_path.exists() and out_path.suffix == ".csv"
+assert list(sub.columns) == ["image_id", "label"]
+print(sub.head())
+print(f"Wrote {out_path} with {len(sub)} rows.")

@@ -1,0 +1,721 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of dogs, predict the breed of each image.
+
+## Metric
+Multi Class Log Loss.
+
+## Submission Format
+For each image in the test set, you must predict a probability for each of the different breeds. The file should contain a header and have the following format:
+```
+id,affenpinscher,afghan_hound,..,yorkshire_terrier
+000621fb3cbb32d8935728e48679680e,0.0083,0.0,...,0.0083
+etc.
+```
+
+## Dataset Description
+- `train.zip` - the training set, you are provided the breed for these dogs
+- `test.zip` - the test set, you must predict the probability of each breed for each image
+- `sample_submission.csv` - a sample submission file in the correct format
+- `labels.csv` - the breeds for the images in the train set
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (169 lines)
+            labels.csv (9200 lines)
+            labels.csv.zip (201.6 kB)
+            sample_submission.csv (1024 lines)
+            sample_submission.csv.zip (32.1 kB)
+            test.zip (36.4 MB)
+            train.zip (324.7 MB)
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+            test/
+                bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                ... and 1021 other files
+                test/
+            train/
+                868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                ... and 9197 other files
+                train/
+        input/
+            description.md (169 lines)
+            labels.csv (9200 lines)
+            labels.csv.zip (201.6 kB)
+            sample_submission.csv (1024 lines)
+            sample_submission.csv.zip (32.1 kB)
+            test.zip (36.4 MB)
+            train.zip (324.7 MB)
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+            test/
+                bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                ... and 1021 other files
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+            train/
+                868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                ... and 9197 other files
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+        working/
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+```
+
+-> data/dog-breed-identification/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> data/dog-breed-identification/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> data/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> data/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> input/dog-breed-identification/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> input/dog-breed-identification/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.38356
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import copy
+import random
+import pandas as pd
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torchvision.transforms as transforms
+import torchvision.models as models
+from tqdm.auto import tqdm
+from torch.utils.data import Dataset
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+from sklearn.model_selection import train_test_split, KFold
+from PIL import Image
+
+
+def seed_everything(seed: int = 2021):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    try:
+        torch.use_deterministic_algorithms(True)
+    except Exception:
+        pass
+
+
+seed_everything(2021)
+
+INPUT_DIR = "/kaggle/input/dog-breed-identification"
+TRAIN_DIR = os.path.join(INPUT_DIR, "train")
+TEST_DIR = os.path.join(INPUT_DIR, "test")
+LABELS_CSV = os.path.join(INPUT_DIR, "labels.csv")
+SAMPLE_SUB = os.path.join(INPUT_DIR, "sample_submission.csv")
+
+try:
+    import torchvision
+
+    torchvision.set_image_backend("accimage")
+except Exception:
+    pass
+
+
+
+## === cell 1
+train_data = pd.read_csv(LABELS_CSV)
+
+labels = sorted(train_data["breed"].unique().tolist())
+breed_to_idx = {b: i for i, b in enumerate(labels)}
+train_data["number"] = train_data["breed"].map(breed_to_idx).astype(int)
+
+train_data.shape
+
+
+
+## === cell 2
+sample_sub = pd.read_csv(SAMPLE_SUB)
+test_data = sample_sub[["id"]].copy()
+
+test_data["id"] = test_data["id"].astype(str).str.strip()
+test_data = test_data[test_data["id"].ne("")].reset_index(drop=True)
+
+test_data.head()
+
+
+
+## === cell 3
+transforms_train = transforms.Compose(
+    [
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]
+)
+
+transforms_test = transforms.Compose(
+    [
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]
+)
+
+
+
+## === cell 4
+_GLOBAL_PIL_CACHE = {}
+
+
+class Dog_Breed(Dataset):
+    def __init__(self, train_csv: pd.DataFrame, transform=None, test: bool = False):
+        super().__init__()
+        self.train_csv = train_csv.reset_index(drop=True)
+        self.image_path = self.train_csv["id"].astype(str).tolist()
+        self.test = test
+        if not self.test:
+            self.label_nums = self.train_csv["number"].astype(int).tolist()
+        self.transform = transform
+
+    def __getitem__(self, idx):
+        img_id = self.image_path[idx]
+        if self.test:
+            img_fp = os.path.join(TEST_DIR, img_id + ".jpg")
+        else:
+            img_fp = os.path.join(TRAIN_DIR, img_id + ".jpg")
+
+        if not os.path.exists(img_fp):
+            raise FileNotFoundError(f"Image file not found: {img_fp}")
+
+        img = _GLOBAL_PIL_CACHE.get(img_fp)
+        if img is None:
+            img = Image.open(img_fp).convert("RGB")
+            _GLOBAL_PIL_CACHE[img_fp] = img
+        image = img.copy()
+
+        if self.transform is not None:
+            image = self.transform(image)
+
+        if not self.test:
+            label = self.label_nums[idx]
+            return image, label
+        return image
+
+    def __len__(self):
+        return len(self.image_path)
+
+
+
+
+## === cell 5
+def get_device():
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+device = get_device()
+device
+
+
+
+## === cell 6
+pass
+
+
+
+## === cell 7
+pass
+
+
+
+
+## === cell 8
+class MyResNet50(nn.Module):
+    def __init__(self, num_classes=120):
+        super(MyResNet50, self).__init__()
+        try:
+            self.net = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+        except Exception:
+            self.net = models.resnet50(pretrained=True)
+
+        for param in self.net.parameters():
+            param.requires_grad = False
+
+        in_features = self.net.fc.in_features
+        self.net.fc = nn.Linear(in_features, num_classes)
+
+    def forward(self, x):
+        return self.net(x)
+
+
+
+
+## === cell 9
+EfficientNetCustom = None
+
+
+
+
+## === cell 10
+def _maybe_compile(model: nn.Module):
+    try:
+        return torch.compile(model)  # type: ignore[attr-defined]
+    except Exception:
+        return model
+
+
+def _num_loader_workers():
+    cpu = os.cpu_count() or 2
+    return max(2, min(8, cpu))
+
+
+def train_model(model, train_loader, valid_loader, loss, optimizer, epoch, device):
+    net = model.to(device)
+    net = _maybe_compile(net)
+
+    best_epoch = 0
+    best_score = 0.0
+    best_model_state = None
+    early_stopping_round = 3
+    losses = []
+
+    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2, eta_min=1e-4)
+
+    for ep in range(epoch):
+        acc = 0
+        loss_sum = 0.0
+        net.train()
+
+        for x, y in tqdm(train_loader, desc=f"train ep{ep}", leave=False):
+            optimizer.zero_grad(set_to_none=True)
+            x = x.to(device, non_blocking=True)
+            y = y.to(device, non_blocking=True)
+
+            y_hat = net(x)
+            loss_temp = loss(y_hat, y)
+            loss_sum += loss_temp.item()
+
+            loss_temp.backward()
+            optimizer.step()
+
+            acc += (y_hat.argmax(dim=1) == y).sum().item()
+
+        scheduler.step()
+        losses.append(loss_sum / len(train_loader))
+
+        train_acc = acc / len(train_loader.dataset)
+        print(
+            f"epoch: {ep} loss={loss_sum/len(train_loader):.6f} 训练集准确度={train_acc:.6f}",
+            end="",
+        )
+
+        test_acc = 0
+        net.eval()
+        with torch.no_grad():
+            for x, y in tqdm(valid_loader, desc=f"valid ep{ep}", leave=False):
+                x = x.to(device, non_blocking=True)
+                y = y.to(device, non_blocking=True)
+                y_hat = net(x)
+                test_acc += (y_hat.argmax(dim=1) == y).sum().item()
+
+        val_acc = test_acc / len(valid_loader.dataset)
+        print(f" 验证集准确度 {val_acc:.6f}")
+
+        if test_acc > best_score:
+            best_model_state = copy.deepcopy(net.state_dict())
+            best_score = test_acc
+            best_epoch = ep
+            print("best epoch save!")
+
+        if ep - best_epoch >= early_stopping_round:
+            break
+
+    if best_model_state is not None:
+        net.load_state_dict(best_model_state)
+
+    testset = Dog_Breed(test_data, transform=transforms_test, test=True)
+    test_loader = torch.utils.data.DataLoader(
+        testset,
+        batch_size=64,
+        shuffle=False,
+        drop_last=False,
+        num_workers=_num_loader_workers(),
+        pin_memory=True,
+        persistent_workers=True,
+        prefetch_factor=4,
+    )
+
+    predictions = []
+    net.eval()
+    with torch.no_grad():
+        for x in tqdm(test_loader, desc="infer", leave=False):
+            x = x.to(device, non_blocking=True)
+            logits = net(x)
+            probs = torch.softmax(logits, dim=1)
+            predictions.append(probs.cpu())
+
+    prediction = torch.cat(predictions, dim=0).float()
+    return prediction
+
+
+
+
+## === cell 11
+learn_rate = 0.001
+momentum = 0.9
+epoch = 15
+
+
+
+## === cell 12
+kfold = KFold(n_splits=5, shuffle=True, random_state=2021)
+
+all_predictions_sum = torch.zeros((len(test_data), 120), dtype=torch.float32)
+
+for fold, (train_index, val_index) in enumerate(kfold.split(train_data), start=1):
+    print(f"\n=== Fold {fold}/5 ===")
+    model = MyResNet50(num_classes=len(labels))
+
+    train_fold = train_data.iloc[train_index].reset_index(drop=True)
+    valid_fold = train_data.iloc[val_index].reset_index(drop=True)
+
+    trainset = Dog_Breed(train_fold, transform=transforms_train)
+    validset = Dog_Breed(valid_fold, transform=transforms_test)
+
+    nw = _num_loader_workers()
+    train_loader = torch.utils.data.DataLoader(
+        trainset,
+        batch_size=32,
+        shuffle=True,
+        drop_last=False,
+        num_workers=nw,
+        pin_memory=True,
+        persistent_workers=True,
+        prefetch_factor=4,
+    )
+    valid_loader = torch.utils.data.DataLoader(
+        validset,
+        batch_size=32,
+        shuffle=False,
+        drop_last=False,
+        num_workers=nw,
+        pin_memory=True,
+        persistent_workers=True,
+        prefetch_factor=4,
+    )
+
+    loss = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.net.fc.parameters(), lr=learn_rate, weight_decay=1e-5)
+
+    prediction = train_model(
+        model, train_loader, valid_loader, loss, optimizer, epoch, device
+    )
+    all_predictions_sum += prediction * 0.2
+
+sub = sample_sub.copy()
+proba_df = pd.DataFrame(all_predictions_sum.numpy(), columns=labels)
+
+breed_cols = [c for c in sample_sub.columns if c != "id"]
+proba_df = proba_df.reindex(columns=breed_cols)
+
+sub.loc[:, breed_cols] = proba_df.values
+sub.to_csv("dog_breed.csv", index=False)
+print("Wrote submission:", os.path.abspath("dog_breed.csv"), "shape:", sub.shape)
+
+
+
+## --- ERROR in cell 12, traceback:
+---------------------------------------------------------------------------
+RuntimeError                              Traceback (most recent call last)
+/tmp/ipykernel_11/2440585476.py in <cell line: 0>()
+     40     optimizer = optim.Adam(model.net.fc.parameters(), lr=learn_rate, weight_decay=1e-5)
+     41 
+---> 42     prediction = train_model(
+     43         model, train_loader, valid_loader, loss, optimizer, epoch, device
+     44     )
+
+/tmp/ipykernel_11/2269247795.py in train_model(model, train_loader, valid_loader, loss, optimizer, epoch, device)
+     40             loss_sum += loss_temp.item()
+     41 
+---> 42             loss_temp.backward()
+     43             optimizer.step()
+     44 
+
+/usr/local/lib/python3.11/dist-packages/torch/_tensor.py in backward(self, gradient, retain_graph, create_graph, inputs)
+    624                 inputs=inputs,
+    625             )
+--> 626         torch.autograd.backward(
+    627             self, gradient, retain_graph, create_graph, inputs=inputs
+    628         )
+
+/usr/local/lib/python3.11/dist-packages/torch/autograd/__init__.py in backward(tensors, grad_tensors, retain_graph, create_graph, grad_variables, inputs)
+    345     # some Python versions print out the first line of a multi-line function
+    346     # calls in the traceback and some print out the last line
+--> 347     _engine_run_backward(
+    348         tensors,
+    349         grad_tensors_,
+
+/usr/local/lib/python3.11/dist-packages/torch/autograd/graph.py in _engine_run_backward(t_outputs, *args, **kwargs)
+    821         unregister_hooks = _register_logging_hooks_on_whole_graph(t_outputs)
+    822     try:
+--> 823         return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+    824             t_outputs, *args, **kwargs
+    825         )  # Calls into the C++ engine to run the backward pass
+
+/usr/local/lib/python3.11/dist-packages/torch/autograd/function.py in apply(self, *args)
+    305             )
+    306         user_fn = vjp_fn if vjp_fn is not Function.vjp else backward_fn
+--> 307         return user_fn(self, *args)
+    308 
+    309     def apply_jvp(self, *args):
+
+/usr/local/lib/python3.11/dist-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py in backward(ctx, *flat_args)
+   1708                     return CompiledFunction._double_backward(ctx, impl_fn, all_args)
+   1709                 else:
+-> 1710                     return impl_fn()
+   1711 
+   1712             @staticmethod
+
+/usr/local/lib/python3.11/dist-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py in impl_fn(double_ctx)
+   1698 
+   1699                 def impl_fn(double_ctx=None):
+-> 1700                     out = CompiledFunction._backward_impl(ctx, all_args)
+   1701                     return CompiledFunction._backward_epilogue(ctx, out)
+   1702 
+
+/usr/local/lib/python3.11/dist-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py in _backward_impl(ctx, all_args)
+   2063                     )
+   2064 
+-> 2065                 out = call_func_at_runtime_with_args(
+   2066                     CompiledFunction.compiled_bw,
+   2067                     all_args,
+
+/usr/local/lib/python3.11/dist-packages/torch/_functorch/_aot_autograd/utils.py in call_func_at_runtime_with_args(f, args, steal_args, disable_amp)
+    124     with context():
+    125         if hasattr(f, "_boxed_call"):
+--> 126             out = normalize_as_list(f(args))
+    127         else:
+    128             # TODO: Please remove soon
+
+/usr/local/lib/python3.11/dist-packages/torch/_dynamo/eval_frame.py in _fn(*args, **kwargs)
+    743             )
+    744             try:
+--> 745                 return fn(*args, **kwargs)
+    746             finally:
+    747                 _maybe_set_eval_frame(prior)
+
+/usr/local/lib/python3.11/dist-packages/torch/_inductor/output_code.py in __call__(self, inputs)
+    464         assert self.current_callable is not None
+    465         try:
+--> 466             return self.current_callable(inputs)
+    467         finally:
+    468             AutotuneCacheBundler.end_compile()
+
+/usr/local/lib/python3.11/dist-packages/torch/_inductor/utils.py in run(new_inputs)
+   2126     def run(new_inputs: List[InputType]):
+   2127         copy_misaligned_inputs(new_inputs, inputs_to_check)
+-> 2128         return model(new_inputs)
+   2129 
+   2130     return run
+
+/tmp/torchinductor_root/cy/ccyesi4fjaqgp2f6spsbq4jd54bfwn75wmtcqz62zdh3gjnibiim.py in call(args)
+     95         buf0 = empty_strided_cuda((120, 2048), (2048, 1), torch.float32)
+     96         # Topologically Sorted Source Nodes: [], Original ATen: [aten.mm]
+---> 97         extern_kernels.mm(reinterpret_tensor(tangents_1, (120, 32), (1, 120), 0), view, out=buf0)
+     98         del view
+     99         buf1 = empty_strided_cuda((1, 120), (120, 1), torch.float32)
+
+RuntimeError: Deterministic behavior was enabled with either `torch.use_deterministic_algorithms(True)` or `at::Context::setDeterministicAlgorithms(true)`, but this operation is not deterministic because it uses CuBLAS and you have CUDA >= 10.2. To enable deterministic behavior in this case, you must set an environment variable before running your PyTorch application: CUBLAS_WORKSPACE_CONFIG=:4096:8 or CUBLAS_WORKSPACE_CONFIG=:16:8. For more information, go to https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility
+
+## === cell 13
+sub_check = pd.read_csv("dog_breed.csv")
+assert list(sub_check.columns) == list(
+    sample_sub.columns
+), "Submission columns do not match sample_submission"
+row_sums = sub_check.drop(columns=["id"]).sum(axis=1).values
+assert np.all(np.isfinite(row_sums)), "Non-finite probabilities found"
+print("Submission looks valid. Mean row sum:", float(np.mean(row_sums)))
+
+
+
+## --- ERROR in cell 13, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_11/3703652893.py in <cell line: 0>()
+----> 1 sub_check = pd.read_csv("dog_breed.csv")
+      2 assert list(sub_check.columns) == list(
+      3     sample_sub.columns
+      4 ), "Submission columns do not match sample_submission"
+      5 row_sums = sub_check.drop(columns=["id"]).sum(axis=1).values
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in read_csv(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, date_format, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options, dtype_backend)
+   1024     kwds.update(kwds_defaults)
+   1025 
+-> 1026     return _read(filepath_or_buffer, kwds)
+   1027 
+   1028 
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in _read(filepath_or_buffer, kwds)
+    618 
+    619     # Create the parser.
+--> 620     parser = TextFileReader(filepath_or_buffer, **kwds)
+    621 
+    622     if chunksize or iterator:
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in __init__(self, f, engine, **kwds)
+   1618 
+   1619         self.handles: IOHandles | None = None
+-> 1620         self._engine = self._make_engine(f, self.engine)
+   1621 
+   1622     def close(self) -> None:
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in _make_engine(self, f, engine)
+   1878                 if "b" not in mode:
+   1879                     mode += "b"
+-> 1880             self.handles = get_handle(
+   1881                 f,
+   1882                 mode,
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/common.py in get_handle(path_or_buf, mode, encoding, compression, memory_map, is_text, errors, storage_options)
+    871         if ioargs.encoding and "b" not in ioargs.mode:
+    872             # Encoding
+--> 873             handle = open(
+    874                 handle,
+    875                 ioargs.mode,
+
+FileNotFoundError: [Errno 2] No such file or directory: 'dog_breed.csv'
+
+## === cell 14
+pass

@@ -1,0 +1,876 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.0262298038148007
+
+# 6. Current score
+
+0.0
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/Keras import errors by switching from `tensorflow.python.keras` to the supported public `tensorflow.keras` API, which resolves the `MessageFactory.GetPrototype` and missing `BatchNormalization` issues. Then I ensure the data generators are created successfully so `test_gen` exists and the pipeline runs end-to-end. Finally, I replace the placeholder random predictions with real model inference (loading existing weights if present; otherwise using the untrained model), and write `submission.csv` with the exact required columns and `id_code` format. These changes preserve your model/training logic while making the script executable and producing a valid submission file.'
+- What this solution (achieved 0.00958) has done: 'I fix the TensorFlow import crash (`MessageFactory.GetPrototype`) by forcing the pure-Python protobuf implementation before TensorFlow is imported, which is a common Kaggle TF1/TF2 + protobuf mismatch issue. I also ensure TensorFlow/Keras is imported only after that environment setting, and make the generators/model creation robust so `submission.csv` is always produced. Finally, I make the submission `id_code` come strictly from `test.csv` (not generator filenames) to avoid any path/filename mismatch that can silently create misaligned predictions and hurt kappa; this is score-improving but does not change the model itself.'
+- What this solution (achieved -0.03563) has done: 'I fix the TensorFlow/protobuf crash by moving the environment variables to the very top (before any TensorFlow/Keras-related import can occur) and by enforcing `protobuf<4`-compatible behavior via the pure-Python implementation plus version sanity prints. Then I make the Keras generator and prediction steps deterministic and correctly sized (using `ceil` steps and trimming predictions to exactly `len(test)`), which is score-neutral but prevents subtle misalignment/length issues. Finally, I ensure the submission `id_code` comes from `test.csv` (not `sample_submission.csv`) and is written with the exact required columns and `.csv` suffix, which can improve kappa if any prior row-order mismatch existed.'
+- What this solution (achieved 0.0) has done: 'I fix two execution blockers: the TensorFlow/protobuf crash and the generator dtype crash during rescaling. First, I force the pure-Python protobuf implementation *before any TensorFlow import* and delay TensorFlow-related imports until after that, which resolves the `MessageFactory.GetPrototype` error in this environment. Second, I make `preprocess_image` return `float32` in `[0,1]` (not `uint8`) so that `ImageDataGenerator(rescale=...)` doesn’t try to multiply into a `uint8` array and fail. These changes are score-neutral (they don’t alter model architecture/training semantics) but ensure the notebook runs end-to-end and writes a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/protobuf crash by enforcing the pure-Python protobuf implementation *and* applying the standard TensorFlow import workaround that avoids the `MessageFactory.GetPrototype` AttributeError in this Kaggle environment. Then I keep your model/data pipeline unchanged but make the OpenCV preprocessing + `rescale` combination consistent (returning `float32` without double-rescaling), which should improve the score from the current 0.0 toward the target. Finally, I ensure prediction length exactly matches `test.csv` and that `submission.csv` is written with the required `id_code,diagnosis` columns.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/protobuf import crash (`MessageFactory.GetPrototype`) by ensuring the protobuf implementation env vars are set before any TensorFlow-related import and by defensively forcing the pure-Python protobuf path early. Then I keep your generators/model/training logic the same, but make the import order robust so the pipeline can always proceed to inference. Finally, I ensure inference produces exactly `len(test.csv)` predictions aligned to `test.csv` order and writes a valid `submission.csv` with the required columns.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/protobuf `MessageFactory.GetPrototype` crash by forcing the pure-Python protobuf runtime *before any protobuf/TensorFlow import* and by defensively importing TensorFlow only after that environment setup. I also make the image generators robust to missing OpenCV by providing a PIL fallback (so the pipeline always runs in the Kaggle environment) while keeping your preprocessing intent and generator logic the same. Finally, I ensure inference produces exactly `len(test.csv)` predictions aligned to `test.csv` order and writes a valid `submission.csv` with the required columns, which should move the score up from 0.0 toward the target by avoiding runtime failure/misalignment.'
+- What this solution (achieved 0.18956) has done: 'I fix the TensorFlow/protobuf import crash (`MessageFactory.GetPrototype`) by ensuring the protobuf implementation env vars are set before *any* protobuf/TensorFlow-related import and by forcing protobuf to use the pure-Python runtime early. Then I keep your exact data pipeline/model code intact, only moving the TensorFlow/Keras imports into a guarded function so the environment workaround reliably takes effect. Finally, I ensure inference always aligns predictions to `test.csv` order/length and writes a valid `submission.csv` with the required `id_code,diagnosis` columns.'
+- What this solution (achieved 0.0) has done: 'We fix the TensorFlow/protobuf crash (`AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'`) by ensuring the pure-Python protobuf implementation is enforced before *any* protobuf/TensorFlow import and by applying a safe runtime patch for older TensorFlow expecting `GetPrototype`. Then we keep your model/generators/training logic unchanged, only adjusting the import order so the workaround actually takes effect in this environment. Finally, we keep prediction alignment to `test.csv` order/length and always write a valid `submission.csv` with the required columns.'
+- What this solution (achieved 0.09004) has done: 'We fix the protobuf/TensorFlow crash that happens before training/inference by moving the protobuf compatibility patch to run *before* importing TensorFlow and by adding a safe fallback for older TF expecting `MessageFactory.GetPrototype`. Then we keep your model/generator/training logic intact, but ensure generators and prediction length are deterministic and aligned to `test.csv` order. Finally, we guarantee a valid `submission.csv` with exactly the required columns and integer `diagnosis` values in `[0,4]`, so the run completes end-to-end and the score can move up from 0.0.'
+- What this solution (achieved 0.0) has done: 'I fix the protobuf/TensorFlow crash by moving and strengthening the `MessageFactory.GetPrototype` compatibility patch so it executes before any TensorFlow import, and by defensively patching both the class and instance attribute access paths. This is execution-critical (your current run stops in the TF import cell) and score-neutral. I also keep prediction/submission alignment deterministic by trimming predictions to exactly `len(test)` and writing `submission.csv` with the required `id_code,diagnosis` columns. No model/training architecture or loops are changed.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow/protobuf crash by applying the `MessageFactory.GetPrototype` compatibility patch *before* importing TensorFlow, and by patching both `google.protobuf.message_factory.MessageFactory` and the C++-backed `google.protobuf.pyext.message_factory.MessageFactory` when present (the current patch only hits one path, so the import still fails). I keep your model/generator/training logic unchanged, only adjusting import order and patch coverage so the notebook runs end-to-end. Then I ensure prediction length matches `test.csv` exactly (already mostly done) and always write a valid `submission.csv` with the required columns. These changes are execution-critical and should move the score up from 0.0 by enabling real inference instead of a failed run.'
+- What this solution (achieved 0.0) has done: 'We fix the execution blocker causing the TensorFlow import to crash: your protobuf patch currently runs but doesn’t cover the instance-level `MessageFactory` object that TensorFlow ends up using, so `GetPrototype` is still missing. I strengthen the patch to add `GetPrototype` to both the class and any created instances (and to both python and pyext factories when present) before importing TensorFlow, which should make the notebook run end-to-end reliably. Then I keep your model/generator/training logic unchanged, only ensuring inference uses a deterministic test order and that the written `submission.csv` has exactly `len(test.csv)` rows with the required columns. This should move the score up from 0.0 toward your target simply by enabling real inference and correct row alignment.'
+- What this solution (achieved 0.0) has done: 'I fix the TensorFlow import crash by strengthening the protobuf `MessageFactory.GetPrototype` compatibility patch so it also covers the specific factory objects TensorFlow ends up using, and I ensure this patch runs before any TensorFlow-related imports. This is execution-critical and score-improving from your current 0.0 because it enables the model to actually run inference instead of crashing. I keep your model, generators, preprocessing, and training logic unchanged, and only make prediction generation robust to exact test length alignment. The script still write a valid `submission.csv` with the required `id_code,diagnosis` columns.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "2"
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+
+import math
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+TRAINING = False
+
+
+
+## === cell 1
+TRAIN_CSV_PATH = "../input/aptos2019-blindness-detection/train.csv"
+TEST_CSV_PATH = "../input/aptos2019-blindness-detection/test.csv"
+TRAIN_IMG_DIR = "../input/aptos2019-blindness-detection/train_images/"
+TEST_IMG_DIR = "../input/aptos2019-blindness-detection/test_images/"
+
+
+
+## === cell 2
+for p in [TRAIN_CSV_PATH, TEST_CSV_PATH, TRAIN_IMG_DIR, TEST_IMG_DIR]:
+    if not os.path.exists(p):
+        raise FileNotFoundError(f"Expected path not found: {p}")
+
+
+
+## === cell 3
+train = pd.read_csv(TRAIN_CSV_PATH)
+test = pd.read_csv(TEST_CSV_PATH)
+
+print("Number of train samples: ", train.shape[0])
+print("Number of test samples: ", test.shape[0])
+print(train.head())
+print(test.head())
+
+
+
+## === cell 4
+train["id_code"] = train["id_code"].astype(str)
+test["id_code"] = test["id_code"].astype(str)
+
+train["id_code_png"] = train["id_code"].apply(lambda x: x + ".png")
+test["id_code_png"] = test["id_code"].apply(lambda x: x + ".png")
+
+train["diagnosis"] = train["diagnosis"].astype(str)
+
+
+
+
+## === cell 5
+def _force_protobuf_python_impl():
+    try:
+        import google.protobuf  # noqa: F401
+
+        try:
+            from google.protobuf.internal import api_implementation
+
+            try:
+                api_implementation._SetType("python")
+            except Exception:
+                pass
+        except Exception:
+            pass
+    except Exception as e:
+        print("protobuf import warning:", repr(e))
+
+
+def _patch_messagefactory_getprototype():
+    """
+    Fix TF/protobuf incompatibility:
+    TF sometimes calls MessageFactory.GetPrototype(), which may be missing in newer protobuf.
+    We patch:
+      - class-level on python & pyext MessageFactory
+      - module-level default_factory instance
+      - *instances* created before the patch (best-effort)
+    """
+    patched_any = False
+
+    def _add_getprototype_to_instance(obj, where):
+        nonlocal patched_any
+        try:
+            if obj is None:
+                return
+            if (not hasattr(obj, "GetPrototype")) and hasattr(obj, "GetMessageClass"):
+
+                def _GetPrototype(descriptor, _self=obj):
+                    return _self.GetMessageClass(descriptor)
+
+                try:
+                    setattr(obj, "GetPrototype", _GetPrototype)
+                    print(f"Patched {where}.GetPrototype (instance)")
+                    patched_any = True
+                except Exception:
+                    pass
+        except Exception as e:
+            print(f"protobuf instance patch warning for {where}:", repr(e))
+
+    def _install_on_class(FactoryCls, where):
+        nonlocal patched_any
+        try:
+            if FactoryCls is None:
+                return
+
+            if (not hasattr(FactoryCls, "GetPrototype")) and hasattr(
+                FactoryCls, "GetMessageClass"
+            ):
+
+                def _GetPrototype(self, descriptor):
+                    return self.GetMessageClass(descriptor)
+
+                setattr(FactoryCls, "GetPrototype", _GetPrototype)
+                print(f"Patched {where}.MessageFactory.GetPrototype (class)")
+                patched_any = True
+
+            try:
+                orig_init = FactoryCls.__init__
+
+                def __init__(self, *args, **kwargs):
+                    orig_init(self, *args, **kwargs)
+                    _add_getprototype_to_instance(self, f"{where}.MessageFactory()")
+
+                if not getattr(orig_init, "_getprototype_patched", False):
+                    __init__._getprototype_patched = True  # type: ignore[attr-defined]
+                    FactoryCls.__init__ = __init__
+                    print(f"Patched {where}.MessageFactory.__init__ (instance hook)")
+                    patched_any = True
+            except Exception:
+                pass
+        except Exception as e:
+            print(f"protobuf class patch warning for {where}:", repr(e))
+
+    _force_protobuf_python_impl()
+
+    try:
+        import google.protobuf.message_factory as mf  # type: ignore
+
+        PyMessageFactory = getattr(mf, "MessageFactory", None)
+        _install_on_class(PyMessageFactory, "google.protobuf.message_factory")
+
+        _add_getprototype_to_instance(
+            getattr(mf, "default_factory", None),
+            "google.protobuf.message_factory.default_factory",
+        )
+    except Exception as e:
+        print("protobuf import warning (message_factory):", repr(e))
+
+    try:
+        import google.protobuf.pyext.message_factory as cmf  # type: ignore
+
+        CppMessageFactory = getattr(cmf, "MessageFactory", None)
+        _install_on_class(CppMessageFactory, "google.protobuf.pyext.message_factory")
+    except Exception:
+        pass
+
+    try:
+        from google.protobuf import symbol_database  # type: ignore
+
+        db = symbol_database.Default()
+        _add_getprototype_to_instance(
+            getattr(db, "message_factory", None),
+            "google.protobuf.symbol_database.Default().message_factory",
+        )
+    except Exception:
+        pass
+
+    if not patched_any:
+        print(
+            "Warning: could not patch MessageFactory.GetPrototype (may already exist)."
+        )
+
+
+_patch_messagefactory_getprototype()
+
+try:
+    import cv2  # type: ignore
+
+    _HAS_CV2 = True
+except Exception as e:
+    print("OpenCV import warning (will use PIL fallback):", repr(e))
+    _HAS_CV2 = False
+    cv2 = None  # noqa: F401
+
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+print("TensorFlow version:", tf.__version__)
+try:
+    import google.protobuf
+
+    print("protobuf version:", google.protobuf.__version__)
+except Exception as e:
+    print("Could not import protobuf version:", repr(e))
+
+IMG_SIZE = 224
+NB_CHANNELS = 3
+NB_CLASSES = 5  # 0, 1, 2, 3, 4
+BATCH_SIZE = 32
+TEST_BATCH_SIZE = 1
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 6
+"""
+crops black parts around the image (intensity is <= tol)
+"""
+
+
+def crop_image(img, tol=10):
+    def crop_image_1(img2d):
+        mask = img2d > tol
+        if mask.any():
+            return img2d[np.ix_(mask.any(1), mask.any(0))]
+        return img2d
+
+    if img.ndim == 2:
+        return crop_image_1(img)
+
+    elif img.ndim == 3:
+        h, w, _ = img.shape
+        img1 = (
+            cv2.resize(crop_image_1(img[:, :, 0]), (w, h))
+            if _HAS_CV2
+            else crop_image_1(img[:, :, 0])
+        )
+        img2 = (
+            cv2.resize(crop_image_1(img[:, :, 1]), (w, h))
+            if _HAS_CV2
+            else crop_image_1(img[:, :, 1])
+        )
+        img3 = (
+            cv2.resize(crop_image_1(img[:, :, 2]), (w, h))
+            if _HAS_CV2
+            else crop_image_1(img[:, :, 2])
+        )
+
+        img = img.copy()
+        img[:, :, 0] = img1 if img1.shape == (h, w) else img[:, :, 0]
+        img[:, :, 1] = img2 if img2.shape == (h, w) else img[:, :, 1]
+        img[:, :, 2] = img3 if img3.shape == (h, w) else img[:, :, 2]
+        return img
+
+    return img
+
+
+"""
+crops black parts and enhances image (Ben Graham's method)
+
+Important: ImageDataGenerator applies preprocessing_function BEFORE rescale.
+We keep rescale=1/255 in the generators, so return float32 in [0,255].
+Avoid returning uint8 to prevent rescale dtype casting issues.
+"""
+
+
+def preprocess_image(img):
+    if img is None:
+        return img
+
+    if img.dtype != np.uint8:
+        if np.max(img) <= 1.0:
+            img_u8 = (img * 255.0).clip(0, 255).astype(np.uint8)
+        else:
+            img_u8 = img.clip(0, 255).astype(np.uint8)
+    else:
+        img_u8 = img
+
+    if _HAS_CV2:
+        img_u8 = crop_image(img_u8)
+        img_u8 = cv2.resize(img_u8, (IMG_SIZE, IMG_SIZE))
+        img_u8 = cv2.addWeighted(
+            img_u8, 4, cv2.GaussianBlur(img_u8, (0, 0), IMG_SIZE / 10), -4, 128
+        )
+        return img_u8.astype(np.float32)
+
+    from PIL import Image
+
+    h, w = img_u8.shape[:2]
+    side = min(h, w)
+    y0 = (h - side) // 2
+    x0 = (w - side) // 2
+    img_u8 = img_u8[y0 : y0 + side, x0 : x0 + side]
+
+    pil = Image.fromarray(img_u8)
+    pil = pil.resize((IMG_SIZE, IMG_SIZE), resample=Image.BILINEAR)
+    return np.asarray(pil).astype(np.float32)
+
+
+
+
+## === cell 7
+train_datagen = ImageDataGenerator(
+    rescale=1.0 / 255,
+    validation_split=0.2,
+    horizontal_flip=True,
+    preprocessing_function=preprocess_image,
+)
+
+train_gen = train_datagen.flow_from_dataframe(
+    dataframe=train,
+    directory=TRAIN_IMG_DIR,
+    x_col="id_code_png",
+    y_col="diagnosis",
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    subset="training",
+    shuffle=True,
+    seed=42,
+)
+
+val_gen = train_datagen.flow_from_dataframe(
+    dataframe=train,
+    directory=TRAIN_IMG_DIR,
+    x_col="id_code_png",
+    y_col="diagnosis",
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    subset="validation",
+    shuffle=True,
+    seed=42,
+)
+
+test_datagen = ImageDataGenerator(
+    rescale=1.0 / 255, preprocessing_function=preprocess_image
+)
+
+test_gen = test_datagen.flow_from_dataframe(
+    dataframe=test,
+    directory=TEST_IMG_DIR,
+    x_col="id_code_png",
+    batch_size=TEST_BATCH_SIZE,
+    class_mode=None,
+    target_size=(IMG_SIZE, IMG_SIZE),
+    shuffle=False,
+)
+
+
+
+## === cell 8
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import (
+    Input,
+    GlobalAveragePooling2D,
+    Dense,
+    Dropout,
+    BatchNormalization,
+    Conv2D,
+    MaxPooling2D,
+)
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint, EarlyStopping
+from tensorflow.keras.applications.resnet50 import ResNet50
+
+MODEL_NAME = "conv1"
+
+NB_WARMUP_EPOCHS = 2
+NB_EPOCHS = 30
+INITIAL_LR = 1e-3
+
+weights_path_template = os.path.join(
+    "../input/aptos-2019-conv1-weights/", "{}_weights.hdf5"
+)
+log_path_template = os.path.join("logs/", "{}_training_log.csv")
+
+
+
+## === cell 9
+os.makedirs("weights", exist_ok=True)
+os.makedirs("logs", exist_ok=True)
+
+if not os.path.isdir(os.path.dirname(weights_path_template)):
+    weights_path_template = os.path.join("weights", "{}_weights.hdf5")
+
+
+
+## === cell 10
+"""
+ResNet50 based model
+"""
+
+
+def get_resnet50(input_shape, nb_out):
+    inputs = Input(shape=input_shape)
+    base_model = ResNet50(weights="imagenet", include_top=False, input_tensor=inputs)
+
+    x = GlobalAveragePooling2D()(base_model.output)
+    x = Dropout(0.5)(x)
+
+    x = Dense(2048, activation="relu")(x)
+    x = Dropout(0.5)(x)
+
+    x = Dense(1024, activation="relu")(x)
+    x = Dropout(0.5)(x)
+
+    output = Dense(nb_out, activation="softmax", name="final_output")(x)
+
+    model = Model(inputs, output)
+    return model
+
+
+
+
+## === cell 11
+"""
+simple CNN
+"""
+
+
+def get_conv1(input_shape, nb_out):
+    inputs = Input(shape=input_shape)
+
+    x = Conv2D(64, (7, 7), activation="relu")(inputs)
+    x = MaxPooling2D((2, 2))(x)
+    x = BatchNormalization()(x)
+
+    x = Conv2D(64, (7, 7), activation="relu")(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = BatchNormalization()(x)
+
+    x = Conv2D(128, (5, 5), activation="relu")(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = BatchNormalization()(x)
+
+    x = Conv2D(256, (3, 3), activation="relu")(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = BatchNormalization()(x)
+
+    x = Conv2D(512, (3, 3), activation="relu")(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = BatchNormalization()(x)
+
+    x = GlobalAveragePooling2D()(x)
+    x = Dropout(0.5)(x)
+
+    x = Dense(2048, activation="relu")(x)
+    x = Dropout(0.5)(x)
+
+    x = Dense(1024, activation="relu")(x)
+    x = Dropout(0.5)(x)
+
+    output = Dense(nb_out, activation="softmax", name="final_output")(x)
+
+    model = Model(inputs, output)
+    return model
+
+
+
+
+## === cell 12
+"""
+returns model
+"""
+
+
+def get_model(name, input_shape, nb_out):
+    models = {
+        "resnet50": get_resnet50,
+        "conv1": get_conv1,
+    }
+
+    if name not in models:
+        print(f"No model named '{name}'")
+        return None
+
+    model = models[name](input_shape, nb_out)
+
+    weights_path = weights_path_template.format(name)
+    if os.path.isfile(weights_path):
+        model.load_weights(weights_path)
+        print(f"loaded model from {weights_path}")
+    else:
+        print(f"no weights found at {weights_path}; using randomly initialized weights")
+
+    return model
+
+
+
+
+## === cell 13
+"""
+trains a ResNet50-based model
+"""
+
+
+def train_resnet50(model, train_generator, val_generator, weights_path, log_path):
+    for i in range(len(model.layers)):
+        model.layers[i].trainable = False
+
+    for i in range(-5, 0):
+        model.layers[i].trainable = True
+
+    metrics_list = ["accuracy"]
+    optimizer = Adam(learning_rate=INITIAL_LR)
+
+    model.compile(
+        optimizer=optimizer, loss="categorical_crossentropy", metrics=metrics_list
+    )
+
+    mc = ModelCheckpoint(weights_path, monitor="val_loss", save_best_only=True)
+    es = EarlyStopping(
+        monitor="val_loss", mode="min", restore_best_weights=True, verbose=1
+    )
+    cl = CSVLogger(log_path)
+
+    STEP_SIZE_TRAIN = max(1, train_generator.n // train_generator.batch_size)
+    STEP_SIZE_VAL = max(1, val_generator.n // val_generator.batch_size)
+
+    model.fit(
+        train_generator,
+        steps_per_epoch=STEP_SIZE_TRAIN,
+        validation_data=val_generator,
+        validation_steps=STEP_SIZE_VAL,
+        epochs=NB_WARMUP_EPOCHS,
+        callbacks=[mc, cl],
+        verbose=1,
+    )
+
+    train_generator.reset()
+    val_generator.reset()
+
+    for i in range(len(model.layers)):
+        model.layers[i].trainable = True
+
+    optimizer = Adam(learning_rate=INITIAL_LR)
+
+    model.compile(
+        optimizer=optimizer, loss="categorical_crossentropy", metrics=metrics_list
+    )
+
+    mc = ModelCheckpoint(weights_path, monitor="val_loss", save_best_only=True)
+    es = EarlyStopping(
+        monitor="val_loss", mode="min", restore_best_weights=True, verbose=1
+    )
+    cl = CSVLogger(log_path)
+
+    STEP_SIZE_TRAIN = max(1, train_generator.n // train_generator.batch_size)
+    STEP_SIZE_VAL = max(1, val_generator.n // val_generator.batch_size)
+
+    model.fit(
+        train_generator,
+        steps_per_epoch=STEP_SIZE_TRAIN,
+        validation_data=val_generator,
+        validation_steps=STEP_SIZE_VAL,
+        epochs=NB_WARMUP_EPOCHS,
+        callbacks=[mc, cl],
+        verbose=1,
+    )
+
+
+
+
+## === cell 14
+"""
+trains the simple CNN
+"""
+
+
+def train_conv1(model, train_generator, val_generator, weights_path, log_path):
+    metrics_list = ["accuracy"]
+    optimizer = Adam(learning_rate=INITIAL_LR)
+
+    model.compile(
+        optimizer=optimizer, loss="categorical_crossentropy", metrics=metrics_list
+    )
+
+    mc = ModelCheckpoint(weights_path, monitor="val_loss", save_best_only=True)
+    es = EarlyStopping(
+        monitor="val_loss", mode="min", restore_best_weights=True, verbose=1
+    )
+    cl = CSVLogger(log_path)
+
+    STEP_SIZE_TRAIN = max(1, train_generator.n // train_generator.batch_size)
+    STEP_SIZE_VAL = max(1, val_generator.n // val_generator.batch_size)
+
+    model.fit(
+        train_generator,
+        steps_per_epoch=STEP_SIZE_TRAIN,
+        validation_data=val_generator,
+        validation_steps=STEP_SIZE_VAL,
+        epochs=NB_EPOCHS,
+        callbacks=[mc, cl],
+        verbose=1,
+    )
+
+
+
+
+## === cell 15
+def train_model(name, input_shape, nb_out, train_generator, val_generator):
+    model = get_model(name, input_shape, nb_out)
+
+    trainers = {"resnet50": train_resnet50, "conv1": train_conv1}
+
+    if name not in trainers:
+        print(f"No model named '{name}'")
+        return
+
+    trainers[name](
+        model,
+        train_generator,
+        val_generator,
+        weights_path_template.format(name),
+        log_path_template.format(name),
+    )
+
+
+
+
+## === cell 16
+if TRAINING:
+    train_model(
+        MODEL_NAME, (IMG_SIZE, IMG_SIZE, NB_CHANNELS), NB_CLASSES, train_gen, val_gen
+    )
+
+
+
+## === cell 17
+model = get_model(MODEL_NAME, (IMG_SIZE, IMG_SIZE, NB_CHANNELS), NB_CLASSES)
+if model is None:
+    raise RuntimeError("Model could not be created.")
+
+test_gen.reset()
+
+STEP_SIZE_TEST = int(math.ceil(test_gen.n / test_gen.batch_size))
+probs = model.predict(test_gen, steps=STEP_SIZE_TEST, verbose=1)
+
+probs = np.asarray(probs)
+if probs.ndim != 2 or probs.shape[1] != NB_CLASSES:
+    raise ValueError(f"Unexpected prediction shape: {probs.shape}")
+
+predictions = np.argmax(probs, axis=1).astype(int)
+predictions = predictions[: len(test)]
+predictions = np.clip(predictions, 0, NB_CLASSES - 1)
+
+sub = test[["id_code"]].copy()
+sub["diagnosis"] = predictions.astype(int)
+
+sub.to_csv("submission.csv", index=False)
+print(sub.head(10))
+print("Wrote submission.csv with shape:", sub.shape)
+print(
+    "Diagnosis value counts:\n",
+    sub["diagnosis"].value_counts(dropna=False).sort_index(),
+)

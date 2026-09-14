@@ -1,0 +1,622 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict whether an image contains a cactus.
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each ID in the test set, you must predict a probability for the `has_cactus` variable. The file should contain a header and have the following format:
+
+```
+id,has_cactus
+000940378805c44108d287872b2f04ce.jpg,0.5
+0017242f54ececa4512b4d7937d1e21e.jpg,0.5
+001ee6d8564003107853118ab87df407.jpg,0.5
+etc.
+```
+
+## Dataset
+This dataset contains a large number of 32 x 32 thumbnail images containing aerial photos of a cactus. The file name of an image corresponds to its `id`.
+
+- **train/** - the training set images
+- **test/** - the test set images (you must predict the labels of these)
+- **train.csv** - the training set labels, indicates whether the image has a cactus (`has_cactus = 1`)
+- **sample_submission.csv** - a sample submission file in the correct format
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9942
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+
+import tf_keras as keras
+import tensorflow as tf
+
+BASE_INPUT = "../input/aerial-cactus-identification"
+if not os.path.exists(BASE_INPUT):
+    BASE_INPUT = "../input"
+print("Using BASE_INPUT:", BASE_INPUT)
+print("BASE_INPUT contents:", os.listdir(BASE_INPUT)[:20])
+
+SEED = 1337
+os.environ["PYTHONHASHSEED"] = str(SEED)
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+train_csv_path = os.path.join(BASE_INPUT, "train.csv")
+train_data = pd.read_csv(train_csv_path)
+train_data.head()
+
+
+
+## === cell 2
+train_data.shape
+
+
+
+## === cell 3
+train_data.head()
+
+
+
+## === cell 4
+train_data.has_cactus.unique()
+
+
+
+## === cell 5
+train_data.has_cactus.value_counts()
+
+
+
+## === cell 6
+train_data.has_cactus.value_counts()
+
+
+
+## === cell 7
+train_data.has_cactus.value_counts()
+
+
+
+## === cell 8
+positive_examples = train_data[train_data.has_cactus == 1]
+negative_examples = train_data[train_data.has_cactus == 0]
+
+
+
+## === cell 9
+train_img_dir = os.path.join(BASE_INPUT, "train", "train")
+print("Train dir:", train_img_dir, "num files:", len(os.listdir(train_img_dir)))
+
+
+
+## === cell 10
+print("Example positive id:", positive_examples.id.iloc[0])
+print("Example negative id:", negative_examples.id.iloc[0])
+
+
+
+## === cell 11
+print("Expected image shape: (32, 32, 3)")
+
+
+
+## === cell 12
+model = keras.models.Sequential()
+model.add(keras.layers.Conv2D(32, (5, 5), activation="relu", input_shape=(32, 32, 3)))
+model.add(keras.layers.Conv2D(32, (5, 5), activation="relu"))
+model.add(keras.layers.Conv2D(64, (5, 5), activation="relu"))
+model.add(keras.layers.Conv2D(64, (5, 5), activation="relu"))
+model.add(keras.layers.Conv2D(128, (3, 3), activation="relu"))
+model.add(keras.layers.Conv2D(128, (3, 3), activation="relu"))
+model.add(keras.layers.Conv2D(256, (3, 3), activation="relu"))
+model.add(keras.layers.Conv2D(256, (3, 3), activation="relu"))
+model.add(keras.layers.Flatten())
+model.add(keras.layers.Dense(100, activation="relu"))
+model.add(keras.layers.Dense(1, activation="sigmoid"))
+
+
+
+## === cell 13
+model.summary()
+
+
+
+## === cell 14
+opt = keras.optimizers.Adam(0.0001)
+model.compile(optimizer=opt, loss="binary_crossentropy", metrics=["accuracy"])
+
+
+
+## === cell 15
+train_data.shape[0]
+
+
+
+## === cell 16
+train_img_dir = os.path.join(BASE_INPUT, "train", "train")
+
+BATCH_SIZE = 64
+SPLIT_INDEX = 15000
+split_index = int(min(max(SPLIT_INDEX, 1), len(train_data) - 1))
+
+train_ids = train_data.iloc[:split_index]["id"].values
+train_y = train_data.iloc[:split_index]["has_cactus"].values.astype(np.float32)
+
+val_ids = train_data.iloc[split_index:]["id"].values
+val_y = train_data.iloc[split_index:]["has_cactus"].values.astype(np.float32)
+
+
+def _load_train_image_tf(img_id, label):
+    path = tf.strings.join([tf.constant(train_img_dir + os.sep), img_id])
+    bytes_ = tf.io.read_file(path)
+    img = tf.io.decode_jpeg(bytes_, channels=3)  # uint8 [H,W,3]
+    img = tf.cast(
+        img, tf.float32
+    )  # float32, same scale as mpimg.imread for these JPEGs (0..255)
+    img = tf.ensure_shape(img, [32, 32, 3])
+    label = tf.reshape(tf.cast(label, tf.float32), [1])
+    return img, label
+
+
+train_ds = tf.data.Dataset.from_tensor_slices((train_ids.astype("S"), train_y))
+train_ds = train_ds.shuffle(
+    buffer_size=len(train_ids), seed=SEED, reshuffle_each_iteration=True
+)
+train_ds = train_ds.map(_load_train_image_tf, num_parallel_calls=tf.data.AUTOTUNE)
+train_ds = train_ds.cache()
+train_ds = train_ds.batch(BATCH_SIZE, drop_remainder=True)
+train_ds = train_ds.prefetch(tf.data.AUTOTUNE)
+
+val_ds = tf.data.Dataset.from_tensor_slices((val_ids.astype("S"), val_y))
+val_ds = val_ds.shuffle(
+    buffer_size=max(1, len(val_ids)), seed=SEED, reshuffle_each_iteration=True
+)
+val_ds = val_ds.map(_load_train_image_tf, num_parallel_calls=tf.data.AUTOTUNE)
+val_ds = val_ds.cache()
+val_ds = val_ds.batch(BATCH_SIZE, drop_remainder=True)
+val_ds = val_ds.prefetch(tf.data.AUTOTUNE)
+
+steps_per_epoch = int(train_data.shape[0] / BATCH_SIZE)
+val_steps = int(
+    max(1, (train_data.shape[0] - min(15000, train_data.shape[0] - 1)) / BATCH_SIZE)
+)
+print("steps_per_epoch:", steps_per_epoch, "val_steps:", val_steps)
+
+
+
+## === cell 17
+model.fit(train_ds, steps_per_epoch=steps_per_epoch, epochs=5)
+
+
+
+## --- ERROR in cell 17, traceback:
+---------------------------------------------------------------------------
+NotFoundError                             Traceback (most recent call last)
+/tmp/ipykernel_11/3784289255.py in <cell line: 0>()
+      1 # Timeout fix: use the tf.data pipeline; training loop/epochs unchanged.
+----> 2 model.fit(train_ds, steps_per_epoch=steps_per_epoch, epochs=5)
+      3 
+
+/usr/local/lib/python3.11/dist-packages/tf_keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+     68             # To get the full stack trace, call:
+     69             # `tf.debugging.disable_traceback_filtering()`
+---> 70             raise e.with_traceback(filtered_tb) from None
+     71         finally:
+     72             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/execute.py in quick_execute(op_name, num_outputs, inputs, attrs, ctx, name)
+     57       e.message += " name: " + name
+     58     raise core._status_to_exception(e) from None
+---> 59   except TypeError as e:
+     60     keras_symbolic_tensors = [x for x in inputs if _is_keras_symbolic_tensor(x)]
+     61     if keras_symbolic_tensors:
+
+NotFoundError: Graph execution error:
+
+Detected at node ReadFile defined at (most recent call last):
+<stack traces unavailable>
+Detected at node ReadFile defined at (most recent call last):
+<stack traces unavailable>
+2 root error(s) found.
+  (0) NOT_FOUND:  Error in user-defined function passed to ParallelMapDatasetV2:2 transformation with iterator: Iterator::Root::Prefetch::BatchV2::MemoryCacheImpl::ParallelMapV2: ../input/aerial-cactus-identification/train/train/e0e481f1603d1e76ff2bec1714ba0174.jpg; No such file or directory
+	 [[{{node ReadFile}}]]
+	 [[IteratorGetNext]]
+	 [[IteratorGetNext/_4]]
+  (1) NOT_FOUND:  Error in user-defined function passed to ParallelMapDatasetV2:2 transformation with iterator: Iterator::Root::Prefetch::BatchV2::MemoryCacheImpl::ParallelMapV2: ../input/aerial-cactus-identification/train/train/e0e481f1603d1e76ff2bec1714ba0174.jpg; No such file or directory
+	 [[{{node ReadFile}}]]
+	 [[IteratorGetNext]]
+0 successful operations.
+0 derived errors ignored. [Op:__inference_train_function_2314]
+
+## === cell 18
+model.evaluate(val_ds, steps=val_steps)
+
+
+
+## --- ERROR in cell 18, traceback:
+---------------------------------------------------------------------------
+NotFoundError                             Traceback (most recent call last)
+/tmp/ipykernel_11/1942002417.py in <cell line: 0>()
+      1 # Timeout fix: use the tf.data pipeline; evaluation semantics unchanged.
+----> 2 model.evaluate(val_ds, steps=val_steps)
+      3 
+
+/usr/local/lib/python3.11/dist-packages/tf_keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+     68             # To get the full stack trace, call:
+     69             # `tf.debugging.disable_traceback_filtering()`
+---> 70             raise e.with_traceback(filtered_tb) from None
+     71         finally:
+     72             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/execute.py in quick_execute(op_name, num_outputs, inputs, attrs, ctx, name)
+     57       e.message += " name: " + name
+     58     raise core._status_to_exception(e) from None
+---> 59   except TypeError as e:
+     60     keras_symbolic_tensors = [x for x in inputs if _is_keras_symbolic_tensor(x)]
+     61     if keras_symbolic_tensors:
+
+NotFoundError: Graph execution error:
+
+Detected at node ReadFile defined at (most recent call last):
+<stack traces unavailable>
+Detected at node ReadFile defined at (most recent call last):
+<stack traces unavailable>
+2 root error(s) found.
+  (0) NOT_FOUND:  Error in user-defined function passed to ParallelMapDatasetV2:8 transformation with iterator: Iterator::Root::Prefetch::BatchV2::MemoryCacheImpl::ParallelMapV2: ../input/aerial-cactus-identification/train/train/2654166bc65ed53655b41c70217a8cdc.jpg; No such file or directory
+	 [[{{node ReadFile}}]]
+	 [[IteratorGetNext]]
+	 [[IteratorGetNext/_2]]
+  (1) NOT_FOUND:  Error in user-defined function passed to ParallelMapDatasetV2:8 transformation with iterator: Iterator::Root::Prefetch::BatchV2::MemoryCacheImpl::ParallelMapV2: ../input/aerial-cactus-identification/train/train/2654166bc65ed53655b41c70217a8cdc.jpg; No such file or directory
+	 [[{{node ReadFile}}]]
+	 [[IteratorGetNext]]
+0 successful operations.
+0 derived errors ignored. [Op:__inference_test_function_2482]
+
+## === cell 19
+test_img_dir = os.path.join(BASE_INPUT, "test", "test")
+print("Test dir:", test_img_dir)
+print("Num test entries (including any subdirs):", len(os.listdir(test_img_dir)))
+
+
+
+## === cell 20
+test_files = sorted(
+    [
+        f
+        for f in os.listdir(test_img_dir)
+        if os.path.isfile(os.path.join(test_img_dir, f))
+    ]
+)
+len(test_files), test_files[:5]
+
+
+
+## === cell 21
+len(test_files)
+
+
+
+## === cell 22
+sample_sub_path = os.path.join(BASE_INPUT, "sample_submission.csv")
+sample_sub = pd.read_csv(sample_sub_path)
+
+sample_ids = sample_sub["id"].tolist()
+id_set = set(test_files)
+ordered_test_ids = [i for i in sample_ids if i in id_set]
+
+
+def _load_test_image_tf(img_id):
+    path = tf.strings.join([tf.constant(test_img_dir + os.sep), img_id])
+    bytes_ = tf.io.read_file(path)
+    img = tf.io.decode_jpeg(bytes_, channels=3)
+    img = tf.cast(img, tf.float32)
+    img = tf.ensure_shape(img, [32, 32, 3])
+    return img
+
+
+test_ds = tf.data.Dataset.from_tensor_slices(np.array(ordered_test_ids, dtype="S"))
+test_ds = test_ds.map(_load_test_image_tf, num_parallel_calls=tf.data.AUTOTUNE)
+test_ds = test_ds.cache()
+test_ds = test_ds.batch(256, drop_remainder=False)
+test_ds = test_ds.prefetch(tf.data.AUTOTUNE)
+
+all_out = model.predict(test_ds, verbose=0).reshape(-1, 1)
+all_out.shape
+
+
+
+## --- ERROR in cell 22, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/1729566583.py in <cell line: 0>()
+     25 test_ds = test_ds.prefetch(tf.data.AUTOTUNE)
+     26 
+---> 27 all_out = model.predict(test_ds, verbose=0).reshape(-1, 1)
+     28 all_out.shape
+     29 
+
+/usr/local/lib/python3.11/dist-packages/tf_keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+     68             # To get the full stack trace, call:
+     69             # `tf.debugging.disable_traceback_filtering()`
+---> 70             raise e.with_traceback(filtered_tb) from None
+     71         finally:
+     72             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/tf_keras/src/engine/data_adapter.py in __init__(self, x, y, sample_weight, batch_size, steps_per_epoch, initial_epoch, epochs, shuffle, class_weight, max_queue_size, workers, use_multiprocessing, model, steps_per_execution, distribute, pss_evaluation_shards)
+   1317 
+   1318         if self._inferred_steps == 0:
+-> 1319             raise ValueError("Expected input data to be non-empty.")
+   1320 
+   1321     def _configure_dataset_and_inferred_steps(
+
+ValueError: Expected input data to be non-empty.
+
+## === cell 23
+all_out = np.array(all_out).reshape(-1, 1)
+
+
+
+## --- ERROR in cell 23, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/92697827.py in <cell line: 0>()
+----> 1 all_out = np.array(all_out).reshape(-1, 1)
+      2 
+
+NameError: name 'all_out' is not defined
+
+## === cell 24
+all_out.shape
+
+
+
+## --- ERROR in cell 24, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3759483111.py in <cell line: 0>()
+----> 1 all_out.shape
+      2 
+
+NameError: name 'all_out' is not defined
+
+## === cell 25
+sub_file = pd.DataFrame(
+    data={"id": ordered_test_ids, "has_cactus": all_out.reshape(-1).tolist()}
+)
+sub_file.head()
+
+
+
+## --- ERROR in cell 25, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1995258967.py in <cell line: 0>()
+      1 sub_file = pd.DataFrame(
+----> 2     data={"id": ordered_test_ids, "has_cactus": all_out.reshape(-1).tolist()}
+      3 )
+      4 sub_file.head()
+      5 
+
+NameError: name 'all_out' is not defined
+
+## === cell 26
+sub_file.head()
+
+
+
+## --- ERROR in cell 26, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1721391390.py in <cell line: 0>()
+----> 1 sub_file.head()
+      2 
+
+NameError: name 'sub_file' is not defined
+
+## === cell 27
+sub_path = "submission.csv"
+sub_file.to_csv(sub_path, index=False)
+print("Wrote:", sub_path, "rows:", len(sub_file))
+print(sub_file.head())
+
+## --- ERROR in cell 27, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1284790068.py in <cell line: 0>()
+      1 sub_path = "submission.csv"
+----> 2 sub_file.to_csv(sub_path, index=False)
+      3 print("Wrote:", sub_path, "rows:", len(sub_file))
+      4 print(sub_file.head())
+
+NameError: name 'sub_file' is not defined

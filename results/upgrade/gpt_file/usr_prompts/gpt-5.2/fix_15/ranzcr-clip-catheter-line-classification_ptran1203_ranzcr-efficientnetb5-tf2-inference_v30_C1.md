@@ -1,0 +1,557 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect the presence and position of catheters and lines on chest x-rays.
+
+## Metric
+Area under the ROC curve for each label, with the final score being the average of the individual AUCs of each predicted column.
+
+## Submission Format
+For each ID in the test set, you must predict a probability for all target variables. The file should contain a header and have the following format:
+```
+StudyInstanceUID,ETT - Abnormal,ETT - Borderline,ETT - Normal,NGT - Abnormal,NGT - Borderline,NGT - Incompletely Imaged,NGT - Normal,CVC - Abnormal,CVC - Borderline,CVC - Normal,Swan Ganz Catheter Present
+1.2.826.0.1.3680043.8.498.62451881164053375557257228990443168843,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.83721761279899623084220697845011427274,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.12732270010839808189235995393981377825,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.11769539755086084996287023095028033598,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.87838627504097587943394933987052577153,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.53211840524738036417560823327351887819,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.93555795394184819372299157360228027866,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.52241894131170494723503100795076463919,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.36500167484503936720548852591033878284,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.86199852603457900780565655267977637728,0,0,0,0,0,0,0,0,0,0,0
+```
+
+## Dataset
+`train.csv` contains image IDs, binary labels, and patient IDs.
+
+TFRecords are available for both train and test.
+
+We've also included `train_annotations.csv`. These are segmentation annotations for training samples that have them. They are included solely as additional information for competitors.
+
+- train.csv - contains image IDs, binary labels, and patient IDs.
+- sample_submission.csv - a sample submission file in the correct format
+- test - test images
+- train - training images
+
+### Columns
+- `StudyInstanceUID` - unique ID for each image
+- `ETT - Abnormal` - endotracheal tube placement abnormal
+- `ETT - Borderline` - endotracheal tube placement borderline abnormal
+- `ETT - Normal` - endotracheal tube placement normal
+- `NGT - Abnormal` - nasogastric tube placement abnormal
+- `NGT - Borderline` - nasogastric tube placement borderline abnormal
+- `NGT - Incompletely Imaged` - nasogastric tube placement inconclusive due to imaging
+- `NGT - Normal` - nasogastric tube placement borderline normal
+- `CVC - Abnormal` - central venous catheter placement abnormal
+- `CVC - Borderline` - central venous catheter placement borderline abnormal
+- `CVC - Normal` - central venous catheter placement normal
+- `Swan Ganz Catheter Present`
+- `PatientID` - unique ID for each patient in the dataset
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+        input/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+        working/
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+```
+
+-> data/ranzcr-clip-catheter-line-classification/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/ranzcr-clip-catheter-line-classification/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/ranzcr-clip-catheter-line-classification/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> data/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9375816757551764
+
+# 6. Current score
+
+0.54461
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5) has done: 'I first fix the TensorFlow import crash caused by an incompatible `protobuf` version by pinning `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` before importing TensorFlow (this is a common Kaggle runtime fix for the `MessageFactory.GetPrototype` error). Next, I correct multiple name/path issues (`test_tfrecords` not defined, missing/incorrect TFRecord directory in this environment, and a broken `preprocess()` that returns early) so the data pipeline actually builds. Finally, I ensure the submission has the exact required 11 target columns in the correct order by starting from `sample_submission.csv` and filling any missing columns, then writing a valid `submission.csv`. Core model architecture and inference approach are preserved; changes are only to make it run end-to-end and produce a valid file.'
+- What this solution (achieved 0.5058) has done: 'I fix the TensorFlow import crash by removing the protobuf-implementation override (it’s now causing the `MessageFactory.GetPrototype` error in TF 2.18 + protobuf 6.x) and, if needed, setting the safer fallback to `upb`. Then I fix inference-time tensor/NumPy handling: `predict_on_batch()` already returns a NumPy array, so calling `.numpy()` crashes; removing that makes the loop run end-to-end. Finally, I make the test pipeline deterministic, batched, and aligned with the metric (multi-label sigmoid outputs), while keeping the same EfficientNet + dropout + dense architecture and the existing TTA aggregation (max over 2 flips) so the score should move up from the broken/degenerate behavior toward the target.'
+- What this solution (achieved 0.48658) has done: 'I fix the TensorFlow/protobuf import crash by forcing the pure-Python protobuf implementation before importing TensorFlow (this avoids the `MessageFactory.GetPrototype` error in this environment). Then I fix a correctness bug in `get_model()` where the input shape is swapped (it currently uses `(W, H, 3)` instead of `(H, W, 3)`), which can silently hurt performance. Finally, I make the inference pipeline robust to both TFRecord and JPEG paths and ensure the submission always matches the exact sample submission column order (adding any missing target columns like `CVC - Normal` and `Swan Ganz Catheter Present`). These are minimal changes that preserve the overall model/inference approach but should move the score upward toward the target.'
+- What this solution (achieved 0.53422) has done: 'I fix the TensorFlow import crash by removing the forced pure-Python protobuf implementation (it is incompatible with TF 2.18 + protobuf 6.x and triggers the `MessageFactory.GetPrototype` error). Then I correct the base model selection typo (`base_mode` → `base_model`) that currently prevents weight loading and inference from running. Finally, I keep the same model/inference/TTA logic but ensure the submission columns exactly match the competition’s required 11 targets by starting from `train.csv`’s target columns rather than trusting the truncated `sample_submission.csv` present in this environment.'
+- What this solution (achieved 0.5) has done: 'You’re currently crashing on importing TensorFlow due to an incompatibility between TF 2.18.0 and protobuf 6.x; the minimal stable fix in Kaggle is to force the C++/upb protobuf runtime before importing TF. After TF imports, the rest of your pipeline is mostly sound, but to improve score toward the target we need to ensure inference uses the intended pretrained weights path (and fail loudly if weights are missing) and that predictions are correctly aligned to the test StudyInstanceUID order (avoid any subtle UID extraction mismatches). I keep the same EfficientNetB5 + dropout + dense sigmoid model and the same 2x flip TTA with max aggregation, only tightening the environment fix, weight-path resolution, and UID/order alignment so you don’t silently submit mostly-zeros. The output be a valid `submission.csv` with the required 11 target columns in the correct order.'
+- What this solution (achieved 0.46004) has done: 'I fix the TensorFlow/protobuf import crash by removing the incompatible `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=upb` override so TF 2.18 can import cleanly with protobuf 6.x. Next, I fix the missing-weights failure by falling back to ImageNet weights when the external `.h5` files aren’t available, so the model is still meaningful (and should lift AUC well above the ~0.5 random baseline) while keeping the same EfficientNetB5+Dropout+Dense(sigmoid) core architecture and TTA logic. Finally, I make the submission robust by always using the test IDs from `sample_submission.csv` (or deriving from filenames), aligning predictions by UID, and ensuring all 11 required target columns exist in the correct order before writing `submission.csv`.'
+- What this solution (achieved 0.49216) has done: 'You’re currently failing immediately at `import tensorflow` due to a protobuf/TensorFlow runtime mismatch; the minimal robust fix in this environment is to force the pure-Python protobuf implementation *before* importing TensorFlow. After that, I keep your exact model/inference/TTA logic, but I make the TFRecord parsing more robust by decoding either PNG or JPEG bytes (the TFRecords in this competition are commonly JPEG-encoded), preventing silent image-decode failures. Finally, I ensure the submission always contains all 11 required target columns in the correct order by deriving the target column list from `train.csv` (since the provided `sample_submission.csv` here is truncated) and writing `submission.csv`.'
+- What this solution (achieved 0.50415) has done: 'I fix the TensorFlow import crash by removing the forced pure-Python protobuf runtime (it is what triggers the `MessageFactory.GetPrototype` error in TF 2.18 + protobuf 6.x) and instead forcing the default C++ runtime by unsetting that env var before importing TensorFlow. Then I fix a data-pipeline robustness issue by making JPEG loading use OS-independent path basename extraction (so UIDs are parsed correctly regardless of path separators). Finally, to move the score upward toward your target (large gap from ~0.49), I keep your exact EfficientNetB5+Dropout+Dense(sigmoid) core logic but ensure the backbone uses ImageNet weights when the external `.h5` weights aren’t present (avoids near-random predictions), while keeping the same TTA aggregation and submission formatting.'
+- What this solution (achieved 0.48276) has done: 'I fix the TensorFlow import crash by setting the protobuf implementation to the compatible C++/upb runtime before importing TensorFlow (this resolves the `MessageFactory.GetPrototype` issue in TF 2.18 + protobuf 6.x). Then I correct the TFRecord parsing so it includes the labels and can reuse the same `preprocess(images, labels)` function without a signature mismatch (this also avoids silently broken datasets). Finally, I make submission column handling robust: derive the required 11 targets from `train.csv`, start from whatever `sample_submission.csv` exists, and always output all 11 columns in the right order so Kaggle accepts the file and your model predictions aren’t dropped.'
+- What this solution (achieved 0.51871) has done: 'To fix the immediate crash, I remove the forced protobuf runtime override that is triggering the `MessageFactory.GetPrototype` error under TF 2.18 + protobuf 6.x, and I instead leave protobuf implementation unset (TensorFlow use its compatible default). Then I make the TFRecord-vs-JPEG selection robust: in this dataset there are no `test_tfrecords`, so we should reliably fall back to JPEG loading without relying on `os.sep` splitting inside a TF graph. Finally, I ensure the submission always contains all 11 required target columns in the exact order (using `train.csv`’s target list) even though the provided `sample_submission.csv` in this environment is truncated.'
+- What this solution (achieved 0.49207) has done: 'We fix the immediate TensorFlow import crash by forcing the pure‑Python protobuf implementation before importing TensorFlow, which avoids the `MessageFactory.GetPrototype` incompatibility seen with TF 2.18 + protobuf 6.x in this environment. Then we make the JPEG UID extraction OS-agnostic by using `tf.strings.split(path, os.sep)` (instead of hardcoding `"/"`), preventing silent UID mismatches that can collapse AUC. Finally, we keep your exact model/TTA/submission logic but ensure the model’s AUC metric is configured for multilabel output (score-neutral for inference, but prevents metric-shape issues if training is added later) and that submission columns exactly match the 11 required targets from `train.csv`.'
+- What this solution (achieved 0.48448) has done: 'I fix the TensorFlow import crash by removing the incompatible pure-Python protobuf override and (only if needed) forcing the safer C++/upb implementation before importing TensorFlow. Then I keep your model/inference/TTA logic the same, but I make UID extraction from file paths graph-safe by using `tf.strings.split(path, tf.constant(os.sep))` (TensorFlow can’t reliably split on a Python string in graph mode), preventing silent ID mismatches that can tank AUC. Finally, I ensure the submission always has the full 11 required target columns (your environment’s `sample_submission.csv` is truncated), by taking the canonical target list from `train.csv` and writing `submission.csv` in that exact order.'
+- What this solution (achieved 0.50143) has done: 'We fix the TensorFlow/protobuf crash by removing the incompatible protobuf-runtime override that triggers `MessageFactory.GetPrototype` under TF 2.18 + protobuf 6.x, letting TensorFlow use its default protobuf backend. Then we keep your model/TTA/inference logic intact but make weight loading deterministic: if the external `.h5` isn’t present, we still run with an ImageNet-initialized backbone (instead of silently random-ish outputs), which should move AUC upward toward your target. Finally, we ensure the submission always contains all 11 required target columns in the exact order (the provided `sample_submission.csv` here is truncated), and we align predictions to the canonical test UID list.'
+- What this solution (achieved 0.54461) has done: 'I fix the TensorFlow/protobuf import crash by setting `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` before importing TensorFlow (this environment is currently hitting `MessageFactory` API mismatch otherwise). Then I keep your exact model + TTA inference logic, but make the TFRecord image decoder robust (fallback to JPEG/PNG based on try/except rather than `tf.image.is_jpeg`, which can be brittle across TF versions) so the input pipeline can’t silently break. Finally, I keep your submission construction unchanged but add a safety check that predictions cover all test IDs (and error early if not), ensuring a valid `submission.csv` is always produced.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", None)
+
+import tensorflow as tf
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+print("TF version:", tf.__version__)
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+from datetime import datetime as dt
+
+W = H = 456
+N_CLASSES = 11
+autotune = tf.data.experimental.AUTOTUNE
+
+features = {
+    "StudyInstanceUID": tf.io.FixedLenFeature([], tf.string),
+    "image": tf.io.FixedLenFeature([], tf.string),
+}
+
+BASE_INPUT = "../input/ranzcr-clip-catheter-line-classification"
+if not os.path.exists(BASE_INPUT):
+    if os.path.exists("/kaggle/input/ranzcr-clip-catheter-line-classification"):
+        BASE_INPUT = "/kaggle/input/ranzcr-clip-catheter-line-classification"
+    elif os.path.exists("/kaggle/data/ranzcr-clip-catheter-line-classification"):
+        BASE_INPUT = "/kaggle/data/ranzcr-clip-catheter-line-classification"
+    else:
+        BASE_INPUT = "/kaggle/input/ranzcr-clip-catheter-line-classification"
+
+train_path = os.path.join(BASE_INPUT, "train.csv")
+train_df = pd.read_csv(train_path)
+
+target_cols = [
+    "ETT - Abnormal",
+    "ETT - Borderline",
+    "ETT - Normal",
+    "NGT - Abnormal",
+    "NGT - Borderline",
+    "NGT - Incompletely Imaged",
+    "NGT - Normal",
+    "CVC - Abnormal",
+    "CVC - Borderline",
+    "CVC - Normal",
+    "Swan Ganz Catheter Present",
+]
+missing = [c for c in target_cols if c not in train_df.columns]
+if missing:
+    raise ValueError(f"Missing expected target columns in train.csv: {missing}")
+
+mean = tf.constant([0.485, 0.456, 0.406], dtype=tf.float32)
+std = tf.constant([0.229, 0.224, 0.225], dtype=tf.float32)
+
+test_tfrecords_dir = os.path.join(BASE_INPUT, "test_tfrecords")
+test_images_dir = os.path.join(BASE_INPUT, "test")
+
+weight_dir_candidates = [
+    "../input/cassava2020weights",
+    "/kaggle/input/cassava2020weights",
+    "/kaggle/data/cassava2020weights",
+]
+weight_dir = None
+for c in weight_dir_candidates:
+    if os.path.exists(c):
+        weight_dir = c
+        break
+if weight_dir is None:
+    weight_dir = "../input/cassava2020weights"
+
+model_map = {
+    "efficientb3": [
+        tf.keras.applications.EfficientNetB3,
+        os.path.join(weight_dir, "ranzcr_efficientb3.h5"),
+    ],
+    "efficientb5": [
+        tf.keras.applications.EfficientNetB5,
+        os.path.join(weight_dir, "ranzcr_efficientb5.h5"),
+    ],
+    "efficientb7": [
+        tf.keras.applications.EfficientNetB7,
+        os.path.join(weight_dir, "ranzcr_efficientb7.h5"),
+    ],
+}
+
+print("BASE_INPUT:", BASE_INPUT)
+print("Has test_tfrecords_dir:", os.path.exists(test_tfrecords_dir))
+print("Has test_images_dir:", os.path.exists(test_images_dir))
+print("Resolved weight_dir:", weight_dir)
+
+
+
+
+## === cell 2
+def _decode_image_bytes(img_bytes):
+    try:
+        return tf.image.decode_jpeg(img_bytes, channels=3)
+    except Exception:
+        return tf.image.decode_png(img_bytes, channels=3)
+
+
+def parse_example(sample):
+    sample = tf.io.parse_single_example(sample, features)
+    image = _decode_image_bytes(sample["image"])
+    image = tf.image.resize(image, (H, W))
+    image_id = sample["StudyInstanceUID"]
+    dummy_label = tf.zeros([N_CLASSES], dtype=tf.float32)
+    return image, image_id, dummy_label
+
+
+def preprocess(images, labels):
+    images = tf.cast(images, tf.float32) / 255.0
+    images = (images - mean) / std
+    return images, labels
+
+
+def get_model(
+    base_model,
+    baseline_weight=None,
+    init_weight=None,
+    lr=0.001,
+    optimizer=tf.optimizers.Adam,
+):
+    if init_weight and (not os.path.exists(init_weight)):
+        print(f"WARNING: expected weights not found at: {init_weight}")
+        print("Falling back to ImageNet weights for the backbone.")
+        init_weight = None
+        if baseline_weight is None:
+            baseline_weight = "imagenet"
+
+    base_model = base_model(
+        include_top=False,
+        input_shape=(H, W, 3),
+        pooling="avg",
+        weights=baseline_weight,
+    )
+    base_out = base_model.output
+    out = tf.keras.layers.Dropout(0.3)(base_out)
+    out = tf.keras.layers.Dense(N_CLASSES, activation="sigmoid")(out)
+    model = tf.keras.models.Model(inputs=base_model.input, outputs=out)
+
+    model.compile(
+        optimizer=optimizer(learning_rate=lr),
+        loss="binary_crossentropy",
+        metrics=[tf.keras.metrics.AUC(multi_label=True, num_labels=N_CLASSES)],
+    )
+    if init_weight:
+        model.load_weights(init_weight)
+        print(f"Weight loaded from {init_weight}")
+    return model
+
+
+
+
+## === cell 3
+BATCH_SIZE = 16
+
+if os.path.exists(test_tfrecords_dir):
+    test_tfrecords = sorted(
+        [
+            f
+            for f in os.listdir(test_tfrecords_dir)
+            if f.endswith(".tfrec") or f.endswith(".tfrecord")
+        ]
+    )
+    if len(test_tfrecords) == 0:
+        test_tfrecords = sorted(os.listdir(test_tfrecords_dir))
+
+    files = [os.path.join(test_tfrecords_dir, c) for c in test_tfrecords]
+    test_data = tf.data.TFRecordDataset(files, num_parallel_reads=autotune)
+    test_data = test_data.map(parse_example, num_parallel_calls=autotune)
+    test_data = test_data.map(
+        lambda img, uid, y: (preprocess(img, y)[0], uid), num_parallel_calls=autotune
+    )
+    test_data = test_data.batch(BATCH_SIZE).prefetch(autotune)
+    print("Using TFRecords. Count files:", len(files))
+else:
+    test_files = sorted(
+        [
+            os.path.join(test_images_dir, f)
+            for f in os.listdir(test_images_dir)
+            if f.lower().endswith(".jpg")
+        ]
+    )
+    print("Using JPEGs. Count files:", len(test_files))
+
+    _SEP = tf.constant(os.sep)
+
+    def _load_jpg(path):
+        img_bytes = tf.io.read_file(path)
+        image = tf.image.decode_jpeg(img_bytes, channels=3)
+        image = tf.image.resize(image, (H, W))
+        fname = tf.strings.split(path, _SEP)[-1]
+        uid = tf.strings.regex_replace(fname, r"\.jpg$", "")
+        dummy_label = tf.zeros([N_CLASSES], dtype=tf.float32)
+        image, _ = preprocess(image, dummy_label)
+        return image, uid
+
+    test_data = tf.data.Dataset.from_tensor_slices(test_files)
+    test_data = test_data.map(_load_jpg, num_parallel_calls=autotune)
+    test_data = test_data.batch(BATCH_SIZE).prefetch(autotune)
+
+
+
+
+## === cell 4
+def show_samples(dataset):
+    rows = cols = 2
+    fig = plt.figure(figsize=(10, 10))
+    for batch_imgs, batch_uids in dataset.take(1):
+        n = min(rows * cols, int(batch_imgs.shape[0]))
+        for i in range(n):
+            img = batch_imgs[i]
+            fig.add_subplot(rows, cols, i + 1)
+            disp = img * std + mean
+            disp = tf.clip_by_value(disp, 0.0, 1.0)
+            plt.imshow(disp.numpy())
+            plt.axis("off")
+    plt.show()
+
+
+show_samples(test_data)
+
+
+
+## === cell 5
+base_model, weight_path = model_map["efficientb5"]
+model = get_model(base_model, init_weight=weight_path)
+
+
+
+## === cell 6
+preds = []
+image_ids = []
+
+sample_path = os.path.join(BASE_INPUT, "sample_submission.csv")
+if os.path.exists(sample_path):
+    test_uids = pd.read_csv(sample_path)["StudyInstanceUID"].astype(str).tolist()
+elif os.path.exists(test_images_dir):
+    test_uids = sorted(
+        [f[:-4] for f in os.listdir(test_images_dir) if f.lower().endswith(".jpg")]
+    )
+else:
+    raise FileNotFoundError(
+        "Could not find sample_submission.csv or test image directory."
+    )
+
+test_df = pd.DataFrame({"StudyInstanceUID": test_uids})
+for col in target_cols:
+    test_df[col] = 0.0
+test_df = test_df[["StudyInstanceUID"] + target_cols]
+
+
+def TTA_batch(images):
+    return tf.concat([images, tf.image.flip_left_right(images)], axis=0)
+
+
+c = 0
+for images, img_ids in test_data:
+    uids = [u.decode("utf-8") for u in img_ids.numpy().tolist()]
+    image_ids.extend(uids)
+
+    tta_imgs = TTA_batch(images)
+    pred = model.predict_on_batch(tta_imgs)  # numpy (2B, 11)
+    bsz = int(images.shape[0])
+    pred = pred.reshape(2, bsz, N_CLASSES)
+    pred = np.max(pred, axis=0)  # (B, 11)
+    preds.append(pred)
+
+    c += bsz
+    if c % 1000 == 0:
+        print("Processed:", c)
+
+preds = np.concatenate(preds, axis=0).astype(np.float32)
+print("Preds shape:", preds.shape, "Num IDs:", len(image_ids))
+
+if preds.shape[0] != len(image_ids):
+    raise RuntimeError(
+        f"Prediction/ID count mismatch: preds={preds.shape[0]} ids={len(image_ids)}"
+    )
+
+
+
+## === cell 7
+pred_df = pd.DataFrame(preds, columns=target_cols)
+pred_df.insert(0, "StudyInstanceUID", image_ids)
+
+sub = test_df[["StudyInstanceUID"]].merge(pred_df, on="StudyInstanceUID", how="left")
+sub[target_cols] = sub[target_cols].fillna(0.0).astype(np.float32)
+sub[target_cols] = sub[target_cols].clip(0.0, 1.0)
+
+sub = sub[["StudyInstanceUID"] + target_cols]
+sub.to_csv("submission.csv", index=False)
+
+print(sub.head())
+print("Wrote submission.csv with shape:", sub.shape)
+print("Columns:", list(sub.columns))

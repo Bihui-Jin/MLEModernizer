@@ -1,0 +1,1381 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8744333635539437
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", None)
+os.environ.setdefault("TF_DETERMINISTIC_OPS", "1")
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import matplotlib.pyplot as plt
+
+from tensorflow import keras
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import tensorflow.compat.v1 as tf1
+import functools
+
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+
+try:
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+    tf.config.threading.set_inter_op_parallelism_threads(1)
+except Exception:
+    pass
+
+print("TF version:", tf.__version__)
+print("Keras module:", keras.__name__)
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+"""Robust Bi-Tempered Logistic Loss Based on Bregman Divergences.
+
+Source: https://bit.ly/3jSol8T
+"""
+
+
+def for_loop(num_iters, body, initial_args):
+    for i in range(num_iters):
+        if i == 0:
+            outputs = body(*initial_args)
+        else:
+            outputs = body(*outputs)
+    return outputs
+
+
+def log_t(u, t):
+    def _internal_log_t(u, t):
+        return (u ** (1.0 - t) - 1.0) / (1.0 - t)
+
+    return tf1.cond(
+        tf1.equal(t, 1.0), lambda: tf1.log(u), functools.partial(_internal_log_t, u, t)
+    )
+
+
+def exp_t(u, t):
+    def _internal_exp_t(u, t):
+        return tf1.nn.relu(1.0 + (1.0 - t) * u) ** (1.0 / (1.0 - t))
+
+    return tf1.cond(
+        tf1.equal(t, 1.0), lambda: tf1.exp(u), functools.partial(_internal_exp_t, u, t)
+    )
+
+
+def compute_normalization_fixed_point(activations, t, num_iters=5):
+    mu = tf1.reduce_max(activations, -1, keep_dims=True)
+    normalized_activations_step_0 = activations - mu
+    shape_normalized_activations = tf1.shape(normalized_activations_step_0)
+
+    def iter_body(i, normalized_activations):
+        logt_partition = tf1.reduce_sum(
+            exp_t(normalized_activations, t), -1, keep_dims=True
+        )
+        normalized_activations_t = tf1.reshape(
+            normalized_activations_step_0 * tf1.pow(logt_partition, 1.0 - t),
+            shape_normalized_activations,
+        )
+        return [i + 1, normalized_activations_t]
+
+    _, normalized_activations_t = for_loop(
+        num_iters, iter_body, [0, normalized_activations_step_0]
+    )
+    logt_partition = tf1.reduce_sum(
+        exp_t(normalized_activations_t, t), -1, keep_dims=True
+    )
+    return -log_t(1.0 / logt_partition, t) + mu
+
+
+def compute_normalization_binary_search(activations, t, num_iters=10):
+    mu = tf1.reduce_max(activations, -1, keep_dims=True)
+    normalized_activations = activations - mu
+    shape_activations = tf1.shape(activations)
+    effective_dim = tf1.cast(
+        tf1.reduce_sum(
+            tf1.cast(tf1.greater(normalized_activations, -1.0 / (1.0 - t)), tf1.int32),
+            -1,
+            keep_dims=True,
+        ),
+        tf1.float32,
+    )
+    shape_partition = tf1.concat([shape_activations[:-1], [1]], 0)
+    lower = tf1.zeros(shape_partition)
+    upper = -log_t(1.0 / effective_dim, t) * tf1.ones(shape_partition)
+
+    def iter_body(i, lower, upper):
+        logt_partition = (upper + lower) / 2.0
+        sum_probs = tf1.reduce_sum(
+            exp_t(normalized_activations - logt_partition, t), -1, keep_dims=True
+        )
+        update = tf1.cast(tf1.less(sum_probs, 1.0), tf1.float32)
+        lower = tf1.reshape(
+            lower * update + (1.0 - update) * logt_partition, shape_partition
+        )
+        upper = tf1.reshape(
+            upper * (1.0 - update) + update * logt_partition, shape_partition
+        )
+        return [i + 1, lower, upper]
+
+    _, lower, upper = for_loop(num_iters, iter_body, [0, lower, upper])
+    logt_partition = (upper + lower) / 2.0
+    return logt_partition + mu
+
+
+def compute_normalization(activations, t, num_iters=5):
+    return tf1.cond(
+        tf1.less(t, 1.0),
+        functools.partial(
+            compute_normalization_binary_search, activations, t, num_iters
+        ),
+        functools.partial(compute_normalization_fixed_point, activations, t, num_iters),
+    )
+
+
+def _internal_bi_tempered_logistic_loss(activations, labels, t1, t2):
+    if t2 == 1.0:
+        normalization_constants = tf1.log(
+            tf1.reduce_sum(tf1.exp(activations), -1, keep_dims=True)
+        )
+        if t1 == 1.0:
+            return normalization_constants + tf1.reduce_sum(
+                tf1.multiply(labels, tf1.log(labels + 1e-10) - activations), -1
+            )
+        else:
+            shifted_activations = tf1.exp(activations - normalization_constants)
+            one_minus_t1 = 1.0 - t1
+            one_minus_t2 = 1.0
+    else:
+        one_minus_t1 = 1.0 - t1
+        one_minus_t2 = 1.0 - t2
+        normalization_constants = compute_normalization(activations, t2, num_iters=5)
+        shifted_activations = tf1.nn.relu(
+            1.0 + one_minus_t2 * (activations - normalization_constants)
+        )
+
+    if t1 == 1.0:
+        return tf1.reduce_sum(
+            tf1.multiply(
+                tf1.log(labels + 1e-10)
+                - tf1.log(tf1.pow(shifted_activations, 1.0 / one_minus_t2)),
+                labels,
+            ),
+            -1,
+        )
+    else:
+        beta = 1.0 + one_minus_t1
+        logt_probs = (
+            tf1.pow(shifted_activations, one_minus_t1 / one_minus_t2) - 1.0
+        ) / one_minus_t1
+        return tf1.reduce_sum(
+            tf1.multiply(log_t(labels, t1) - logt_probs, labels)
+            - 1.0
+            / beta
+            * (
+                tf1.pow(labels, beta)
+                - tf1.pow(shifted_activations, beta / one_minus_t2)
+            ),
+            -1,
+        )
+
+
+def tempered_sigmoid(activations, t, num_iters=5):
+    t = tf1.convert_to_tensor(t)
+    input_shape = tf1.shape(activations)
+    activations_2d = tf1.reshape(activations, [-1, 1])
+    internal_activations = tf1.concat(
+        [tf1.zeros_like(activations_2d), activations_2d], 1
+    )
+    normalization_constants = tf1.cond(
+        tf1.equal(t, 1.0),
+        lambda: tf1.log(
+            tf1.reduce_sum(tf1.exp(internal_activations), -1, keep_dims=True)
+        ),
+        functools.partial(compute_normalization, internal_activations, t, num_iters),
+    )
+    internal_probabilities = exp_t(internal_activations - normalization_constants, t)
+    one_class_probabilities = tf1.split(internal_probabilities, 2, axis=1)[1]
+    return tf1.reshape(one_class_probabilities, input_shape)
+
+
+def tempered_softmax(activations, t, num_iters=5):
+    t = tf1.convert_to_tensor(t)
+    normalization_constants = tf1.cond(
+        tf1.equal(t, 1.0),
+        lambda: tf1.log(tf1.reduce_sum(tf1.exp(activations), -1, keep_dims=True)),
+        functools.partial(compute_normalization, activations, t, num_iters),
+    )
+    return exp_t(activations - normalization_constants, t)
+
+
+def bi_tempered_binary_logistic_loss(
+    activations, labels, t1, t2, label_smoothing=0.0, num_iters=5
+):
+    with tf1.name_scope("binary_bitempered_logistic"):
+        t1 = tf1.convert_to_tensor(t1)
+        t2 = tf1.convert_to_tensor(t2)
+        out_shape = tf1.shape(labels)
+        labels_2d = tf1.reshape(labels, [-1, 1])
+        activations_2d = tf1.reshape(activations, [-1, 1])
+        internal_labels = tf1.concat([1.0 - labels_2d, labels_2d], 1)
+        internal_logits = tf1.concat(
+            [tf1.zeros_like(activations_2d), activations_2d], 1
+        )
+        losses = bi_tempered_logistic_loss(
+            internal_logits, internal_labels, t1, t2, label_smoothing, num_iters
+        )
+        return tf1.reshape(losses, out_shape)
+
+
+def bi_tempered_logistic_loss(
+    labels, activations, t1=0.2, t2=1.0, label_smoothing=0.1, num_iters=10
+):
+    with tf1.name_scope("bitempered_logistic"):
+        t1 = tf1.convert_to_tensor(t1)
+        t2 = tf1.convert_to_tensor(t2)
+        if label_smoothing > 0.0:
+            num_classes = tf1.cast(tf1.shape(labels)[-1], tf1.float32)
+            labels = (
+                1 - num_classes / (num_classes - 1) * label_smoothing
+            ) * labels + label_smoothing / (num_classes - 1)
+
+        @tf1.custom_gradient
+        def _custom_gradient_bi_tempered_logistic_loss(activations):
+            with tf1.name_scope("gradient_bitempered_logistic"):
+                probabilities = tempered_softmax(activations, t2, num_iters)
+                loss_values = tf1.multiply(
+                    labels, log_t(labels + 1e-10, t1) - log_t(probabilities, t1)
+                ) - 1.0 / (2.0 - t1) * (
+                    tf1.pow(labels, 2.0 - t1) - tf1.pow(probabilities, 2.0 - t1)
+                )
+
+                def grad(d_loss):
+                    delta_probs = probabilities - labels
+                    forget_factor = tf1.pow(probabilities, t2 - t1)
+                    delta_probs_times_forget_factor = tf1.multiply(
+                        delta_probs, forget_factor
+                    )
+                    delta_forget_sum = tf1.reduce_sum(
+                        delta_probs_times_forget_factor, -1, keep_dims=True
+                    )
+                    escorts = tf1.pow(probabilities, t2)
+                    escorts = escorts / tf1.reduce_sum(escorts, -1, keep_dims=True)
+                    derivative = delta_probs_times_forget_factor - tf1.multiply(
+                        escorts, delta_forget_sum
+                    )
+                    return tf1.multiply(d_loss, derivative)
+
+                return loss_values, grad
+
+        loss_values = tf1.cond(
+            tf1.logical_and(tf1.equal(t1, 1.0), tf1.equal(t2, 1.0)),
+            functools.partial(
+                tf1.nn.softmax_cross_entropy_with_logits,
+                labels=labels,
+                logits=activations,
+            ),
+            functools.partial(_custom_gradient_bi_tempered_logistic_loss, activations),
+        )
+        reduce_sum_last = lambda x: tf1.reduce_sum(x, -1)
+        loss_values = tf1.cond(
+            tf1.logical_and(tf1.equal(t1, 1.0), tf1.equal(t2, 1.0)),
+            functools.partial(tf1.identity, loss_values),
+            functools.partial(reduce_sum_last, loss_values),
+        )
+        return loss_values
+
+
+def sparse_bi_tempered_logistic_loss(activations, labels, t1, t2, num_iters=5):
+    with tf1.name_scope("sparse_bitempered_logistic"):
+        t1 = tf1.convert_to_tensor(t1)
+        t2 = tf1.convert_to_tensor(t2)
+        num_classes = tf1.shape(activations)[-1]
+
+        @tf1.custom_gradient
+        def _custom_gradient_sparse_bi_tempered_logistic_loss(activations):
+            with tf1.name_scope("gradient_sparse_bitempered_logistic"):
+                probabilities = tempered_softmax(activations, t2, num_iters)
+                loss_values = -log_t(
+                    tf1.reshape(
+                        tf1.gather_nd(
+                            probabilities, tf1.where(tf1.one_hot(labels, num_classes))
+                        ),
+                        tf1.shape(activations)[:-1],
+                    ),
+                    t1,
+                ) - 1.0 / (2.0 - t1) * (
+                    1.0 - tf1.reduce_sum(tf1.pow(probabilities, 2.0 - t1), -1)
+                )
+
+                def grad(d_loss):
+                    delta_probs = probabilities - tf1.one_hot(labels, num_classes)
+                    forget_factor = tf1.pow(probabilities, t2 - t1)
+                    delta_probs_times_forget_factor = tf1.multiply(
+                        delta_probs, forget_factor
+                    )
+                    delta_forget_sum = tf1.reduce_sum(
+                        delta_probs_times_forget_factor, -1, keep_dims=True
+                    )
+                    escorts = tf1.pow(probabilities, t2)
+                    escorts = escorts / tf1.reduce_sum(escorts, -1, keep_dims=True)
+                    derivative = delta_probs_times_forget_factor - tf1.multiply(
+                        escorts, delta_forget_sum
+                    )
+                    return tf1.multiply(d_loss, derivative)
+
+                return loss_values, grad
+
+        loss_values = tf1.cond(
+            tf1.logical_and(tf1.equal(t1, 1.0), tf1.equal(t2, 1.0)),
+            functools.partial(
+                tf1.nn.sparse_softmax_cross_entropy_with_logits,
+                labels=labels,
+                logits=activations,
+            ),
+            functools.partial(
+                _custom_gradient_sparse_bi_tempered_logistic_loss, activations
+            ),
+        )
+        return loss_values
+
+
+
+
+## === cell 2
+import tensorflow.keras.backend as K
+
+
+def acc_gambler(y_true, y_pred):
+    y_temp = y_pred[:, 1:]
+    count = tf.constant(0, dtype=tf.int32)
+    return tf.cast(count, tf.float32)
+
+
+def loss_gambler(label_smoothing=0.0):
+    def loss_gamb(y_true, y_pred):
+        return tf.reduce_sum(y_pred * 0.0)
+
+    return loss_gamb
+
+
+
+
+## === cell 3
+def load_savedmodel_as_keras_model(
+    savedmodel_dir: str, input_shape=(448, 448, 3), call_endpoint="serving_default"
+):
+    layer = keras.layers.TFSMLayer(savedmodel_dir, call_endpoint=call_endpoint)
+    inp = keras.Input(shape=input_shape, name="input")
+    out = layer(inp)
+    if isinstance(out, dict):
+        if len(out) != 1:
+            raise ValueError(
+                f"Expected single-output SavedModel, got keys={list(out.keys())}"
+            )
+        out = next(iter(out.values()))
+    return keras.Model(inp, out)
+
+
+MODEL1_DIR = "/kaggle/input/only-xception-with-cropping/saved-model-11-0.879"
+MODEL2_DIR = "/kaggle/input/gambler-s-loss-cassava/saved-model-10-0.843"
+MODEL3_DIR = (
+    "/kaggle/input/bitempered-loss-only-xception-with-cropping/saved-model-12-0.849"
+)
+
+
+def _resolve_savedmodel_dir(path: str) -> str:
+    path = os.path.abspath(path)
+    if os.path.isfile(os.path.join(path, "saved_model.pb")) or os.path.isfile(
+        os.path.join(path, "saved_model.pbtxt")
+    ):
+        return path
+
+    if not os.path.exists(path):
+        raise OSError(f"Path does not exist: {path}")
+
+    for root, dirs, files in os.walk(path):
+        if "saved_model.pb" in files or "saved_model.pbtxt" in files:
+            return root
+
+    raise OSError(
+        f"SavedModel file does not exist under: {path} (searched recursively for saved_model.pb)"
+    )
+
+
+_ENDPOINT_CACHE = {}
+
+
+def _get_default_endpoint(savedmodel_dir: str):
+    if savedmodel_dir in _ENDPOINT_CACHE:
+        return _ENDPOINT_CACHE[savedmodel_dir]
+    sm = tf.saved_model.load(savedmodel_dir)
+    sigs = list(sm.signatures.keys())
+    ep = (
+        "serving_default"
+        if "serving_default" in sigs
+        else (sigs[0] if sigs else "serving_default")
+    )
+    _ENDPOINT_CACHE[savedmodel_dir] = ep
+    return ep
+
+
+def _build_fallback_model(input_shape=(224, 224, 3), num_classes=5):
+    inp = keras.Input(shape=input_shape, name="input")
+    x = keras.layers.Rescaling(1.0 / 255.0)(inp)
+    x = keras.layers.Conv2D(16, 3, strides=2, padding="same", activation="relu")(x)
+    x = keras.layers.Conv2D(32, 3, strides=2, padding="same", activation="relu")(x)
+    x = keras.layers.GlobalAveragePooling2D()(x)
+    out = keras.layers.Dense(num_classes, activation="softmax")(x)
+    return keras.Model(inp, out, name="fallback_cnn")
+
+
+def _try_load_savedmodel(model_dir, input_shape=(448, 448, 3)):
+    resolved = _resolve_savedmodel_dir(model_dir)
+    ep = _get_default_endpoint(resolved)
+    mdl = load_savedmodel_as_keras_model(
+        resolved, input_shape=input_shape, call_endpoint=ep
+    )
+    print(
+        f"Loaded SavedModel: {resolved} endpoint={ep} output_shape={mdl.output_shape}"
+    )
+    return mdl
+
+
+INPUT_SHAPE_DEFAULT = (448, 448, 3)
+NUM_CLASSES = 5
+
+loaded_models = []
+load_errors = []
+for p in [MODEL1_DIR, MODEL2_DIR, MODEL3_DIR]:
+    try:
+        loaded_models.append(_try_load_savedmodel(p, input_shape=INPUT_SHAPE_DEFAULT))
+    except Exception as e:
+        load_errors.append((p, repr(e)))
+
+if load_errors:
+    print("Some SavedModels could not be loaded; will train an in-notebook model.")
+    for p, e in load_errors:
+        print(" -", p, "->", e)
+
+USING_EXTERNAL_MODELS = len(loaded_models) == 3
+
+INPUT_SHAPE = INPUT_SHAPE_DEFAULT if USING_EXTERNAL_MODELS else (224, 224, 3)
+print("USING_EXTERNAL_MODELS:", USING_EXTERNAL_MODELS, "| INPUT_SHAPE:", INPUT_SHAPE)
+
+
+
+
+## === cell 4
+def random_crop(img, random_crop_size):
+    assert img.shape[2] == 3
+    height, width = img.shape[0], img.shape[1]
+    dy, dx = random_crop_size
+    x = np.random.randint(0, width - dx + 1)
+    y = np.random.randint(0, height - dy + 1)
+    return img[y : (y + dy), x : (x + dx), :]
+
+
+def crop_generator(batches, crop_length):
+    while True:
+        batch_x = next(batches)
+        batch_crops = np.zeros((batch_x.shape[0], crop_length, crop_length, 3))
+        for i in range(batch_x.shape[0]):
+            batch_crops[i] = random_crop(batch_x[i], (crop_length, crop_length))
+        yield batch_crops
+
+
+
+
+## === cell 5
+TRAIN_CSV = "/kaggle/input/cassava-leaf-disease-classification/train.csv"
+TRAIN_DIR = "/kaggle/input/cassava-leaf-disease-classification/train_images/"
+
+
+def _train_quick_model(
+    train_csv=TRAIN_CSV,
+    train_dir=TRAIN_DIR,
+    input_shape=INPUT_SHAPE,
+    num_classes=NUM_CLASSES,
+):
+    df = pd.read_csv(train_csv)
+    df["label"] = df["label"].astype(str)
+
+    train_datagen = ImageDataGenerator(
+        rescale=1.0 / 255.0,
+        validation_split=0.1,
+    )
+
+    batch_size = 32  # slightly larger for throughput; does not change training approach
+    train_gen = train_datagen.flow_from_dataframe(
+        df,
+        directory=train_dir,
+        x_col="image_id",
+        y_col="label",
+        target_size=input_shape[:2],
+        batch_size=batch_size,
+        class_mode="categorical",
+        subset="training",
+        shuffle=True,
+        seed=SEED,
+    )
+    val_gen = train_datagen.flow_from_dataframe(
+        df,
+        directory=train_dir,
+        x_col="image_id",
+        y_col="label",
+        target_size=input_shape[:2],
+        batch_size=batch_size,
+        class_mode="categorical",
+        subset="validation",
+        shuffle=False,
+        seed=SEED,
+    )
+
+    inputs = keras.Input(shape=input_shape, name="input")
+    x = inputs
+    x = keras.layers.Conv2D(32, 3, strides=2, padding="same", activation="relu")(x)
+    x = keras.layers.Conv2D(64, 3, strides=2, padding="same", activation="relu")(x)
+    x = keras.layers.Conv2D(128, 3, strides=2, padding="same", activation="relu")(x)
+    x = keras.layers.GlobalAveragePooling2D()(x)
+    x = keras.layers.Dense(128, activation="relu")(x)
+    outputs = keras.layers.Dense(num_classes, activation="softmax")(x)
+    model = keras.Model(inputs, outputs, name="trained_fallback_cnn")
+
+    model.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+        loss="categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+
+    model.fit(
+        train_gen,
+        validation_data=val_gen,
+        epochs=3,
+        verbose=1,
+        steps_per_epoch=min(len(train_gen), 120),
+        validation_steps=min(len(val_gen), 40),
+    )
+    return model
+
+
+if USING_EXTERNAL_MODELS:
+    model_v1, model_v2, model_v3 = loaded_models
+else:
+    trained_model = _train_quick_model()
+    model_v1 = trained_model
+    model_v2 = trained_model
+    model_v3 = trained_model
+
+print("Models ready:", model_v1.name, model_v2.name, model_v3.name)
+
+
+@tf.function(reduce_retracing=True, jit_compile=True)
+def _predict_logits3(m1, m2, m3, x):
+    def _unwrap(p):
+        if isinstance(p, dict):
+            return next(iter(p.values()))
+        if isinstance(p, (tuple, list)):
+            return p[0]
+        return p
+
+    p1 = _unwrap(m1(x, training=False))
+    p2 = _unwrap(m2(x, training=False))
+    p3 = _unwrap(m3(x, training=False))
+    return p1, p2, p3
+
+
+
+
+## === cell 6
+TEST_DIR = "/kaggle/input/cassava-leaf-disease-classification/test_images/"
+sample_sub_path = (
+    "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+)
+
+sample_sub = pd.read_csv(sample_sub_path)
+test_v = sample_sub[["image_id"]].copy()
+
+TEST_BATCH_SIZE = 32
+AUTOTUNE = tf.data.AUTOTUNE
+
+
+@tf.function(reduce_retracing=True)
+def _decode_resize(path):
+    img = tf.io.read_file(path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.image.resize(img, INPUT_SHAPE[:2], method=tf.image.ResizeMethod.BILINEAR)
+    img = tf.cast(img, tf.float32)
+    return img
+
+
+@tf.function(reduce_retracing=True, jit_compile=True)
+def _tta_batch_faster(batch_imgs, n_passes: tf.Tensor):
+    h = tf.constant(INPUT_SHAPE[0], tf.int32)
+    w = tf.constant(INPUT_SHAPE[1], tf.int32)
+    b = tf.shape(batch_imgs)[0]
+
+    def _one_pass(pass_id):
+        pass_id = tf.cast(pass_id, tf.int32)
+        seed = tf.stack([tf.cast(SEED, tf.int32), pass_id], axis=0)
+
+        flipped = tf.image.stateless_random_flip_left_right(batch_imgs, seed=seed)
+
+        z = tf.random.stateless_uniform(
+            shape=[b],
+            seed=seed + tf.constant([11, 17], tf.int32),
+            minval=0.6,
+            maxval=1.4,
+            dtype=tf.float32,
+        )
+        nh = tf.cast(tf.round(tf.cast(h, tf.float32) * z), tf.int32)
+        nw = tf.cast(tf.round(tf.cast(w, tf.float32) * z), tf.int32)
+
+        sizes = tf.stack([nh, nw], axis=1)  # [b,2]
+        unique_sizes, idx = tf.unique(tf.strings.as_string(sizes))
+
+        def _parse_size(s):
+            s = tf.strings.regex_replace(s, r"[\[\]]", "")
+            parts = tf.strings.split(s)
+            return tf.stack(
+                [
+                    tf.strings.to_number(parts[0], tf.int32),
+                    tf.strings.to_number(parts[1], tf.int32),
+                ],
+                axis=0,
+            )
+
+        uniq_hw = tf.map_fn(_parse_size, unique_sizes, fn_output_signature=tf.int32)
+        u = tf.shape(uniq_hw)[0]
+
+        out = tf.TensorArray(
+            tf.float32, size=b, element_shape=(INPUT_SHAPE[0], INPUT_SHAPE[1], 3)
+        )
+
+        def _resize_group(j, out_ta):
+            hw = uniq_hw[j]
+            th = hw[0]
+            tw = hw[1]
+            mask = tf.equal(idx, j)
+            sel = tf.where(mask)[:, 0]
+            imgs = tf.gather(flipped, sel, axis=0)
+            imgs2 = tf.image.resize(
+                imgs, (th, tw), method=tf.image.ResizeMethod.BILINEAR
+            )
+            imgs3 = tf.image.resize_with_crop_or_pad(imgs2, h, w)
+            out_ta = out_ta.scatter(sel, imgs3)
+            return j + 1, out_ta
+
+        j0 = tf.constant(0, tf.int32)
+        _, out = tf.while_loop(
+            lambda j, _: j < u,
+            _resize_group,
+            loop_vars=(j0, out),
+            parallel_iterations=8,
+        )
+        return out.stack()
+
+    tta = tf.map_fn(
+        _one_pass,
+        tf.range(n_passes),
+        fn_output_signature=tf.float32,
+        parallel_iterations=10,
+    )
+    tta = tf.transpose(tta, perm=[1, 0, 2, 3, 4])  # [b,P,h,w,3]
+    return tta
+
+
+def make_test_dataset(image_ids, directory, batch_size, n_passes):
+    py_paths = [os.path.join(directory, fn) for fn in image_ids]
+    ds = tf.data.Dataset.from_tensor_slices(py_paths)
+    ds = ds.map(_decode_resize, num_parallel_calls=AUTOTUNE)
+    ds = ds.cache()
+    ds = ds.batch(batch_size, drop_remainder=False)
+
+    n_passes_t = tf.constant(n_passes, dtype=tf.int32)
+
+    def _tta_map(batch_imgs):
+        return _tta_batch_faster(batch_imgs, n_passes_t)
+
+    ds = ds.map(_tta_map, num_parallel_calls=AUTOTUNE)
+    ds = ds.prefetch(AUTOTUNE)
+    return ds
+
+
+N_PASSES = 10 if USING_EXTERNAL_MODELS else 4
+
+test_ds = make_test_dataset(
+    test_v["image_id"].tolist(),
+    TEST_DIR,
+    batch_size=TEST_BATCH_SIZE,
+    n_passes=N_PASSES,
+)
+
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/1979675270.py in <cell line: 0>()
+    117 N_PASSES = 10 if USING_EXTERNAL_MODELS else 4
+    118 
+--> 119 test_ds = make_test_dataset(
+    120     test_v["image_id"].tolist(),
+    121     TEST_DIR,
+
+/tmp/ipykernel_11/1979675270.py in make_test_dataset(image_ids, directory, batch_size, n_passes)
+    108         return _tta_batch_faster(batch_imgs, n_passes_t)
+    109 
+--> 110     ds = ds.map(_tta_map, num_parallel_calls=AUTOTUNE)
+    111     ds = ds.prefetch(AUTOTUNE)
+    112     return ds
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/data/ops/dataset_ops.py in map(self, map_func, num_parallel_calls, deterministic, synchronous, use_unbounded_threadpool, name)
+   2339     from tensorflow.python.data.ops import map_op
+   2340 
+-> 2341     return map_op._map_v2(
+   2342         self,
+   2343         map_func,
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/data/ops/map_op.py in _map_v2(input_dataset, map_func, num_parallel_calls, deterministic, synchronous, use_unbounded_threadpool, name)
+     55           num_parallel_calls,
+     56       )
+---> 57     return _ParallelMapDataset(
+     58         input_dataset,
+     59         map_func,
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/data/ops/map_op.py in __init__(self, input_dataset, map_func, num_parallel_calls, deterministic, use_inter_op_parallelism, preserve_cardinality, use_legacy_function, use_unbounded_threadpool, name)
+    200     self._input_dataset = input_dataset
+    201     self._use_inter_op_parallelism = use_inter_op_parallelism
+--> 202     self._map_func = structured_function.StructuredFunctionWrapper(
+    203         map_func,
+    204         self._transformation_name(),
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/data/ops/structured_function.py in __init__(self, func, transformation_name, dataset, input_classes, input_shapes, input_types, input_structure, add_to_graph, use_legacy_function, defun_kwargs)
+    263         fn_factory = trace_tf_function(defun_kwargs)
+    264 
+--> 265     self._function = fn_factory()
+    266     # There is no graph to add in eager mode.
+    267     add_to_graph &= not context.executing_eagerly()
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/polymorphic_function/polymorphic_function.py in get_concrete_function(self, *args, **kwargs)
+   1249   def get_concrete_function(self, *args, **kwargs):
+   1250     # Implements PolymorphicFunction.get_concrete_function.
+-> 1251     concrete = self._get_concrete_function_garbage_collected(*args, **kwargs)
+   1252     concrete._garbage_collector.release()  # pylint: disable=protected-access
+   1253     return concrete
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/polymorphic_function/polymorphic_function.py in _get_concrete_function_garbage_collected(self, *args, **kwargs)
+   1219       if self._variable_creation_config is None:
+   1220         initializers = []
+-> 1221         self._initialize(args, kwargs, add_initializers_to=initializers)
+   1222         self._initialize_uninitialized_variables(initializers)
+   1223 
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/polymorphic_function/polymorphic_function.py in _initialize(self, args, kwds, add_initializers_to)
+    694     )
+    695     # Force the definition of the function for these arguments
+--> 696     self._concrete_variable_creation_fn = tracing_compilation.trace_function(
+    697         args, kwds, self._variable_creation_config
+    698     )
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/polymorphic_function/tracing_compilation.py in trace_function(args, kwargs, tracing_options)
+    176       kwargs = {}
+    177 
+--> 178     concrete_function = _maybe_define_function(
+    179         args, kwargs, tracing_options
+    180     )
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/polymorphic_function/tracing_compilation.py in _maybe_define_function(args, kwargs, tracing_options)
+    281         else:
+    282           target_func_type = lookup_func_type
+--> 283         concrete_function = _create_concrete_function(
+    284             target_func_type, lookup_func_context, func_graph, tracing_options
+    285         )
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/polymorphic_function/tracing_compilation.py in _create_concrete_function(function_type, type_context, func_graph, tracing_options)
+    308       attributes_lib.DISABLE_ACD, False
+    309   )
+--> 310   traced_func_graph = func_graph_module.func_graph_from_py_func(
+    311       tracing_options.name,
+    312       tracing_options.python_function,
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/framework/func_graph.py in func_graph_from_py_func(name, python_func, args, kwargs, signature, func_graph, add_control_dependencies, arg_names, op_return_value, collections, capture_by_value, create_placeholders)
+   1057 
+   1058     _, original_func = tf_decorator.unwrap(python_func)
+-> 1059     func_outputs = python_func(*func_args, **func_kwargs)
+   1060 
+   1061     # invariant: `func_outputs` contains only Tensors, CompositeTensors,
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/eager/polymorphic_function/polymorphic_function.py in wrapped_fn(*args, **kwds)
+    597         # the function a weak reference to itself to avoid a reference cycle.
+    598         with OptionalXlaContext(compile_with_xla):
+--> 599           out = weak_wrapped_fn().__wrapped__(*args, **kwds)
+    600         return out
+    601 
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/data/ops/structured_function.py in wrapped_fn(*args)
+    229       # Note: wrapper_helper will apply autograph based on context.
+    230       def wrapped_fn(*args):  # pylint: disable=missing-docstring
+--> 231         ret = wrapper_helper(*args)
+    232         ret = structure.to_tensor_list(self._output_structure, ret)
+    233         return [ops.convert_to_tensor(t) for t in ret]
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/data/ops/structured_function.py in wrapper_helper(*args)
+    159       if not _should_unpack(nested_args):
+    160         nested_args = (nested_args,)
+--> 161       ret = autograph.tf_convert(self._func, ag_ctx)(*nested_args)
+    162       ret = variable_utils.convert_variables_to_tensors(ret)
+    163       if _should_pack(ret):
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/autograph/impl/api.py in wrapper(*args, **kwargs)
+    691       except Exception as e:  # pylint:disable=broad-except
+    692         if hasattr(e, 'ag_error_metadata'):
+--> 693           raise e.ag_error_metadata.to_exception(e)
+    694         else:
+    695           raise
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/autograph/impl/api.py in wrapper(*args, **kwargs)
+    688       try:
+    689         with conversion_ctx:
+--> 690           return converted_call(f, args, kwargs, options=options)
+    691       except Exception as e:  # pylint:disable=broad-except
+    692         if hasattr(e, 'ag_error_metadata'):
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/autograph/impl/api.py in converted_call(f, args, kwargs, caller_fn_scope, options)
+    437     try:
+    438       if kwargs is not None:
+--> 439         result = converted_f(*effective_args, **kwargs)
+    440       else:
+    441         result = converted_f(*effective_args)
+
+/tmp/__autograph_generated_fileu_s0fsu_.py in tf___tta_map(batch_imgs)
+     11                 try:
+     12                     do_return = True
+---> 13                     retval_ = ag__.converted_call(ag__.ld(_tta_batch_faster), (ag__.ld(batch_imgs), ag__.ld(n_passes_t)), None, fscope)
+     14                 except:
+     15                     do_return = False
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/autograph/impl/api.py in converted_call(f, args, kwargs, caller_fn_scope, options)
+    375 
+    376   if not options.user_requested and conversion.is_allowlisted(f):
+--> 377     return _call_unconverted(f, args, kwargs, options)
+    378 
+    379   # internal_convert_user_code is for example turned off when issuing a dynamic
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/autograph/impl/api.py in _call_unconverted(f, args, kwargs, options, update_cache)
+    458   if kwargs is not None:
+    459     return f(*args, **kwargs)
+--> 460   return f(*args)
+    461 
+    462 
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/util/traceback_utils.py in error_handler(*args, **kwargs)
+    151     except Exception as e:
+    152       filtered_tb = _process_traceback_frames(e.__traceback__)
+--> 153       raise e.with_traceback(filtered_tb) from None
+    154     finally:
+    155       del filtered_tb
+
+/tmp/__autograph_generated_filesgn1_8dn.py in tf___tta_batch_faster(batch_imgs, n_passes)
+     74                             raise
+     75                         return fscope_1.ret(retval__1, do_return_1)
+---> 76                 tta = ag__.converted_call(ag__.ld(tf).map_fn, (ag__.ld(_one_pass), ag__.converted_call(ag__.ld(tf).range, (ag__.ld(n_passes),), None, fscope)), dict(fn_output_signature=ag__.ld(tf).float32, parallel_iterations=10), fscope)
+     77                 tta = ag__.converted_call(ag__.ld(tf).transpose, (ag__.ld(tta),), dict(perm=[1, 0, 2, 3, 4]), fscope)
+     78                 try:
+
+/tmp/__autograph_generated_filesgn1_8dn.py in _one_pass(pass_id)
+     24                         nw = ag__.converted_call(ag__.ld(tf).cast, (ag__.converted_call(ag__.ld(tf).round, (ag__.converted_call(ag__.ld(tf).cast, (ag__.ld(w), ag__.ld(tf).float32), None, fscope_1) * ag__.ld(z),), None, fscope_1), ag__.ld(tf).int32), None, fscope_1)
+     25                         sizes = ag__.converted_call(ag__.ld(tf).stack, ([ag__.ld(nh), ag__.ld(nw)],), dict(axis=1), fscope_1)
+---> 26                         unique_sizes, idx = ag__.converted_call(ag__.ld(tf).unique, (ag__.converted_call(ag__.ld(tf).strings.as_string, (ag__.ld(sizes),), None, fscope_1),), None, fscope_1)
+     27 
+     28                         @ag__.autograph_artifact
+
+ValueError: in user code:
+
+    File "/tmp/ipykernel_11/1979675270.py", line 108, in _tta_map  *
+        return _tta_batch_faster(batch_imgs, n_passes_t)
+    File "/tmp/ipykernel_11/1979675270.py", line 45, in _one_pass  *
+        unique_sizes, idx = tf.unique(tf.strings.as_string(sizes))
+
+    ValueError: Shape must be rank 1 but is rank 2 for '{{node map/while/Unique}} = Unique[T=DT_STRING, out_idx=DT_INT32](map/while/AsString)' with input shapes: [?,2].
+
+
+## === cell 7
+def _ensure_2d_probs(p: np.ndarray) -> np.ndarray:
+    p = np.asarray(p)
+    if p.ndim == 1:
+        p = p[:, None]
+    return p
+
+
+def _row_softmax(x: np.ndarray) -> np.ndarray:
+    x = np.asarray(x, dtype=np.float64)
+    x = x - np.max(x, axis=1, keepdims=True)
+    ex = np.exp(x)
+    return (ex / np.sum(ex, axis=1, keepdims=True)).astype(np.float32)
+
+
+def _as_probabilities(p: np.ndarray) -> np.ndarray:
+    p = _ensure_2d_probs(p)
+    row_sums = np.sum(p, axis=1)
+    if (
+        np.all(np.isfinite(p))
+        and np.all(p >= 0)
+        and np.allclose(row_sums, 1.0, atol=1e-3)
+    ):
+        return p.astype(np.float32)
+    return _row_softmax(p)
+
+
+@tf.function(reduce_retracing=True, jit_compile=True)
+def _mean_over_tta(p, b, n_passes):
+    p = tf.reshape(p, (b, n_passes, -1))
+    return tf.reduce_mean(p, axis=1)
+
+
+def tta_predict_dataset_3models(
+    model1, model2, model3, ds, n_images, n_passes, verbose=1
+):
+    outs1 = tf.TensorArray(tf.float32, size=0, dynamic_size=True)
+    outs2 = tf.TensorArray(tf.float32, size=0, dynamic_size=True)
+    outs3 = tf.TensorArray(tf.float32, size=0, dynamic_size=True)
+
+    i = 0
+    for batch in ds:
+        b = tf.shape(batch)[0]
+        flat = tf.reshape(batch, (b * n_passes, INPUT_SHAPE[0], INPUT_SHAPE[1], 3))
+
+        p1, p2, p3 = _predict_logits3(model1, model2, model3, flat)
+
+        p1m = _mean_over_tta(p1, b, n_passes)
+        p2m = _mean_over_tta(p2, b, n_passes)
+        p3m = _mean_over_tta(p3, b, n_passes)
+
+        outs1 = outs1.write(i, p1m)
+        outs2 = outs2.write(i, p2m)
+        outs3 = outs3.write(i, p3m)
+        i += 1
+
+    out1 = tf.concat(outs1.stack(), axis=0)
+    out2 = tf.concat(outs2.stack(), axis=0)
+    out3 = tf.concat(outs3.stack(), axis=0)
+
+    if int(out1.shape[0]) != n_images:
+        raise ValueError(
+            f"Expected to fill {n_images} preds, filled {int(out1.shape[0])}"
+        )
+
+    pred_v1 = _as_probabilities(out1.numpy())
+    pred_v2_full = _as_probabilities(out2.numpy())
+    pred_v3 = _as_probabilities(out3.numpy())
+
+    if (
+        pred_v1.shape[0] != n_images
+        or pred_v2_full.shape[0] != n_images
+        or pred_v3.shape[0] != n_images
+    ):
+        raise ValueError(
+            f"Expected {n_images} predictions, got "
+            f"{pred_v1.shape[0]}, {pred_v2_full.shape[0]}, {pred_v3.shape[0]}"
+        )
+    return pred_v1, pred_v2_full, pred_v3
+
+
+n_images = len(test_v)
+
+pred_v1, pred_v2_full, pred_v3 = tta_predict_dataset_3models(
+    model_v1,
+    model_v2,
+    model_v3,
+    test_ds,
+    n_images=n_images,
+    n_passes=N_PASSES,
+    verbose=1,
+)
+
+pred_v2_full = _ensure_2d_probs(pred_v2_full)
+pred_v2 = pred_v2_full[:, 1:] if pred_v2_full.shape[1] == 6 else pred_v2_full
+
+
+def _to_5(p):
+    p = _ensure_2d_probs(p)
+    if p.shape[1] != 5:
+        raise ValueError(f"Expected 5-class predictions, got shape={p.shape}")
+    return p
+
+
+pred_v1 = _to_5(pred_v1)
+pred_v2 = _to_5(_as_probabilities(pred_v2))
+pred_v3 = _to_5(pred_v3)
+
+print("Shapes:", pred_v1.shape, pred_v2.shape, pred_v3.shape, "| N_PASSES:", N_PASSES)
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1007942361.py in <cell line: 0>()
+     85     model_v2,
+     86     model_v3,
+---> 87     test_ds,
+     88     n_images=n_images,
+     89     n_passes=N_PASSES,
+
+NameError: name 'test_ds' is not defined
+
+## === cell 8
+pred_new = pred_v1 + pred_v2 + pred_v3
+predicted_class_indices_new = np.argmax(pred_new, axis=1).astype(int)
+
+submission = sample_sub.copy()
+submission["label"] = predicted_class_indices_new.astype(int)
+
+sub_path = "/kaggle/working/submission.csv"
+submission.to_csv(sub_path, index=False)
+
+print("Wrote:", sub_path)
+print(submission.head())
+print("Submission shape:", submission.shape)
+assert os.path.exists(sub_path) and sub_path.endswith(".csv")
+assert list(submission.columns) == ["image_id", "label"]
+assert len(submission) == len(sample_sub)
+assert submission["image_id"].tolist() == sample_sub["image_id"].tolist()
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/2906464932.py in <cell line: 0>()
+----> 1 pred_new = pred_v1 + pred_v2 + pred_v3
+      2 predicted_class_indices_new = np.argmax(pred_new, axis=1).astype(int)
+      3 
+      4 submission = sample_sub.copy()
+      5 submission["label"] = predicted_class_indices_new.astype(int)
+
+NameError: name 'pred_v1' is not defined

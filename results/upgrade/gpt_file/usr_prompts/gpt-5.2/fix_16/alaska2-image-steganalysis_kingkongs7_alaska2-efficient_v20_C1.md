@@ -1,0 +1,819 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Determine which of the images have hidden messages embedded using one of three steganography algorithms (JMiPOD, JUNIWARD, UERD).
+
+## Metric
+Weighted AUC. Each region of the ROC curve is weighted according to these chosen parameters:
+
+```
+tpr_thresholds = [0.0, 0.4, 1.0]
+weights = [2, 1]
+```
+
+In other words, the area between the true positive rate of 0 and 0.4 is weighted 2X, the area between 0.4 and 1 is now weighed (1X). The total area is normalized by the sum of weights such that the final weighted AUC is between 0 and 1.
+
+## Submission Format
+For each `Id` (image) in the test set, you must provide a score that indicates how likely this image contains hidden data: the higher the score, the more it is assumed that image contains secret data. The file should contain a header and have the following format:
+
+```
+Id,Label
+0001.jpg,0.1
+0002.jpg,0.99
+0003.jpg,1.2
+0004.jpg,-2.2
+etc.
+```
+## Dataset
+The only available information on the test set is:
+
+1. Each embedding algorithm is used with the same probability.
+2. The payload (message length) is adjusted such that the "difficulty" is approximately the same regardless the content of the image. Images with smooth content are used to hide shorter messages while highly textured images will be used to hide more secret bits. The payload is adjusted in the same manner for testing and training sets.
+3. The average message length is 0.4 bit per non-zero AC DCT coefficient.
+4. The images are all compressed with one of the three following JPEG quality factors: 95, 90 or 75.
+
+### Files
+- `Cover/` contains 75k unaltered images meant for use in training.
+- `JMiPOD/` contains 75k examples of the JMiPOD algorithm applied to the cover images.
+- `JUNIWARD/`contains 75k examples of the JUNIWARD algorithm applied to the cover images.
+- `UERD/` contains 75k examples of the UERD algorithm applied to the cover images.
+- `Test/` contains 5k test set images. These are the images for which you are predicting.
+- `sample_submission.csv` contains an example submission in the correct format.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            Cover.zip (7.4 GB)
+            JMiPOD.zip (7.4 GB)
+            JUNIWARD.zip (7.4 GB)
+            Test.zip (528.5 MB)
+            UERD.zip (7.4 GB)
+            description.md (91 lines)
+            sample_submission.csv (5001 lines)
+            sample_submission.csv.zip (10.7 kB)
+            Cover/
+                54965.jpg (237.9 kB)
+                54517.jpg (126.7 kB)
+                ... and 69998 other files
+            JMiPOD/
+                06809.jpg (36.6 kB)
+                42490.jpg (78.8 kB)
+                ... and 69998 other files
+            JUNIWARD/
+                03684.jpg (106.2 kB)
+                42131.jpg (144.4 kB)
+                ... and 69998 other files
+            Test/
+                3630.jpg (79.5 kB)
+                3197.jpg (208.4 kB)
+                ... and 4998 other files
+            UERD/
+                42300.jpg (47.1 kB)
+                59199.jpg (41.9 kB)
+                ... and 69998 other files
+            alaska2-image-steganalysis/
+                Cover.zip (7.4 GB)
+                JMiPOD.zip (7.4 GB)
+                ... and 6 other files
+                Cover/
+                    54965.jpg (237.9 kB)
+                    54517.jpg (126.7 kB)
+                    ... and 69998 other files
+                JMiPOD/
+                    06809.jpg (36.6 kB)
+                    42490.jpg (78.8 kB)
+                    ... and 69998 other files
+                JUNIWARD/
+                    03684.jpg (106.2 kB)
+                    42131.jpg (144.4 kB)
+                    ... and 69998 other files
+                Test/
+                    3630.jpg (79.5 kB)
+                    3197.jpg (208.4 kB)
+                    ... and 4998 other files
+                UERD/
+                    42300.jpg (47.1 kB)
+                    59199.jpg (41.9 kB)
+                    ... and 69998 other files
+                alaska2-image-steganalysis/
+        input/
+            Cover.zip (7.4 GB)
+            JMiPOD.zip (7.4 GB)
+            JUNIWARD.zip (7.4 GB)
+            Test.zip (528.5 MB)
+            UERD.zip (7.4 GB)
+            description.md (91 lines)
+            sample_submission.csv (5001 lines)
+            sample_submission.csv.zip (10.7 kB)
+            Cover/
+                54965.jpg (237.9 kB)
+                54517.jpg (126.7 kB)
+                ... and 69998 other files
+            JMiPOD/
+                06809.jpg (36.6 kB)
+                42490.jpg (78.8 kB)
+                ... and 69998 other files
+            JUNIWARD/
+                03684.jpg (106.2 kB)
+                42131.jpg (144.4 kB)
+                ... and 69998 other files
+            Test/
+                3630.jpg (79.5 kB)
+                3197.jpg (208.4 kB)
+                ... and 4998 other files
+            UERD/
+                42300.jpg (47.1 kB)
+                59199.jpg (41.9 kB)
+                ... and 69998 other files
+            alaska2-image-steganalysis/
+                Cover.zip (7.4 GB)
+                JMiPOD.zip (7.4 GB)
+                ... and 6 other files
+                Cover/
+                    54965.jpg (237.9 kB)
+                    54517.jpg (126.7 kB)
+                    ... and 69998 other files
+                JMiPOD/
+                    06809.jpg (36.6 kB)
+                    42490.jpg (78.8 kB)
+                    ... and 69998 other files
+                JUNIWARD/
+                    03684.jpg (106.2 kB)
+                    42131.jpg (144.4 kB)
+                    ... and 69998 other files
+                Test/
+                    3630.jpg (79.5 kB)
+                    3197.jpg (208.4 kB)
+                    ... and 4998 other files
+                UERD/
+                    42300.jpg (47.1 kB)
+                    59199.jpg (41.9 kB)
+                    ... and 69998 other files
+                alaska2-image-steganalysis/
+        working/
+            alaska2-image-steganalysis/
+                Cover.zip (7.4 GB)
+                JMiPOD.zip (7.4 GB)
+                ... and 6 other files
+                Cover/
+                    54965.jpg (237.9 kB)
+                    54517.jpg (126.7 kB)
+                    ... and 69998 other files
+                JMiPOD/
+                    06809.jpg (36.6 kB)
+                    42490.jpg (78.8 kB)
+                    ... and 69998 other files
+                JUNIWARD/
+                    03684.jpg (106.2 kB)
+                    42131.jpg (144.4 kB)
+                    ... and 69998 other files
+                Test/
+                    3630.jpg (79.5 kB)
+                    3197.jpg (208.4 kB)
+                    ... and 4998 other files
+                UERD/
+                    42300.jpg (47.1 kB)
+                    59199.jpg (41.9 kB)
+                    ... and 69998 other files
+                alaska2-image-steganalysis/
+```
+
+-> data/alaska2-image-steganalysis/sample_submission.csv has 5000 rows and 2 columns.
+The columns are: Id, Label
+
+-> data/sample_submission.csv has 5000 rows and 2 columns.
+The columns are: Id, Label
+
+-> input/alaska2-image-steganalysis/sample_submission.csv has 5000 rows and 2 columns.
+The columns are: Id, Label
+
+-> input/sample_submission.csv has 5000 rows and 2 columns.
+The columns are: Id, Label
+
+-> working/alaska2-image-steganalysis/sample_submission.csv has 5000 rows and 2 columns.
+The columns are: Id, Label
+
+# 5. Target score
+
+0.8278926088583237
+
+# 6. Current score
+
+0.6037
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.56719) has done: 'I fix the missing `efficientnet_pytorch` dependency by switching to the built-in `torchvision.models.efficientnet_b0` while keeping the same EfficientNet-B0 backbone + pooled features + linear head logic. I also fix the cascading `NameError`s by ensuring albumentations is imported and augmentations are defined before use, and I make the checkpoint loading robust by looking for an optional provided checkpoint but not failing when it’s absent. Finally, I ensure the pipeline always reaches inference and writes a valid `submission.csv` with `Id,Label` for all 5000 test images.'
+- What this solution (achieved 0.60578) has done: 'The timeout is dominated by the (potential) training path: you’re building a 225k-image dataset at 512×512 with heavy JPEG augmentations and running EfficientNet-B0 for multiple epochs, which is far beyond 600s. The fastest correct fix is to ensure the pretrained competition checkpoint is always found/loaded (so `num_epochs` stays 0) and to avoid the expensive recursive checkpoint search. Additionally, inference can be sped up without changing semantics by enabling cuDNN benchmarking (safe here because input shapes are constant) and by removing per-batch dtype casts and redundant CPU syncs. The rest of the pipeline (architecture, TTA inference logic, predictions) is preserved exactly.'
+- What this solution (achieved 0.59027) has done: 'The timeout is almost certainly coming from the fallback training path (building 300k-image train/val splits and running an epoch) and from avoidable overhead in the dataloading/inference loop. I keep the exact same model, augmentations, loss, and TTA semantics, but make execution reliably fast by (1) making checkpoint loading deterministic and fail-fast (so we don’t accidentally train), (2) enabling the fastest equivalent DataLoader settings (more prefetch, pinned memory, persistent workers, CPU thread sanity), and (3) reducing Python overhead in inference by batching the three TTA forwards into one concatenated forward pass (mathematically identical). These changes preserve correctness (same computations, just reorganized) and should bring runtime comfortably under 600s when the checkpoint exists, while also preventing a 10+ minute accidental training run.'
+- What this solution (achieved 0.6037) has done: 'Main bottlenecks are the heavy CPU-side JPEG decode/resize/normalize pipeline plus `torch.compile` warmup overhead, which together can push inference beyond 600s. I keep the exact model and TTA logic, but speed up data loading by removing unused albumentations from the test dataset, switching to OpenCV-optimized resize paths, enabling faster DataLoader settings (more workers, larger prefetch, pinned memory), and eliminating redundant work inside `__getitem__`. I also avoid `torch.compile` in this strict-timeout setting (it can spend a lot of time compiling for a single inference pass), while keeping the same weights and forward computation. These changes preserve evaluation semantics and should only cause negligible floating-point differences.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import random
+import gc
+import time
+from glob import glob
+
+import numpy as np
+import pandas as pd
+
+import cv2
+import matplotlib.pyplot as plt
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset
+
+from sklearn import metrics
+from tqdm.auto import tqdm
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+import torchvision
+
+cv2.setNumThreads(max(1, (os.cpu_count() or 2)))
+cv2.ocl.setUseOpenCL(False)
+
+torch.set_num_threads(max(1, (os.cpu_count() or 2) // 2))
+
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
+
+
+
+## === cell 1
+seed = 42
+print(f"setting everything to seed {seed}")
+random.seed(seed)
+os.environ["PYTHONHASHSEED"] = str(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = True
+
+
+def _seed_worker(worker_id: int):
+    worker_seed = (seed + worker_id) % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+
+
+
+## === cell 2
+def list_jpgs_fast(folder: str):
+    out = []
+    with os.scandir(folder) as it:
+        for e in it:
+            if e.is_file():
+                name = e.name
+                if name.endswith(".jpg"):
+                    out.append(e.path)
+    return out
+
+
+data_dir_candidates = [
+    "../input/alaska2-image-steganalysis",
+    "/kaggle/input/alaska2-image-steganalysis",
+    "../input/alaska2-image-steganalysis/alaska2-image-steganalysis",
+    "/kaggle/input/alaska2-image-steganalysis/alaska2-image-steganalysis",
+]
+data_dir = None
+for p in data_dir_candidates:
+    if (
+        os.path.exists(p)
+        and os.path.isdir(p)
+        and os.path.exists(os.path.join(p, "Cover"))
+    ):
+        data_dir = p
+        break
+if data_dir is None:
+    data_dir = "../input/alaska2-image-steganalysis"
+
+sample_size = 75000
+val_size = int(sample_size * 0.25)
+
+train_df = None
+val_df = None
+
+
+
+
+## === cell 3
+class Alaska2Dataset(Dataset):
+    def __init__(self, df, augmentations=None):
+        self.data = df.reset_index(drop=True)
+        self.fns = self.data["ImageFileName"].to_numpy()
+        self.labels = self.data["Label"].to_numpy(dtype=np.int64, copy=False)
+        self.augment = augmentations
+
+    def __len__(self):
+        return len(self.fns)
+
+    def __getitem__(self, idx):
+        fn = self.fns[idx]
+        label = int(self.labels[idx])
+
+        im = cv2.imread(fn, cv2.IMREAD_REDUCED_COLOR_2 | cv2.IMREAD_IGNORE_ORIENTATION)
+        if im is None:
+            raise FileNotFoundError(f"Could not read image: {fn}")
+        im = im[:, :, ::-1]  # BGR -> RGB
+
+        if self.augment is not None:
+            out = self.augment(image=im)
+            im = out["image"]
+
+        return im, label
+
+
+img_size = 512
+
+IMAGENET_MEAN = (0.485, 0.456, 0.406)
+IMAGENET_STD = (0.229, 0.224, 0.225)
+
+AUGMENTATIONS_TRAIN = A.Compose(
+    [
+        A.Resize(img_size, img_size),
+        A.VerticalFlip(p=0.5),
+        A.HorizontalFlip(p=0.5),
+        A.ImageCompression(quality_range=(75, 100), p=0.5),
+        A.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD, max_pixel_value=255.0),
+        ToTensorV2(),
+    ]
+)
+
+AUGMENTATIONS_TEST = A.Compose(
+    [
+        A.Resize(img_size, img_size),
+        A.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD, max_pixel_value=255.0),
+        ToTensorV2(),
+    ]
+)
+
+
+
+## === cell 4
+if False:
+    temp_df = train_df.sample(32, random_state=seed).reset_index(drop=True)
+    train_dataset_vis = Alaska2Dataset(temp_df, augmentations=AUGMENTATIONS_TEST)
+
+    batch_size = 32
+    num_workers = 0
+
+    temp_loader = torch.utils.data.DataLoader(
+        train_dataset_vis, batch_size=batch_size, num_workers=num_workers, shuffle=False
+    )
+
+    images, labels = next(iter(temp_loader))
+    images = images.permute(0, 2, 3, 1).cpu().numpy()
+
+    images = np.clip(images, 0, 1)
+
+    grid_width = 8
+    grid_height = int(np.ceil(len(images) / grid_width))
+    fig, axs = plt.subplots(
+        grid_height, grid_width, figsize=(grid_width + 2, grid_height + 2)
+    )
+    axs = np.array(axs).reshape(grid_height, grid_width)
+
+    for i in range(grid_height * grid_width):
+        ax = axs[i // grid_width, i % grid_width]
+        if i < len(images):
+            ax.imshow(images[i])
+            ax.set_title(str(int(labels[i].item())))
+        ax.axis("off")
+
+    plt.suptitle("0: COVER, 1: JMiPOD, 2: JUNIWARD, 3: UERD")
+    plt.show()
+    del images, labels, temp_df, train_dataset_vis, temp_loader
+    gc.collect()
+
+
+
+
+## === cell 5
+class Net(nn.Module):
+    def __init__(self):
+        super().__init__()
+        weights = torchvision.models.EfficientNet_B0_Weights.IMAGENET1K_V1
+        self.model = torchvision.models.efficientnet_b0(weights=weights)
+        self.dense_output = nn.Linear(1280, 4)
+
+    def forward(self, x):
+        feat = self.model.features(x)
+        feat = F.avg_pool2d(feat, feat.size()[2:]).reshape(-1, 1280)
+        return self.dense_output(feat)
+
+
+
+
+## === cell 6
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = Net().to(device)
+
+candidate_ckpts = [
+    "../input/alaska/epoch_10_val_loss_6.73_auc_0.815.pth",
+    "../input/alaska2-image-steganalysis/epoch_10_val_loss_6.73_auc_0.815.pth",
+    "../input/alaska2-image-steganalysis/alaska2-image-steganalysis/epoch_10_val_loss_6.73_auc_0.815.pth",
+    "/kaggle/input/alaska/epoch_10_val_loss_6.73_auc_0.815.pth",
+    "/kaggle/input/alaska2-image-steganalysis/epoch_10_val_loss_6.73_auc_0.815.pth",
+    "/kaggle/input/alaska2-image-steganalysis/alaska2-image-steganalysis/epoch_10_val_loss_6.73_auc_0.815.pth",
+]
+
+seen = set()
+candidate_ckpts = [p for p in candidate_ckpts if not (p in seen or seen.add(p))]
+
+loaded = False
+for ckpt_path in candidate_ckpts:
+    if os.path.exists(ckpt_path):
+        state = torch.load(ckpt_path, map_location="cpu")
+        model.load_state_dict(state, strict=True)
+        print(f"Loaded checkpoint: {ckpt_path}")
+        loaded = True
+        break
+
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+
+if device == "cuda":
+    model = model.to(memory_format=torch.channels_last)
+
+use_compile = bool(int(os.environ.get("ALASKA_USE_COMPILE", "0")))
+if use_compile:
+    try:
+        if hasattr(torch, "compile"):
+            model = torch.compile(
+                model, mode="max-autotune", fullgraph=False, dynamic=False
+            )
+            print("torch.compile enabled")
+    except Exception as e:
+        print("torch.compile not available/failed; continuing without it:", repr(e))
+
+
+
+
+## === cell 7
+def alaska_weighted_auc(y_true, y_score):
+    tpr_thresholds = [0.0, 0.4, 1.0]
+    weights = [2, 1]
+
+    fpr, tpr, _ = metrics.roc_curve(y_true, y_score, pos_label=1)
+
+    areas = np.diff(np.array(tpr_thresholds))
+    normalization = float(np.dot(areas, weights))
+
+    score = 0.0
+    for i, w in enumerate(weights):
+        y_min, y_max = tpr_thresholds[i], tpr_thresholds[i + 1]
+        tpr_c = np.clip(tpr, y_min, y_max) - y_min
+        score += w * metrics.auc(fpr, tpr_c)
+
+    return score / normalization
+
+
+
+
+## === cell 8
+criterion = torch.nn.CrossEntropyLoss()
+
+num_epochs = 0 if loaded else 2  # minimal fallback training
+train_loss, val_loss = [], []
+log_every = 200
+
+if num_epochs > 0:
+    per_class_total = 2000  # total per class used (train+val)
+    per_class_val = 400
+    per_class_train = per_class_total - per_class_val
+
+    train_fn, val_fn = [], []
+    train_labels, val_labels = [], []
+
+    folder_names = ["Cover", "JMiPOD", "JUNIWARD", "UERD"]  # label 0 1 2 3
+    rng = np.random.RandomState(seed)
+    for label, folder in enumerate(folder_names):
+        folder_path = f"{data_dir}/{folder}"
+        filenames = list_jpgs_fast(folder_path)
+        if len(filenames) == 0:
+            raise FileNotFoundError(f"No jpg files found in: {folder_path}")
+
+        filenames = np.array(filenames, dtype=object)
+        rng.shuffle(filenames)
+
+        filenames = filenames[:per_class_total]
+
+        val_files = filenames[:per_class_val].tolist()
+        trn_files = filenames[per_class_val:].tolist()
+
+        train_fn.extend(trn_files)
+        train_labels.extend([label] * len(trn_files))
+        val_fn.extend(val_files)
+        val_labels.extend([label] * len(val_files))
+
+    train_df = pd.DataFrame(
+        {"ImageFileName": train_fn, "Label": train_labels},
+        columns=["ImageFileName", "Label"],
+    )
+    train_df["Label"] = train_df["Label"].astype(int)
+
+    val_df = pd.DataFrame(
+        {"ImageFileName": val_fn, "Label": val_labels},
+        columns=["ImageFileName", "Label"],
+    )
+    val_df["Label"] = val_df["Label"].astype(int)
+
+    batch_size = 16
+
+    cpu = os.cpu_count() or 4
+    num_workers = min(6, max(2, cpu // 2))
+
+    train_dataset = Alaska2Dataset(train_df, augmentations=AUGMENTATIONS_TRAIN)
+    valid_dataset = Alaska2Dataset(val_df, augmentations=AUGMENTATIONS_TEST)
+
+    g = torch.Generator()
+    g.manual_seed(seed)
+
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        shuffle=True,
+        pin_memory=True,
+        persistent_workers=(num_workers > 0),
+        prefetch_factor=2 if num_workers > 0 else None,
+        worker_init_fn=_seed_worker,
+        generator=g,
+        in_order=False if num_workers > 0 else True,
+    )
+    valid_loader = torch.utils.data.DataLoader(
+        valid_dataset,
+        batch_size=batch_size * 2,
+        num_workers=num_workers,
+        shuffle=False,
+        pin_memory=True,
+        persistent_workers=(num_workers > 0),
+        prefetch_factor=2 if num_workers > 0 else None,
+        worker_init_fn=_seed_worker,
+        in_order=False if num_workers > 0 else True,
+    )
+
+    for epoch in range(num_epochs):
+        print("Epoch {}/{}".format(epoch + 1, num_epochs))
+        print("-" * 10)
+        model.train()
+        running_loss = 0.0
+
+        tk0 = tqdm(train_loader, total=len(train_loader))
+        for step, (im, labels) in enumerate(tk0):
+            inputs = im.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+
+            if device == "cuda":
+                inputs = inputs.contiguous(memory_format=torch.channels_last)
+
+            optimizer.zero_grad(set_to_none=True)
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            loss_scalar = float(loss.detach().cpu().item())
+            running_loss += loss_scalar
+            if (step % log_every) == 0:
+                tk0.set_postfix(loss=loss_scalar)
+
+        epoch_loss = running_loss / max(1, len(train_loader))
+        train_loss.append(epoch_loss)
+        print("Training Loss: {:.8f}".format(epoch_loss))
+
+        model.eval()
+        running_loss = 0.0
+
+        y_arr = np.empty(len(valid_dataset), dtype=np.int64)
+        preds_arr = np.empty((len(valid_dataset), 4), dtype=np.float32)
+        ofs = 0
+
+        tk1 = tqdm(valid_loader, total=len(valid_loader))
+        with torch.inference_mode():
+            for step, (im, labels) in enumerate(tk1):
+                b = labels.size(0)
+                inputs = im.to(device, non_blocking=True)
+                labels_dev = labels.to(device, non_blocking=True)
+
+                if device == "cuda":
+                    inputs = inputs.contiguous(memory_format=torch.channels_last)
+
+                outputs = model(inputs)
+                loss = criterion(outputs, labels_dev)
+                running_loss += float(loss.detach().cpu().item())
+
+                probs = torch.softmax(outputs, 1).float().cpu().numpy()
+
+                y_arr[ofs : ofs + b] = labels.numpy().astype(np.int64, copy=False)
+                preds_arr[ofs : ofs + b] = probs
+                ofs += b
+
+                if (step % log_every) == 0:
+                    tk1.set_postfix(loss=float(loss.detach().cpu().item()))
+
+        epoch_loss = running_loss / max(1, len(valid_loader))
+        val_loss.append(epoch_loss)
+
+        preds = preds_arr[:ofs]
+        y = y_arr[:ofs]
+        pred_class = preds.argmax(1)
+        acc = (pred_class == y).mean() * 100.0
+
+        new_preds = (1.0 - preds[:, 0]).astype(np.float32)
+        y_bin = (y != 0).astype(int)
+        auc_score = alaska_weighted_auc(y_bin, new_preds)
+        print(f"Val Loss: {epoch_loss:.3}, Weighted AUC:{auc_score:.3}, Acc: {acc:.3}")
+
+    del train_loader, valid_loader, train_dataset, valid_dataset
+    gc.collect()
+
+
+
+## === cell 9
+if False and len(train_loss) > 0:
+    plt.figure(figsize=(15, 7))
+    plt.plot(train_loss, c="r")
+    plt.plot(val_loss, c="b")
+    plt.legend(["train_loss", "val_loss"])
+    plt.title("Loss Plot")
+    plt.show()
+
+
+
+
+## === cell 10
+class Alaska2TestDataset(Dataset):
+    def __init__(self, df, augmentations=None):
+        self.data = df.reset_index(drop=True)
+        self.fns = self.data["ImageFileName"].to_numpy()
+        self.augment = None
+
+        self._mean = np.array(IMAGENET_MEAN, dtype=np.float32).reshape(1, 1, 3)
+        self._std = np.array(IMAGENET_STD, dtype=np.float32).reshape(1, 1, 3)
+
+    def __len__(self):
+        return len(self.fns)
+
+    def __getitem__(self, idx):
+        fn = self.fns[idx]
+
+        im = cv2.imread(fn, cv2.IMREAD_REDUCED_COLOR_2 | cv2.IMREAD_IGNORE_ORIENTATION)
+        if im is None:
+            raise FileNotFoundError(f"Could not read image: {fn}")
+
+        im = im[:, :, ::-1]
+
+        im = cv2.resize(im, (img_size, img_size), interpolation=cv2.INTER_LINEAR)
+
+        im = im.astype(np.float32) * (1.0 / 255.0)
+        im = (im - self._mean) / self._std
+
+        im = torch.from_numpy(np.ascontiguousarray(im.transpose(2, 0, 1)))
+        return im
+
+
+test_folder = f"{data_dir}/Test"
+test_filenames = list_jpgs_fast(test_folder)
+if len(test_filenames) == 0:
+    raise FileNotFoundError(f"No test jpg files found in: {test_folder}")
+test_filenames = sorted(test_filenames)
+
+test_df = pd.DataFrame(
+    {"ImageFileName": list(test_filenames)}, columns=["ImageFileName"]
+)
+
+batch_size = 32  # keep as provided
+
+cpu = os.cpu_count() or 4
+num_workers = min(8, max(2, cpu))  # allow more workers for IO-bound JPEG decode
+prefetch_factor = 4 if num_workers > 0 else None
+
+test_dataset = Alaska2TestDataset(test_df, augmentations=AUGMENTATIONS_TEST)
+
+test_loader = torch.utils.data.DataLoader(
+    test_dataset,
+    batch_size=batch_size,
+    num_workers=num_workers,
+    shuffle=False,
+    drop_last=False,
+    pin_memory=True,
+    persistent_workers=(num_workers > 0),
+    prefetch_factor=prefetch_factor,
+    worker_init_fn=_seed_worker,
+    in_order=False if num_workers > 0 else True,
+)
+
+print("Test images:", len(test_df))
+
+
+
+## === cell 11
+model.eval()
+
+preds_arr = np.empty((len(test_dataset), 4), dtype=np.float32)
+ofs = 0
+
+copy_stream = torch.cuda.Stream() if device == "cuda" else None
+
+tk0 = tqdm(test_loader, total=len(test_loader))
+with torch.inference_mode():
+    for im in tk0:
+        b = im.size(0)
+        if device == "cuda":
+            with torch.cuda.stream(copy_stream):
+                inputs = im.to(device, non_blocking=True).contiguous(
+                    memory_format=torch.channels_last
+                )
+            torch.cuda.current_stream().wait_stream(copy_stream)
+        else:
+            inputs = im.to(device)
+
+        x0 = inputs
+        x1 = inputs.flip(2)
+        x2 = inputs.flip(3)
+        x = torch.cat([x0, x1, x2], dim=0)
+
+        out = model(x)
+        out0, out1, out2 = out[:b], out[b : 2 * b], out[2 * b : 3 * b]
+
+        outputs = 0.5 * out0 + 0.25 * out1 + 0.25 * out2
+        preds_arr[ofs : ofs + b] = torch.softmax(outputs, 1).float().cpu().numpy()
+        ofs += b
+
+preds = preds_arr[:ofs]
+new_preds = (1.0 - preds[:, 0]).astype(np.float32)
+
+test_df["Id"] = test_df["ImageFileName"].map(os.path.basename)
+test_df["Label"] = new_preds.astype(float)
+
+submission = test_df[["Id", "Label"]].copy()
+submission.to_csv("submission.csv", index=False)
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)
+print("Saved to:", os.path.abspath("submission.csv"))

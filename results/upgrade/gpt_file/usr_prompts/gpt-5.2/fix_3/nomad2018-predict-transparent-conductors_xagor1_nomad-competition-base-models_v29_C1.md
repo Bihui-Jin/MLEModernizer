@@ -1,0 +1,521 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the formation energy and bandgap energy of a material.
+
+## Metric
+Column-wise root mean squared logarithmic error.
+
+## Submission Format
+For each id in the test set, you must predict a value for both formation_energy_ev_natom and bandgap_energy_ev. The file should contain a header and have the following format:
+```
+id,formation_energy_ev_natom,bandgap_energy_ev
+1,0.1779,1.8892
+2,0.1779,1.8892
+3,0.1779,1.8892
+...
+```
+
+## Dataset
+The following information has been included:
+
+- Spacegroup (a label identifying the symmetry of the material)
+- Total number of Al, Ga, In and O atoms in the unit cell ($\N_{total}$)
+- Relative compositions of Al, Ga, and In (x, y, z)
+- Lattice vectors and angles: lv1, lv2, lv3 (which are lengths given in units of angstroms ($10^{-10}$ meters) and $\alpha, \beta, \gamma$ (which are angles in degrees between 0° and 360°)
+
+Note: For each line of the CSV file, the corresponding spatial positions of all of the atoms in the unit cell (expressed in Cartesian coordinates) are provided as a separate file.
+
+train.csv - contains a set of materials for which the bandgap and formation energies are provided
+
+test.csv - contains the set of materials for which you must predict the bandgap and formation energies
+
+/{train|test}/{id}/geometry.xyz - files with spatial information about the material. The file name corresponds to the id in the respective csv files.
+
+# 2. Python version
+
+3.6
+
+# 3. Installed packages
+
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (89 lines)
+            sample_submission.csv (241 lines)
+            sample_submission.csv.zip (765 Bytes)
+            test.csv (241 lines)
+            test.csv.zip (6.0 kB)
+            test.zip (505.0 kB)
+            train.csv (2161 lines)
+            train.csv.zip (56.7 kB)
+            train.zip (4.5 MB)
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+            test/
+                1/
+                    geometry.xyz (3.0 kB)
+                10/
+                    geometry.xyz (3.0 kB)
+                ... and 239 other folders
+            train/
+                1/
+                    geometry.xyz (5.5 kB)
+                10/
+                    geometry.xyz (2.3 kB)
+                ... and 2159 other folders
+        input/
+            description.md (89 lines)
+            sample_submission.csv (241 lines)
+            sample_submission.csv.zip (765 Bytes)
+            test.csv (241 lines)
+            test.csv.zip (6.0 kB)
+            test.zip (505.0 kB)
+            train.csv (2161 lines)
+            train.csv.zip (56.7 kB)
+            train.zip (4.5 MB)
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+            test/
+                1/
+                    geometry.xyz (3.0 kB)
+                10/
+                    geometry.xyz (3.0 kB)
+                ... and 239 other folders
+            train/
+                1/
+                    geometry.xyz (5.5 kB)
+                10/
+                    geometry.xyz (2.3 kB)
+                ... and 2159 other folders
+        working/
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+```
+
+-> data/nomad2018-predict-transparent-conductors/sample_submission.csv has 240 rows and 3 columns.
+The columns are: id, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/nomad2018-predict-transparent-conductors/test.csv has 240 rows and 12 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree
+
+-> data/nomad2018-predict-transparent-conductors/train.csv has 2160 rows and 14 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/sample_submission.csv has 240 rows and 3 columns.
+The columns are: id, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/test.csv has 240 rows and 12 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree
+
+-> data/train.csv has 2160 rows and 14 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree, formation_energy_ev_natom, bandgap_energy_ev
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.06917
+
+# 6. Current score
+
+0.05828
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.08327) has done: 'I fix the import/runtime errors caused by deprecated scikit-learn modules (e.g., `sklearn.cross_validation`, `sklearn.grid_search`) and ensure all required classes (like `LinearRegression`) and `xgboost` are properly imported so later cells can execute. I also correct the train/test slicing bug where the code assumes 2400/3000 rows even though the dataset has 2160/240 rows, which currently breaks feature/label alignment and prevents valid predictions. Finally, to make RMSLE well-defined and avoid negative predictions causing invalid log computations, I clip predictions to non-negative values before writing the submission CSV (score-neutral/stabilizing). The script run end-to-end and write a valid `Stacked_Nomad.csv` submission with the required columns.'
+- What this solution (achieved 0.05828) has done: 'To move your score down toward the 0.06917 target (lower is better) with minimal core-logic disruption, I align training/validation to the competition metric more closely and remove a source of train-time leakage from using `xgb.cv` on all training rows to pick `n_estimators`. Specifically: (1) train the linear models on `log1p(y)` and invert with `expm1`, which better matches RMSLE/MSLE behavior; (2) replace the `xgb.cv`-chosen `n_estimators` with a fixed, conservative `n_estimators=300` for both XGB models (keeping the same model family and parameters otherwise) to reduce overfitting and stabilize generalization; and (3) keep your non-negativity clipping and submission formatting unchanged. These are small, metric-aligned changes that typically reduce RMSLE without changing the overall approach (Linear + XGB + weighted stack).'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import gc
+import time
+import numpy as np
+import pandas as pd
+import glob
+import io
+import math
+import matplotlib
+
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+
+import xgboost as xgb
+from xgboost import plot_importance
+
+import matplotlib.pyplot as plt
+from sklearn.linear_model import (
+    Ridge,
+    RidgeCV,
+    ElasticNet,
+    LassoCV,
+    LassoLarsCV,
+    LinearRegression,
+)
+from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
+from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn import tree
+from sklearn.preprocessing import OneHotEncoder
+from sklearn import metrics
+import seaborn as sns
+
+import warnings
+
+warnings.filterwarnings("ignore")
+
+for p in ["../input", "/kaggle/input", "/kaggle/data/input"]:
+    if os.path.exists(p):
+        print("Found input dir:", p, "->", os.listdir(p)[:10])
+        break
+
+
+
+## === cell 1
+DATA_DIR_CANDIDATES = [
+    "/kaggle/data/nomad2018-predict-transparent-conductors",
+    "/kaggle/input/nomad2018-predict-transparent-conductors",
+    "/kaggle/data/input/nomad2018-predict-transparent-conductors",
+    "../input/nomad2018-predict-transparent-conductors",
+    "/kaggle/data",
+    "/kaggle/input",
+    "../input",
+]
+
+DATA_DIR = None
+for d in DATA_DIR_CANDIDATES:
+    if os.path.exists(os.path.join(d, "train.csv")) and os.path.exists(
+        os.path.join(d, "test.csv")
+    ):
+        DATA_DIR = d
+        break
+if DATA_DIR is None:
+    raise FileNotFoundError(
+        "Could not find train.csv/test.csv in expected Kaggle input locations."
+    )
+
+print("Using DATA_DIR:", DATA_DIR)
+
+train_df = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
+test_df = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
+
+
+
+## === cell 2
+print("Training data shape", "\n")
+print(train_df.shape, "\n")
+print("Testing data shape", "\n")
+print(test_df.shape, "\n")
+
+print("Training columns", "\n")
+print(list(train_df.columns), "\n")
+print("Testing columns", "\n")
+print(list(test_df.columns), "\n")
+
+
+
+## === cell 3
+Targets_df = pd.DataFrame()
+Targets_df["bandgap_energy_ev"] = train_df["bandgap_energy_ev"].copy()
+Targets_df["formation_energy_ev_natom"] = train_df["formation_energy_ev_natom"].copy()
+train_df = train_df.drop(["formation_energy_ev_natom", "bandgap_energy_ev"], axis=1)
+
+train_id_df = pd.DataFrame()
+train_id_df["id"] = train_df["id"].copy()
+train_df = train_df.drop(["id"], axis=1)
+
+test_id_df = pd.DataFrame()
+test_id_df["id"] = test_df["id"].copy()
+test_df = test_df.drop(["id"], axis=1)
+
+combined_df = pd.concat([train_df, test_df], ignore_index=True)
+print("Total number of null values in the df", "\n")
+print(combined_df.isna().sum().sum())
+
+
+
+## === cell 4
+numerical_df = combined_df[
+    [
+        "number_of_total_atoms",
+        "percent_atom_al",
+        "percent_atom_ga",
+        "percent_atom_in",
+        "lattice_vector_1_ang",
+        "lattice_vector_2_ang",
+        "lattice_vector_3_ang",
+        "lattice_angle_alpha_degree",
+        "lattice_angle_beta_degree",
+        "lattice_angle_gamma_degree",
+    ]
+].copy()
+
+one_hot_df = combined_df[["spacegroup"]].copy()
+one_hot_df = pd.get_dummies(one_hot_df, prefix=["spacegroup"], columns=["spacegroup"])
+
+skewed_feats = numerical_df.skew()
+skewed_feats = skewed_feats[skewed_feats > 0.1].index
+
+unskewed_feats = numerical_df.skew()
+unskewed_feats = unskewed_feats[unskewed_feats < 0.1].index
+
+transform_df = pd.DataFrame(index=combined_df.index)
+
+eps = 1e-12
+den = (numerical_df[unskewed_feats].max() - numerical_df[unskewed_feats].min()) + eps
+transform_df[unskewed_feats] = (
+    numerical_df[unskewed_feats] - numerical_df[unskewed_feats].mean()
+) / den
+transform_df[skewed_feats] = np.log1p(numerical_df[skewed_feats])
+
+features_transform_df = pd.concat([transform_df, one_hot_df], axis=1)
+features_df = pd.concat([numerical_df, one_hot_df], axis=1)
+
+print("features_df shape:", features_df.shape)
+print("features_transform_df shape:", features_transform_df.shape)
+
+
+
+## === cell 5
+n_train = Targets_df.shape[0]
+n_test = test_id_df.shape[0]
+assert (
+    features_df.shape[0] == n_train + n_test
+), "Combined feature rows must equal train+test rows."
+
+training_examples = features_df.iloc[:n_train].copy()
+test_examples = features_df.iloc[n_train:].copy()
+
+training_examples_transform = features_transform_df.iloc[:n_train].copy()
+test_examples_transform = features_transform_df.iloc[n_train:].copy()
+
+print("n_train:", n_train, "n_test:", n_test)
+print(
+    "training_examples:", training_examples.shape, "test_examples:", test_examples.shape
+)
+
+
+
+
+## === cell 6
+def rmsle_cv(model):
+    rmsle = np.sqrt(
+        -cross_val_score(
+            model,
+            training_examples_transform,
+            training_targets,
+            scoring="neg_mean_squared_log_error",
+            cv=5,
+        )
+    )
+    return rmsle
+
+
+
+
+## === cell 7
+training_targets_raw = Targets_df["bandgap_energy_ev"].copy()
+training_targets = np.log1p(training_targets_raw)
+model_linear = LinearRegression().fit(training_examples_transform, training_targets)
+linear_BG_pred = np.expm1(model_linear.predict(test_examples_transform))
+linear_BG_pred = np.clip(linear_BG_pred, 0, None)
+
+training_targets = training_targets_raw
+BG_rmsle = rmsle_cv(model_linear).mean()
+print("Band gap RMSLE:")
+print(BG_rmsle, "\n")
+
+training_targets_raw = Targets_df["formation_energy_ev_natom"].copy()
+training_targets = np.log1p(training_targets_raw)
+model_linear = LinearRegression().fit(training_examples_transform, training_targets)
+linear_EF_pred = np.expm1(model_linear.predict(test_examples_transform))
+linear_EF_pred = np.clip(linear_EF_pred, 0, None)
+
+training_targets = training_targets_raw
+EF_rmsle = rmsle_cv(model_linear).mean()
+print("Formation Energy RMSLE:")
+print(EF_rmsle, "\n")
+
+print("Expected combined RMSLE")
+combined_rmsle = (EF_rmsle + BG_rmsle) / 2
+print(combined_rmsle)
+
+Predictions_df = pd.DataFrame()
+Predictions_df["id"] = test_id_df["id"].copy()
+Predictions_df["formation_energy_ev_natom"] = linear_EF_pred
+Predictions_df["bandgap_energy_ev"] = linear_BG_pred
+Predictions_df.to_csv("Linear_Nomad.csv", index=False)
+print("Wrote Linear_Nomad.csv with shape:", Predictions_df.shape)
+
+
+
+## === cell 8
+XGB_N_ESTIMATORS_BG = 300
+
+training_targets = np.log1p(Targets_df["bandgap_energy_ev"].copy())
+
+model_xgb_bg = xgb.XGBRegressor(
+    n_estimators=XGB_N_ESTIMATORS_BG,
+    max_depth=2,
+    learning_rate=0.1,
+    gamma=0,
+    subsample=0.8,
+    colsample_bytree=1,
+    min_child_weight=10,
+    objective="reg:squarederror",
+    random_state=42,
+    n_jobs=4,
+)
+model_xgb_bg.fit(training_examples, training_targets)
+
+xgb_BG_preds = np.expm1(model_xgb_bg.predict(test_examples))
+xgb_BG_preds = np.clip(xgb_BG_preds, 0, None)
+
+print("Using fixed n_estimators (BG):", XGB_N_ESTIMATORS_BG)
+
+
+
+## === cell 9
+XGB_N_ESTIMATORS_EF = 300
+
+training_targets = np.log1p(Targets_df["formation_energy_ev_natom"].copy())
+
+model_xgb_ef = xgb.XGBRegressor(
+    n_estimators=XGB_N_ESTIMATORS_EF,
+    max_depth=4,
+    learning_rate=0.08,
+    gamma=0,
+    subsample=1,
+    colsample_bytree=0.4,
+    min_child_weight=3,
+    objective="reg:squarederror",
+    random_state=42,
+    n_jobs=4,
+)
+model_xgb_ef.fit(training_examples, training_targets)
+
+xgb_EF_preds = np.expm1(model_xgb_ef.predict(test_examples))
+xgb_EF_preds = np.clip(xgb_EF_preds, 0, None)
+
+print("Using fixed n_estimators (EF):", XGB_N_ESTIMATORS_EF)
+
+
+
+## === cell 10
+Predictions_df = pd.DataFrame()
+Predictions_df["id"] = test_id_df["id"].copy()
+Predictions_df["formation_energy_ev_natom"] = xgb_EF_preds
+Predictions_df["bandgap_energy_ev"] = xgb_BG_preds
+Predictions_df.to_csv("XGB_Nomad.csv", index=False)
+print("Wrote XGB_Nomad.csv with shape:", Predictions_df.shape)
+
+
+
+## === cell 11
+Predictions_df = pd.DataFrame()
+Predictions_df["id"] = test_id_df["id"].copy()
+
+stacked_EF_preds = 0.9 * xgb_EF_preds + 0.1 * linear_EF_pred
+stacked_BG_preds = 0.9 * xgb_BG_preds + 0.1 * linear_BG_pred
+
+stacked_EF_preds = np.clip(stacked_EF_preds, 0, None)
+stacked_BG_preds = np.clip(stacked_BG_preds, 0, None)
+
+Predictions_df["formation_energy_ev_natom"] = stacked_EF_preds
+Predictions_df["bandgap_energy_ev"] = stacked_BG_preds
+
+Predictions_df = Predictions_df[
+    ["id", "formation_energy_ev_natom", "bandgap_energy_ev"]
+]
+Predictions_df.to_csv("Stacked_Nomad.csv", index=False)
+print("Wrote Stacked_Nomad.csv with shape:", Predictions_df.shape)
+print(Predictions_df.head())

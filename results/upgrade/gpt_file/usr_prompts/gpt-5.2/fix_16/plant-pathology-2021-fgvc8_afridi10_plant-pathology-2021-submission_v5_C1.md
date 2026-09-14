@@ -1,0 +1,470 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import sys
+
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", None)
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", None)
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ.pop("TF_USE_LEGACY_KERAS", None)
+
+for m in list(sys.modules.keys()):
+    if m.startswith(("google.protobuf", "tensorflow", "keras")):
+        del sys.modules[m]
+
+import types
+
+
+class _KerasBlocker(types.ModuleType):
+    def __getattr__(self, name):
+        raise ImportError(
+            "Standalone `keras` is blocked in this notebook. Use `tensorflow.keras` / `tf.keras` only."
+        )
+
+
+sys.modules["keras"] = _KerasBlocker("keras")
+
+import random
+import numpy as np
+import pandas as pd
+
+import tensorflow as tf
+from tensorflow.keras import backend as K
+
+print("TensorFlow:", tf.__version__)
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+try:
+    tf.config.threading.set_inter_op_parallelism_threads(0)
+    tf.config.threading.set_intra_op_parallelism_threads(0)
+except Exception:
+    pass
+
+
+
+
+## === cell 1
+def f1(y_true, y_pred):  # taken from old keras source code
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    recall = true_positives / (possible_positives + K.epsilon())
+    f1_val = 2 * (precision * recall) / (precision + recall + K.epsilon())
+    return f1_val
+
+
+
+
+## === cell 2
+DATA_DIR = "/kaggle/input/plant-pathology-2021-fgvc8"
+if not os.path.exists(os.path.join(DATA_DIR, "train.csv")):
+    nested = os.path.join(DATA_DIR, "plant-pathology-2021-fgvc8")
+    if os.path.exists(os.path.join(nested, "train.csv")):
+        DATA_DIR = nested
+
+TRAIN_CSV = os.path.join(DATA_DIR, "train.csv")
+SAMPLE_SUB = os.path.join(DATA_DIR, "sample_submission.csv")
+TRAIN_IMG_DIR = os.path.join(DATA_DIR, "train_images")
+TEST_IMG_DIR = os.path.join(DATA_DIR, "test_images")
+
+assert os.path.exists(TRAIN_CSV), f"Missing {TRAIN_CSV}"
+assert os.path.exists(SAMPLE_SUB), f"Missing {SAMPLE_SUB}"
+assert os.path.exists(TRAIN_IMG_DIR), f"Missing {TRAIN_IMG_DIR}"
+assert os.path.exists(TEST_IMG_DIR), f"Missing {TEST_IMG_DIR}"
+
+train_df = pd.read_csv(TRAIN_CSV)
+sub_df = pd.read_csv(SAMPLE_SUB)
+
+train_df["image"] = train_df["image"].astype(str).str.strip()
+train_df["labels"] = train_df["labels"].astype(str).str.strip()
+sub_df["image"] = sub_df["image"].astype(str).str.strip()
+
+print("DATA_DIR:", DATA_DIR)
+print(train_df.shape, sub_df.shape)
+train_df.head()
+
+
+
+
+## === cell 3
+CLASSES = ["healthy", "scab", "frog_eye_leaf_spot", "rust", "powdery_mildew", "complex"]
+class2idx = {c: i for i, c in enumerate(CLASSES)}
+idx2class = {i: c for c, i in class2idx.items()}
+
+
+def encode_labels(label_str: str) -> np.ndarray:
+    y = np.zeros(len(CLASSES), dtype=np.float32)
+    if isinstance(label_str, str) and label_str.strip():
+        for tok in label_str.split():
+            if tok in class2idx:
+                y[class2idx[tok]] = 1.0
+    return y
+
+
+y_all = np.stack([encode_labels(s) for s in train_df["labels"].tolist()], axis=0)
+print("Encoded y:", y_all.shape, "positives per class:", y_all.sum(axis=0))
+
+
+
+
+## === cell 4
+IMSIZE = 128
+BATCH = 32
+
+TRAIN_DIR_TF = tf.constant(TRAIN_IMG_DIR + "/", dtype=tf.string)
+TEST_DIR_TF = tf.constant(TEST_IMG_DIR + "/", dtype=tf.string)
+
+
+@tf.function
+def load_image(path):
+    img = tf.io.read_file(path)
+    img = tf.io.decode_jpeg(img, channels=3, dct_method="INTEGER_FAST")
+    img = tf.image.resize(img, [IMSIZE, IMSIZE])
+    img = tf.cast(img, tf.float32) / 255.0
+    return img
+
+
+@tf.function
+def train_parse(image_name, y):
+    path = tf.strings.join([TRAIN_DIR_TF, image_name])
+    img = load_image(path)
+    return img, y
+
+
+@tf.function
+def test_parse(image_name):
+    path = tf.strings.join([TEST_DIR_TF, image_name])
+    img = load_image(path)
+    return img
+
+
+n = len(train_df)
+idx = np.arange(n)
+rng = np.random.RandomState(SEED)
+rng.shuffle(idx)
+
+val_frac = 0.1
+n_val = int(n * val_frac)
+val_idx = idx[:n_val]
+trn_idx = idx[n_val:]
+
+x_trn = train_df.iloc[trn_idx]["image"].values
+y_trn = y_all[trn_idx]
+x_val = train_df.iloc[val_idx]["image"].values
+y_val = y_all[val_idx]
+
+train_options = tf.data.Options()
+train_options.experimental_deterministic = False
+train_options.experimental_optimization.map_parallelization = True
+train_options.experimental_optimization.parallel_batch = True
+train_options.threading.private_threadpool_size = 0
+
+val_options = tf.data.Options()
+val_options.experimental_deterministic = True
+val_options.experimental_optimization.map_parallelization = True
+val_options.experimental_optimization.parallel_batch = True
+val_options.threading.private_threadpool_size = 0
+
+train_ds = tf.data.Dataset.from_tensor_slices((x_trn, y_trn)).with_options(
+    train_options
+)
+train_ds = train_ds.map(train_parse, num_parallel_calls=tf.data.AUTOTUNE)
+train_ds = train_ds.cache()  # in-memory cache (no disk I/O)
+train_ds = (
+    train_ds.shuffle(2048, seed=SEED, reshuffle_each_iteration=True)
+    .batch(BATCH, drop_remainder=False)
+    .prefetch(tf.data.AUTOTUNE)
+)
+
+val_ds = tf.data.Dataset.from_tensor_slices((x_val, y_val)).with_options(val_options)
+val_ds = val_ds.map(train_parse, num_parallel_calls=tf.data.AUTOTUNE)
+val_ds = val_ds.cache()  # in-memory cache (no disk I/O)
+val_ds = val_ds.batch(BATCH, drop_remainder=False).prefetch(tf.data.AUTOTUNE)
+
+print(
+    "Train batches:",
+    tf.data.experimental.cardinality(train_ds).numpy(),
+    "Val batches:",
+    tf.data.experimental.cardinality(val_ds).numpy(),
+)
+
+
+
+
+## === cell 5
+base = tf.keras.applications.MobileNetV2(
+    input_shape=(IMSIZE, IMSIZE, 3), include_top=False, weights="imagenet"
+)
+base.trainable = False
+
+inp = tf.keras.Input(shape=(IMSIZE, IMSIZE, 3))
+x = base(inp, training=False)
+x = tf.keras.layers.GlobalAveragePooling2D()(x)
+x = tf.keras.layers.Dropout(0.2)(x)
+out = tf.keras.layers.Dense(len(CLASSES), activation="sigmoid")(x)
+model = tf.keras.Model(inp, out)
+
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+    loss="binary_crossentropy",
+    metrics=[f1],
+    jit_compile=False,
+    steps_per_execution=32,
+)
+
+model.summary()
+
+EPOCHS = 2
+history = model.fit(train_ds, validation_data=val_ds, epochs=EPOCHS, verbose=1)
+
+
+
+
+## === cell 6
+test_names = sub_df["image"].astype(str).str.strip().values
+
+test_options = tf.data.Options()
+test_options.experimental_deterministic = True
+test_options.experimental_optimization.map_parallelization = True
+test_options.experimental_optimization.parallel_batch = True
+test_options.threading.private_threadpool_size = 0
+
+test_ds = tf.data.Dataset.from_tensor_slices(tf.constant(test_names)).with_options(
+    test_options
+)
+test_ds = test_ds.map(test_parse, num_parallel_calls=tf.data.AUTOTUNE)
+test_ds = test_ds.cache()  # in-memory cache, avoids disk writes
+test_ds = test_ds.batch(BATCH).prefetch(tf.data.AUTOTUNE)
+
+y_pred = model.predict(test_ds, verbose=1)
+print("Pred shape:", y_pred.shape)
+
+
+
+
+## === cell 7
+y_bin = np.around(y_pred).astype(np.int8)
+chosen_any = y_bin.any(axis=1)
+
+argmax_idx = np.argmax(y_pred, axis=1).astype(np.int32)
+y_bin_filled = y_bin.copy()
+y_bin_filled[~chosen_any, :] = 0
+y_bin_filled[~chosen_any, argmax_idx[~chosen_any]] = 1
+
+labels_out = np.full((y_bin_filled.shape[0],), "", dtype=object)
+for j, cname in enumerate(CLASSES):
+    mask = y_bin_filled[:, j].astype(bool)
+    if np.any(mask):
+        add = cname
+        labels_out[mask] = np.where(
+            labels_out[mask] == "", add, labels_out[mask] + " " + add
+        )
+
+pred_df = pd.DataFrame({"image": test_names, "labels": labels_out})
+pred_df.head()
+
+
+
+
+## === cell 8
+pred_df["image"] = pred_df["image"].astype(str).str.strip()
+pred_df["labels"] = pred_df["labels"].astype(str).str.strip()
+pred_df = pred_df.set_index("image").reindex(sub_df["image"]).reset_index()
+
+pred_df = pred_df[["image", "labels"]]
+
+out_path = "/kaggle/working/submission.csv"
+pred_df.to_csv(out_path, index=False)
+print("Wrote:", out_path, "rows:", len(pred_df))
+
+with open("/kaggle/working/submission.csv", "r") as f:
+    for _ in range(5):
+        print(f.readline().rstrip())

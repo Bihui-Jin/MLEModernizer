@@ -1,0 +1,1056 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.14
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8909035962526443
+
+# 6. Current score
+
+0.11584
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.11584) has done: 'I fix the crash by making device selection automatic (CPU fallback when no NVIDIA driver is available) and by only using CUDA autocast when CUDA is present. I also make model weight loading more robust by handling common checkpoint formats (`state_dict`, `model`, `module.` prefixes) so it can run end-to-end and actually write `submission.csv`. Finally, I add a safe fallback to generate a valid submission from `sample_submission.csv` if the external model files aren’t available in this environment, ensuring “Not yielded” becomes a valid `.csv` output without changing the intended inference logic when weights exist.'
+- What this solution (achieved 0.11584) has done: 'Your very low score is consistent with the “no weights found → write sample_submission” fallback, which effectively submits all-4s and lands around ~0.1 accuracy. To move the score toward your target with minimal core-logic change, I (1) make the code auto-discover any `.pth` checkpoints available anywhere under `/kaggle/input` (while keeping your existing `CFG.model_paths` priority), and (2) add a safe CPU/GPU-agnostic test-time augmentation that’s already consistent with your current logic (horizontal flip) without changing the model/training approach. This keeps the same ConvNeXt-Tiny inference pipeline, but greatly increases the chance that real weights are loaded in this environment instead of falling back to the sample submission. The submission writing and schema remain unchanged.'
+- What this solution (achieved 0.11584) has done: 'Your low score is consistent with either (1) still not actually loading the intended pretrained weights (so predictions are effectively random), or (2) a label mapping mismatch between the checkpoint’s class order and the competition’s `0..4` label IDs. I keep your exact ConvNeXt-Tiny inference + flip-TTA + fold-ensemble logic, but make checkpoint discovery prioritize likely Cassava solutions, then add a tiny “label permutation calibration” step that uses `train.csv` to infer the best class-index→label-id mapping from each checkpoint (no training, just a quick pass over a small subset). This is a minimal, metric-aligned fix that often turns ~0.1 accuracy into a much higher score when the model’s internal class order differs. The submission format, paths, and core inference remain the same; we only (a) ensure we load the right weights and (b) map predicted indices to the correct label IDs.'
+- What this solution (achieved 0.11584) has done: 'Your score (0.11584) suggests the pipeline is still effectively producing near-random predictions, most commonly because the loaded checkpoint(s) don’t actually match `convnext_tiny` (so most weights stay randomly initialized under `strict=False`) and/or because inference is being done with mismatched preprocessing (e.g., wrong input size for the checkpoint). To move toward the target with minimal core-logic change, I (1) filter auto-discovered checkpoints by compatibility by measuring how many parameters actually load, and only ensemble “good” ones (otherwise you ensemble noise), (2) automatically infer the checkpoint’s expected input resolution from common metadata (and fall back to 384), and (3) keep your exact model + flip-TTA + permutation-calibration approach unchanged aside from these safety gates. This should increase accuracy by ensuring you only use real, matching Cassava weights and apply the right resize, without changing the intended inference semantics. The script still always writes a valid `submission.csv` in the required format.'
+- What this solution (achieved 0.11584) has done: 'Your current score strongly indicates you’re still falling back to `sample_submission.csv` (or using incompatible checkpoints that mostly don’t load), so the smallest meaningful improvement is to (1) make checkpoint discovery actually find Cassava checkpoints in this dataset environment by scanning `/kaggle/input` and `/kaggle/data` and (2) ensure we only accept checkpoints that load into your ConvNeXt-Tiny head correctly (including common key name mismatches like `head.fc` vs `head`). I keep your exact inference pipeline (ConvNeXt-Tiny, flip-TTA, optional permutation calibration, ensemble averaging) and only tighten weight-loading compatibility so real weights are used when present. I also make the test/train image root resolution more robust (some environments place them under different but existing folders), which prevents silent “no images”/fallback behavior. These minimal changes should move your accuracy substantially upward toward the target without changing the model or training logic.'
+- What this solution (achieved 0.11584) has done: 'Your score is still near-random, which most often happens when no compatible weights are actually being used (falling back to `sample_submission.csv`) or when the test directory points to an empty/nested folder. I make two minimal, score-relevant fixes: (1) robustly resolve the true `test_images` directory even if it’s nested (the dataset here contains duplicated `test_images/test_images` folders), and (2) improve checkpoint discovery to include `.pt`/`.bin` and prioritize likely timm/convnext/cassava files, while keeping your existing ensemble/inference logic unchanged. These changes increase the chance that real, compatible weights are found and that inference runs over the real test set, moving accuracy toward your target without altering model architecture, loss, or training. Submission writing remains identical (`submission.csv` with `image_id,label`).'
+- What this solution (achieved 0.11584) has done: 'Your score indicates you’re still effectively not using good weights (either none found, incompatible loads, or wrong key/shape handling), so the smallest change that should improve toward the target is to make weight loading compatible with more real Cassava ConvNeXt-Tiny checkpoints. I keep your ConvNeXt-Tiny + flip-TTA + ensemble averaging pipeline unchanged, but (1) improve checkpoint discovery scoring so likely Cassava “convnext_tiny num_classes=5” checkpoints are preferred, and (2) extend the classifier remap to handle more common timm naming variants so the load ratio threshold doesn’t incorrectly reject usable checkpoints. Finally, I fix the probability column reordering for permutation calibration to be explicitly correct (avoid accidental inverse mapping), which can otherwise destroy accuracy while still “working.” These are minimal, metric-aligned fixes that should move accuracy upward without changing the model or inference semantics.'
+- What this solution (achieved 0.11584) has done: 'Your current score is consistent with the pipeline still not running real inference over the test set in the exact submission order, which can silently tank accuracy even if predictions are reasonable. I make two minimal, score-relevant fixes: (1) build `submission.csv` by starting from `sample_submission.csv` and filling labels in that exact row order (no sorting), and (2) ensure the `TestDataset` enumerates images in the same canonical order as `sample_submission.csv` (so predictions align 1:1). These changes preserve your model/inference logic (ConvNeXt-Tiny, flip-TTA, ensemble, optional permutation calibration) and only fix output alignment, which can move accuracy sharply upward toward your target when misalignment is the issue.'
+- What this solution (achieved 0.11584) has done: 'Your score is still near-random, so the most likely remaining issue is prediction/row misalignment: your dataset currently assumes every `image_id` exists directly under `CFG.test_dir`, but this dataset layout often has nested `test_images/test_images`, causing missing reads or silent fallbacks in other runs. I make the image root resolution per-image (try a small set of known test roots, including the nested folder) while preserving the same ConvNeXt-Tiny + flip-TTA + ensemble + optional permutation calibration logic. I also ensure we always build the submission by starting from `sample_submission.csv` and filling labels in that exact order (no sorting), which prevents accidental order drift. These are minimal, score-relevant fixes that should move accuracy upward toward your target without changing model architecture or training semantics.'
+- What this solution (achieved 0.11584) has done: 'Your current score (0.11584) is still consistent with either (a) not actually running inference over the real test set, or (b) running inference but then misaligning predictions to `image_id` rows in the submission. I keep your exact ConvNeXt-Tiny + flip-TTA + ensemble + optional permutation-calibration core logic, but make two minimal, score-critical fixes: (1) ensure the test roots resolver prefers the “deepest” valid folder (often `.../test_images/test_images`) to avoid silent wrong-root reads, and (2) add a strict sanity check that the dataset’s returned `image_id` sequence matches `sample_submission.csv` order 1:1 (otherwise we abort instead of writing a scrambled submission). These changes don’t change model semantics; they prevent the most common “looks fine but scores ~random” failure mode. The script still always writes a valid `submission.csv`.'
+- What this solution (achieved 0.11584) has done: 'Your score is still near-random, which strongly suggests you’re either (a) falling back to `sample_submission.csv` because no weights are found, or (b) loading incompatible checkpoints so most layers stay randomly initialized under `strict=False`. I make two minimal, score-relevant changes: (1) broaden and improve checkpoint discovery to explicitly look for ConvNeXt/Cassava artifacts inside the provided dataset directories (including `/kaggle/input/cassava-leaf-disease-classification`), and (2) make the compatibility check stricter by requiring the classifier head weights to match (shape/key) so we don’t accept “mostly-loads” checkpoints that still yield garbage predictions. This preserves your exact inference core (ConvNeXt-Tiny, flip-TTA, optional permutation calibration, ensemble averaging) but prevents ensembling noise and increases the chance we use real Cassava-compatible weights, moving accuracy toward the target. Submission writing remains aligned to `sample_submission.csv` order and always produces a valid `submission.csv`.'
+- What this solution (achieved 0.11584) has done: 'Your low score is still consistent with the script not actually using any valid Cassava weights (so it falls back to `sample_submission`) or silently rejecting usable checkpoints due to an overly strict “head must match” check that doesn’t correctly account for where timm stores ConvNeXt’s classifier parameters. I keep your exact inference core (ConvNeXt-Tiny, flip-TTA, ensemble averaging, optional label-permutation calibration) but (1) fix the head-key matching logic so it checks the *actual* keys in this model (`backbone.head.*`) and common saved-key variants, and (2) print a clear summary of why each checkpoint is accepted/rejected to ensure we stop ensembling noise. This is the smallest change that should materially increase accuracy toward your target by enabling real compatible weights to load instead of being skipped/falling back. Submission writing and alignment to `sample_submission.csv` order remain unchanged.'
+- What this solution (achieved 0.11584) has done: 'Your 0.11584 score is consistent with still ending up with effectively random/noisy predictions, most likely because the “head match” gate is currently checking the wrong parameter names for timm ConvNeXt (so it rejects valid checkpoints and falls back), and/or because we accept checkpoints where the backbone loads but the 5-class head does not. I make a minimal, score-critical fix to `_head_matches` to correctly recognize ConvNeXt’s classifier keys as they exist in timm (`backbone.head.fc.*` vs `backbone.head.*`) and in common saved formats, and I make the acceptance rule require that at least one valid head key-pair matches by shape. I also slightly tighten the classifier-key remap to cover the exact `backbone.head.fc.*`↔`backbone.head.*` variants, so compatible weights are not skipped. This preserves your exact inference core (ConvNeXt-Tiny, same transforms, flip-TTA, ensemble averaging, optional permutation calibration) but increases the chance that real Cassava weights are actually used, moving accuracy toward your target.'
+- What this solution (achieved 0.11584) has done: 'Your score (~0.116) is still consistent with effectively not using any real Cassava-trained weights, so the smallest meaningful improvement is to ensure the model can load common Kaggle ConvNeXt-tiny checkpoints whose classifier is stored under different key names (especially `backbone.head.fc.*` vs `backbone.head.*`). I make two minimal, score-critical fixes: (1) remap classifier keys in a direction that actually matches this timm ConvNeXt implementation, and (2) update the head-match gate to accept when the checkpoint’s head keys match the model after remapping (so valid checkpoints aren’t incorrectly skipped). This preserves your exact core inference logic (ConvNeXt-Tiny, same transforms, flip-TTA, ensemble averaging, optional permutation calibration) while increasing the chance that compatible weights are actually used instead of falling back/being skipped. Submission writing stays aligned to `sample_submission.csv` order and still always produces `submission.csv`.'
+- What this solution (achieved 0.11584) has done: 'Your score is still near-random, which most often means the inference outputs aren’t aligned to the correct label IDs even if the model is producing meaningful class indices. I keep your exact ConvNeXt-Tiny + flip-TTA + ensemble + optional permutation-calibration flow, but make the label-permutation calibration more robust by computing the mapping from the full 5×5 confusion matrix (majority-vote per predicted class) instead of brute-forcing permutations on argmaxes, which can be unstable on small subsets. I also apply a single calibrated mapping consistently across the whole ensemble (using the first accepted checkpoint) so that different per-fold permutations don’t “fight” each other and collapse the ensemble into noise. These are minimal, metric-aligned changes that don’t alter the model or transforms, but can move accuracy sharply upward toward your target when class-index ordering differs.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import re
+import cv2
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from itertools import permutations
+
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from torch.amp import autocast
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+from tqdm.auto import tqdm
+import timm
+
+
+class CFG:
+    img_size = 384
+    batch_size = 64
+    num_workers = 4
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    test_dir = "/kaggle/input/cassava-leaf-disease-classification/test_images"
+    train_csv = "/kaggle/input/cassava-leaf-disease-classification/train.csv"
+
+    model_paths = [
+        "/kaggle/input/cassava-convnext-tiny/pytorch/default/1/best_fold0.pth",
+        "/kaggle/input/cassava-convnext-tiny/pytorch/default/1/best_fold1.pth",
+        "/kaggle/input/cassava-convnext-tiny/pytorch/default/1/best_fold2.pth",
+        "/kaggle/input/cassava-convnext-tiny/pytorch/default/1/best_fold3.pth",
+        "/kaggle/input/cassava-convnext-tiny/pytorch/default/1/best_fold4.pth",
+    ]
+
+    calibrate_label_permutation = True
+    calib_max_images = 512
+    calib_seed = 123
+    calib_batch_size = 64
+
+    min_loaded_param_ratio = 0.80
+
+    allow_ckpt_img_size_override = True
+
+    ckpt_search_roots = [
+        "/kaggle/input",
+        "/kaggle/data",
+        "/kaggle/input/cassava-leaf-disease-classification",
+        "/kaggle/data/cassava-leaf-disease-classification",
+    ]
+
+    allow_classifier_key_remap = True
+
+    require_head_match = True
+
+
+def build_test_tfms(img_size: int):
+    return A.Compose(
+        [
+            A.Resize(img_size, img_size),
+            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ToTensorV2(),
+        ]
+    )
+
+
+test_tfms = build_test_tfms(CFG.img_size)
+
+
+
+
+## === cell 1
+class TestDataset(Dataset):
+    """
+    SCORE FIX (minimal): resolve each image_id against multiple known test roots (including nested
+    test_images/test_images). This prevents misreads / missing-file issues that can silently wreck
+    accuracy while keeping the same inference logic and submission order.
+    """
+
+    def __init__(self, folder, tfms, image_ids=None, roots=None):
+        self.tfms = tfms
+
+        if image_ids is None:
+            self.paths = sorted([str(p) for p in Path(folder).glob("*.jpg")])
+            self.image_ids = [os.path.basename(p) for p in self.paths]
+            return
+
+        self.image_ids = list(image_ids)
+
+        if roots is None:
+            roots = []
+        roots = [str(Path(r)) for r in roots]
+        ordered_roots = []
+        for r in [folder] + roots:
+            if r and r not in ordered_roots:
+                ordered_roots.append(r)
+
+        self.roots = ordered_roots
+
+    def __len__(self):
+        return len(self.image_ids)
+
+    def _resolve_path(self, image_id: str) -> str:
+        for r in self.roots:
+            p = os.path.join(r, image_id)
+            if os.path.exists(p):
+                return p
+        return os.path.join(self.roots[0], image_id) if self.roots else image_id
+
+    def __getitem__(self, idx):
+        image_id = self.image_ids[idx]
+        img_path = self._resolve_path(image_id)
+
+        img = cv2.imread(img_path)
+        if img is None:
+            raise FileNotFoundError(
+                f"Failed to read image: {img_path}\nTried roots: {self.roots}"
+            )
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = self.tfms(image=img)["image"]
+        return img, image_id
+
+
+class TrainSubsetDataset(Dataset):
+    def __init__(self, image_paths, labels, tfms):
+        self.image_paths = image_paths
+        self.labels = labels
+        self.tfms = tfms
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.image_paths[idx]
+        img = cv2.imread(img_path)
+        if img is None:
+            raise FileNotFoundError(f"Failed to read image: {img_path}")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = self.tfms(image=img)["image"]
+        return img, int(self.labels[idx])
+
+
+class CassavaModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.backbone = timm.create_model(
+            "convnext_tiny", pretrained=False, num_classes=5
+        )
+
+    def forward(self, x):
+        return self.backbone(x)
+
+
+
+
+## === cell 2
+def _extract_state_dict(ckpt):
+    """
+    Checkpoints can be raw state_dict, or dict with keys like 'state_dict'/'model'.
+    Also handles DataParallel 'module.' prefix.
+    """
+    if isinstance(ckpt, dict):
+        for k in ("state_dict", "model", "model_state_dict", "net", "weights"):
+            if k in ckpt and isinstance(ckpt[k], dict):
+                ckpt = ckpt[k]
+                break
+
+    if not isinstance(ckpt, dict):
+        raise TypeError(f"Unsupported checkpoint type: {type(ckpt)}")
+
+    if any(key.startswith("module.") for key in ckpt.keys()):
+        ckpt = {k.replace("module.", "", 1): v for k, v in ckpt.items()}
+    return ckpt
+
+
+def _maybe_remap_classifier_keys(state: dict, model: nn.Module = None) -> dict:
+    """
+    SCORE FIX (minimal but critical): remap classifier keys toward the *actual* keys in this model.
+    timm ConvNeXt typically uses head.fc.{weight,bias}. Some checkpoints store head.{weight,bias}.
+    Our wrapper prefixes with 'backbone.'. We add missing equivalents so load_state_dict can match.
+
+    This does NOT change architecture/inference; it only increases the chance that a real 5-class
+    head loads instead of being treated as missing (which leads to near-random predictions).
+    """
+    if not CFG.allow_classifier_key_remap:
+        return state
+    if not isinstance(state, dict) or len(state) == 0:
+        return state
+
+    state2 = dict(state)
+
+    expects_fc = None
+    if model is not None:
+        msd = model.state_dict()
+        expects_fc = ("backbone.head.fc.weight" in msd) and (
+            "backbone.head.fc.bias" in msd
+        )
+
+    def _add_if_missing(src, dst):
+        if src in state2 and dst not in state2:
+            state2[dst] = state2[src]
+
+    _add_if_missing("head.weight", "head.fc.weight")
+    _add_if_missing("head.bias", "head.fc.bias")
+    _add_if_missing("head.fc.weight", "head.weight")
+    _add_if_missing("head.fc.bias", "head.bias")
+
+    _add_if_missing("backbone.head.weight", "backbone.head.fc.weight")
+    _add_if_missing("backbone.head.bias", "backbone.head.fc.bias")
+    _add_if_missing("backbone.head.fc.weight", "backbone.head.weight")
+    _add_if_missing("backbone.head.fc.bias", "backbone.head.bias")
+
+    _add_if_missing("classifier.weight", "backbone.head.fc.weight")
+    _add_if_missing("classifier.bias", "backbone.head.fc.bias")
+    _add_if_missing("classifier.weight", "backbone.head.weight")
+    _add_if_missing("classifier.bias", "backbone.head.bias")
+
+    if expects_fc is True:
+        _add_if_missing("backbone.head.weight", "backbone.head.fc.weight")
+        _add_if_missing("backbone.head.bias", "backbone.head.fc.bias")
+        _add_if_missing("head.weight", "head.fc.weight")
+        _add_if_missing("head.bias", "head.fc.bias")
+
+    return state2
+
+
+def _find_candidate_checkpoints(roots, max_files=120):
+    if isinstance(roots, (str, Path)):
+        roots = [roots]
+    roots = [Path(r) for r in roots if Path(r).exists()]
+    if not roots:
+        return []
+
+    priority_globs = [
+        "**/*best*.pth",
+        "**/*fold*.pth",
+        "**/*.pth",
+        "**/*.pt",
+        "**/*.bin",
+        "**/*.ckpt",
+    ]
+
+    seen = set()
+    candidates = []
+    for root in roots:
+        for pat in priority_globs:
+            for p in root.glob(pat):
+                ps = str(p)
+                if ps in seen:
+                    continue
+                seen.add(ps)
+                candidates.append(ps)
+
+    def score(path_str: str) -> float:
+        s = path_str.lower()
+        sc = 0.0
+        if "cassava" in s:
+            sc += 6.0
+        if "leaf" in s:
+            sc += 1.5
+        if "convnext" in s:
+            sc += 3.5
+        if "tiny" in s or "convnext_tiny" in s:
+            sc += 2.5
+        if "fold" in s:
+            sc += 1.0
+        if "best" in s:
+            sc += 1.0
+        if "efficientnet" in s or "resnet" in s or "vit" in s:
+            sc -= 0.5
+        if any(
+            x in s for x in ["optimizer", "sched", "scheduler", "ema", "swav", "moco"]
+        ):
+            sc -= 1.0
+        return sc
+
+    candidates = sorted(candidates, key=score, reverse=True)
+    return candidates[:max_files]
+
+
+def _infer_img_size_from_ckpt(ckpt, default_size: int) -> int:
+    if not CFG.allow_ckpt_img_size_override:
+        return default_size
+    if not isinstance(ckpt, dict):
+        return default_size
+
+    candidates = []
+    for k in ("img_size", "image_size", "input_size"):
+        if k in ckpt:
+            candidates.append(ckpt[k])
+
+    for k in ("cfg", "config", "hparams", "args"):
+        if k in ckpt and isinstance(ckpt[k], dict):
+            for kk in ("img_size", "image_size", "input_size"):
+                if kk in ckpt[k]:
+                    candidates.append(ckpt[k][kk])
+
+    for v in candidates:
+        try:
+            if isinstance(v, int):
+                s = v
+            elif isinstance(v, (tuple, list)) and len(v) >= 2:
+                s = int(v[-1])
+            elif isinstance(v, str):
+                nums = re.findall(r"\d+", v)
+                s = int(nums[-1]) if nums else default_size
+            else:
+                continue
+            if 128 <= s <= 768:
+                return s
+        except Exception:
+            pass
+
+    return default_size
+
+
+def _loaded_param_ratio(model: nn.Module, state: dict) -> float:
+    model_sd = model.state_dict()
+    total = 0
+    matched = 0
+    for k, v in model_sd.items():
+        total += v.numel()
+        if (
+            k in state
+            and isinstance(state[k], torch.Tensor)
+            and tuple(state[k].shape) == tuple(v.shape)
+        ):
+            matched += v.numel()
+    return float(matched) / float(total) if total > 0 else 0.0
+
+
+def _head_matches(model: nn.Module, state: dict) -> bool:
+    """
+    SCORE FIX (minimal): perform the head check AFTER considering the common key remaps.
+    Previously, good checkpoints could be rejected because they store head as head.weight/bias
+    while this timm ConvNeXt expects head.fc.weight/bias (or vice versa).
+    """
+    if not CFG.require_head_match:
+        return True
+
+    state_m = _maybe_remap_classifier_keys(state, model=model)
+
+    msd = model.state_dict()
+    key_families = [
+        ("backbone.head.fc.weight", "backbone.head.fc.bias"),
+        ("backbone.head.weight", "backbone.head.bias"),
+        ("head.fc.weight", "head.fc.bias"),
+        ("head.weight", "head.bias"),
+        ("classifier.weight", "classifier.bias"),
+    ]
+
+    for w_key, b_key in key_families:
+        if w_key in msd and b_key in msd and w_key in state_m and b_key in state_m:
+            if tuple(msd[w_key].shape) == tuple(state_m[w_key].shape) and tuple(
+                msd[b_key].shape
+            ) == tuple(state_m[b_key].shape):
+                return True
+
+    return False
+
+
+@torch.no_grad()
+def _predict_proba(model, loader, device):
+    model.eval()
+    out = []
+    for imgs, _ in loader:
+        imgs = imgs.to(device, non_blocking=(device == "cuda"))
+        if device == "cuda":
+            with autocast(device_type="cuda"):
+                logits = model(imgs)
+        else:
+            logits = model(imgs)
+        out.append(torch.softmax(logits, dim=1).cpu().numpy())
+    return np.concatenate(out, axis=0)
+
+
+def _resolve_train_image_root():
+    candidates = [
+        "/kaggle/input/cassava-leaf-disease-classification/train_images",
+        "/kaggle/data/cassava-leaf-disease-classification/train_images",
+        "/kaggle/input/train_images",
+        "/kaggle/data/train_images",
+        "/kaggle/input/cassava-leaf-disease-classification/train_images/train_images",
+        "/kaggle/data/cassava-leaf-disease-classification/train_images/train_images",
+    ]
+    for c in candidates:
+        if os.path.exists(c) and len(list(Path(c).glob("*.jpg"))) > 0:
+            return c
+    return candidates[0]
+
+
+def _resolve_test_image_roots():
+    """
+    SCORE FIX (minimal): prefer the *deepest* valid test_images folder (often nested as
+    test_images/test_images). Reading from the wrong level can lead to missing/None reads.
+    """
+    candidates = [
+        "/kaggle/input/cassava-leaf-disease-classification/test_images/test_images",
+        "/kaggle/data/cassava-leaf-disease-classification/test_images/test_images",
+        "/kaggle/input/test_images/test_images",
+        "/kaggle/data/test_images/test_images",
+        CFG.test_dir,
+        "/kaggle/input/cassava-leaf-disease-classification/test_images",
+        "/kaggle/data/cassava-leaf-disease-classification/test_images",
+        "/kaggle/input/test_images",
+        "/kaggle/data/test_images",
+    ]
+    roots = []
+    for c in candidates:
+        if os.path.exists(c) and len(list(Path(c).glob("*.jpg"))) > 0:
+            roots.append(c)
+    if not roots:
+        roots = [CFG.test_dir]
+    out = []
+    for r in roots:
+        if r not in out:
+            out.append(r)
+    return out
+
+
+def _resolve_sample_submission_path():
+    candidates = [
+        "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv",
+        "/kaggle/input/sample_submission.csv",
+        "/kaggle/data/sample_submission.csv",
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    return candidates[0]
+
+
+def _confusion_based_perm(pred_idx: np.ndarray, labels: np.ndarray, n_classes: int = 5):
+    """
+    SCORE FIX (minimal, stability): infer class_index->label_id mapping from confusion counts.
+    This avoids brute-force permutation search sensitivity on small subsets while still only
+    changing label-index mapping (evaluation-aligned, no training).
+    """
+    cm = np.zeros((n_classes, n_classes), dtype=np.int64)
+    for p, y in zip(pred_idx, labels):
+        if 0 <= p < n_classes and 0 <= y < n_classes:
+            cm[p, y] += 1
+
+    perm = -np.ones(n_classes, dtype=np.int64)
+    used_labels = set()
+
+    pairs = []
+    for p in range(n_classes):
+        for y in range(n_classes):
+            pairs.append((cm[p, y], p, y))
+    pairs.sort(reverse=True, key=lambda x: x[0])
+
+    for cnt, p, y in pairs:
+        if cnt <= 0:
+            break
+        if perm[p] == -1 and y not in used_labels:
+            perm[p] = y
+            used_labels.add(y)
+
+    remaining_labels = [y for y in range(n_classes) if y not in used_labels]
+    for p in range(n_classes):
+        if perm[p] == -1:
+            perm[p] = remaining_labels.pop(0) if remaining_labels else p
+
+    acc = (perm[pred_idx] == labels).mean() if len(labels) else 0.0
+    return perm, acc
+
+
+@torch.no_grad()
+def _calibrate_label_permutation(model, device, tfms):
+    """
+    Finds mapping from model class-index -> competition label-id on a small train subset.
+    Returns perm where perm[class_idx] == label_id.
+    """
+    if (not CFG.calibrate_label_permutation) or (not os.path.exists(CFG.train_csv)):
+        return None
+
+    train_df = pd.read_csv(CFG.train_csv)
+    img_root = _resolve_train_image_root()
+
+    rs = np.random.RandomState(CFG.calib_seed)
+    idx = rs.choice(
+        len(train_df), size=min(CFG.calib_max_images, len(train_df)), replace=False
+    )
+    sub = train_df.iloc[idx].copy().reset_index(drop=True)
+
+    paths = [os.path.join(img_root, x) for x in sub["image_id"].tolist()]
+    labels = sub["label"].astype(int).values
+
+    ds = TrainSubsetDataset(paths, labels, tfms=tfms)
+    loader = DataLoader(
+        ds,
+        batch_size=CFG.calib_batch_size,
+        shuffle=False,
+        num_workers=CFG.num_workers,
+        pin_memory=(device == "cuda"),
+    )
+
+    probs = _predict_proba(model, loader, device)
+    pred_idx = probs.argmax(axis=1)
+
+    perm, acc = _confusion_based_perm(pred_idx, labels, n_classes=5)
+    print(
+        f"Calibrated label permutation (class_index->label_id): {tuple(perm.tolist())} (subset acc={acc:.4f})"
+    )
+    return perm
+
+
+
+
+## === cell 3
+@torch.no_grad()
+def inference():
+    sample_path = _resolve_sample_submission_path()
+    sample_sub = pd.read_csv(sample_path)
+    sample_sub["label"] = sample_sub["label"].astype(int)
+
+    test_image_ids = sample_sub["image_id"].tolist()
+
+    available_model_paths = [p for p in CFG.model_paths if os.path.exists(p)]
+    if len(available_model_paths) == 0:
+        discovered = _find_candidate_checkpoints(CFG.ckpt_search_roots, max_files=120)
+        available_model_paths = [p for p in discovered if os.path.exists(p)]
+        if len(available_model_paths) > 0:
+            print("Discovered checkpoints (ranked candidates for ensembling):")
+            for p in available_model_paths[:25]:
+                print("  ", p)
+
+    if len(available_model_paths) == 0:
+        sample_sub.to_csv("submission.csv", index=False)
+        print(
+            "WARNING: No model weights found under configured paths or search roots; wrote sample_submission as submission.csv."
+        )
+        print(sample_sub.head())
+        return sample_sub
+
+    inferred_img_size = CFG.img_size
+    for p in available_model_paths:
+        try:
+            ckpt0 = torch.load(p, map_location="cpu")
+            inferred_img_size = _infer_img_size_from_ckpt(ckpt0, CFG.img_size)
+            break
+        except Exception:
+            continue
+
+    tfms = build_test_tfms(inferred_img_size)
+    if inferred_img_size != CFG.img_size:
+        print(
+            f"Using checkpoint-inferred img_size={inferred_img_size} (CFG.img_size was {CFG.img_size})."
+        )
+
+    test_roots = _resolve_test_image_roots()
+    CFG.test_dir = test_roots[0]
+    print("Test image roots (in priority order):")
+    for r in test_roots:
+        print("  ", r)
+
+    dataset = TestDataset(
+        CFG.test_dir, tfms=tfms, image_ids=test_image_ids, roots=test_roots
+    )
+    if len(dataset) == 0:
+        raise RuntimeError(f"No test images found under roots: {test_roots}")
+
+    for i in (0, len(dataset) // 2, len(dataset) - 1):
+        if i < 0:
+            continue
+        _, img_id = dataset[i]
+        if img_id != test_image_ids[i]:
+            raise RuntimeError(
+                "Submission alignment check failed: dataset image_id order does not match "
+                "sample_submission.csv order.\n"
+                f"At index {i}: dataset={img_id}, sample_submission={test_image_ids[i]}"
+            )
+
+    loader = DataLoader(
+        dataset,
+        batch_size=CFG.batch_size,
+        shuffle=False,
+        num_workers=CFG.num_workers,
+        pin_memory=(CFG.device == "cuda"),
+    )
+
+    ensemble_probs = None
+    used_paths = []
+
+    global_inv = None
+
+    for fold, path in enumerate(available_model_paths):
+        print(f"Loading fold {fold} → {os.path.basename(path)} on device={CFG.device}")
+        model = CassavaModel().to(CFG.device)
+
+        try:
+            ckpt = torch.load(path, map_location=CFG.device)
+        except Exception as e:
+            print(f"Skipping {path} (torch.load failed): {e}")
+            del model
+            if CFG.device == "cuda":
+                torch.cuda.empty_cache()
+            continue
+
+        state = _extract_state_dict(ckpt)
+        state = _maybe_remap_classifier_keys(state, model=model)
+
+        ratio = _loaded_param_ratio(model, state)
+        print(f"Checkpoint loadable parameter ratio: {ratio:.3f}")
+
+        if not _head_matches(model, state):
+            print(
+                f"Skipping {os.path.basename(path)} because classifier head does not match this ConvNeXt-Tiny(5) model."
+            )
+            del model, ckpt, state
+            if CFG.device == "cuda":
+                torch.cuda.empty_cache()
+            continue
+
+        if ratio < CFG.min_loaded_param_ratio:
+            print(
+                f"Skipping {os.path.basename(path)} because ratio<{CFG.min_loaded_param_ratio} (likely incompatible / wrong model)."
+            )
+            del model, ckpt, state
+            if CFG.device == "cuda":
+                torch.cuda.empty_cache()
+            continue
+
+        missing, unexpected = model.load_state_dict(state, strict=False)
+        if missing or unexpected:
+            print(
+                f"Note: load_state_dict strict=False; missing={len(missing)}, unexpected={len(unexpected)}"
+            )
+
+        if global_inv is None:
+            perm = _calibrate_label_permutation(model, CFG.device, tfms=tfms)
+            if perm is not None:
+                inv = np.empty_like(perm)
+                inv[perm] = np.arange(len(perm), dtype=perm.dtype)
+                global_inv = inv
+            else:
+                global_inv = None
+
+        fold_probs = []
+        for imgs, _ in tqdm(loader, leave=False, desc=f"Fold {fold} TTA"):
+            imgs = imgs.to(CFG.device, non_blocking=(CFG.device == "cuda"))
+
+            if CFG.device == "cuda":
+                with autocast(device_type="cuda"):
+                    p1 = torch.softmax(model(imgs), dim=1)
+                    p2 = torch.softmax(model(torch.flip(imgs, dims=[3])), dim=1)
+            else:
+                p1 = torch.softmax(model(imgs), dim=1)
+                p2 = torch.softmax(model(torch.flip(imgs, dims=[3])), dim=1)
+
+            p = ((p1 + p2) / 2).cpu().numpy()
+
+            if global_inv is not None:
+                p = p[:, global_inv]  # now columns align to label_id 0..4
+
+            fold_probs.append(p)
+
+        fold_probs = np.concatenate(fold_probs, axis=0)
+        ensemble_probs = (
+            fold_probs if ensemble_probs is None else (ensemble_probs + fold_probs)
+        )
+        used_paths.append(path)
+
+        del model, ckpt, state
+        if CFG.device == "cuda":
+            torch.cuda.empty_cache()
+
+        if len(used_paths) >= 5:
+            break
+
+    if ensemble_probs is None or len(used_paths) == 0:
+        sample_sub.to_csv("submission.csv", index=False)
+        print(
+            "WARNING: All discovered checkpoints were incompatible with convnext_tiny; wrote sample_submission as submission.csv."
+        )
+        print(sample_sub.head())
+        return sample_sub
+
+    final_labels = np.argmax(ensemble_probs / len(used_paths), axis=1).astype(int)
+
+    sub = sample_sub.copy()
+    sub["label"] = final_labels
+    sub.to_csv("submission.csv", index=False)
+
+    print(f"\n{len(sub)} predictions written to submission.csv")
+    print(f"Used {len(used_paths)} checkpoint(s) in ensemble:")
+    for p in used_paths:
+        print("  ", p)
+    print(sub.head())
+    return sub
+
+
+inference()

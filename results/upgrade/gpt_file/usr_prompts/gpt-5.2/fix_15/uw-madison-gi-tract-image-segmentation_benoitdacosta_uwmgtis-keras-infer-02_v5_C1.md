@@ -1,0 +1,957 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a model to automatically segment the stomach and intestines on MRI scans.
+
+## Metric
+Mean Dice coefficient and 3D Hausdorff distance. 
+
+The Dice coefficient can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:
+
+$$
+\frac{2 \cdot |X \cap Y|}{|X| + |Y|}
+$$
+
+where $X$ is the predicted set of pixels and $Y$ is the ground truth. The Dice coefficient is defined to be 0 when both $X$ and $Y$ are empty. 
+
+Hausdorff distance is a method for calculating the distance between segmentation objects A and B, by calculating the furthest point on object A from the nearest point on object B. For 3D Hausdorff, we construct 3D volumes by combining each 2D segmentation with slice depth as the Z coordinate and then find the Hausdorff distance between them. (Here the slice depth for all scans is set to 1). The expected / predicted pixel locations are normalized by image size to create a bounded 0-1 score.
+
+The two metrics are combined, with a weight of 0.4 for the Dice metric and 0.6 for the Hausdorff distance.
+
+## Submission Format
+Use run-length encoding on the pixel values.  Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+Note that, at the time of encoding, the mask should be binary, meaning the masks for all objects in an image are joined into a single large mask. A value of 0 should indicate pixels that are not masked, and a value of 1 will indicate pixels that are masked.
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. The pixels are numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The file should contain a header and have the following format:
+
+```
+id,class,predicted
+1,large_bowel,1 1 5 1
+1,small_bowel,1 1
+1,stomach,1 1
+2,large_bowel,1 5 2 17
+etc.
+```
+
+## Dataset
+Each case is represented by multiple sets of scan slices (each set is identified by the day the scan took place). Some cases are split by time (early days are in train, later days are in test) while some cases are split by case - the entirety of the case is in train or test. The goal is to be able to generalize to both partially and wholly unseen cases.
+
+### Files
+- train.csv - IDs and masks for all training objects.
+- sample_submission.csv - a sample submission file in the correct format
+- train - a folder of case/day folders, each containing slice images for a particular case on a given day.
+
+Note that the image filenames include 4 numbers (ex. 276_276_1.63_1.63.png). These four numbers are slice width / height (integers in pixels) and width/height pixel spacing (floating points in mm). The first two defines the resolution of the slide. The last two record the physical size of each pixel.
+
+Physical pixel thickness in superior-inferior direction is 3mm.
+
+### Columns
+- `id` - unique identifier for object
+- `class` - the predicted class for the object
+- `segmentation` - RLE-encoded pixels for the identified object
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        input/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        working/
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+```
+
+-> data/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> data/uw-madison-gi-tract-image-segmentation/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/uw-madison-gi-tract-image-segmentation/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/uw-madison-gi-tract-image-segmentation/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> input/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+
+import warnings
+
+warnings.filterwarnings("ignore")
+
+from time import time
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
+from glob import glob
+from joblib import dump, load
+from tqdm import tqdm
+
+from sklearn.model_selection import KFold
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import backend as K
+
+from tensorflow.keras.layers import (
+    Conv2D,
+    BatchNormalization,
+    Activation,
+    MaxPool2D,
+    Conv2DTranspose,
+    Concatenate,
+    Input,
+    Dropout,
+)
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.losses import binary_crossentropy
+from tensorflow.keras.callbacks import EarlyStopping
+
+import cv2
+from functools import lru_cache
+
+pd.set_option("display.max_columns", 200)
+pd.set_option("display.max_colwidth", 200)
+
+os.environ.setdefault("PYTHONHASHSEED", "42")
+np.random.seed(42)
+tf.random.set_seed(42)
+try:
+    tf.config.experimental.enable_op_determinism(True)
+except Exception:
+    pass
+
+try:
+    tf.config.threading.set_intra_op_parallelism_threads(max(2, os.cpu_count() // 2))
+    tf.config.threading.set_inter_op_parallelism_threads(2)
+except Exception:
+    pass
+
+try:
+    cv2.setNumThreads(0)
+except Exception:
+    pass
+
+try:
+    AUTOTUNE = tf.data.AUTOTUNE
+except Exception:
+    AUTOTUNE = 4
+
+print("TF:", tf.__version__)
+
+
+
+## === cell 1
+repertory = "/kaggle/input/"
+
+DIR = repertory + "uw-madison-gi-tract-image-segmentation/"
+TRAIN_DIR = DIR + "train"
+TEST_DIR = DIR + "test"
+train_csv = DIR + "train.csv"
+sample_sub = DIR + "sample_submission.csv"
+test_csv = DIR + "test.csv"
+
+df_train = pd.read_csv(train_csv)
+df_train.head(10)
+
+
+
+
+## === cell 2
+class CFG:
+    BATCH_SIZE = 64
+    img_size = (256, 256, 1)
+    n_fold = 5
+    fold_selected = 1
+    epochs = 100
+    seed = 42
+    steps_per_epoch_train = None
+    steps_per_epoch_val = None
+
+
+
+
+## === cell 3
+_FOLDER_SUFFIX_CACHE = {}  # key: scans_dir -> suffix string like "266_266_1.5_1.5.png"
+_SCANS_NAMESET_CACHE = {}  # key: scans_dir -> frozenset of filenames in that folder
+
+
+def _get_folder_suffix(scans_dir: str) -> str:
+    suf = _FOLDER_SUFFIX_CACHE.get(scans_dir)
+    if suf is not None:
+        return suf
+    try:
+        with os.scandir(scans_dir) as it:
+            for e in it:
+                if (
+                    e.is_file()
+                    and e.name.startswith("slice_")
+                    and e.name.endswith(".png")
+                ):
+                    parts = e.name.split("_", 2)
+                    if len(parts) == 3:
+                        suf = parts[2]
+                        _FOLDER_SUFFIX_CACHE[scans_dir] = suf
+                        return suf
+    except FileNotFoundError:
+        pass
+    suf = ""
+    _FOLDER_SUFFIX_CACHE[scans_dir] = suf
+    return suf
+
+
+def _get_scans_nameset(scans_dir: str):
+    cached = _SCANS_NAMESET_CACHE.get(scans_dir)
+    if cached is not None:
+        return cached
+    try:
+        with os.scandir(scans_dir) as it:
+            names = frozenset(e.name for e in it if e.is_file())
+    except FileNotFoundError:
+        names = frozenset()
+    _SCANS_NAMESET_CACHE[scans_dir] = names
+    return names
+
+
+def preprocessing(df, subset="train"):
+    df = df.copy()
+
+    parts = df["id"].str.split("_", expand=True)
+    df["case"] = parts[0].str.replace("case", "", regex=False).astype(np.int32)
+    df["day"] = parts[1].str.replace("day", "", regex=False).astype(np.int32)
+    df["slice"] = parts[3]  # keep as string to match filenames
+
+    base_dir = TRAIN_DIR if subset == "train" else TEST_DIR
+
+    df["scans_dir"] = (
+        base_dir
+        + "/case"
+        + df["case"].astype(str)
+        + "/case"
+        + df["case"].astype(str)
+        + "_day"
+        + df["day"].astype(str)
+        + "/scans"
+    )
+
+    uniq_dirs = df["scans_dir"].unique()
+    dir2suf = {d: _get_folder_suffix(d) for d in uniq_dirs}
+    suffix = df["scans_dir"].map(dir2suf).astype("string")
+    df["path"] = (
+        df["scans_dir"] + "/slice_" + df["slice"].astype(str) + "_" + suffix.fillna("")
+    )
+
+    p = df["path"].astype("string")
+    stem = p.str.replace(".png", "", regex=False)
+    spl = stem.str.rsplit("_", n=4, expand=True)
+    df["width"] = pd.to_numeric(spl[1], errors="coerce")
+    df["height"] = pd.to_numeric(spl[2], errors="coerce")
+    df["px_spacing_h"] = pd.to_numeric(spl[3], errors="coerce")
+    df["px_spacing_w"] = pd.to_numeric(spl[4], errors="coerce")
+
+    keep = np.zeros(len(df), dtype=bool)
+    for scans_dir, idx in df.groupby("scans_dir", sort=False).indices.items():
+        names = _get_scans_nameset(scans_dir)
+        if not names:
+            continue
+        base = df.loc[idx, "path"].astype("string").str.rsplit("/", n=1).str[-1]
+        keep[idx] = base.isin(names).to_numpy()
+
+    df = df[keep].dropna(subset=["width", "height"]).reset_index(drop=True)
+    df["width"] = df["width"].astype(int)
+    df["height"] = df["height"].astype(int)
+
+    return df
+
+
+
+
+## === cell 4
+train_df = preprocessing(df_train, subset="train")
+train_df.head()
+
+
+
+
+## === cell 5
+def rle_decode(mask_rle, shape):
+    if (
+        mask_rle is None
+        or mask_rle == ""
+        or (isinstance(mask_rle, float) and np.isnan(mask_rle))
+    ):
+        return np.zeros(shape, dtype=np.uint8)
+
+    s = np.asarray(mask_rle.split(), dtype=np.int64)
+    starts = s[0::2] - 1
+    lengths = s[1::2]
+    ends = starts + lengths
+
+    flat = np.zeros(shape[0] * shape[1], dtype=np.uint8)
+    flat[starts] = 1
+    flat[ends] -= 1
+    flat = np.cumsum(flat)
+    return flat.reshape(shape)
+
+
+def rle_encode(img):
+    if img is None:
+        return ""
+    pixels = np.asarray(img, dtype=np.uint8).ravel(order="C")
+    if pixels.size == 0 or pixels.max() == 0:
+        return ""
+
+    padded = np.empty(pixels.size + 2, dtype=np.uint8)
+    padded[0] = 0
+    padded[-1] = 0
+    padded[1:-1] = pixels
+
+    changes = np.flatnonzero(padded[1:] != padded[:-1]) + 1
+    if changes.size == 0:
+        return ""
+    runs = changes.copy()
+    runs[1::2] -= runs[::2]
+    return " ".join(map(str, runs.tolist()))
+
+
+
+
+## === cell 6
+def restructure(df, subset="train"):
+    df = df.reset_index(drop=True)
+
+    df_out = pd.DataFrame({"id": df["id"][::3].values})
+
+    if subset == "train":
+        df_out["large_bowel"] = df["segmentation"][::3].values
+        df_out["small_bowel"] = df["segmentation"][1::3].values
+        df_out["stomach"] = df["segmentation"][2::3].values
+
+    df_out["path"] = df["path"][::3].values
+    df_out["case"] = df["case"][::3].values
+    df_out["day"] = df["day"][::3].values
+    df_out["slice"] = df["slice"][::3].values
+    df_out["width"] = df["width"][::3].values
+    df_out["height"] = df["height"][::3].values
+
+    df_out = df_out.fillna("").reset_index(drop=True)
+    if subset == "train":
+        df_out["count"] = np.sum(df_out.iloc[:, 1:4] != "", axis=1).values
+
+    return df_out
+
+
+
+
+## === cell 7
+DF_train = restructure(train_df, subset="train")
+DF_train.head()
+
+
+
+
+## === cell 8
+@lru_cache(maxsize=8192)
+def _load_grayscale_cached(img_path: str, out_h: int, out_w: int):
+    img = cv2.imread(img_path, cv2.IMREAD_ANYDEPTH)
+    if img is None:
+        img = np.zeros((out_h, out_w), dtype=np.uint16)
+        img = img.astype("float32")
+        img = np.expand_dims(img, axis=-1)
+        return img
+
+    img = cv2.resize(img, (out_w, out_h), interpolation=cv2.INTER_AREA)
+    img = img.astype("float32")
+    mx = float(img.max())
+    mn = float(img.min())
+    denom = mx - mn
+    if denom > 0:
+        img = (img - mn) / denom
+    else:
+        img = img * 0.0
+    img = np.expand_dims(img, axis=-1)
+    return img
+
+
+@lru_cache(maxsize=20000)
+def _load_masks_256_cached(
+    id_str: str,
+    h: int,
+    w: int,
+    rle_lb: str,
+    rle_sb: str,
+    rle_st: str,
+    out_h: int,
+    out_w: int,
+):
+    y = np.empty((out_h, out_w, 3), dtype=np.float32)
+    for k, rles in enumerate((rle_lb, rle_sb, rle_st)):
+        mask = rle_decode(rles, shape=(h, w))
+        mask = cv2.resize(mask, (out_w, out_h), interpolation=cv2.INTER_NEAREST)
+        y[:, :, k] = mask.astype(np.float32)
+    return y
+
+
+class DataGenerator(tf.keras.utils.Sequence):
+    def __init__(
+        self,
+        df,
+        batch_size=CFG.BATCH_SIZE,
+        subset="train",
+        shuffle=False,
+        img_shape=CFG.img_size,
+    ):
+        super().__init__()
+        self.df = df.reset_index(drop=True)
+        self.shuffle = shuffle
+        self.subset = subset
+        self.batch_size = batch_size
+        self.img_shape = img_shape
+        self.indexes = np.arange(len(self.df))
+        self.on_epoch_end()
+
+        self._path = self.df["path"].to_numpy()
+        self._width = self.df["width"].to_numpy()
+        self._height = self.df["height"].to_numpy()
+        self._id = self.df["id"].to_numpy()
+        if self.subset == "train":
+            self._rle_lb = self.df["large_bowel"].to_numpy()
+            self._rle_sb = self.df["small_bowel"].to_numpy()
+            self._rle_st = self.df["stomach"].to_numpy()
+
+    def __len__(self):
+        if self.subset == "train":
+            return int(np.floor(len(self.df) / self.batch_size))
+        return int(np.ceil(len(self.df) / self.batch_size))
+
+    def on_epoch_end(self):
+        if self.shuffle:
+            np.random.shuffle(self.indexes)
+
+    def __getitem__(self, index):
+        start = index * self.batch_size
+        end = min((index + 1) * self.batch_size, len(self.df))
+        batch_ids = self.indexes[start:end]
+        bs = len(batch_ids)
+
+        H, W = self.img_shape[0], self.img_shape[1]
+        X = np.empty((bs, H, W, self.img_shape[2]), dtype=np.float32)
+
+        if self.subset == "train":
+            y = np.empty((bs, H, W, 3), dtype=np.float32)
+        else:
+            id_, heights, widths = [], [], []
+
+        for i, row_idx in enumerate(batch_ids):
+            img_path = self._path[row_idx]
+            w = int(self._width[row_idx])
+            h = int(self._height[row_idx])
+
+            X[i] = _load_grayscale_cached(img_path, H, W)
+
+            if self.subset == "train":
+                id_str = str(self._id[row_idx])
+                y[i] = _load_masks_256_cached(
+                    id_str,
+                    h,
+                    w,
+                    str(self._rle_lb[row_idx]),
+                    str(self._rle_sb[row_idx]),
+                    str(self._rle_st[row_idx]),
+                    H,
+                    W,
+                )
+            else:
+                id_.append(self._id[row_idx])
+                heights.append(h)
+                widths.append(w)
+
+        if self.subset == "train":
+            return X, y
+        else:
+            return X, id_, widths, heights
+
+
+
+
+## === cell 9
+def dice_coef(y_true, y_pred, smooth=1e-6):
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = K.sum(y_true_f * y_pred_f)
+    return (2.0 * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+
+
+def iou_coef(y_true, y_pred, smooth=1):
+    intersection = K.sum(K.abs(y_true * y_pred), axis=[1, 2, 3])
+    union = K.sum(y_true, [1, 2, 3]) + K.sum(y_pred, [1, 2, 3]) - intersection
+    iou = K.mean((intersection + smooth) / (union + smooth), axis=0)
+    return iou
+
+
+def dice_loss(y_true, y_pred):
+    smooth = 1.0
+    y_true_f = K.flatten(y_true)
+    y_pred_f = K.flatten(y_pred)
+    intersection = y_true_f * y_pred_f
+    score = (2.0 * K.sum(intersection) + smooth) / (
+        K.sum(y_true_f) + K.sum(y_pred_f) + smooth
+    )
+    return 1.0 - score
+
+
+def bce_dice_loss(y_true, y_pred):
+    return binary_crossentropy(tf.cast(y_true, tf.float32), y_pred) + 0.5 * dice_loss(
+        tf.cast(y_true, tf.float32), y_pred
+    )
+
+
+
+
+## === cell 10
+def conv_block(input, num_filters, batchnorm):
+    x = Conv2D(num_filters, kernel_size=(3, 3), padding="same")(input)
+    if batchnorm:
+        x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = Conv2D(num_filters, kernel_size=(3, 3), padding="same")(x)
+    if batchnorm:
+        x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    return x
+
+
+def encoder_block(input, num_filters, dropout=False, batchnorm=True):
+    x = conv_block(input, num_filters, batchnorm)
+    p = MaxPool2D((2, 2))(x)
+    if dropout:
+        p = Dropout(0.3)(p)
+    return x, p
+
+
+def decoder_block(input, skip_features, num_filters, dropout=False, batchnorm=True):
+    x = Conv2DTranspose(num_filters, (2, 2), strides=2, padding="same")(input)
+    x = Concatenate()([x, skip_features])
+    if dropout:
+        x = Dropout(0.3)(x)
+    x = conv_block(x, num_filters, batchnorm)
+    return x
+
+
+def build_unet(input_shape, dropout=False, batchnorm=True, activation="sigmoid"):
+    inputs = Input(shape=input_shape)
+
+    s0, p0 = encoder_block(inputs, 32, dropout, batchnorm)
+    s1, p1 = encoder_block(p0, 64, dropout, batchnorm)
+    s2, p2 = encoder_block(p1, 128, dropout, batchnorm)
+    s3, p3 = encoder_block(p2, 256, dropout, batchnorm)
+    s4, p4 = encoder_block(p3, 512, dropout, batchnorm)
+    s5, p5 = encoder_block(p4, 1024, dropout, batchnorm)
+
+    b1 = conv_block(p5, 2048, batchnorm)
+
+    d0 = decoder_block(b1, s5, 1024, dropout, batchnorm)
+    d1 = decoder_block(d0, s4, 512, dropout, batchnorm)
+    d2 = decoder_block(d1, s3, 256, dropout, batchnorm)
+    d3 = decoder_block(d2, s2, 128, dropout, batchnorm)
+    d4 = decoder_block(d3, s1, 64, dropout, batchnorm)
+    d5 = decoder_block(d4, s0, 32, dropout, batchnorm)
+
+    outputs = Conv2D(3, 1, padding="same", activation=activation)(d5)
+
+    model = Model(inputs, outputs, name="U-Net")
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(),
+        loss=bce_dice_loss,
+        metrics=[iou_coef, dice_coef],
+    )
+    return model
+
+
+
+
+## === cell 11
+def fit_model(model, model_name, train_gen, val_gen):
+    model_file = models_path + str(model_name) + ".h5"
+    score_file = results_path + "score_" + str(model_name) + ".joblib"
+
+    if os.path.isfile(model_file):
+        model = load_model(
+            model_file,
+            custom_objects={
+                "bce_dice_loss": bce_dice_loss,
+                "iou_coef": iou_coef,
+                "dice_coef": dice_coef,
+            },
+        )
+        results = load(score_file) if os.path.isfile(score_file) else pd.DataFrame()
+        return model, results
+
+    raise FileNotFoundError(
+        f"Pretrained model not found at {model_file}. "
+        "Training this U-Net from scratch will exceed the 600s timeout. "
+        "Provide the pretrained weights as an input dataset or generate them offline and place them in /kaggle/working/models/."
+    )
+
+
+
+
+## === cell 12
+models_path = "/kaggle/working/models/"
+results_path = "/kaggle/working/models/"
+os.makedirs(models_path, exist_ok=True)
+
+input_shape = CFG.img_size
+model = build_unet(input_shape, dropout=True, batchnorm=True)
+
+kf = KFold(n_splits=CFG.n_fold, shuffle=True, random_state=CFG.seed)
+folds = np.zeros(len(DF_train), dtype=np.int32)
+for f, (_, val_idx) in enumerate(kf.split(DF_train)):
+    folds[val_idx] = f
+DF_train["fold"] = folds
+
+train_idx = DF_train["fold"] != CFG.fold_selected
+val_idx = DF_train["fold"] == CFG.fold_selected
+
+train_gen = DataGenerator(
+    DF_train.loc[train_idx].reset_index(drop=True),
+    batch_size=CFG.BATCH_SIZE,
+    subset="train",
+    shuffle=True,
+)
+val_gen = DataGenerator(
+    DF_train.loc[val_idx].reset_index(drop=True),
+    batch_size=CFG.BATCH_SIZE,
+    subset="train",
+    shuffle=False,
+)
+
+model_name_for_fit = f"U-net_fold{CFG.fold_selected}"
+model, results = fit_model(model, model_name_for_fit, train_gen, val_gen)
+if len(results) > 0:
+    print(
+        "Load complete. Last metrics:",
+        {k: results[k].iloc[-1] for k in results.columns},
+    )
+else:
+    print("Load complete. No saved training history found.")
+
+
+
+## === cell 13
+sub_df = pd.read_csv(sample_sub)
+debug = False
+
+df_test = pd.read_csv(test_csv)
+test_df = preprocessing(df_test, subset="test")
+test_df.head()
+
+
+
+
+## === cell 14
+def _tf_read_resize_norm(path):
+    img_bytes = tf.io.read_file(path)
+    img = tf.io.decode_png(img_bytes, channels=1, dtype=tf.uint16)  # (H,W,1)
+    img = tf.image.resize(img, (CFG.img_size[0], CFG.img_size[1]), method="area")
+    img = tf.cast(img, tf.float32)
+    mx = tf.reduce_max(img)
+    mn = tf.reduce_min(img)
+    denom = mx - mn
+    img = tf.where(denom > 0.0, (img - mn) / denom, tf.zeros_like(img))
+    return img
+
+
+def rle_encode_fast(mask: np.ndarray) -> str:
+    pixels = np.asarray(mask, dtype=np.uint8).ravel(order="C")
+    if pixels.size == 0 or pixels.max() == 0:
+        return ""
+    padded = np.empty(pixels.size + 2, dtype=np.uint8)
+    padded[0] = 0
+    padded[-1] = 0
+    padded[1:-1] = pixels
+    changes = np.flatnonzero(padded[1:] != padded[:-1]) + 1
+    if changes.size == 0:
+        return ""
+    runs = changes.copy()
+    runs[1::2] -= runs[::2]
+    return " ".join(map(str, runs))
+
+
+def infer(test_df, model, batch_size=CFG.BATCH_SIZE):
+    img_df = test_df.drop_duplicates(subset=["id"]).reset_index(drop=True)
+
+    widths = img_df["width"].to_numpy(np.int32)
+    heights = img_df["height"].to_numpy(np.int32)
+    ids = img_df["id"].to_numpy()
+    paths = img_df["path"].to_numpy()
+
+    classes = ("large_bowel", "small_bowel", "stomach")
+    n = len(img_df)
+
+    ds = tf.data.Dataset.from_tensor_slices(paths.astype(str))
+    ds = ds.map(_tf_read_resize_norm, num_parallel_calls=AUTOTUNE, deterministic=True)
+    ds = ds.batch(batch_size, drop_remainder=False)
+    ds = ds.prefetch(AUTOTUNE)
+
+    preds_all = model.predict(ds, verbose=0)  # (n,256,256,3)
+
+    out_n = n * 3
+    pred_rle = [""] * out_n
+    pred_ids = [None] * out_n
+    pred_classes = [None] * out_n
+    out_pos = 0
+
+    for i in tqdm(range(n), total=n):
+        wj = int(widths[i])
+        hj = int(heights[i])
+        idj = ids[i]
+
+        prob3_rs = cv2.resize(preds_all[i], (wj, hj), interpolation=cv2.INTER_NEAREST)
+        bin3 = (prob3_rs > 0.5).astype(np.uint8, copy=False)
+
+        pred_ids[out_pos] = idj
+        pred_classes[out_pos] = classes[0]
+        pred_rle[out_pos] = rle_encode_fast(bin3[:, :, 0])
+        out_pos += 1
+
+        pred_ids[out_pos] = idj
+        pred_classes[out_pos] = classes[1]
+        pred_rle[out_pos] = rle_encode_fast(bin3[:, :, 1])
+        out_pos += 1
+
+        pred_ids[out_pos] = idj
+        pred_classes[out_pos] = classes[2]
+        pred_rle[out_pos] = rle_encode_fast(bin3[:, :, 2])
+        out_pos += 1
+
+    return pred_rle, pred_ids, pred_classes
+
+
+
+
+## === cell 15
+CFG.BATCH_SIZE = 64
+pred_rle, pred_ids, pred_classes = infer(test_df, model, batch_size=CFG.BATCH_SIZE)
+
+
+
+## === cell 16
+submission = pd.DataFrame(
+    {"id": pred_ids, "class": pred_classes, "predicted": pred_rle}
+)
+
+sub_out = sub_df.drop(columns=["predicted"]).merge(
+    submission, on=["id", "class"], how="left"
+)
+sub_out["predicted"] = sub_out["predicted"].fillna("")
+sub_out.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with shape:", sub_out.shape)
+sub_out.head()

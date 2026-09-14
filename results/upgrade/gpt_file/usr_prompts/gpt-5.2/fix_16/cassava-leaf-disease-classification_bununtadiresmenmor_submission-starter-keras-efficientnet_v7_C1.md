@@ -1,0 +1,532 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.4728014505893019
+
+# 6. Current score
+
+0.7926
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.7926) has done: 'I fix the environment-breaking protobuf/import issue by removing unused visualization/imports that trigger the `MessageFactory.GetPrototype` error under this TensorFlow/protobuf combination. Then I remove the dependency on a missing external `.h5` file by building the same kind of Keras image-classification pipeline locally (EfficientNet backbone + softmax head) trained from `train.csv` and `train_images`, so the notebook runs end-to-end. Finally, I ensure inference matches the submission format by reading `sample_submission.csv`, predicting labels for each `test_images` file, and writing `submission.csv` with exactly `image_id,label`.'
+- What this solution (achieved 0.7926) has done: 'The current failure happens at import time due to an incompatibility between TensorFlow 2.18 and protobuf 6.x that triggers `MessageFactory.GetPrototype` errors. The minimal robust fix is to force protobuf to use the pure-Python implementation **before importing TensorFlow**, which avoids that missing method path. I also keep the existing model/training/inference logic unchanged, only adding a small safety check to ensure the submission is written with the correct columns and row count. Since your current score (0.7926) is already well above the target (0.4728), I not make any score-improving changes beyond restoring successful execution.'
+- What this solution (achieved 0.7926) has done: 'We fix the import-time protobuf/TensorFlow crash by setting `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` (and its version) *before any protobuf/TensorFlow-related imports*, and also clearing already-imported `google.protobuf` modules if the notebook environment preloaded them. This change is execution-only and should be score-neutral because it doesn’t alter the model/training/inference logic. Additionally, we keep all paths and submission formatting identical, ensuring `submission.csv` is always written with the correct columns and row count. Finally, we renumber cells starting from 1 while preserving the original order and logic.'
+- What this solution (achieved 0.7926) has done: 'The crash happens before your environment variables take effect because protobuf/TensorFlow pieces can already be imported by the kernel; we force the pure-Python protobuf implementation as early as possible and also proactively purge both `google.protobuf*` and `tensorflow*` from `sys.modules` before importing TensorFlow. This is an execution-only fix and should be score-neutral (it doesn’t touch model/training/inference logic). I also keep the same paths and submission formatting, and add a small fallback to locate the dataset directory in case Kaggle mounts it under `/kaggle/data/...` in this environment. The rest of the pipeline (EfficientNetB3, training loop, prediction, and `submission.csv`) remains unchanged.'
+- What this solution (achieved 0.7926) has done: 'We fix the import-time crash (`MessageFactory.GetPrototype`) by forcing the pure-Python protobuf implementation *as early as possible* and preventing incompatible protobuf C++ bindings from being loaded before TensorFlow. This is done by setting the protobuf env vars first, purging already-loaded `google.protobuf*`/`tensorflow*` modules, and then importing TensorFlow. No model/training/inference logic is changed, so the achieved score should remain essentially the same (still well above your target). Finally, we keep the same file paths and ensure `submission.csv` is always written with the correct `image_id,label` columns and row count.'
+- What this solution (achieved 0.7926) has done: 'We fix the import-time crash (`AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'`) by forcing pure-Python protobuf *before anything protobuf-related is imported* and by preventing TensorFlow from loading the incompatible “upb” proto runtime via environment flags. This is an execution-only change and should be score-neutral (it does not modify your model, training, or inference logic). I also keep the same dataset paths and ensure a valid `submission.csv` is always written with the required `image_id,label` columns and correct row count. No score-improving changes are made since your current score is already far above the target.'
+- What this solution (achieved 0.7926) has done: 'We fix the TensorFlow/protobuf import-time crash by forcing the pure-Python protobuf runtime *before any TensorFlow/Keras/protobuf modules are imported*, and by removing the unsupported env var (`PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_DISABLE_CPP`) that can still lead to the incompatible C++/upb path being used. We also add a small pre-import cleanup to purge any already-loaded `google.protobuf`/`tensorflow`/`keras` modules, which can happen in some notebook kernels and prevents the env vars from taking effect. These changes are execution-only and keep your model/training/inference logic identical, so the score should remain essentially unchanged (still above target). The submission writing logic is kept the same and produce `submission.csv` with the required columns.'
+- What this solution (achieved 0.7926) has done: 'The only blocking issue is the TensorFlow/protobuf import-time crash (`MessageFactory.GetPrototype`) in cell 1 (your cell 0). I fix this by forcing the pure-Python protobuf runtime as early as possible and preventing TensorFlow from using the incompatible “upb” path, without changing any of your model/training/inference logic (so the score should remain essentially unchanged and still above your target). I also keep your existing dataset path fallback and submission formatting checks intact to ensure a valid `submission.csv` is always produced.'
+- What this solution (achieved 0.7926) has done: 'We fix the TensorFlow/protobuf import crash (`MessageFactory.GetPrototype`) by forcing the pure-Python protobuf runtime *before* any TensorFlow/protobuf-related import and by removing the module-purging approach (which can be too late and/or leave the interpreter in a partially-initialized state). This is an execution-only change and should be score-neutral: it does not alter your model, training loop, preprocessing, or inference. We also keep the same dataset path logic and ensure `submission.csv` is written with the required `image_id,label` columns and the exact row count from `sample_submission.csv`. Since your current score (0.7926) is already far above the target (0.4728), we not make any score-improving changes.'
+- What this solution (achieved 0.7926) has done: 'I fix the import-time crash caused by the TensorFlow 2.18 + protobuf 6.x incompatibility by forcing the pure-Python protobuf runtime *before* TensorFlow loads, and by ensuring this is applied at the very top of the notebook/script. This is an execution-only change and should be score-neutral (it does not alter your model/training/inference logic), which is important since your current score (0.7926) is already far above the target (0.4728) and we should not chase further improvements. I also keep your dataset path fallback and submission-format assertions intact so a valid `submission.csv` is always produced end-to-end.'
+- What this solution (achieved 0.7926) has done: 'We fix the crash that happens before your env vars take effect by forcing the pure-Python protobuf runtime at process start *and* restarting the interpreter if TensorFlow/protobuf were already imported (this avoids the `MessageFactory.GetPrototype` failure under TF 2.18 + protobuf 6.x). This is an execution-only change and keeps your model/training/inference logic intact, so the score should remain essentially unchanged (still above target, and we won’t try to improve it). We also keep the same data paths and add a tiny safety fallback for `DATA_DIR` resolution without changing I/O semantics. Finally, we ensure `submission.csv` is always produced with exactly `image_id,label` and the correct row count.'
+- What this solution (achieved 0.7926) has done: 'We fix the import-time `MessageFactory.GetPrototype` crash by ensuring TensorFlow never loads the incompatible protobuf runtime: set the protobuf env vars even earlier and also force the pure-Python protobuf backend via `google.protobuf.internal.api_implementation._SetType("python")` before importing TensorFlow. We remove the `os.execv(...)` restart logic (it can loop or still restart too late) and instead do a safe pre-import purge of already-loaded protobuf modules to let the env/config take effect. These changes are execution-only and should be score-neutral (your current score is already far above the target, so we avoid any model/training changes). The rest of the pipeline (data loading, EfficientNetB3 training, inference, and writing `submission.csv`) is kept identical.'
+- What this solution (achieved 0.7926) has done: 'We fix the import-time crash (`MessageFactory.GetPrototype`) by forcing TensorFlow to use the pure-Python protobuf runtime *before* any TensorFlow/protobuf modules load, without doing the risky partial-module deletion that can leave protobuf in a broken state. Concretely, we set the protobuf env vars at the very top and remove the `sys.modules` purge + `_SetType(...)` call that can still trigger the failure under TF 2.18/protobuf 6.x. This change is execution-only and should be score-neutral (it doesn’t alter your model/training/inference logic), which is appropriate since your current score is already far above the target. The rest of the pipeline is kept identical and still writes a valid `submission.csv` with `image_id,label`.'
+- What this solution (achieved 0.7926) has done: 'I fix the import-time TensorFlow/protobuf crash (`MessageFactory.GetPrototype`) by forcing TensorFlow to use the pure-Python protobuf runtime as early as possible, and by guarding against cases where protobuf was already imported before the env vars took effect. These changes are execution-only and keep your model/training/inference logic identical, so they should be score-neutral (important since your current score is already far above the target). I also renumber cells starting at 1 (as required) while preserving the original cell order and code behavior. The pipeline still train, run inference, and write a valid `submission.csv` with the required `image_id,label` columns.'
+- What this solution (achieved 0.7926) has done: 'I fix the import-time crash (`MessageFactory.GetPrototype`) by forcing TensorFlow/Keras to use the pure-Python protobuf runtime *before* any TensorFlow-related imports, and by removing the risky `sys.modules` deletion that can leave protobuf in a partially broken state. This change is execution-only and should be score-neutral (no model/training/inference logic changes), which is appropriate since your current score (0.7926) is already far above the target (0.4728). I also add a tiny dataset-path fallback to handle both `/kaggle/input/...` and `/kaggle/data/...` layouts robustly without changing I/O semantics. The rest of the pipeline (EfficientNetB3, training schedule, prediction, and writing `submission.csv`) remains the same.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "2")
+os.environ.setdefault("TF_PROTOBUF_USE_UPB", "0")
+
+import json
+import numpy as np
+import pandas as pd
+
+import tensorflow as tf
+from tensorflow import keras
+
+SEED = 42
+tf.keras.utils.set_random_seed(SEED)
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+CANDIDATE_DIRS = [
+    "/kaggle/input/cassava-leaf-disease-classification",
+    "/kaggle/data/cassava-leaf-disease-classification",
+    "/kaggle/input/cassava-leaf-disease-classification/cassava-leaf-disease-classification",
+    "/kaggle/data/cassava-leaf-disease-classification/cassava-leaf-disease-classification",
+]
+DATA_DIR = next((d for d in CANDIDATE_DIRS if os.path.exists(d)), None)
+if DATA_DIR is None:
+    DATA_DIR = "/kaggle/input/cassava-leaf-disease-classification"
+
+TRAIN_CSV = os.path.join(DATA_DIR, "train.csv")
+SAMPLE_SUB = os.path.join(DATA_DIR, "sample_submission.csv")
+TRAIN_IMG_DIR = os.path.join(DATA_DIR, "train_images")
+TEST_IMG_DIR = os.path.join(DATA_DIR, "test_images")
+
+print("TensorFlow:", tf.__version__)
+print("DATA_DIR:", DATA_DIR)
+print("Train CSV exists:", os.path.exists(TRAIN_CSV))
+print("Sample submission exists:", os.path.exists(SAMPLE_SUB))
+print("Train images dir exists:", os.path.isdir(TRAIN_IMG_DIR))
+print("Test images dir exists:", os.path.isdir(TEST_IMG_DIR))
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+train_df = pd.read_csv(TRAIN_CSV)
+num_classes = train_df["label"].nunique()
+assert num_classes == 5, f"Expected 5 classes, got {num_classes}"
+
+IMG_SIZE = (300, 300)
+BATCH_SIZE = 32
+AUTOTUNE = tf.data.AUTOTUNE
+
+
+def decode_and_resize(path, label=None):
+    img = tf.io.read_file(path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.image.resize(img, IMG_SIZE, method="bilinear")
+    img = tf.cast(img, tf.float32)
+    if label is None:
+        return img
+    return img, tf.cast(label, tf.int32)
+
+
+idx = np.arange(len(train_df))
+rng = np.random.default_rng(SEED)
+rng.shuffle(idx)
+val_size = int(0.1 * len(idx))
+val_idx = idx[:val_size]
+trn_idx = idx[val_size:]
+
+trn_df = train_df.iloc[trn_idx].reset_index(drop=True)
+val_df = train_df.iloc[val_idx].reset_index(drop=True)
+
+trn_paths = (TRAIN_IMG_DIR + "/" + trn_df["image_id"]).values
+trn_labels = trn_df["label"].values
+
+val_paths = (TRAIN_IMG_DIR + "/" + val_df["image_id"]).values
+val_labels = val_df["label"].values
+
+train_ds = tf.data.Dataset.from_tensor_slices((trn_paths, trn_labels)).map(
+    decode_and_resize, num_parallel_calls=AUTOTUNE
+)
+val_ds = tf.data.Dataset.from_tensor_slices((val_paths, val_labels)).map(
+    decode_and_resize, num_parallel_calls=AUTOTUNE
+)
+
+train_ds = (
+    train_ds.shuffle(2048, seed=SEED, reshuffle_each_iteration=True)
+    .batch(BATCH_SIZE)
+    .prefetch(AUTOTUNE)
+)
+val_ds = val_ds.batch(BATCH_SIZE).prefetch(AUTOTUNE)
+
+print("Train batches:", tf.data.experimental.cardinality(train_ds).numpy())
+print("Val batches:", tf.data.experimental.cardinality(val_ds).numpy())
+
+
+
+## === cell 2
+inputs = keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3), name="image")
+x = keras.applications.efficientnet.preprocess_input(inputs)
+
+base = keras.applications.EfficientNetB3(
+    include_top=False, weights="imagenet", input_tensor=x, pooling="avg"
+)
+base.trainable = False  # fast, stable training under time limit
+
+x = base.output
+outputs = keras.layers.Dense(num_classes, activation="softmax", name="pred")(x)
+model = keras.Model(inputs=inputs, outputs=outputs)
+
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"],
+)
+
+model.summary()
+
+
+
+## === cell 3
+EPOCHS = 3
+history = model.fit(train_ds, validation_data=val_ds, epochs=EPOCHS, verbose=1)
+
+base.trainable = True
+for layer in base.layers[:-20]:
+    layer.trainable = False
+
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-4),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"],
+)
+history_ft = model.fit(train_ds, validation_data=val_ds, epochs=1, verbose=1)
+
+
+
+## === cell 4
+ss = pd.read_csv(SAMPLE_SUB)
+test_paths = (TEST_IMG_DIR + "/" + ss["image_id"]).values
+
+test_ds = tf.data.Dataset.from_tensor_slices(test_paths).map(
+    lambda p: decode_and_resize(p, None), num_parallel_calls=AUTOTUNE
+)
+test_ds = test_ds.batch(BATCH_SIZE).prefetch(AUTOTUNE)
+
+probs = model.predict(test_ds, verbose=1)
+preds = np.argmax(probs, axis=1).astype(int)
+
+my_submission = pd.DataFrame({"image_id": ss["image_id"].values, "label": preds})
+
+assert list(my_submission.columns) == ["image_id", "label"]
+assert len(my_submission) == len(
+    ss
+), "Submission row count must match sample_submission.csv"
+
+my_submission.to_csv("submission.csv", index=False)
+
+print(my_submission.head())
+print("Wrote submission.csv with shape:", my_submission.shape)
+
+
+
+## === cell 5
+my_submission

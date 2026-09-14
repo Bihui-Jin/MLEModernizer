@@ -1,0 +1,848 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict engagement with a pet's profile based on the photograph for that profile.
+
+## Metric
+Root mean squared error.
+
+## Submission Format
+For each `Id` in the test set, you must predict a probability for the target variable, `Pawpularity`. The file should contain a header and have the following format:
+
+```
+Id, Pawpularity
+0008dbfb52aa1dc6ee51ee02adf13537, 99.24
+0014a7b528f1682f0cf3b73a991c17a0, 61.71
+0019c1388dfcd30ac8b112fb4250c251, 6.23
+00307b779c82716b240a24f028b0031b, 9.43
+00320c6dd5b4223c62a9670110d47911, 70.89
+etc.
+```
+
+## Dataset
+- **train/** - Folder containing training set photos of the form **{id}.jpg**, where **{id}** is a unique Pet Profile ID.
+- **train.csv** - Metadata (described below) for each photo in the training set as well as the target, the photo's Pawpularity score. The Id column gives the photo's unique Pet Profile ID corresponding the photo's file name.
+
+The train.csv and test.csv files contain metadata for photos in the training set and test set, respectively. Each pet photo is labeled with the value of 1 (Yes) or 0 (No) for each of the following features:
+
+- **Focus** - Pet stands out against uncluttered background, not too close / far.
+- **Eyes** - Both eyes are facing front or near-front, with at least 1 eye / pupil decently clear.
+- **Face** - Decently clear face, facing front or near-front.
+- **Near** - Single pet taking up significant portion of photo (roughly over 50% of photo width or height).
+- **Action** - Pet in the middle of an action (e.g., jumping).
+- **Accessory** - Accompanying physical or digital accessory / prop (i.e. toy, digital sticker), excluding collar and leash.
+- **Group** - More than 1 pet in the photo.
+- **Collage** - Digitally-retouched photo (i.e. with digital photo frame, combination of multiple photos).
+- **Human** - Human in the photo.
+- **Occlusion** - Specific undesirable objects blocking part of the pet (i.e. human, cage or fence). Note that not all blocking objects are considered occlusion.
+- **Info** - Custom-added text or labels (i.e. pet name, description).
+- **Blur** - Noticeably out of focus or noisy, especially for the pet's eyes and face. For Blur entries, "Eyes" column is always set to 0.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (132 lines)
+            sample_submission.csv (993 lines)
+            sample_submission.csv.zip (22.7 kB)
+            test.csv (993 lines)
+            test.csv.zip (22.5 kB)
+            test.zip (102.2 MB)
+            train.csv (8921 lines)
+            train.csv.zip (213.0 kB)
+            train.zip (926.9 MB)
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+            test/
+                a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                ... and 990 other files
+                test/
+            train/
+                e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                ... and 8918 other files
+                train/
+        input/
+            description.md (132 lines)
+            sample_submission.csv (993 lines)
+            sample_submission.csv.zip (22.7 kB)
+            test.csv (993 lines)
+            test.csv.zip (22.5 kB)
+            test.zip (102.2 MB)
+            train.csv (8921 lines)
+            train.csv.zip (213.0 kB)
+            train.zip (926.9 MB)
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+            test/
+                a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                ... and 990 other files
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+            train/
+                e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                ... and 8918 other files
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+        working/
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+```
+
+-> data/petfinder-pawpularity-score/sample_submission.csv has 992 rows and 2 columns.
+The columns are: Id, Pawpularity
+
+-> data/petfinder-pawpularity-score/test.csv has 992 rows and 13 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur
+
+-> data/petfinder-pawpularity-score/train.csv has 8920 rows and 14 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur, Pawpularity
+
+-> data/sample_submission.csv has 992 rows and 2 columns.
+The columns are: Id, Pawpularity
+
+-> data/test.csv has 992 rows and 13 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur
+
+-> data/train.csv has 8920 rows and 14 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur, Pawpularity
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+23.9889
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+from glob import glob
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import seaborn as sns
+
+sns.set_style("darkgrid")
+from pathlib import Path
+
+import time
+import math
+
+import cv2
+
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras import callbacks
+from keras.preprocessing.image import ImageDataGenerator
+
+from tensorflow.keras import layers as preprocessing
+from tensorflow.keras.regularizers import l2
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+path = "../input/petfinder-pawpularity-score/"
+
+train_df = pd.read_csv(path + "train.csv")
+test_df = pd.read_csv(path + "test.csv")
+
+train_jpg = glob(path + "train/*.jpg")
+test_jpg = glob(path + "test/*.jpg")
+
+train_jpg[:5]
+
+
+
+## === cell 2
+print("train_df dimensions: ", train_df.shape)
+print("test_df dimensions: ", test_df.shape)
+train_df.head()
+
+
+
+## === cell 3
+plt.figure(figsize=(12, 4))
+
+sns.histplot(data=train_df, x="Pawpularity", bins=100)
+
+plt.axvline(
+    train_df["Pawpularity"].mean(), c="red", ls="-", lw=3, label="Mean Pawpularity"
+)
+plt.axvline(
+    train_df["Pawpularity"].median(), c="blue", ls="-", lw=3, label="Median Pawpularity"
+)
+plt.title("Distribution of Pawpularity Scores", fontsize=20)
+plt.legend()
+plt.xlabel("Pawpularity", fontsize=15)
+plt.ylabel("Count", fontsize=15)
+
+
+
+## === cell 4
+feature_variables = train_df.columns.values.tolist()
+
+for i in feature_variables[1:-1]:
+    fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+    sns.boxplot(ax=ax[0], data=train_df, x=i, y="Pawpularity")
+    sns.histplot(ax=ax[1], data=train_df, x="Pawpularity", hue=i, kde=True)
+    plt.suptitle(i, fontsize=20)
+    fig.show()
+
+
+
+## === cell 5
+for i in range(3):
+
+    image_path = train_jpg[i]
+
+    id_stem = Path(image_path).stem
+
+    id_stem_series = train_df.loc[train_df["Id"] == id_stem, "Pawpularity"]
+    pawpularity_by_id = id_stem_series.iloc[0]
+
+    image_array = plt.imread(image_path)
+
+    plt.figure(figsize=(8, 8))
+    plt.imshow(image_array)
+
+    title = id_stem + ", Pawpularity score:" + str(pawpularity_by_id)
+    plt.title(title)
+
+    plt.axis("off")
+
+    plt.show()
+
+
+
+
+## === cell 6
+def pawpularity_pics(
+    df=pd.DataFrame, num_images=int, desired_pawpularity=int, random_state=int
+):
+    """The pawpularity_pics() function accepts 4 parameters: df is a dataframe,
+    num_images is the number of images you want displayed, desired_pawpularity
+    is the pawpularity score of pics you want to see, and random state ensures reproducibility.
+    """
+
+    random_sample = (
+        df.loc[
+            (df["Pawpularity"] <= (desired_pawpularity + 1))
+            & (df["Pawpularity"] >= (desired_pawpularity - 1))
+        ]
+        .sample(num_images, random_state=random_state)
+        .reset_index(drop=True)
+    )
+
+    plt.subplots(1, num_images, figsize=(14, 14))
+
+    for i in range(num_images):
+
+        image_path_stem = random_sample.iloc[i]["Id"]
+        root = "../input/petfinder-pawpularity-score/train/"
+        extension = ".jpg"
+        image_path = root + str(image_path_stem) + extension
+
+        pawpularity_by_id = random_sample.iloc[i]["Pawpularity"]
+
+        image_array = plt.imread(image_path)
+
+        plt.subplot(1, num_images, i + 1)
+
+        plt.title(pawpularity_by_id)
+
+        plt.axis("off")
+
+        plt.imshow(image_array)
+
+    plt.show()
+    plt.close()
+
+
+
+
+## === cell 7
+pawpularity_pics(train_df, 4, 10, 0)
+
+
+
+## === cell 8
+pawpularity_pics(train_df, 4, 50, 0)
+
+
+
+## === cell 9
+pawpularity_pics(train_df, 4, 100, 0)
+
+
+
+## === cell 10
+del train_jpg, test_jpg
+
+
+
+## === cell 11
+y = train_df["Pawpularity"]
+X = train_df.drop(["Id", "Pawpularity"], axis=1)
+
+
+
+## === cell 12
+X_train, X_valid, y_train, y_valid = train_test_split(
+    X, y, train_size=0.8, test_size=0.2, random_state=0
+)
+print(
+    "Dimensions: \n X_train:{} \n X_valid{} \n y_train{} \n y_valid{}".format(
+        X_train.shape, X_valid.shape, y_train.shape, y_valid.shape
+    )
+)
+
+
+
+## === cell 13
+RF = RandomForestRegressor(n_estimators=100, max_depth=4)
+
+start = time.time()
+RF.fit(X_train, y_train)
+stop = time.time()
+
+RF_pred = RF.predict(X_valid)
+
+print(f"Training time: {round((stop - start),3)} seconds")
+RF_RMSE = math.sqrt(mean_squared_error(y_valid, RF_pred))
+print(f"RF_RMSE: {round(RF_RMSE,3)}")
+
+
+
+
+## === cell 14
+def ActualvPredictionsGraph(y_test, y_pred, title):
+    if max(y_test) >= max(y_pred):
+        my_range = int(max(y_test))
+    else:
+        my_range = int(max(y_pred))
+    plt.figure(figsize=(12, 3))
+    plt.scatter(range(len(y_test)), y_test, color="blue")
+    plt.scatter(range(len(y_pred)), y_pred, color="red")
+    plt.xlabel("Index ")
+    plt.ylabel("Pawpularity ")
+    plt.title(title, fontdict={"fontsize": 15})
+    plt.legend(
+        handles=[
+            mpatches.Patch(color="red", label="prediction"),
+            mpatches.Patch(color="blue", label="actual"),
+        ]
+    )
+    plt.show()
+    return
+
+
+ActualvPredictionsGraph(y_valid[0:50], RF_pred[0:50], "First 50 Actual v. Predicted")
+ActualvPredictionsGraph(y_valid, RF_pred, "All Actual v. Predicted")
+
+plt.figure(figsize=(12, 4))
+sns.histplot(RF_pred, color="r", alpha=0.3, stat="probability", kde=True)
+sns.histplot(y_valid, color="b", alpha=0.3, stat="probability", kde=True)
+plt.legend(labels=["prediction", "actual"])
+plt.title("Actual v Predict Distribution")
+plt.ylim([0.0, 0.2])
+plt.show()
+
+
+
+## === cell 15
+"""
+# Test set
+X_test = test_df.drop(['Id'], axis=1)
+
+# Make predictions
+test_df['Pawpularity'] = RF.predict(X_test) 
+
+# Save to csv
+submission_df = test_df[['Id','Pawpularity']]
+submission_df.to_csv("submission.csv", index=False)
+submission_df.head()
+"""
+
+
+
+## === cell 16
+del RF
+
+
+
+
+## === cell 17
+def train_id_to_path(x):
+    return "../input/petfinder-pawpularity-score/train/" + x + ".jpg"
+
+
+def test_id_to_path(x):
+    return "../input/petfinder-pawpularity-score/test/" + x + ".jpg"
+
+
+train_df = train_df.drop(
+    [
+        "Subject Focus",
+        "Eyes",
+        "Face",
+        "Near",
+        "Action",
+        "Accessory",
+        "Group",
+        "Collage",
+        "Human",
+        "Occlusion",
+        "Info",
+        "Blur",
+    ],
+    axis=1,
+)
+test_df = test_df.drop(
+    [
+        "Subject Focus",
+        "Eyes",
+        "Face",
+        "Near",
+        "Action",
+        "Accessory",
+        "Group",
+        "Collage",
+        "Human",
+        "Occlusion",
+        "Info",
+        "Blur",
+    ],
+    axis=1,
+)
+
+train_df["img_path"] = train_df["Id"].apply(train_id_to_path)
+test_df["img_path"] = test_df["Id"].apply(test_id_to_path)
+
+train_df.head()
+
+
+
+## === cell 18
+train_df["two_bin_pawp"] = pd.qcut(train_df["Pawpularity"], q=2, labels=False)
+train_df = train_df.astype({"two_bin_pawp": str})
+
+train_df["five_bin_pawp"] = pd.qcut(train_df["Pawpularity"], q=5, labels=False)
+train_df = train_df.astype({"five_bin_pawp": str})
+
+train_df["ten_bin_pawp"] = pd.qcut(train_df["Pawpularity"], q=10, labels=False)
+train_df = train_df.astype({"ten_bin_pawp": str})
+
+
+
+## === cell 19
+num_bins = 5
+
+del y
+y = train_df["five_bin_pawp"]
+y = pd.get_dummies(y)
+y.head()
+
+
+
+## === cell 20
+train_df.groupby("five_bin_pawp").describe()
+
+
+
+## === cell 21
+image_height = 128
+image_width = 128
+
+
+def path_to_eagertensor(image_path):
+    raw = tf.io.read_file(image_path)
+    image = tf.image.decode_jpeg(raw, channels=3)
+    image = tf.cast(image, tf.float32) / 255.0
+    image = tf.image.resize(image, (image_height, image_width))
+    return image
+
+
+
+
+## === cell 22
+og_example_image = plt.imread(train_df["img_path"][0])
+print(og_example_image.shape)
+
+plt.imshow(og_example_image)
+plt.title("First Training Image")
+plt.axis("off")  # turns off the gridlines
+plt.show()
+
+
+
+## === cell 23
+example_image = path_to_eagertensor(train_df["img_path"][0])
+
+
+
+## === cell 24
+print("type: ", type(example_image), "\n shape: ", example_image.shape)
+
+plt.imshow(example_image)
+plt.title("First Training Image - with preprocessing")
+plt.axis("off")  # turns off the gridlines
+plt.show()
+
+
+
+## === cell 25
+del X, X_train, X_valid, y_train, y_valid
+
+
+
+## === cell 26
+X = []
+for i in train_df["img_path"]:
+    X.append(path_to_eagertensor(i))
+X = np.array(X)
+print(type(X), X.shape)
+
+
+
+## === cell 27
+X_submission = []
+for i in test_df["img_path"]:
+    X_submission.append(path_to_eagertensor(i))
+X_submission = np.array(X_submission)
+print(type(X_submission), X_submission.shape)
+
+
+
+## === cell 28
+X_train, X_valid, y_train, y_valid = train_test_split(
+    X, y, train_size=0.9, test_size=0.1, random_state=0
+)
+
+
+
+## === cell 29
+model = keras.Sequential(
+    [
+        preprocessing.RandomRotation(factor=0.05, fill_mode="constant"),
+        preprocessing.RandomZoom(
+            height_factor=(-0.05, 0.05),
+            width_factor=(-0.05, 0.05),
+            fill_mode="constant",
+        ),
+        preprocessing.RandomFlip(mode="horizontal"),
+        layers.Conv2D(
+            filters=32,
+            kernel_size=7,
+            strides=1,
+            padding="same",
+            input_shape=[image_height, image_width, 3],
+            activation="relu",
+        ),
+        layers.MaxPool2D(pool_size=2, padding="same"),
+        layers.Dropout(rate=0.4),
+        layers.Conv2D(
+            filters=64, kernel_size=5, strides=1, padding="same", activation="relu"
+        ),
+        layers.MaxPool2D(pool_size=2, padding="same"),
+        layers.Dropout(rate=0.4),
+        layers.Conv2D(
+            filters=128, kernel_size=3, strides=1, padding="same", activation="relu"
+        ),
+        layers.MaxPool2D(pool_size=2, padding="same"),
+        layers.Dropout(rate=0.4),
+        layers.Conv2D(
+            filters=128, kernel_size=3, strides=1, padding="same", activation="relu"
+        ),
+        layers.MaxPool2D(pool_size=2, padding="same"),
+        layers.Dropout(rate=0.4),
+        layers.Flatten(),
+        layers.Dense(units=256, activation="relu"),
+        layers.Dropout(rate=0.4),
+        layers.Dense(units=num_bins, activation="softmax"),  # one-hot encoding
+    ]
+)
+
+model.compile(
+    optimizer="adam",
+    loss="categorical_crossentropy",  # one-hot encoding
+    metrics=["categorical_accuracy"],
+)  # one-hot encoding
+
+early_stopping = keras.callbacks.EarlyStopping(
+    patience=10,
+    min_delta=0.0001,
+    restore_best_weights=True,
+)
+
+
+
+## --- ERROR in cell 29, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1583012230.py in <cell line: 0>()
+      1 model = keras.Sequential(
+      2     [
+----> 3         preprocessing.RandomRotation(factor=0.05, fill_mode="constant"),
+      4         preprocessing.RandomZoom(
+      5             height_factor=(-0.05, 0.05),
+
+NameError: name 'preprocessing' is not defined
+
+## === cell 30
+history = model.fit(
+    X_train,
+    y_train,
+    validation_data=(X_valid, y_valid),
+    epochs=100,
+    batch_size=500,
+    callbacks=[early_stopping],
+    verbose=True,
+)
+
+
+
+## --- ERROR in cell 30, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3685386463.py in <cell line: 0>()
+----> 1 history = model.fit(
+      2     X_train,
+      3     y_train,
+      4     validation_data=(X_valid, y_valid),
+      5     epochs=100,
+
+NameError: name 'model' is not defined
+
+## === cell 31
+history_df = pd.DataFrame(history.history)
+history_df.loc[1:, ["loss", "val_loss"]].plot(
+    title="Categorical cross-entropy"
+)  # one-hot encoding
+
+
+
+
+## --- ERROR in cell 31, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/19450801.py in <cell line: 0>()
+----> 1 history_df = pd.DataFrame(history.history)
+      2 history_df.loc[1:, ["loss", "val_loss"]].plot(
+      3     title="Categorical cross-entropy"
+      4 )  # one-hot encoding
+      5 
+
+NameError: name 'history' is not defined
+
+## === cell 32
+def bin_to_pawp(bin):
+    bin_means = [16, 27, 34, 44, 72]
+    return bin_means[bin]
+
+
+cnn_preds = np.argmax(model.predict(X_valid, verbose=0), axis=1)
+
+valid_pawps = train_df.loc[y_valid.index, "Pawpularity"].to_numpy()
+
+pawp_preds = map(bin_to_pawp, cnn_preds)
+pawp_preds = np.fromiter(pawp_preds, dtype=int)
+
+cnn_rmse = math.sqrt(mean_squared_error(valid_pawps, pawp_preds))
+print("Final RMSE on validation set:", cnn_rmse)
+
+
+
+## --- ERROR in cell 32, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3534795174.py in <cell line: 0>()
+      4 
+      5 
+----> 6 cnn_preds = np.argmax(model.predict(X_valid, verbose=0), axis=1)
+      7 
+      8 # FIX: y_valid is a DataFrame (one-hot); its index aligns to train_df rows.
+
+NameError: name 'model' is not defined
+
+## === cell 33
+cnn_preds[:100]
+
+
+
+## --- ERROR in cell 33, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/4221848819.py in <cell line: 0>()
+----> 1 cnn_preds[:100]
+      2 
+
+NameError: name 'cnn_preds' is not defined
+
+## === cell 34
+model.summary()
+
+
+
+## --- ERROR in cell 34, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1903595429.py in <cell line: 0>()
+----> 1 model.summary()
+      2 
+
+NameError: name 'model' is not defined
+
+## === cell 35
+preds = np.argmax(model.predict(X_submission, verbose=0), axis=1)
+
+final_preds = map(bin_to_pawp, preds)
+final_preds = np.fromiter(final_preds, dtype=int)
+
+sub_df = pd.DataFrame()
+sub_df["Id"] = test_df["Id"]
+sub_df["Pawpularity"] = final_preds
+
+sub_df.to_csv("submission.csv", index=False)
+sub_df.head()
+
+## --- ERROR in cell 35, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3279667860.py in <cell line: 0>()
+----> 1 preds = np.argmax(model.predict(X_submission, verbose=0), axis=1)
+      2 
+      3 final_preds = map(bin_to_pawp, preds)
+      4 final_preds = np.fromiter(final_preds, dtype=int)
+      5 
+
+NameError: name 'model' is not defined

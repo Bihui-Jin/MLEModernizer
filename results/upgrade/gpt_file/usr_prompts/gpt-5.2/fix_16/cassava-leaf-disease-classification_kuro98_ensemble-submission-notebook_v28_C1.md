@@ -1,0 +1,862 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8934723481414325
+
+# 6. Current score
+
+0.11547
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.12743) has done: 'I fix the missing model files by falling back to standard torchvision ViT weights when the Kaggle `/kaggle/input/vit-*` artifacts aren’t present, so inference can run end-to-end. I also make test loading deterministic and aligned with `sample_submission.csv` (no shuffle; exact image_id order) to prevent the “same length as the answers” submission error. To preserve the original ensemble logic, I keep the same weighted averaging and softmax/argmax flow, only adapting the model heads to output 5 classes. Finally, I ensure the script always writes a valid `submission.csv` with exactly the required rows and columns.'
+- What this solution (achieved 0.05531) has done: 'The timeout is most likely dominated by on-the-fly CPU preprocessing (center-crop + bicubic resize + normalize) done for every batch and by slow/duplicated image decoding; the models themselves are comparatively fast on GPU. I keep the exact same models, logits ensembling, training loop, and transforms semantics, but I (1) switch the dataset to decode/rescale directly to 600px on CPU using torchvision’s built-in optimized decoder (so we don’t decode full-res then crop), (2) precompute and reuse the center-crop indices and normalization tensors in the right shapes to avoid per-batch overhead, and (3) tune DataLoader knobs (workers/prefetch/persistent workers) safely for higher throughput without changing any results. These changes are provably equivalent to the current preprocessing (center-crop 600 then resize) and preserve determinism/order.'
+- What this solution (achieved 0.05531) has done: 'I fix the crashing JPEG decode by removing the unsupported `target_size` argument (Torchvision’s `decode_jpeg` in this environment doesn’t accept it), while keeping the same preprocessing semantics (center-crop 600 then bicubic resize + normalize). This unblocks both training fallback and test inference so the pipeline can run end-to-end and write `submission.csv`. To move accuracy toward the target, I also prevent the “always retrain” behavior when pretrained checkpoints are missing (training a ViT from scratch for 3 epochs is what typically yields the very low current score); instead we rely on the strong IMAGENET1K_SWAG weights that were already loaded. All other model/ensemble logic and submission alignment with `sample_submission.csv` is preserved.'
+- What this solution (achieved 0.1278) has done: 'I fix the `torch.compile()`/CUDA graphs overwrite runtime error by disabling compilation for inference (keeping the same models, weights, and preprocessing) and by ensuring the logits are safely materialized before ensembling. This change is score-neutral in intent (same predictions, just stable execution), but it unblocks end-to-end inference so you can actually submit. I also correct a small ensembling bug where the weighted sum is incorrectly divided by 2, which was severely shrinking logits and hurting accuracy; instead we keep the same weights but remove the extra division (proper weighted average). Finally, I keep the test ordering aligned to `sample_submission.csv` and always write a valid `submission.csv`.'
+- What this solution (achieved 0.05531) has done: 'Your current low score is consistent with a silent but severe issue: when the external fine-tuned checkpoints are missing, you replace the ViT classification head with a new random 5-class head, so you’re effectively doing near-random guessing on the test set. To move accuracy toward the target with minimal changes and without altering the overall approach, I keep the same ViT backbone/ensemble/inference loop but initialize the 5-class head in a more sensible way by reusing the pretrained 1000-class head weights (class-mean init) and enabling strict state_dict loading when checkpoints exist. This preserves your core logic (same model, same preprocessing, same weighted-logits ensemble) while removing the main accuracy collapse in the “no ckpt available” path. The submission writing/order remains exactly aligned to `sample_submission.csv`.'
+- What this solution (achieved 0.11547) has done: 'Your current score is near-random for this competition, which strongly suggests the 5-class classification head is not actually benefiting from the pretrained weights (it’s effectively an untrained head), even though the ViT backbone is pretrained. With minimal change to your core logic (same models, same preprocessing, same ensemble), I adapt the pretrained 1000-class head to 5 classes by selecting the 5 ImageNet classes whose text labels best match the cassava class names (using the built-in `ViT_B_16_Weights` category names), then copy those rows into the new 5-class head (bias included). This keeps the exact inference/training flow unchanged but makes the “no external checkpoint” path produce meaningful logits instead of near-random guesses, moving accuracy sharply toward the target. I also ensure strict loading remains for real fine-tuned checkpoints, and keep submission ordering aligned to `sample_submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+import pandas as pd
+import torch
+from torch.backends import cudnn
+from torch.utils.data import DataLoader
+from torchvision.datasets import VisionDataset
+from torchvision.transforms import InterpolationMode, v2
+
+torch.manual_seed(3407)
+torch.cuda.manual_seed(3407)
+
+cudnn.deterministic = False
+cudnn.benchmark = True
+
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
+
+torch.set_float32_matmul_precision("high")
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
+data_root = "/kaggle/input/cassava-leaf-disease-classification/"
+train_csv_path = os.path.join(data_root, "train.csv")
+train_dir = os.path.join(data_root, "train_images/")
+test_dir = os.path.join(data_root, "test_images/")
+sample_path = os.path.join(data_root, "sample_submission.csv")
+
+model_b_img_size = 384
+model_a_img_size = 384
+batch_size = 16
+
+_cpu = os.cpu_count() or 4
+num_workers = min(8, _cpu)
+num_classes = 5
+tta = False
+
+train_if_missing = False
+train_epochs = 3
+train_lr = 3e-4
+
+from torchvision.models import vit_b_16, ViT_B_16_Weights
+
+
+def _init_head_from_pretrained(m: torch.nn.Module, num_classes: int) -> None:
+    if not (hasattr(m, "heads") and hasattr(m.heads, "head")):
+        return
+    old_head = m.heads.head
+    if not isinstance(old_head, torch.nn.Linear):
+        return
+    if old_head.out_features != 1000:
+        return
+
+    in_f = old_head.in_features
+    new_head = torch.nn.Linear(in_f, num_classes)
+
+    with torch.no_grad():
+        w = old_head.weight.data
+        b = old_head.bias.data if old_head.bias is not None else None
+
+        try:
+            cats = list(
+                ViT_B_16_Weights.IMAGENET1K_SWAG_E2E_V1.meta.get("categories", [])
+            )
+            if len(cats) == 1000:
+                cassava_names = [
+                    "cassava bacterial blight",
+                    "cassava brown streak disease",
+                    "cassava green mite",
+                    "cassava mosaic disease",
+                    "healthy",
+                ]
+
+                kw = [
+                    ["blight", "bacteria", "bacterial"],
+                    ["streak", "brown", "necrosis"],
+                    ["mite", "arachnid", "tick", "spider"],
+                    ["mosaic", "virus", "viral"],
+                    ["leaf", "plant", "tree", "foliage", "green"],  # proxy for healthy
+                ]
+
+                def best_idx_for_keywords(keywords):
+                    best_i, best_score = None, -1
+                    for i, name in enumerate(cats):
+                        s = name.lower()
+                        score = sum(1 for k in keywords if k in s)
+                        if score > best_score:
+                            best_i, best_score = i, score
+                    return best_i, best_score
+
+                picked = []
+                used = set()
+                for kwords in kw:
+                    i, score = best_idx_for_keywords(kwords)
+                    if i in used:
+                        best_i, best_score = None, -1
+                        for j, name in enumerate(cats):
+                            if j in used:
+                                continue
+                            s = name.lower()
+                            sc = sum(1 for k in kwords if k in s)
+                            if sc > best_score:
+                                best_i, best_score = j, sc
+                        i, score = best_i, best_score
+                    picked.append(i)
+                    used.add(i)
+
+                if all(isinstance(i, int) and 0 <= i < 1000 for i in picked):
+                    new_head.weight.copy_(w[picked, :])
+                    if b is not None:
+                        new_head.bias.copy_(b[picked])
+                    else:
+                        torch.nn.init.zeros_(new_head.bias)
+                else:
+                    raise ValueError("Failed to pick valid ImageNet indices.")
+            else:
+                raise ValueError("No categories metadata; fallback.")
+        except Exception:
+            w_mean = w.mean(dim=0, keepdim=True)  # [1, in_f]
+            new_head.weight.copy_(w_mean.repeat(num_classes, 1))
+            if b is not None:
+                b_mean = b.mean().view(1)  # [1]
+                new_head.bias.copy_(b_mean.repeat(num_classes))
+            else:
+                torch.nn.init.zeros_(new_head.bias)
+
+    m.heads.head = new_head
+
+
+def _build_vit(num_classes: int):
+    m = vit_b_16(weights=ViT_B_16_Weights.IMAGENET1K_SWAG_E2E_V1)
+    if hasattr(m, "heads") and hasattr(m.heads, "head"):
+        _init_head_from_pretrained(m, num_classes)
+        if m.heads.head.out_features != num_classes:
+            in_f = m.heads.head.in_features
+            m.heads.head = torch.nn.Linear(in_f, num_classes)
+    return m
+
+
+def _load_or_build_vit(path: str, num_classes: int):
+    if os.path.exists(path):
+        obj = torch.load(path, map_location=device)
+        if isinstance(obj, dict) and all(isinstance(k, str) for k in obj.keys()):
+            m = _build_vit(num_classes)
+            m.load_state_dict(obj, strict=True)
+            return m.to(device)
+        return obj.to(device)
+    m = _build_vit(num_classes)
+    return m.to(device)
+
+
+model_a_ckpt = "/kaggle/input/vit-v1/vit_v1.pt"
+model_b_ckpt = "/kaggle/input/vit-boosted/vit_boosted.pt"
+
+model_a = _load_or_build_vit(model_a_ckpt, num_classes)
+model_b = _load_or_build_vit(model_b_ckpt, num_classes)
+
+linear_head_path = "/kaggle/input/linear-head/linear_cls.pt"
+linear_head = (
+    torch.load(linear_head_path, map_location=device)
+    if os.path.exists(linear_head_path)
+    else torch.nn.Identity()
+)
+
+
+def _maybe_compile(m: torch.nn.Module):
+    if hasattr(torch, "compile"):
+        try:
+            return torch.compile(m, mode="reduce-overhead", fullgraph=False)
+        except Exception:
+            return m
+    return m
+
+
+
+
+## === cell 1
+import torchvision
+
+try:
+    torchvision.set_image_backend("accimage")
+except Exception:
+    pass
+
+_HAS_DECODE_JPEG = hasattr(torchvision.io, "decode_jpeg")
+_HAS_READ_FILE = hasattr(torchvision.io, "read_file")
+
+
+class CassavaDataset(VisionDataset):
+    """Custom dataset for Cassava images.
+
+    For test-time: pass explicit image_ids to match sample_submission.csv order.
+    For train-time: pass image_ids and labels from train.csv.
+    """
+
+    def __init__(
+        self,
+        data_dir,
+        model_a_size,
+        model_b_size,
+        transform=None,
+        ttas=None,
+        image_ids=None,
+        labels=None,
+    ):
+        super().__init__(root=data_dir)
+
+        self.transform = transform
+        self.images = (
+            list(image_ids) if image_ids is not None else sorted(os.listdir(data_dir))
+        )
+        self.labels = labels  # list/array aligned with self.images or None for test
+        self.ttas = ttas
+        self.model_a_size = int(model_a_size)
+        self.model_b_size = int(model_b_size)
+        self.same_size = self.model_a_size == self.model_b_size
+
+    def _read_rgb_u8(self, path: str) -> torch.Tensor:
+        if _HAS_READ_FILE and _HAS_DECODE_JPEG:
+            data = torchvision.io.read_file(path)
+            img = torchvision.io.decode_jpeg(
+                data,
+                mode=torchvision.io.ImageReadMode.RGB,
+                device="cpu",
+            )
+            return img
+        return torchvision.io.read_image(path, mode=torchvision.io.ImageReadMode.RGB)
+
+    def __getitem__(self, idx):
+        filename = self.images[idx]
+        path = os.path.join(self.root, filename)
+
+        img = self._read_rgb_u8(path)
+
+        if self.labels is None:
+            return img, filename
+        else:
+            return img, int(self.labels[idx])
+
+    def __len__(self):
+        return len(self.images)
+
+
+
+
+## === cell 2
+from torchvision.transforms.v2 import functional as F
+
+MEAN_CHW = torch.tensor([0.485, 0.456, 0.406], dtype=torch.float32).view(3, 1, 1)
+STD_CHW = torch.tensor([0.229, 0.224, 0.225], dtype=torch.float32).view(3, 1, 1)
+MEAN_NCHW = MEAN_CHW.view(1, 3, 1, 1)
+STD_NCHW = STD_CHW.view(1, 3, 1, 1)
+
+_CROP_SIZE = 600
+
+
+def _fast_norm_transform(x: torch.Tensor) -> torch.Tensor:
+    x = x.to(dtype=torch.float32).mul_(1.0 / 255.0)
+    x = x.sub_(MEAN_CHW).div_(STD_CHW)
+    return x
+
+
+def _center_crop_600_batch(x: torch.Tensor) -> torch.Tensor:
+    _, _, h, w = x.shape
+    top = (h - _CROP_SIZE) // 2
+    left = (w - _CROP_SIZE) // 2
+    return x[:, :, top : top + _CROP_SIZE, left : left + _CROP_SIZE]
+
+
+def _preprocess_batch(imgs_u8: torch.Tensor, out_size: int) -> torch.Tensor:
+    x = imgs_u8
+    x = _center_crop_600_batch(x)
+    x = F.resize(
+        x,
+        size=[out_size, out_size],
+        interpolation=InterpolationMode.BICUBIC,
+        antialias=True,
+    )
+    x = x.to(dtype=torch.float32).mul_(1.0 / 255.0)
+    x.sub_(MEAN_NCHW).div_(STD_NCHW)
+    return x
+
+
+def _collate_test_fast(batch):
+    imgs, names = zip(*batch)
+    imgs = torch.stack(imgs, 0)  # uint8
+    a = _preprocess_batch(imgs, model_a_img_size)
+    if model_a_img_size == model_b_img_size:
+        b = a
+    else:
+        b = _preprocess_batch(imgs, model_b_img_size)
+    return a, b, list(names)
+
+
+def _collate_train_fast(batch):
+    imgs, y = zip(*batch)
+    imgs = torch.stack(imgs, 0)  # uint8
+    a = _preprocess_batch(imgs, model_a_img_size)
+    if model_a_img_size == model_b_img_size:
+        b = a
+    else:
+        b = _preprocess_batch(imgs, model_b_img_size)
+    return a, b, torch.as_tensor(y, dtype=torch.long)
+
+
+test_transforms = None if not tta else _fast_norm_transform
+train_transforms = None
+
+if tta:
+    ttas = [
+        v2.RandomRotation(180),
+        v2.RandomVerticalFlip(1),
+        v2.RandomPerspective(p=1),
+    ]
+else:
+    ttas = None
+
+sample_sub = pd.read_csv(sample_path)
+test_image_ids = sample_sub["image_id"].tolist()
+
+test_dataset = CassavaDataset(
+    test_dir,
+    model_a_img_size,
+    model_b_img_size,
+    transform=test_transforms,
+    ttas=ttas,
+    image_ids=test_image_ids,
+)
+
+_pin = torch.cuda.is_available()
+
+
+def _seed_worker(worker_id: int):
+    seed = 3407 + worker_id
+    torch.manual_seed(seed)
+
+
+_loader_gen = torch.Generator()
+_loader_gen.manual_seed(3407)
+
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=batch_size,
+    shuffle=False,  # critical for deterministic, aligned ordering
+    num_workers=num_workers,
+    pin_memory=_pin,
+    pin_memory_device="cuda" if _pin else "",
+    persistent_workers=(num_workers > 0),
+    prefetch_factor=(6 if num_workers > 0 else None),
+    collate_fn=None if tta else _collate_test_fast,
+    worker_init_fn=_seed_worker if num_workers > 0 else None,
+    generator=_loader_gen,
+)
+
+normalizer = torch.nn.Softmax(dim=1)
+
+
+
+
+## === cell 3
+def _looks_like_untrained_head(m: torch.nn.Module) -> bool:
+    return True
+
+
+need_train = train_if_missing and (
+    not os.path.exists(model_a_ckpt) or not os.path.exists(model_b_ckpt)
+)
+if need_train:
+    train_df = pd.read_csv(train_csv_path)
+    train_image_ids = train_df["image_id"].tolist()
+    train_labels = train_df["label"].tolist()
+
+    train_dataset = CassavaDataset(
+        train_dir,
+        model_a_img_size,
+        model_b_img_size,
+        transform=train_transforms,
+        ttas=None,
+        image_ids=train_image_ids,
+        labels=train_labels,
+    )
+
+    _pin = torch.cuda.is_available()
+
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=_pin,
+        pin_memory_device="cuda" if _pin else "",
+        persistent_workers=(num_workers > 0),
+        prefetch_factor=6 if num_workers > 0 else None,
+        collate_fn=_collate_train_fast,
+        worker_init_fn=_seed_worker if num_workers > 0 else None,
+        generator=_loader_gen,
+    )
+
+    def _train_one_model(model: torch.nn.Module, which: str):
+        model.train()
+        criterion = torch.nn.CrossEntropyLoss()
+        optimizer = torch.optim.AdamW(model.parameters(), lr=train_lr)
+
+        model_local = _maybe_compile(model)
+
+        for epoch in range(train_epochs):
+            running_loss = 0.0
+            n = 0
+            for model_a_x, model_b_x, y in train_loader:
+                x = model_a_x if which == "a" else model_b_x
+                x = x.to(device, non_blocking=True)
+                y = y.to(device, non_blocking=True)
+
+                if device.type == "cuda":
+                    x = x.contiguous(memory_format=torch.channels_last)
+
+                optimizer.zero_grad(set_to_none=True)
+                logits = model_local(x)
+                loss = criterion(logits, y)
+                loss.backward()
+                optimizer.step()
+
+                running_loss += float(loss.item()) * y.size(0)
+                n += y.size(0)
+
+            print(
+                f"train {which}: epoch {epoch+1}/{train_epochs} loss={running_loss/max(n,1):.4f}"
+            )
+
+        model.eval()
+
+    _train_one_model(model_a, which="a")
+    _train_one_model(model_b, which="b")
+
+
+
+## === cell 4
+all_names = []
+all_preds = []
+
+model_a.eval()
+model_b.eval()
+
+if device.type == "cuda":
+    model_a = model_a.to(memory_format=torch.channels_last)
+    model_b = model_b.to(memory_format=torch.channels_last)
+
+model_a_infer = model_a
+model_b_infer = model_b
+
+with torch.inference_mode():
+    for model_a_inputs, model_b_inputs, filenames in test_loader:
+        this_bs = len(filenames)
+
+        if tta:
+            model_a_inputs = torch.cat(model_a_inputs, dim=0).to(
+                device, non_blocking=True
+            )
+            model_b_inputs = torch.cat(model_b_inputs, dim=0).to(
+                device, non_blocking=True
+            )
+
+            if device.type == "cuda":
+                model_a_inputs = model_a_inputs.contiguous(
+                    memory_format=torch.channels_last
+                )
+                model_b_inputs = model_b_inputs.contiguous(
+                    memory_format=torch.channels_last
+                )
+
+            logits_a = model_a_infer(model_a_inputs)
+            logits_b = model_b_infer(model_b_inputs)
+
+            model_a_batch_logits = torch.stack(torch.split(logits_a, this_bs), dim=0)
+            model_a_mean_logits = torch.mean(model_a_batch_logits, dim=0)
+
+            model_b_batch_logits = torch.stack(torch.split(logits_b, this_bs), dim=0)
+            model_b_mean_logits = torch.mean(model_b_batch_logits, dim=0)
+
+            outputs = 0.9 * model_a_mean_logits + 0.1 * model_b_mean_logits
+            mean_preds = normalizer(outputs)
+            pred_labels = torch.argmax(mean_preds, 1).tolist()
+        else:
+            model_a_inputs = model_a_inputs.to(device, non_blocking=True)
+            model_b_inputs = model_b_inputs.to(device, non_blocking=True)
+
+            if device.type == "cuda":
+                model_a_inputs = model_a_inputs.contiguous(
+                    memory_format=torch.channels_last
+                )
+                model_b_inputs = model_b_inputs.contiguous(
+                    memory_format=torch.channels_last
+                )
+
+            logits_a = model_a_infer(model_a_inputs)
+            logits_b = model_b_infer(model_b_inputs)
+
+            outputs = 0.93 * logits_a + 0.07 * logits_b
+            preds = normalizer(outputs)
+            pred_labels = torch.argmax(preds, 1).tolist()
+
+        all_names.extend(filenames)
+        all_preds.extend(pred_labels)
+
+
+
+## === cell 5
+pred_df = pd.DataFrame({"image_id": all_names, "label": all_preds})
+
+pred_df = sample_sub[["image_id"]].merge(pred_df, on="image_id", how="left")
+pred_df["label"] = pred_df["label"].fillna(0).astype(int)
+
+pred_df.to_csv("submission.csv", index=False)
+print(pred_df.shape)
+print(pred_df.head())
+print("Wrote submission.csv")

@@ -1,0 +1,939 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+4.26907
+
+# 6. Current score
+
+6.51273
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 5.6685) has done: 'Your code already has the right overall pipeline and does write a submission, but it is likely to fail (or silently degrade score) because `train.csv` is read without the `key` column while later cleaning expects it, and because `clean()` may drop too many test rows (making scaling/prediction misaligned). I make two minimal fixes: (1) include `key` in the training read and ensure we never drop `key` inside cleaning, and (2) make `clean()` behave differently for test data (don’t filter rows out; instead only fix obvious invalids via clipping and filling) so that the submission always has exactly the expected 9914 rows aligned to `key`. These changes preserve your model architecture/training/feature logic and should move RMSE toward the target by preventing row loss/misalignment and by using consistent preprocessing between train and test.'
+- What this solution (achieved 5.5985) has done: 'Your current pipeline is likely underperforming because the training split used for modeling is cleaned with `is_train=True` (dropping rows aggressively) while the held-out “test_df” split is also cleaned with `is_train=True`, but the real Kaggle test is cleaned with `is_train=False` (no row drops). To move RMSE down toward the 4.269 target without changing the model/feature logic, I make preprocessing consistent by applying the same “train cleaning” rules only to the training portion and using “test-safe cleaning” for validation/test-like data. I also ensure the scaler is fit on the final cleaned training features only and that all three datasets pass through identical feature engineering before column dropping. These are minimal, stability-focused changes that typically improve generalization and reduce score gap without altering architecture or training semantics.'
+- What this solution (achieved 5.6039) has done: 'Your RMSE is still far from the 4.269 target (needs to decrease), and the biggest minimal win without changing the model is to make the *train and Kaggle-test preprocessing semantics match more closely*. Right now you clip Kaggle predictions to `[0, 50]` but you also *trained on a heavily filtered label range* and didn’t apply the same label cap to the training targets, which can create a mild train/test objective mismatch. I make two minimal changes: (1) apply the same fare cap to the training labels used for fitting (so training objective matches submission post-processing), and (2) fix the test-safe cleaning to use medians learned from the cleaned training data (not test medians) to reduce distribution shift; this preserves your feature set and model architecture/training loop while typically improving generalization.'
+- What this solution (achieved 5.77365) has done: 'Your score gap is large (5.6039 vs target 4.26907; lower is better), so we need a small-but-real improvement without changing the model architecture or training loop. The biggest safe win here is to make the train/test feature distributions more consistent by using a more appropriate distance feature: compute the “distance” in kilometers via a Haversine formula (instead of Euclidean distance in degrees), while keeping all existing features (including `manhattan`) intact. This keeps your pipeline the same (same inputs, scaler, model, loss), but usually reduces RMSE materially on this competition. I also keep submission generation identical and deterministic.'
+- What this solution (achieved 5.64906) has done: 'Your current RMSE (5.77365) is worse than the target (4.26907), so we should make a small, low-risk change that improves generalization without changing the model or training loop. The biggest minimal issue is that you fit the MinMaxScaler on *all* cleaned training data, including the validation portion, which leaks distribution information and can hurt real test performance; we fit the scaler on the final training fold only and then transform validation/test with it. While doing that, we also switch `ModelCheckpoint` to monitor `val_loss` explicitly (still saving best-only, same training) to ensure the best epoch is what gets used for Kaggle predictions. These changes keep the architecture/features/loss identical, but usually move public RMSE down toward the target by reducing leakage and using a better-selected checkpoint.'
+- What this solution (achieved 5.99409) has done: 'Your current RMSE (5.64906) is worse than the target (4.26907), so we need a small, legitimate improvement without changing the model architecture or training loop. The biggest minimal win is to fix a train/test preprocessing mismatch: you currently drop the raw lat/long columns and keep only engineered differences/distances, which throws away important absolute-location signal (e.g., airport trips) and typically hurts this competition’s RMSE. I keep your existing engineered features exactly as-is, but stop dropping the raw coordinate columns so the model can learn location-dependent base fares; this preserves the same pipeline and semantics while usually reducing RMSE materially. Everything else (cleaning rules, scaler fitting, checkpointing, clipping, submission writing) remains unchanged.'
+- What this solution (achieved 5.86825) has done: 'We need to move RMSE down from 5.99409 toward 4.26907 (lower is better), with minimal changes and without altering the model/training loop/feature set. The safest high-impact fix is to make scaling robust to the heavy-tailed engineered features by switching from `MinMaxScaler` to `StandardScaler`, which keeps the exact same inputs/features but usually improves generalization for dense nets on this competition. I also add two small, metric-aligned post-processing steps that don’t change the learning setup: forcing predictions non-negative and applying a tiny fixed downward calibration factor (derived from the known typical slight overprediction after clipping) to reduce public RMSE without “optimizing for best.” Everything else (cleaning logic, feature engineering, architecture, epochs, batch size, loss) remains unchanged and it still writes a valid `submission.csv`.'
+- What this solution (achieved 6.51273) has done: 'To move RMSE down toward your 4.26907 target without changing the model/training loop/feature set, I make the smallest high-impact data-quality fix: remove (only in training) obviously wrong label/coordinate records that slip through your current cleaning (e.g., huge fares for tiny trips, invalid passenger_count, and out-of-range coordinates). This improves the signal-to-noise ratio of the 80k sample while keeping your exact architecture, loss, scaling, and feature engineering intact. I also make the train/validation/test-split drawn from the *already-cleaned* `train_df` (instead of taking `test_df` pre-cleaning), so the validation/test-like split reflects the same training data distribution and reduces preprocessing-induced shift. Submission generation remains identical and still produces `submission.csv` with 9914 rows aligned to `key`.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ.setdefault("KERAS_BACKEND", "tensorflow")
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+os.environ.setdefault("TF_DETERMINISTIC_OPS", "1")
+
+try:
+    from google.protobuf import message_factory as _message_factory
+
+    if hasattr(_message_factory, "MessageFactory") and not hasattr(
+        _message_factory.MessageFactory, "GetPrototype"
+    ):
+
+        def _GetPrototype(self, descriptor):
+            if hasattr(self, "GetMessageClass"):
+                return self.GetMessageClass(descriptor)
+            if hasattr(_message_factory, "GetMessageClass"):
+                return _message_factory.GetMessageClass(descriptor)
+            raise AttributeError("No compatible GetPrototype/GetMessageClass found")
+
+        _message_factory.MessageFactory.GetPrototype = _GetPrototype
+except Exception as _e:
+    print("protobuf patch skipped due to:", repr(_e))
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+
+from keras.models import Sequential
+from keras.layers import Dense, BatchNormalization
+from keras.callbacks import ModelCheckpoint
+from keras import optimizers, regularizers
+from keras import ops  # Keras 3-compatible math ops for custom metrics
+
+np.random.seed(1)
+try:
+    import tensorflow as tf
+
+    tf.random.set_seed(1)
+except Exception as _e:
+    print("TensorFlow seed set skipped due to:", repr(_e))
+
+
+def _resolve_path(*candidates):
+    for p in candidates:
+        if p and os.path.exists(p):
+            return p
+    return candidates[-1]
+
+
+TRAIN_PATH = _resolve_path(
+    "/kaggle/input/train.csv",
+    "/kaggle/input/new-york-city-taxi-fare-prediction/train.csv",
+    "/kaggle/data/train.csv",
+)
+TEST_PATH = _resolve_path(
+    "/kaggle/input/test.csv",
+    "/kaggle/input/new-york-city-taxi-fare-prediction/test.csv",
+    "/kaggle/data/test.csv",
+)
+
+SUBMISSION_NAME = "submission.csv"
+
+BATCH_SIZE = 256
+EPOCHS = 100
+LEARNING_RATE = 0.001
+DATASET_SIZE = 80000
+
+FARE_MIN = 0.0
+FARE_MAX = 50.0
+
+PRED_SCALE = 0.97
+
+print("TRAIN_PATH exists:", os.path.exists(TRAIN_PATH), TRAIN_PATH)
+print("TEST_PATH exists:", os.path.exists(TEST_PATH), TEST_PATH)
+
+
+
+
+## === cell 1
+def clean(df, is_train=True, fill_values=None):
+    print(" Old size: %d" % len(df))
+
+    key_col = df["key"] if "key" in df.columns else None
+
+    if is_train:
+        df = df.dropna(how="any", axis="rows")
+        print(" New size after dropna: %d" % len(df))
+
+        df = df[
+            (df["dropoff_longitude"] != df["pickup_longitude"])
+            & (df["dropoff_latitude"] != df["pickup_latitude"])
+        ]
+        print(" New size after removing same long lat: %d" % len(df))
+
+        df = df[
+            (df["dropoff_longitude"] != 0)
+            & (df["pickup_longitude"] != 0)
+            & (df["dropoff_latitude"] != 0)
+            & (df["pickup_latitude"] != 0)
+        ]
+        print(" New size after removing 0 long lat: %d" % len(df))
+
+        MinMax = (-74.5, -72.8, 40.5, 41.8)
+        df = df[
+            (MinMax[0] <= df["pickup_longitude"])
+            & (df["pickup_longitude"] <= MinMax[1])
+        ]
+        df = df[
+            (MinMax[0] <= df["dropoff_longitude"])
+            & (df["dropoff_longitude"] <= MinMax[1])
+        ]
+        df = df[
+            (MinMax[2] <= df["pickup_latitude"]) & (df["pickup_latitude"] <= MinMax[3])
+        ]
+        df = df[
+            (MinMax[2] <= df["dropoff_latitude"])
+            & (df["dropoff_latitude"] <= MinMax[3])
+        ]
+        print(" New size after NYC lang lot: %d" % len(df))
+
+        df = df[(df["pickup_latitude"] != 0)]
+        df = df[(df["dropoff_longitude"] != 0)]
+        df = df[(df["dropoff_latitude"] != 0)]
+        print(" New size after lang lot > 0: %d" % len(df))
+
+        df = df[((df["pickup_latitude"] - df["dropoff_latitude"]).abs() > 0.001)]
+        df = df[((df["pickup_longitude"] - df["dropoff_longitude"]).abs() > 0.001)]
+        print(" New size after lang - lot > 0.001: %d" % len(df))
+
+        if "fare_amount" in df.columns:
+            df = df[(FARE_MIN < df["fare_amount"]) & (df["fare_amount"] <= FARE_MAX)]
+            print(" New size after removing outliers: %d" % len(df))
+
+        df = df[(df["passenger_count"] > 0)]
+        print(" New size after removing passenger_count <= 0 : %d" % len(df))
+
+        try:
+            lat1 = df["pickup_latitude"].astype("float64").values
+            lon1 = df["pickup_longitude"].astype("float64").values
+            lat2 = df["dropoff_latitude"].astype("float64").values
+            lon2 = df["dropoff_longitude"].astype("float64").values
+            lat1r = np.radians(lat1)
+            lon1r = np.radians(lon1)
+            lat2r = np.radians(lat2)
+            lon2r = np.radians(lon2)
+            dlat = lat2r - lat1r
+            dlon = lon2r - lon1r
+            a = (
+                np.sin(dlat / 2.0) ** 2
+                + np.cos(lat1r) * np.cos(lat2r) * np.sin(dlon / 2.0) ** 2
+            )
+            c = 2.0 * np.arcsin(np.sqrt(a))
+            dist_km = 6371.0 * c
+
+            fare = df["fare_amount"].astype("float64").values
+            keep = np.ones(len(df), dtype=bool)
+            keep &= ~((dist_km > 60.0) & (fare < 15.0))
+            keep &= ~((dist_km < 0.5) & (fare > 35.0))
+            keep &= ~((dist_km < 0.2) & (fare > 25.0))
+            df = df.loc[keep]
+            print(" New size after plausibility filter: %d" % len(df))
+        except Exception as e:
+            print(" plausibility filter skipped due to:", repr(e))
+    else:
+        num_cols = [
+            "pickup_longitude",
+            "pickup_latitude",
+            "dropoff_longitude",
+            "dropoff_latitude",
+            "passenger_count",
+        ]
+        for c in num_cols:
+            if c in df.columns:
+                df[c] = pd.to_numeric(df[c], errors="coerce")
+
+        for c in [
+            "pickup_longitude",
+            "pickup_latitude",
+            "dropoff_longitude",
+            "dropoff_latitude",
+        ]:
+            if c in df.columns:
+                if (
+                    fill_values is not None
+                    and c in fill_values
+                    and pd.notna(fill_values[c])
+                ):
+                    fill = fill_values[c]
+                else:
+                    fill = df[c].median(skipna=True)
+                df[c] = df[c].fillna(fill)
+
+        if "passenger_count" in df.columns:
+            fill_pc = 1
+            if (
+                fill_values is not None
+                and "passenger_count" in fill_values
+                and pd.notna(fill_values["passenger_count"])
+            ):
+                fill_pc = int(fill_values["passenger_count"])
+            df["passenger_count"] = df["passenger_count"].fillna(fill_pc)
+            df["passenger_count"] = (
+                df["passenger_count"].clip(lower=1, upper=6).astype("uint8")
+            )
+
+        MinMax = (-74.5, -72.8, 40.5, 41.8)
+        df["pickup_longitude"] = df["pickup_longitude"].clip(MinMax[0], MinMax[1])
+        df["dropoff_longitude"] = df["dropoff_longitude"].clip(MinMax[0], MinMax[1])
+        df["pickup_latitude"] = df["pickup_latitude"].clip(MinMax[2], MinMax[3])
+        df["dropoff_latitude"] = df["dropoff_latitude"].clip(MinMax[2], MinMax[3])
+
+        print(" New size after test-safe cleaning (no row drops): %d" % len(df))
+
+    if key_col is not None and "key" not in df.columns:
+        df.insert(0, "key", key_col.values)
+
+    return df
+
+
+def manhattan(pickup_lat, pickup_long, dropoff_lat, dropoff_long):
+    return np.abs(dropoff_lat - pickup_lat) + np.abs(dropoff_long - pickup_long)
+
+
+def add_time_features(df):
+    dt = pd.to_datetime(df["pickup_datetime"], errors="coerce", utc=True)
+
+    df["year"] = dt.dt.year.astype("float32")
+    df["month"] = dt.dt.month.astype("float32")
+    df["day"] = dt.dt.day.astype("float32")
+    df["hour"] = dt.dt.hour.astype("float32")
+    df["weekday"] = dt.dt.weekday.astype("float32")
+
+    df["pickup_datetime"] = dt.dt.strftime("%Y-%m-%d %H:%M:%S").fillna("")
+
+    hour = df["hour"]
+    weekday = df["weekday"]
+
+    df["night"] = ((weekday < 5) & ((hour >= 20) | (hour <= 5))).astype("uint8")
+    df["late_night"] = (hour <= 3).astype("uint8")
+    df["rush_hour"] = ((weekday < 5) & (hour >= 16) & (hour <= 20)).astype("uint8")
+
+    return df
+
+
+def add_coordinate_features(df):
+    lat1 = df["pickup_latitude"]
+    lat2 = df["dropoff_latitude"]
+    lon1 = df["pickup_longitude"]
+    lon2 = df["dropoff_longitude"]
+    df["latdiff"] = (lat1 - lat2).abs()
+    df["londiff"] = (lon1 - lon2).abs()
+    return df
+
+
+def _haversine_km(lat1, lon1, lat2, lon2):
+    lat1 = np.radians(lat1.astype("float64"))
+    lon1 = np.radians(lon1.astype("float64"))
+    lat2 = np.radians(lat2.astype("float64"))
+    lon2 = np.radians(lon2.astype("float64"))
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
+    c = 2.0 * np.arcsin(np.sqrt(a))
+    R = 6371.0
+    return (R * c).astype("float32")
+
+
+def add_distances_features(df):
+    lat1 = df["pickup_latitude"]
+    lat2 = df["dropoff_latitude"]
+    lon1 = df["pickup_longitude"]
+    lon2 = df["dropoff_longitude"]
+    df["manhattan"] = manhattan(lat1, lon1, lat2, lon2)
+    df["distance"] = _haversine_km(lat1, lon1, lat2, lon2)
+    return df
+
+
+def output_submission(raw_test, prediction, id_column, prediction_column, file_name):
+    df = pd.DataFrame(
+        {
+            id_column: raw_test[id_column].values,
+            prediction_column: np.asarray(prediction).reshape(-1),
+        }
+    )
+    df.to_csv(file_name, index=False)
+    print("Output complete:", file_name, "rows:", len(df))
+
+
+def plot_loss_accuracy_rmse(history):
+    plt.figure(figsize=(20, 6))
+    plt.plot(history.history.get("loss", []))
+    plt.plot(history.history.get("val_loss", []))
+    plt.title("model loss")
+    plt.ylabel("loss")
+    plt.xlabel("epoch")
+    plt.legend(["train", "val"], loc="upper right")
+    plt.show()
+
+    if "rmse" in history.history:
+        plt.figure(figsize=(20, 6))
+        plt.plot(history.history.get("rmse", []))
+        plt.plot(history.history.get("val_rmse", []))
+        plt.title("Model rmse")
+        plt.ylabel("rmse")
+        plt.xlabel("epoch")
+        plt.legend(["train", "val"], loc="upper right")
+        plt.show()
+
+
+
+
+## === cell 2
+datatypes = {
+    "key": "str",
+    "fare_amount": "float32",
+    "pickup_datetime": "str",
+    "pickup_longitude": "float32",
+    "pickup_latitude": "float32",
+    "dropoff_longitude": "float32",
+    "dropoff_latitude": "float32",
+    "passenger_count": "uint8",
+}
+
+trainKaggle = pd.read_csv(
+    TRAIN_PATH,
+    nrows=DATASET_SIZE,
+    dtype=datatypes,
+    usecols=[
+        "key",
+        "fare_amount",
+        "pickup_datetime",
+        "pickup_longitude",
+        "pickup_latitude",
+        "dropoff_longitude",
+        "dropoff_latitude",
+        "passenger_count",
+    ],
+)
+
+testKaggle = pd.read_csv(
+    TEST_PATH,
+    dtype={
+        "key": "str",
+        "pickup_datetime": "str",
+        "pickup_longitude": "float32",
+        "pickup_latitude": "float32",
+        "dropoff_longitude": "float32",
+        "dropoff_latitude": "float32",
+        "passenger_count": "uint8",
+    },
+    usecols=[
+        "key",
+        "pickup_datetime",
+        "pickup_longitude",
+        "pickup_latitude",
+        "dropoff_longitude",
+        "dropoff_latitude",
+        "passenger_count",
+    ],
+)
+
+trainKaggle.head(), testKaggle.head()
+
+
+
+## === cell 3
+print("Raw trainKaggle Size %d" % len(trainKaggle))
+print("Raw testKaggle Size %d" % len(testKaggle))
+
+print("trainKaggle clean (train rules)")
+trainKaggle_cleaned = clean(trainKaggle, is_train=True)
+
+_fill_values = {}
+for c in [
+    "pickup_longitude",
+    "pickup_latitude",
+    "dropoff_longitude",
+    "dropoff_latitude",
+]:
+    _fill_values[c] = float(trainKaggle_cleaned[c].median(skipna=True))
+_fill_values["passenger_count"] = int(
+    trainKaggle_cleaned["passenger_count"].median(skipna=True)
+)
+
+print("testKaggle clean (test-safe rules using train-derived fill values)")
+testKaggle = clean(testKaggle, is_train=False, fill_values=_fill_values)
+
+train_df, test_df = train_test_split(
+    trainKaggle_cleaned, test_size=0.50, random_state=1
+)
+test_df = test_df[:10000]
+
+print("Cleaned train_df Size %d" % len(train_df))
+print("Cleaned test_df Size %d" % len(test_df))
+print("Cleaned testKaggle Size %d" % len(testKaggle))
+
+
+
+## === cell 4
+print("train_df add_time_features")
+train_df = add_time_features(train_df)
+print("test_df add_time_features")
+test_df = add_time_features(test_df)
+print("testKaggle add_time_features")
+testKaggle = add_time_features(testKaggle)
+
+print("train_df add_coordinate_features")
+train_df = add_coordinate_features(train_df)
+print("test_df add_coordinate_features")
+test_df = add_coordinate_features(test_df)
+print("testKaggle add_coordinate_features")
+testKaggle = add_coordinate_features(testKaggle)
+
+print("train_df add_distances_features")
+train_df = add_distances_features(train_df)
+print("test_df add_distances_features")
+test_df = add_distances_features(test_df)
+print("testKaggle add_distances_features")
+testKaggle = add_distances_features(testKaggle)
+
+print("Done with Adding features")
+
+
+
+## === cell 5
+try:
+    _ = train_df.iloc[:2000].plot.scatter("latdiff", "londiff")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "passenger_count")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "year")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "month")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "day")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "hour")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "weekday")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "night")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "late_night")
+    _ = train_df.iloc[:2000].plot.scatter("fare_amount", "rush_hour")
+    plt.show()
+except Exception as e:
+    print("Skipping plots due to:", repr(e))
+
+
+
+## === cell 6
+dropped_columns = [
+    "pickup_datetime",
+]
+
+train_df = train_df.drop(
+    dropped_columns + (["key"] if "key" in train_df.columns else []), axis=1
+)
+test_df = test_df.drop(
+    dropped_columns + (["key"] if "key" in test_df.columns else []), axis=1
+)
+
+testKaggle_clean = testKaggle.drop(dropped_columns + ["key"], axis=1)
+
+print("Done with dropped_columns")
+print("Train columns:", list(train_df.columns))
+print("TestKaggle_clean columns:", list(testKaggle_clean.columns))
+
+
+
+## === cell 7
+train_df, validation_df = train_test_split(train_df, test_size=0.10, random_state=1)
+
+train_labels = train_df["fare_amount"].values
+validation_labels = validation_df["fare_amount"].values
+test_labels = test_df["fare_amount"].values
+
+train_labels = np.clip(train_labels, FARE_MIN, FARE_MAX).astype("float32")
+validation_labels = np.clip(validation_labels, FARE_MIN, FARE_MAX).astype("float32")
+test_labels = np.clip(test_labels, FARE_MIN, FARE_MAX).astype("float32")
+
+train_df = train_df.drop(["fare_amount"], axis=1)
+validation_df = validation_df.drop(["fare_amount"], axis=1)
+test_df = test_df.drop(["fare_amount"], axis=1)
+
+print("Done with Labels")
+print("Feature dim:", train_df.shape[1])
+
+
+
+## === cell 8
+scaler = preprocessing.StandardScaler()
+train_df_scaled = scaler.fit_transform(train_df)
+validation_df_scaled = scaler.transform(validation_df)
+test_scaled = scaler.transform(test_df)
+testKaggle_scaled = scaler.transform(testKaggle_clean)
+
+
+def rmse(y_true, y_pred):
+    y_true = ops.cast(y_true, "float32")
+    y_pred = ops.cast(y_pred, "float32")
+    return ops.sqrt(ops.mean(ops.square(y_pred - y_true), axis=-1))
+
+
+
+
+## === cell 9
+checkpoint = ModelCheckpoint(
+    filepath="my_model.keras",
+    verbose=1,
+    save_best_only=True,
+    monitor="val_loss",
+    mode="min",
+)
+
+model = Sequential()
+model.add(
+    Dense(
+        256,
+        activation="linear",
+        input_dim=train_df_scaled.shape[1],
+        activity_regularizer=regularizers.l1(0.01),
+    )
+)
+model.add(BatchNormalization())
+model.add(Dense(128, activation="relu"))
+model.add(BatchNormalization())
+model.add(Dense(64, activation="relu"))
+model.add(BatchNormalization())
+model.add(Dense(32, activation="relu"))
+model.add(BatchNormalization())
+model.add(Dense(8, activation="relu"))
+model.add(BatchNormalization())
+model.add(Dense(1))
+
+adam = optimizers.Adam(learning_rate=LEARNING_RATE)
+
+model.compile(loss="mean_squared_error", optimizer=adam, metrics=["mae", rmse, "mse"])
+
+print("Dataset size: %s" % DATASET_SIZE)
+print("Epochs: %s" % EPOCHS)
+print("Learning rate: %s" % LEARNING_RATE)
+print("Batch size: %s" % BATCH_SIZE)
+print("Input dimension: %s" % train_df_scaled.shape[1])
+print("Features used: %s" % list(train_df.columns))
+model.summary()
+
+history = model.fit(
+    x=train_df_scaled,
+    y=train_labels,
+    batch_size=BATCH_SIZE,
+    epochs=EPOCHS,
+    verbose=1,
+    callbacks=[checkpoint],
+    validation_data=(validation_df_scaled, validation_labels),
+    shuffle=True,
+)
+
+
+
+## === cell 10
+try:
+    from keras.utils import model_to_dot
+    from IPython.display import SVG
+
+    SVG(model_to_dot(model).create(prog="dot", format="svg"))
+except Exception as e:
+    print("Skipping model graph due to:", repr(e))
+
+
+
+## === cell 11
+plot_loss_accuracy_rmse(history)
+
+
+
+## === cell 12
+score = model.evaluate(train_df_scaled, train_labels, verbose=1)
+print(score)
+print("train mean_squared_error:", score[0])
+print("train mae:", score[1])
+print("train rmse:", score[2])
+print("train mse:", score[3])
+
+score = model.evaluate(validation_df_scaled, validation_labels, verbose=1)
+print(score)
+print("Validation mean_squared_error:", score[0])
+print("Validation mae:", score[1])
+print("Validation rmse:", score[2])
+print("Validation mse:", score[3])
+
+score = model.evaluate(test_scaled, test_labels, verbose=1)
+print(score)
+print("Test mean_squared_error:", score[0])
+print("Test mae:", score[1])
+print("Test rmse:", score[2])
+print("Test mse:", score[3])
+
+
+
+## === cell 13
+validation_predictions = model.predict(validation_df_scaled, verbose=0).flatten()
+
+plt.scatter(validation_labels, validation_predictions, s=5)
+plt.xlabel("True Values")
+plt.ylabel("Predictions")
+plt.axis("equal")
+plt.xlim(plt.xlim())
+plt.ylim(plt.ylim())
+_ = plt.plot(
+    [validation_predictions.min(), validation_predictions.max()],
+    [validation_predictions.min(), validation_predictions.max()],
+    "k--",
+    lw=2,
+)
+plt.show()
+
+
+
+## === cell 14
+test_predictions = model.predict(test_scaled, verbose=0).flatten()
+
+plt.scatter(test_labels, test_predictions, s=5)
+plt.xlabel("True Values")
+plt.ylabel("Predictions")
+plt.axis("equal")
+plt.xlim(plt.xlim())
+plt.ylim(plt.ylim())
+_ = plt.plot(
+    [test_predictions.min(), test_predictions.max()],
+    [test_predictions.min(), test_predictions.max()],
+    "k--",
+    lw=2,
+)
+plt.show()
+
+
+
+## === cell 15
+print(np.argmax(test_predictions))
+print(test_predictions[np.argmax(test_predictions)])
+print(test_labels[np.argmax(test_predictions)])
+test_df.iloc[np.argmax(test_predictions)]
+
+
+
+## === cell 16
+print(np.argmin(test_predictions))
+print(test_predictions[np.argmin(test_predictions)])
+print(test_labels[np.argmin(test_predictions)])
+test_df.iloc[np.argmin(test_predictions)]
+
+
+
+## === cell 17
+fig, ax = plt.subplots()
+ax.scatter(test_labels, test_predictions, s=5)
+ax.plot(
+    [test_labels.min(), test_labels.max()],
+    [test_labels.min(), test_labels.max()],
+    "k--",
+    lw=2,
+)
+ax.set_xlabel("Measured")
+ax.set_ylabel("Predicted")
+plt.show()
+
+
+
+## === cell 18
+plt.figure(figsize=(20, 6))
+plt.plot(validation_labels[:100])
+plt.plot(validation_predictions[:100])
+plt.title("Prediction vs Actual (validation)")
+plt.ylabel("Fare Amount")
+plt.xlabel("Transaction")
+plt.legend(["Actual", "prediction"], loc="upper right")
+plt.show()
+
+
+
+## === cell 19
+plt.figure(figsize=(20, 6))
+plt.plot(test_labels[:100])
+plt.plot(test_predictions[:100])
+plt.title("Prediction vs Actual (test split)")
+plt.ylabel("Fare Amount")
+plt.xlabel("Transaction")
+plt.legend(["Actual", "prediction"], loc="upper right")
+plt.show()
+
+
+
+## === cell 20
+error = validation_predictions - validation_labels
+plt.hist(error, bins=100)
+plt.xlabel("Prediction Error (validation)")
+_ = plt.ylabel("Count")
+plt.show()
+
+error = test_predictions - test_labels
+plt.hist(error, bins=50)
+plt.xlabel("Prediction Error (test split)")
+_ = plt.ylabel("Count")
+plt.show()
+
+
+
+## === cell 21
+errorGreaterZero = error[np.logical_or(error <= -1, error >= 1)]
+print(len(error))
+print(len(errorGreaterZero))
+
+plt.hist(errorGreaterZero, bins=100)
+plt.xlabel("Prediction Error |>=1| (test split)")
+_ = plt.ylabel("Count")
+plt.show()
+
+
+
+## === cell 22
+try:
+    from keras.models import load_model
+
+    if os.path.exists("my_model.keras"):
+        model = load_model("my_model.keras", custom_objects={"rmse": rmse})
+        print("Loaded best saved model from my_model.keras for submission predictions.")
+    else:
+        print("Checkpoint file my_model.keras not found; using current model weights.")
+except Exception as e:
+    print(
+        "Could not load saved model; using current model weights. Reason:",
+        repr(e),
+    )
+
+predictionKaggle = model.predict(testKaggle_scaled, batch_size=128, verbose=1)
+
+predictionKaggle = np.asarray(predictionKaggle, dtype="float32") * np.float32(
+    PRED_SCALE
+)
+predictionKaggle = np.clip(predictionKaggle, FARE_MIN, FARE_MAX)
+
+assert len(testKaggle) == len(predictionKaggle), (
+    len(testKaggle),
+    len(predictionKaggle),
+)
+
+output_submission(testKaggle, predictionKaggle, "key", "fare_amount", SUBMISSION_NAME)
+print("Submission preview:")
+print(pd.read_csv(SUBMISSION_NAME).head())
+print(
+    "Submission file exists:",
+    os.path.exists(SUBMISSION_NAME),
+    "size(bytes):",
+    os.path.getsize(SUBMISSION_NAME) if os.path.exists(SUBMISSION_NAME) else None,
+)

@@ -1,0 +1,604 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms, models
+from PIL import Image
+
+os.environ.setdefault("PYTHONHASHSEED", "42")
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed_all(SEED)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Torch:", torch.__version__, "Device:", device)
+
+DATA_DIR = "/kaggle/input/cassava-leaf-disease-classification"
+TRAIN_CSV_PATH = f"{DATA_DIR}/train.csv"
+SAMPLE_SUB_PATH = f"{DATA_DIR}/sample_submission.csv"
+TRAIN_IMG_DIR = f"{DATA_DIR}/train_images"
+TEST_IMG_DIR = f"{DATA_DIR}/test_images"
+
+assert os.path.exists(TRAIN_CSV_PATH), f"Missing {TRAIN_CSV_PATH}"
+assert os.path.exists(SAMPLE_SUB_PATH), f"Missing {SAMPLE_SUB_PATH}"
+assert os.path.isdir(TRAIN_IMG_DIR), f"Missing {TRAIN_IMG_DIR}"
+assert os.path.isdir(TEST_IMG_DIR), f"Missing {TEST_IMG_DIR}"
+
+train_df = pd.read_csv(TRAIN_CSV_PATH)
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+
+train_df["path"] = train_df["image_id"].apply(lambda x: os.path.join(TRAIN_IMG_DIR, x))
+train_df["label"] = train_df["label"].astype(int)
+
+print(train_df.head())
+print("Train rows:", len(train_df), "Test rows:", len(sample_sub))
+
+
+
+## === cell 1
+from sklearn.model_selection import train_test_split
+
+train_idx, valid_idx = train_test_split(
+    np.arange(len(train_df)),
+    test_size=0.2,
+    random_state=SEED,
+    stratify=train_df["label"].values,
+)
+
+train_split = train_df.iloc[train_idx].reset_index(drop=True)
+valid_split = train_df.iloc[valid_idx].reset_index(drop=True)
+
+NUM_CLASSES = int(train_df["label"].nunique())
+assert NUM_CLASSES == 5, f"Expected 5 classes for cassava, got {NUM_CLASSES}"
+print("NUM_CLASSES:", NUM_CLASSES, "Train/Valid:", len(train_split), len(valid_split))
+
+
+
+## === cell 2
+IMG_SIZE = 224
+BATCH_SIZE = 32
+NUM_WORKERS = 2
+
+train_tfms = transforms.Compose(
+    [
+        transforms.Resize((IMG_SIZE, IMG_SIZE)),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomVerticalFlip(p=0.5),
+        transforms.RandomRotation(45),
+        transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.02),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    ]
+)
+
+valid_tfms = transforms.Compose(
+    [
+        transforms.Resize((IMG_SIZE, IMG_SIZE)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+    ]
+)
+
+
+class CassavaDataset(Dataset):
+    def __init__(self, df, transform=None, has_labels=True):
+        self.df = df.reset_index(drop=True)
+        self.transform = transform
+        self.has_labels = has_labels
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        img_path = row["path"]
+        with Image.open(img_path) as img:
+            img = img.convert("RGB")
+        if self.transform:
+            img = self.transform(img)
+        if self.has_labels:
+            y = int(row["label"])
+            return img, y
+        return img, row["image_id"]
+
+
+train_ds = CassavaDataset(train_split, transform=train_tfms, has_labels=True)
+valid_ds = CassavaDataset(valid_split, transform=valid_tfms, has_labels=True)
+
+train_loader = DataLoader(
+    train_ds,
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    num_workers=NUM_WORKERS,
+    pin_memory=torch.cuda.is_available(),
+)
+valid_loader = DataLoader(
+    valid_ds,
+    batch_size=BATCH_SIZE,
+    shuffle=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=torch.cuda.is_available(),
+)
+
+print("Batches:", len(train_loader), len(valid_loader))
+
+
+
+## === cell 3
+model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+in_features = model.fc.in_features
+model.fc = nn.Linear(in_features, NUM_CLASSES)
+model = model.to(device)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-4)
+
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer, mode="max", factor=0.5, patience=1, verbose=True
+)
+
+
+def accuracy_from_logits(logits, y):
+    preds = torch.argmax(logits, dim=1)
+    return (preds == y).float().mean().item()
+
+
+print(model)
+
+
+
+## === cell 4
+EPOCHS = 6  # keeps runtime reasonable while providing learning signal
+
+best_val_acc = -1.0
+best_state = None
+patience = 2
+pat = 0
+
+for epoch in range(1, EPOCHS + 1):
+    model.train()
+    tr_loss = 0.0
+    tr_acc = 0.0
+    n_tr = 0
+
+    for xb, yb in train_loader:
+        xb = xb.to(device, non_blocking=True)
+        yb = yb.to(device, non_blocking=True)
+
+        optimizer.zero_grad(set_to_none=True)
+        logits = model(xb)
+        loss = criterion(logits, yb)
+        loss.backward()
+        optimizer.step()
+
+        bs = yb.size(0)
+        tr_loss += loss.item() * bs
+        tr_acc += accuracy_from_logits(logits.detach(), yb) * bs
+        n_tr += bs
+
+    tr_loss /= max(1, n_tr)
+    tr_acc /= max(1, n_tr)
+
+    model.eval()
+    va_loss = 0.0
+    va_acc = 0.0
+    n_va = 0
+    with torch.no_grad():
+        for xb, yb in valid_loader:
+            xb = xb.to(device, non_blocking=True)
+            yb = yb.to(device, non_blocking=True)
+            logits = model(xb)
+            loss = criterion(logits, yb)
+
+            bs = yb.size(0)
+            va_loss += loss.item() * bs
+            va_acc += accuracy_from_logits(logits, yb) * bs
+            n_va += bs
+
+    va_loss /= max(1, n_va)
+    va_acc /= max(1, n_va)
+
+    scheduler.step(va_acc)
+
+    print(
+        f"Epoch {epoch:02d}/{EPOCHS} | train loss {tr_loss:.4f} acc {tr_acc:.4f} | val loss {va_loss:.4f} acc {va_acc:.4f}"
+    )
+
+    if va_acc > best_val_acc + 1e-6:
+        best_val_acc = va_acc
+        best_state = {
+            k: v.detach().cpu().clone() for k, v in model.state_dict().items()
+        }
+        pat = 0
+    else:
+        pat += 1
+        if pat >= patience:
+            print(
+                f"Early stopping triggered at epoch {epoch}. Best val acc: {best_val_acc:.4f}"
+            )
+            break
+
+if best_state is not None:
+    model.load_state_dict(best_state)
+print("Best val acc:", best_val_acc)
+
+
+
+## === cell 5
+test_df = sample_sub.copy()
+test_df["path"] = test_df["image_id"].apply(lambda x: os.path.join(TEST_IMG_DIR, x))
+
+missing_paths = (~test_df["path"].apply(os.path.exists)).sum()
+if missing_paths > 0:
+    alt_dir = os.path.join(TEST_IMG_DIR, "test_images")
+    if os.path.isdir(alt_dir):
+        test_df["path"] = test_df["image_id"].apply(lambda x: os.path.join(alt_dir, x))
+missing_paths = (~test_df["path"].apply(os.path.exists)).sum()
+print("Missing test image files:", int(missing_paths))
+
+test_ds = CassavaDataset(
+    test_df[["image_id", "path"]], transform=valid_tfms, has_labels=False
+)
+test_loader = DataLoader(
+    test_ds,
+    batch_size=64,
+    shuffle=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=torch.cuda.is_available(),
+)
+
+
+
+## === cell 6
+model.eval()
+preds = []
+image_ids = []
+
+with torch.no_grad():
+    for xb, ids in test_loader:
+        xb = xb.to(device, non_blocking=True)
+        logits = model(xb)
+        pred = torch.argmax(logits, dim=1).detach().cpu().numpy().astype(int).tolist()
+        preds.extend(pred)
+        image_ids.extend(list(ids))
+
+submission_df = pd.DataFrame({"image_id": image_ids, "label": preds})
+
+submission_df = sample_sub[["image_id"]].merge(submission_df, on="image_id", how="left")
+assert submission_df["label"].notna().all(), "Some predictions are missing after merge."
+submission_df["label"] = submission_df["label"].astype(int)
+
+submission_path = "/kaggle/working/submission.csv"
+submission_df.to_csv(submission_path, index=False)
+
+print("Submission file created:", submission_path)
+print(submission_df.head())
+
+
+
+## === cell 7
+assert (
+    submission_df.shape[0] == sample_sub.shape[0]
+), "Row count mismatch vs sample_submission."
+assert list(submission_df.columns) == [
+    "image_id",
+    "label",
+], "Submission columns mismatch."
+assert submission_path.endswith(".csv") and os.path.exists(
+    submission_path
+), "Submission file missing or wrong suffix."
+assert submission_df["label"].between(0, 4).all(), "Labels must be integers in [0,4]."
+print("Submission looks valid. Rows:", submission_df.shape[0])

@@ -1,0 +1,666 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Overview
+Predict likely degradation rates at each base of an RNA molecule.
+
+## Metric
+Mean columnwise root mean squared error:
+
+$\textrm{MCRMSE} = \frac{1}{N_{t}}\sum_{j=1}^{N_{t}}\sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_{ij} - \hat{y}_{ij})^2}$
+
+where $N_{t}$ is the number of scored ground truth target columns, and $y$ and $\hat{y}$ are the actual and predicted values, respectively.
+
+There are multiple ground truth values provided in the training data. While the submission format requires all 5 to be predicted, only the following are scored: reactivity, deg_Mg_pH10, and deg_Mg_50C.
+
+## Submission Formats
+For each sample `id` in the test set, you must predict targets for *each* sequence position (`seqpos`), one per row. If the length of the `sequence` of an `id` is, e.g., 107, then you should make 107 predictions. Positions greater than the `seq_scored` value of a sample are not scored, but still need a value in the solution file.
+
+```csv
+id_seqpos,reactivity,deg_Mg_pH10,deg_pH10,deg_Mg_50C,deg_50C
+id_d190610e8_0,0.1,0.3,0.2,0.5,0.4
+id_d190610e8_1,0.3,0.2,0.5,0.4,0.2
+id_d190610e8_2,0.5,0.4,0.2,0.1,0.2
+etc.
+```
+
+## Dataset 
+- **train.json** - the training data
+- **test.json** - the test set, without any columns associated with the ground truth.
+- **sample_submission.csv** - a sample submission file in the correct format
+
+#### Columns
+- `id` - An arbitrary identifier for each sample.
+- `seq_scored` - (68 in Train and Public Test, 68 in Private Test) Integer value denoting the number of positions used in scoring with predicted values. This should match the length of `reactivity`, `deg_*` and `*_error_*` columns.
+- `seq_length` - (107 in Train and Public Test, 107 in Private Test) Integer values, denotes the length of `sequence`.
+- `sequence` - (1x107 string in Train and Public Test, 107 in Private Test) Describes the RNA sequence, a combination of `A`, `G`, `U`, and `C` for each sample. Should be 107 characters long, and the first 68 bases should correspond to the 68 positions specified in `seq_scored` (note: indexed starting at 0).
+- `structure` - (1x107 string in Train and Public Test, 107 in Private Test) An array of `(`, `)`, and `.` characters that describe whether a base is estimated to be paired or unpaired. Paired bases are denoted by opening and closing parentheses e.g. (....) means that base 0 is paired to base 5, and bases 1-4 are unpaired.
+- `reactivity` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likely secondary structure of the RNA sample.
+- `deg_pH10` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating without magnesium at high pH (pH 10).
+- `deg_Mg_pH10` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating with magnesium in high pH (pH 10).
+- `deg_50C` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating without magnesium at high temperature (50 degrees Celsius).
+- `deg_Mg_50C` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating with magnesium at high temperature (50 degrees Celsius).
+- `*_error_*` - An array of floating point numbers, should have the same length as the corresponding `reactivity` or `deg_*` columns, calculated errors in experimental values obtained in `reactivity` and `deg_*` columns.
+- `predicted_loop_type` - (1x107 string) Describes the structural context (also referred to as 'loop type')of each character in `sequence`. Loop types assigned by bpRNA from Vienna RNAfold 2 structure. From the bpRNA_documentation: S: paired "Stem" M: Multiloop I: Internal loop B: Bulge H: Hairpin loop E: dangling End X: eXternal loop
+    - `S/N filter` Indicates if the sample passed filters described below in `Additional Notes`.
+
+#### Additional Notes
+At the beginning of the competition, Stanford scientists have data on 2400 RNA sequences of length 107. For technical reasons, measurements cannot be carried out on the final bases of these RNA sequences, so we have experimental data (ground truth) in 5 conditions for the first 68 bases.
+
+We have split out 240 of these 2400 sequences for a public test set to allow for continuous evaluation through the competition, on the public leaderboard. These sequences, in `test.json`, have been additionally filtered based on three criteria detailed below to ensure that this subset is not dominated by any large cluster of RNA molecules with poor data, which might bias the public leaderboard. The remaining 2160 sequences for which we have data are in `train.json`.
+
+For our final and most important scoring (the Private Leaderbooard), Stanford scientists are carrying out measurements on 240 new RNAs. For these data, we expect to have measurements for the first 68 bases, again missing the ends of the RNA. These sequences constitute the 240 sequences in `test.json`.
+
+For those interested in how the sequences in `test.json` were filtered, here were the steps to ensure a diverse and high quality test set for public leaderboard scoring:
+
+1. Minimum value across all 5 conditions must be greater than -0.5.
+2. Mean signal/noise across all 5 conditions must be greater than 1.0. [Signal/noise is defined as mean( measurement value over 68 nts )/mean( statistical error in measurement value over 68 nts)]
+3. To help ensure sequence diversity, the resulting sequences were clustered into clusters with less than 50% sequence similarity, and the 240 test set sequences were chosen from clusters with 3 or fewer members. That is, any sequence in the test set should be sequence similar to at most 2 other sequences.
+
+Note that these filters have not been applied to the 2160 RNAs in the public training data `train.json` -- some of those measurements have negative values or poor signal-to-noise, or some RNA sequences have near-identical sequences in that set. But we are providing all those data in case competitors can squeeze out more signal.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        input/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        working/
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+```
+
+-> data/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/stanford-covid-vaccine/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> input/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.3521099280679826
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import os
+
+
+
+## === cell 1
+BASE_INPUT = "../input/stanford-covid-vaccine"
+if not os.path.exists(BASE_INPUT):
+    BASE_INPUT = "/kaggle/input/stanford-covid-vaccine"
+
+train_path = os.path.join(BASE_INPUT, "train.json")
+test_path = os.path.join(BASE_INPUT, "test.json")
+sample_path = os.path.join(BASE_INPUT, "sample_submission.csv")
+
+df_train = pd.read_json(train_path)  # standard JSON
+df_test = pd.read_json(test_path)
+sample = pd.read_csv(sample_path)
+
+df_train.shape, df_test.shape, sample.shape
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/1225585892.py in <cell line: 0>()
+      9 sample_path = os.path.join(BASE_INPUT, "sample_submission.csv")
+     10 
+---> 11 df_train = pd.read_json(train_path)  # standard JSON
+     12 df_test = pd.read_json(test_path)
+     13 sample = pd.read_csv(sample_path)
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/json/_json.py in read_json(path_or_buf, orient, typ, dtype, convert_axes, convert_dates, keep_default_dates, precise_float, date_unit, encoding, encoding_errors, lines, chunksize, compression, nrows, storage_options, dtype_backend, engine)
+    813         return json_reader
+    814     else:
+--> 815         return json_reader.read()
+    816 
+    817 
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/json/_json.py in read(self)
+   1023                         obj = self._get_object_parser(self._combine_lines(data_lines))
+   1024                 else:
+-> 1025                     obj = self._get_object_parser(self.data)
+   1026                 if self.dtype_backend is not lib.no_default:
+   1027                     return obj.convert_dtypes(
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/json/_json.py in _get_object_parser(self, json)
+   1049         obj = None
+   1050         if typ == "frame":
+-> 1051             obj = FrameParser(json, **kwargs).parse()
+   1052 
+   1053         if typ == "series" or obj is None:
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/json/_json.py in parse(self)
+   1185     @final
+   1186     def parse(self):
+-> 1187         self._parse()
+   1188 
+   1189         if self.obj is None:
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/json/_json.py in _parse(self)
+   1401         if orient == "columns":
+   1402             self.obj = DataFrame(
+-> 1403                 ujson_loads(json, precise_float=self.precise_float), dtype=None
+   1404             )
+   1405         elif orient == "split":
+
+ValueError: Trailing data
+
+## === cell 2
+target_cols = ["reactivity", "deg_Mg_pH10", "deg_pH10", "deg_Mg_50C", "deg_50C"]
+seq_scored = int(df_train["seq_scored"].iloc[0])  # expected 68
+seq_length = int(df_train["seq_length"].iloc[0])  # expected 107
+
+pos_means = {}
+for col in target_cols:
+    arr = np.stack(df_train[col].values)  # (n_train, 68)
+    pos_means[col] = arr.mean(axis=0).astype(np.float32)  # (68,)
+
+global_means = {col: float(pos_means[col].mean()) for col in target_cols}
+
+seq_scored, seq_length, {k: v.shape for k, v in pos_means.items()}, global_means
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/2529786246.py in <cell line: 0>()
+      2 # Replacement: create a simple, valid baseline using train per-position mean targets.
+      3 target_cols = ["reactivity", "deg_Mg_pH10", "deg_pH10", "deg_Mg_50C", "deg_50C"]
+----> 4 seq_scored = int(df_train["seq_scored"].iloc[0])  # expected 68
+      5 seq_length = int(df_train["seq_length"].iloc[0])  # expected 107
+      6 
+
+NameError: name 'df_train' is not defined
+
+## === cell 3
+rows = []
+for _id in df_test["id"].values:
+    for pos in range(seq_length):
+        row = {"id_seqpos": f"{_id}_{pos}"}
+        for col in target_cols:
+            if pos < seq_scored:
+                row[col] = float(pos_means[col][pos])
+            else:
+                row[col] = global_means[col]
+        rows.append(row)
+
+df = pd.DataFrame(rows, columns=["id_seqpos"] + target_cols)
+
+df = sample[["id_seqpos"]].merge(df, on="id_seqpos", how="left")
+
+for col in target_cols:
+    df[col] = df[col].fillna(global_means[col])
+
+df.head(), df.shape
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3396594884.py in <cell line: 0>()
+      2 # Ensure the id_seqpos matches Kaggle format: "{id}_{seqpos}"
+      3 rows = []
+----> 4 for _id in df_test["id"].values:
+      5     for pos in range(seq_length):
+      6         row = {"id_seqpos": f"{_id}_{pos}"}
+
+NameError: name 'df_test' is not defined
+
+## === cell 4
+sequences_public = set(df_train.id.astype(str).values)
+
+sequences = list(set(["_".join(v.split("_")[:-1]) for v in df.id_seqpos.values]))
+sequences = [s for s in sequences if s not in sequences_public]
+sequences[:5], len(sequences)
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/630214096.py in <cell line: 0>()
+      2 # The original code tried to identify non-public sequences from another submission.
+      3 # Here, we can still define sequences_public for completeness.
+----> 4 sequences_public = set(df_train.id.astype(str).values)
+      5 
+      6 # Derive sequences from the submission ids (all are test ids); this is not used further.
+
+NameError: name 'df_train' is not defined
+
+## === cell 5
+mask = df.id_seqpos.str.startswith("id_36279882a_")
+if mask.any():
+    df.loc[mask, "reactivity"] = 1.0
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/191367207.py in <cell line: 0>()
+      1 # Original code hard-overrode one specific id's reactivity.
+      2 # That was tied to the missing external submission; keep it guarded so it can't crash.
+----> 3 mask = df.id_seqpos.str.startswith("id_36279882a_")
+      4 if mask.any():
+      5     df.loc[mask, "reactivity"] = 1.0
+
+NameError: name 'df' is not defined
+
+## === cell 6
+expected_cols = [
+    "id_seqpos",
+    "reactivity",
+    "deg_Mg_pH10",
+    "deg_pH10",
+    "deg_Mg_50C",
+    "deg_50C",
+]
+df = df[expected_cols]
+
+assert df.shape[0] == sample.shape[0], "Row count mismatch vs sample submission"
+assert (
+    list(df.columns) == expected_cols
+), "Column mismatch vs expected submission format"
+
+df.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", df.shape)
+print(df.head())
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/630158657.py in <cell line: 0>()
+      8     "deg_50C",
+      9 ]
+---> 10 df = df[expected_cols]
+     11 
+     12 assert df.shape[0] == sample.shape[0], "Row count mismatch vs sample submission"
+
+NameError: name 'df' is not defined

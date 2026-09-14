@@ -1,0 +1,846 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a model to automatically segment the stomach and intestines on MRI scans.
+
+## Metric
+Mean Dice coefficient and 3D Hausdorff distance. 
+
+The Dice coefficient can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:
+
+$$
+\frac{2 \cdot |X \cap Y|}{|X| + |Y|}
+$$
+
+where $X$ is the predicted set of pixels and $Y$ is the ground truth. The Dice coefficient is defined to be 0 when both $X$ and $Y$ are empty. 
+
+Hausdorff distance is a method for calculating the distance between segmentation objects A and B, by calculating the furthest point on object A from the nearest point on object B. For 3D Hausdorff, we construct 3D volumes by combining each 2D segmentation with slice depth as the Z coordinate and then find the Hausdorff distance between them. (Here the slice depth for all scans is set to 1). The expected / predicted pixel locations are normalized by image size to create a bounded 0-1 score.
+
+The two metrics are combined, with a weight of 0.4 for the Dice metric and 0.6 for the Hausdorff distance.
+
+## Submission Format
+Use run-length encoding on the pixel values.  Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+Note that, at the time of encoding, the mask should be binary, meaning the masks for all objects in an image are joined into a single large mask. A value of 0 should indicate pixels that are not masked, and a value of 1 will indicate pixels that are masked.
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. The pixels are numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The file should contain a header and have the following format:
+
+```
+id,class,predicted
+1,large_bowel,1 1 5 1
+1,small_bowel,1 1
+1,stomach,1 1
+2,large_bowel,1 5 2 17
+etc.
+```
+
+## Dataset
+Each case is represented by multiple sets of scan slices (each set is identified by the day the scan took place). Some cases are split by time (early days are in train, later days are in test) while some cases are split by case - the entirety of the case is in train or test. The goal is to be able to generalize to both partially and wholly unseen cases.
+
+### Files
+- train.csv - IDs and masks for all training objects.
+- sample_submission.csv - a sample submission file in the correct format
+- train - a folder of case/day folders, each containing slice images for a particular case on a given day.
+
+Note that the image filenames include 4 numbers (ex. 276_276_1.63_1.63.png). These four numbers are slice width / height (integers in pixels) and width/height pixel spacing (floating points in mm). The first two defines the resolution of the slide. The last two record the physical size of each pixel.
+
+Physical pixel thickness in superior-inferior direction is 3mm.
+
+### Columns
+- `id` - unique identifier for object
+- `class` - the predicted class for the object
+- `segmentation` - RLE-encoded pixels for the identified object
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+albumentations==2.0.8
+cupy-cuda12x==13.6.0
+fastai==2.8.5
+more-itertools==10.7.0
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-image==0.25.2
+scipy==1.15.3
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        input/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        working/
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+```
+
+-> data/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> data/uw-madison-gi-tract-image-segmentation/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/uw-madison-gi-tract-image-segmentation/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/uw-madison-gi-tract-image-segmentation/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> input/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8426629557225797
+
+# 6. Current score
+
+0.01657
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I fix the metadata parsing so it correctly extracts image height/width from the actual scan filenames (not the folder name), which is what caused the `ValueError: invalid literal for int() with base 10: 'slice'`. Because the provided external model file is missing, I add a safe, minimal fallback path that produces a valid submission by outputting empty masks (this is score-poor but guarantees a valid `.csv` end-to-end in the current environment). I also make the inference code conditional on having a loaded learner, preventing the downstream `NameError: learn is not defined`. Finally, I ensure `df_preds` always has the required columns so the merge into `sample_submission.csv` cannot fail.'
+- What this solution (achieved 0.0) has done: 'I fix the filename/metadata parsing so it doesn’t assume the scan filename begins with `H_W_...`, which is what’s triggering `ValueError: invalid literal for int() with base 10: 'slice'`. The safest minimal fix is to extract `(h,w)` from the *actual* scan filename using a regex that finds the first two integers anywhere in the stem, and to fall back to reading the image shape if parsing fails. I also make `get_size()` consistent with the same robust parsing so `CreateSample` can’t break on unexpected names. These changes are execution/stability fixes and preserve your existing inference/submission logic.'
+- What this solution (achieved 0.04908) has done: 'Your current 0.0 score is coming from the fallback path that outputs empty masks because the expected `.pkl` model file isn’t available at `/kaggle/input/uwm-models/`. The smallest legitimate way to move the score toward your target (0.84) without changing the core modeling/training logic is to (1) make model loading robust by searching common Kaggle input locations for that exact `{model_name}.pkl`, and (2) if still missing, automatically fall back to a simple non-empty heuristic segmentation (Otsu-threshold + light morphology) instead of all-empty masks so the submission is no longer trivially zero. I’m also fixing one correctness bug in `CreateSample`: it swaps `h,w` when allocating/stacking slices, which can silently degrade inference when a model is loaded. These are minimal, execution-safe changes that preserve the main inference pipeline and keep the submission format identical.'
+- What this solution (achieved 0.20286) has done: 'Your current score (0.04908) is far below the target (0.84266), so we should improve performance; the biggest limiter is that you’re not actually using a trained segmentation model when the `.pkl` is missing. The smallest legitimate step toward the target without changing your core approach is to (1) robustly locate/load the model if it exists anywhere under `/kaggle/input`, and (2) if it truly doesn’t exist, fall back to an official baseline-style heuristic that is much closer to the competition’s common “empty mask vs. non-empty mask” distribution by using per-class empty/non-empty rates estimated from `train.csv` (still non-leaky). Finally, when a model is loaded, we fix a correctness issue: ensure the predicted mask channel order aligns with your class order and avoid re-reading images just to get `h,w` (use your metadata), which reduces accidental mismatches and should lift score toward the target.'
+- What this solution (achieved 0.01357) has done: 'Your current gap to target is large (0.20286 → 0.84266), and the biggest limiter is that the model is not being used (missing `.pkl`), so the fallback must be strengthened without changing your core model/inference logic. I keep the architecture/training loop untouched and only adjust the fallback so it produces more anatomically plausible masks per class (still non-leaky), using lightweight connected-component filtering + hole filling and per-class size scaling, which should raise the score relative to the current heuristic. I also fix one inference correctness issue when a model is available: `get_size()` was returning `(w,h)` from the filename but used as `(h,w)` elsewhere; making it consistent reduces accidental dimension swaps that degrade predictions. Submission writing remains identical and still always produce a valid `submission.csv`.'
+- What this solution (achieved 0.01653) has done: 'Your current score is far below target and the code is mostly running a heuristic fallback (no `.pkl` found), so the most direct way to move toward the target without changing core modeling is to (1) make the heuristic fallback more consistent with the competition metric by predicting a *single shared binary mask per image* and reusing it for all 3 classes (since the metric ultimately unions masks at encoding time), and (2) remove the randomized empty-mask sampling so predictions are deterministic and less often entirely empty. I keep your existing model-loading/inference path intact, only improving the fallback path to generate a stronger, stable non-empty union mask via Otsu + morphology + largest component. This should increase Dice substantially versus the current per-class random empty outputs and reduce Hausdorff penalties from scattered noise, moving the score upward toward your target. Submission format and paths remain identical and it still always write `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your current score (0.01653) is far below the target (0.84266), and the biggest bottleneck is that the `.pkl` model is not found so you’re always using the heuristic fallback. I keep your core pipeline intact and make the smallest changes that should legitimately increase the heuristic’s Dice/Hausdorff: (1) generate the heuristic mask from the *same 5-slice merged mid-slice* representation you already use for model inference (more stable anatomy than a single slice), and (2) use per-class empty-rate priors from `train.csv` to sometimes output empty masks (since many slices truly have no organ) instead of always predicting non-empty for all classes. This keeps submission semantics unchanged (still RLE per id/class) and remains deterministic (no randomness) so it’s stable across runs. No model/training/architecture changes are introduced; only the fallback mask generation and empty/non-empty gating are adjusted.'
+- What this solution (achieved 0.0) has done: 'Your score is 0.0 because the current fallback frequently emits empty masks (and the per-class empty gating can blank out even when the union heuristic found something), so we should make the smallest change that increases non-empty, contiguous predictions without changing your model path or core inference logic. I keep your model-loading and fastai inference unchanged, and only adjust the heuristic fallback to (1) build the union mask from the 5-slice merged representation (not just the mid slice), and (2) remove the per-class empty gating so the non-empty union mask is actually submitted for all classes (still valid because evaluation ultimately unions masks at encode-time). I also make the pack→test_id mapping robust and O(1) by precomputing slice indices per case_day, avoiding occasional mismatches that can silently misalign predictions to ids (which can tank score). The output remains a valid `submission.csv` with the required columns and row count.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 is consistent with a submission/id alignment failure: you’re generating predictions for `caseXXX_dayYY_slice_ZZZZ`, but `test.csv`/`sample_submission.csv` ids in this competition are `caseXXX_dayYY_slice_ZZZZ` only if your mapping from pack mid-slice → slice index is correct; otherwise you effectively submit mostly empty strings after the merge, which can score ~0. I make the smallest change that fixes this by building `packs` directly from the already-correct `groups` (so the windowed packs are guaranteed to contain the exact `Path` objects used in `slice_index_map`), and by deriving `test_id` directly from the precomputed `METADATA` mapping (mid-slice path → sample_id) instead of recomputing via dictionary lookups that can miss due to `Path` normalization differences. This preserves your inference/heuristic core logic and submission semantics, but should turn the submission from “mostly unmatched/empty” into “actually populated”, moving the score upward toward the target. I also ensure we emit exactly one row per (id,class) by dropping accidental duplicates before merging (a correctness fix that can otherwise silently degrade the metric).'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with an id-to-image misalignment: right now you generate predictions for a sliding window of slice packs, which produces far fewer rows than the 20,400 rows expected (so most submission rows become empty after the merge). I make the smallest change that guarantees 1 prediction per test id by building packs directly from `test.csv` ids (using your already-built `METADATA` and `groups`), so every `(id,class)` gets a mask. I also remove the unused empty-rate gating (it isn’t applied now, but keeping it can encourage later accidental emptying) and keep your heuristic/model inference exactly as-is, just driven by a correct per-id pack list. This should move the score upward toward the target without changing your model architecture/training logic and still writes a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with an id alignment failure: even though you generate packs, the current code derives `test_id` from `PATH_TO_SAMPLE_ID[mid_path]`, which can mismatch because `PATH_TO_SAMPLE_ID` is built from raw `Path` objects (and you later reconstruct/duplicate paths via packing), and because pack mid-slice is not guaranteed to correspond to the exact `TEST_ID` you intended. I make the smallest change that guarantees perfect alignment by driving inference directly from `TEST_IDS` (one pack per test id) and by carrying the `test_id` alongside each pack so we never “guess” ids from paths. This preserves your core model/heuristic logic (same pack construction, same preprocessing, same thresholding) but ensures every `(id,class)` row in the sample submission gets a real prediction instead of silently becoming empty after the merge. I also add a strict assertion that `df_preds` covers all `TEST_IDS * 3` rows to prevent another accidental 0.0 submission.'
+- What this solution (achieved 0.01656) has done: 'Your 0.0 score is very likely coming from RLE/id misalignment or invalid/empty predictions being submitted for most rows, so the smallest score-improving change is to (1) ensure every `test.csv` id maps to the correct scan file by matching slice index to the *sorted scan filenames* per `case_day`, and (2) build packs using that mapping so we always predict the right image for the right id. I keep your model/heuristic inference logic the same, but I replace the current `Metadata.extract()`-based size parsing (which can be wrong because scan stems are not `276_276_...`) with a safe “read image shape once” metadata build, preventing silent h/w corruption. Finally, I add a strict coverage assertion before writing to guarantee we output exactly 20,400 rows with non-missing `(id,class)` pairs, which prevents another accidental 0.0 submission.'
+- What this solution (achieved 0.01642) has done: 'Your current score (0.01656) is far below the target (0.84266), and the dominant limiter is that you’re not loading a trained model, so you’re submitting a weak heuristic mask copied to all classes. I keep your existing model/inference pipeline intact, but strengthen the fallback in a minimal way by (1) generating a more stable union mask from the full 5-slice merged stack (instead of the median slice), (2) adding a conservative per-slice “empty vs non-empty” gate based on intensity (to avoid penalizing many truly-empty slices), and (3) reusing that union mask for all classes as you already do (preserving submission semantics). These changes only touch the heuristic fallback path (used when `learn is None`) and should move the score upward without changing your model architecture/training logic or submission format.'
+- What this solution (achieved 0.01657) has done: 'I keep your model/inference pipeline intact and only strengthen the heuristic fallback path (used because the `.pkl` model is missing), since your current score (0.01642) is far below the target and the easiest legitimate gain is improving non-empty mask quality/coverage. Concretely, I (1) remove the overly-aggressive “empty” gate that’s blanking many slices, (2) build the heuristic union mask from a more stable stack summary (mean + max projection) rather than OR-ing potentially noisy per-slice masks, and (3) add a conservative per-image area clamp to avoid predicting huge foreground regions that hurt Hausdorff. These are minimal changes confined to the heuristic functions and the `learn is None` inference branch, and the script still write a fully valid `submission.csv` with the same required schema and row count.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import sys
+import gc
+import re
+import logging
+from dataclasses import dataclass
+from pathlib import Path
+from collections import defaultdict
+
+import numpy as np
+import pandas as pd
+import cv2 as cv
+import torch
+
+from fastai.vision.all import (
+    Transform,
+    ItemTransform,
+    TensorImage,
+    TensorMask,
+    get_image_files,
+    progress_bar,
+    load_learner,
+    noop,
+)
+from more_itertools import chunked
+from skimage.morphology import disk
+from scipy.ndimage import binary_opening, binary_closing, binary_fill_holes
+
+logging.captureWarnings(True)
+
+
+def on_kaggle() -> bool:
+    return True
+
+
+def equalize(x):
+    return x
+
+
+
+
+## === cell 1
+@dataclass
+class Metadata:
+    sample_id: str
+    full_path: str
+    h: int
+    w: int
+
+    @classmethod
+    def extract(cls, path: Path) -> "Metadata":
+        """
+        Do not parse H/W from filename stem (often 'slice_0001').
+        Read the image once and use its true shape to keep RLE alignment correct.
+        """
+        img = cv.imread(str(path), cv.IMREAD_UNCHANGED)
+        if img is None:
+            raise ValueError(f"Could not read scan image to infer size: {path}")
+        h, w = img.shape[:2]
+        return Metadata(sample_id="", full_path=str(path), h=h, w=w)
+
+
+
+
+## === cell 2
+DATA_DIR = Path("/kaggle/input/uw-madison-gi-tract-image-segmentation")
+
+DEBUG = False
+
+df_test = pd.read_csv(DATA_DIR / ("train.csv" if DEBUG else "test.csv"))
+TEST_IDS = df_test["id"].drop_duplicates().tolist()
+
+TEST_FILES = get_image_files(DATA_DIR / ("train" if DEBUG else "test"))
+
+
+def get_case_day_from_path(p: Path) -> str:
+    return re.search(r"case\d+_day\d+", str(p)).group()
+
+
+groups = defaultdict(list)
+for fn in TEST_FILES:
+    groups[get_case_day_from_path(fn)].append(fn)
+groups = {k: sorted(v, key=lambda x: x.name) for k, v in groups.items()}
+
+METADATA = {}
+ID_TO_PATH = {}
+
+missing_ids = 0
+bad_case_days = 0
+
+for sid in TEST_IDS:
+    m_case = re.search(r"(case\d+_day\d+)", sid)
+    m_slice = re.search(r"slice_(\d{4})", sid)
+    if (m_case is None) or (m_slice is None):
+        missing_ids += 1
+        continue
+
+    case_day = m_case.group(1)
+    slice_idx_1b = int(m_slice.group(1))
+
+    files = groups.get(case_day)
+    if not files:
+        bad_case_days += 1
+        continue
+
+    if slice_idx_1b < 1 or slice_idx_1b > len(files):
+        slice_idx_1b = min(max(slice_idx_1b, 1), len(files))
+
+    p = files[slice_idx_1b - 1]
+    ID_TO_PATH[sid] = p
+    md = Metadata.extract(p)
+    md.sample_id = sid
+    METADATA[sid] = md
+
+print(
+    f"DEBUG={DEBUG} | unique ids={len(TEST_IDS)} | metadata ids={len(METADATA)} "
+    f"| missing_ids={missing_ids} | bad_case_days={bad_case_days}"
+)
+
+
+
+
+## === cell 3
+class CreateSample(Transform):
+    def encodes(self, pack):
+        img0 = cv.imread(str(pack[0]), cv.IMREAD_UNCHANGED)
+        if img0 is None:
+            raise ValueError(f"Could not read scan image: {pack[0]}")
+        h, w = img0.shape[:2]
+
+        merged = np.ndarray((h, w, len(pack)), dtype=np.uint8)
+
+        q = 0.01
+        for i, fn in enumerate(pack):
+            img = cv.imread(str(fn), cv.IMREAD_UNCHANGED)
+            if img is None:
+                img = img0
+            lo, hi = np.percentile(img, [q * 100, (1 - q) * 100])
+            img = np.clip(img, lo, hi)
+            v_min, v_max = np.min(img), np.max(img)
+            if v_max == v_min:
+                img = np.zeros_like(img, dtype=np.uint8)
+            else:
+                img = (img - v_min) / float(v_max - v_min)
+                img = (img * 255).astype(np.uint8)
+            merged[:, :, i] = img
+        return merged
+
+
+class CreateTarget(Transform):
+    def __init__(self, codes=(1, 2, 3)):
+        super().__init__()
+        self.codes = codes
+
+    def encodes(self, pack):
+        raise NotImplementedError("Targets are not used for test-time inference.")
+
+
+class TensorImageNChannels(TensorImage):
+    def show(self, ctx=None, channels=(0, 1, 2), **kwargs):
+        assert len(channels) == 3
+        visible_image = TensorImage(
+            torch.cat([self[..., c, None] for c in channels], dim=-1)
+        )
+        return show_image(visible_image, ctx=ctx, **kwargs)
+
+
+class AugBase(ItemTransform):
+    def __init__(self, aug):
+        self.aug = aug
+
+    def encodes(self, x):
+        return x
+
+
+class ChannelsFirst(ItemTransform):
+    def encodes(self, x):
+        return tuple(t.permute(0, 3, 1, 2) for t in x)
+
+    def decodes(self, x):
+        return tuple(t.permute(0, 2, 3, 1) for t in x)
+
+
+class FloatMask(Transform):
+    order = 99
+
+    def encodes(self, x: TensorMask):
+        return TensorImage(x.float())
+
+    def decodes(self, x: TensorMask):
+        return TensorMask(x.long())
+
+
+class NormalizeSample(Transform):
+    order = 99
+
+    def setups(self, *args, **kwargs):
+        self.mean, self.std = 0.18161897, 0.257913
+
+    def encodes(self, x: TensorImageNChannels):
+        return (x - self.mean) / self.std
+
+    def decodes(self, x: TensorImageNChannels):
+        return x * self.std + self.mean
+
+
+
+
+## === cell 4
+model_name = "dataset_norm_e10_e15"
+
+
+
+## === cell 5
+learn = None
+expected_name = f"{model_name}.pkl"
+
+candidate_paths = [
+    Path(f"/kaggle/input/uwm-models/{expected_name}"),
+    Path(f"/kaggle/input/models/{expected_name}"),
+    Path(f"/kaggle/input/model/{expected_name}"),
+    Path(f"/kaggle/input/{expected_name}"),
+    Path(f"/kaggle/working/{expected_name}"),
+]
+
+try:
+    for p in Path("/kaggle/input").rglob(expected_name):
+        candidate_paths.append(p)
+except Exception:
+    pass
+
+model_path = None
+for p in candidate_paths:
+    if p.exists():
+        model_path = p
+        break
+
+if model_path is not None:
+    learn = load_learner(model_path)
+    print(f"Loaded model: {model_path}")
+else:
+    print(
+        f"WARNING: Missing model file '{expected_name}' in /kaggle/input. "
+        "Will generate a valid submission using the deterministic heuristic fallback."
+    )
+
+
+
+
+## === cell 6
+def build_packs_for_test_ids_with_ids(
+    test_ids, id_to_path, groups_map, n_slices_to_merge=5
+):
+    assert n_slices_to_merge % 2 == 1
+    half = n_slices_to_merge // 2
+    out = []
+    for sid in test_ids:
+        p = id_to_path.get(sid)
+        if p is None:
+            out.append((sid, None))
+            continue
+        case_day = re.search(r"(case\d+_day\d+)", sid).group(1)
+        slice_idx = int(re.search(r"slice_(\d{4})", sid).group(1))  # 1-based
+        files = groups_map[case_day]
+        pack = []
+        for k in range(slice_idx - half, slice_idx + half + 1):
+            kk = min(max(k, 1), len(files))
+            pack.append(files[kk - 1])
+        out.append((sid, pack))
+    return out
+
+
+packs_with_ids = build_packs_for_test_ids_with_ids(
+    TEST_IDS, ID_TO_PATH, groups, n_slices_to_merge=5
+)
+print("packs_with_ids:", len(packs_with_ids), "| expected:", len(TEST_IDS))
+
+
+
+## === cell 7
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+if learn is not None:
+    learn.dls.to(device)
+    learn.model.to(device)
+    learn.eval()
+device
+
+
+
+
+## === cell 8
+def mask2rle(mask: np.ndarray) -> str:
+    mask = (mask > 0).astype(np.uint8)
+    pixels = mask.T.flatten()  # Fortran-like order
+    pixels = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
+    runs[1::2] -= runs[::2]
+    return " ".join(str(x) for x in runs)
+
+
+def pad_mask(mask, image_size):
+    padded = np.zeros((image_size, image_size), dtype=mask.dtype)
+    dh = image_size - mask.shape[0]
+    dw = image_size - mask.shape[1]
+    top = dh // 2
+    left = dw // 2
+    padded[top : top + mask.shape[0], left : left + mask.shape[1]] = mask
+    return padded
+
+
+
+
+## === cell 9
+def _largest_component(mask_u8: np.ndarray) -> np.ndarray:
+    num, labels, stats, _ = cv.connectedComponentsWithStats(mask_u8, connectivity=8)
+    if num <= 1:
+        return mask_u8
+    areas = stats[1:, cv.CC_STAT_AREA]
+    k = 1 + int(np.argmax(areas))
+    return (labels == k).astype(np.uint8)
+
+
+def merged_median_slice_uint8(pack) -> np.ndarray:
+    merged = CreateSample().encodes(pack)  # (h,w,n)
+    med = np.median(merged.astype(np.float32), axis=2).astype(np.uint8)
+    return med
+
+
+def merged_stack_uint8(pack) -> np.ndarray:
+    return CreateSample().encodes(pack)  # (h,w,n)
+
+
+def heuristic_union_mask(img_u8: np.ndarray) -> np.ndarray:
+    if img_u8.ndim == 3:
+        img_u8 = img_u8[..., 0]
+    img8 = img_u8.astype(np.uint8)
+
+    clahe = cv.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    img8 = clahe.apply(img8)
+
+    img_blur = cv.GaussianBlur(img8, (5, 5), 0)
+    _, th = cv.threshold(img_blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+
+    if (th > 0).mean() > 0.65:
+        th = cv.bitwise_not(th)
+
+    m = (th > 0).astype(np.uint8)
+
+    m = binary_opening(m.astype(bool), structure=disk(2))
+    m = binary_closing(m.astype(bool), structure=disk(6))
+    m = binary_fill_holes(m)
+    m = m.astype(np.uint8)
+    m = _largest_component(m)
+
+    m = cv.dilate(m, cv.getStructuringElement(cv.MORPH_ELLIPSE, (7, 7)), iterations=1)
+    return m.astype(np.uint8)
+
+
+def heuristic_union_mask_from_stack(stack_u8: np.ndarray) -> np.ndarray:
+    """
+    Change (score-improving, still heuristic-only): use stable stack projections
+    (mean + max) instead of OR-ing per-slice masks, which can create speckle and
+    large unions that hurt Hausdorff. This typically yields a smoother, more
+    contiguous prediction.
+    """
+    h, w, n = stack_u8.shape
+    mean_img = np.mean(stack_u8.astype(np.float32), axis=2).astype(np.uint8)
+    max_img = np.max(stack_u8, axis=2).astype(np.uint8)
+
+    m_mean = heuristic_union_mask(mean_img)
+    m_max = heuristic_union_mask(max_img)
+
+    acc = (m_mean | m_max).astype(np.uint8)
+
+    area = float(acc.mean())
+    if area > 0.45:
+        acc = cv.erode(
+            acc, cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5)), iterations=1
+        )
+        acc = _largest_component(acc.astype(np.uint8))
+
+    return acc.astype(np.uint8)
+
+
+def should_be_empty_from_stack(stack_u8: np.ndarray) -> bool:
+    """
+    Change (score-improving): previous gate was too aggressive and produced many
+    all-empty masks, tanking Dice. Keep function but make it much less likely
+    to blank out a slice; only blank when the entire stack is essentially black.
+    """
+    p99 = np.percentile(stack_u8, 99)
+    return p99 < 8
+
+
+
+
+## === cell 10
+preds = []
+CLASS_ORDER = ("large_bowel", "small_bowel", "stomach")
+
+if learn is None:
+    for test_id, pack in progress_bar(packs_with_ids):
+        m = METADATA.get(test_id)
+
+        if (m is None) or (pack is None):
+            for name in CLASS_ORDER:
+                preds.append({"id": test_id, "class": name, "predicted": ""})
+            continue
+
+        try:
+            stack_u8 = merged_stack_uint8(pack)  # (h,w,5)
+
+            if should_be_empty_from_stack(stack_u8):
+                u = np.zeros((m.h, m.w), dtype=np.uint8)
+            else:
+                u = heuristic_union_mask_from_stack(stack_u8)
+        except Exception:
+            u = np.zeros((m.h, m.w), dtype=np.uint8)
+
+        if u.shape[:2] != (m.h, m.w):
+            u = cv.resize(u, (m.w, m.h), cv.INTER_NEAREST)
+
+        rle_u = "" if u.mean() == 0.0 else mask2rle(u)
+        for name in CLASS_ORDER:
+            preds.append({"id": test_id, "class": name, "predicted": rle_u})
+
+    df_preds = pd.DataFrame(preds, columns=["id", "class", "predicted"])
+    print("Heuristic fallback pred rows:", len(df_preds))
+else:
+    batch_size = 64
+
+    valid = [(tid, pk) for tid, pk in packs_with_ids if pk is not None]
+    chunks = list(chunked(valid, n=batch_size))
+
+    with learn.no_bar():
+        for subset in progress_bar(chunks):
+            subset_ids = [x[0] for x in subset]
+            subset_packs = [x[1] for x in subset]
+
+            test_dl = learn.dls.test_dl(
+                subset_packs, batch_size=batch_size, device=device
+            )
+            logits, *_ = learn.get_preds(dl=test_dl, act=noop)
+            labels = (torch.sigmoid(logits) >= 0.5).to("cpu").numpy().astype(np.uint8)
+
+            for test_id, mask in zip(subset_ids, labels):
+                m = METADATA.get(test_id)
+                if m is None:
+                    continue
+
+                h, w = m.h, m.w
+                for i, name in enumerate(CLASS_ORDER):
+                    cls_mask = pad_mask(mask[i], 320)
+                    cls_mask = cv.resize(cls_mask, (w, h), cv.INTER_NEAREST)
+                    cls_mask = binary_opening(
+                        cls_mask.astype(bool), structure=disk(5)
+                    ).astype(np.uint8)
+                    rle = "" if cls_mask.mean() == 0.0 else mask2rle(cls_mask)
+                    preds.append({"id": test_id, "class": name, "predicted": rle})
+
+            del logits, labels
+            gc.collect()
+
+    df_preds = pd.DataFrame(preds, columns=["id", "class", "predicted"])
+    print("Model pred rows:", len(df_preds))
+
+
+
+## === cell 11
+if not isinstance(df_preds, pd.DataFrame):
+    df_preds = pd.DataFrame(df_preds)
+
+for col in ["id", "class", "predicted"]:
+    if col not in df_preds.columns:
+        df_preds[col] = pd.Series(dtype="object")
+
+df_preds = (
+    df_preds.sort_values(["id", "class"])
+    .drop_duplicates(subset=["id", "class"], keep="last")
+    .reset_index(drop=True)
+)
+
+expected_rows = len(TEST_IDS) * 3
+
+full_index = pd.MultiIndex.from_product(
+    [TEST_IDS, list(CLASS_ORDER)], names=["id", "class"]
+)
+df_preds = df_preds.set_index(["id", "class"]).reindex(full_index).reset_index()
+df_preds["predicted"] = df_preds["predicted"].fillna("")
+
+assert len(df_preds) == expected_rows, (len(df_preds), expected_rows)
+assert df_preds["id"].nunique() == len(TEST_IDS)
+assert set(df_preds["class"].unique().tolist()) == set(CLASS_ORDER)
+
+print(df_preds.head())
+print("rows:", len(df_preds), "| unique ids:", df_preds["id"].nunique())
+
+
+
+## === cell 12
+df_submit = pd.read_csv(DATA_DIR / "sample_submission.csv")
+df_submit = df_submit.drop(columns="predicted").merge(
+    df_preds[["id", "class", "predicted"]], on=["id", "class"], how="left"
+)
+df_submit["predicted"] = df_submit["predicted"].fillna("")
+
+assert len(df_submit) == len(pd.read_csv(DATA_DIR / "sample_submission.csv"))
+assert list(df_submit.columns) == ["id", "class", "predicted"]
+assert df_submit["predicted"].isna().sum() == 0
+
+df_submit.to_csv("submission.csv", index=False)
+
+check = pd.read_csv("submission.csv")
+assert list(check.columns) == ["id", "class", "predicted"]
+assert len(check) == len(pd.read_csv(DATA_DIR / "sample_submission.csv"))
+print(check.head(10))
+print("Wrote submission.csv")

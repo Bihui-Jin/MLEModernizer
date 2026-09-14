@@ -1,0 +1,944 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.92455188153232
+
+# 6. Current score
+
+0.02908
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I fix three execution blockers while keeping the model and inference logic the same: (1) make the code robust to CPU-only Kaggle runtimes by selecting `cuda` only if available and removing hard `.cuda()` calls, (2) fix the missing weights path by searching for the checkpoint in the known Kaggle directories and loading with `map_location`, and (3) prevent the transform pipeline from returning `None` (your `trim()` sometimes returned nothing), which was leading to downstream failures/empty submissions. These changes are score-neutral (they don’t alter architecture or thresholds) and are only to ensure the notebook runs end-to-end and writes a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'I fix the execution blocker by making the checkpoint loading resilient to the file not being provided in the dataset: if the weight file can’t be found, the code still run end-to-end by using the model’s random initialization (this keep the current low score behavior rather than crashing). I also make inference more robust by (1) using a simple Dataset/DataLoader to avoid per-image overhead/timeouts and (2) ensuring predictions are always valid ints in `[0,4]`. Finally, I keep the submission formatting aligned to `sample_submission.csv` so the output is always a valid `submission.csv` with the required columns and row order.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 score is consistent with running the network with random weights (the checkpoint is not found), so the smallest score-moving change is to make weight discovery/load robust without changing the model or inference logic. I expand the checkpoint search to include `/kaggle/data`, `/kaggle/working`, and the competition folder itself, and also handle common checkpoint formats (`state_dict`, `model`, EMA) while keeping strict loading when possible. If no checkpoint is found, the code still produce a valid submission, but now it has a much higher chance to actually load the intended weights and move the score upward toward the target. No architecture, transforms, thresholds, or prediction logic are changed.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 score is most consistent with the model running on random initialization because the checkpoint is not being found/loaded, so the smallest score-moving change is to make checkpoint discovery and state_dict extraction more robust while keeping the same model, transforms, and thresholding. I (1) widen the search to also look for common alternative filenames and extensions around your expected weight name, (2) handle nested/saved formats more reliably (including `{'model': {'state_dict': ...}}` and `{'model': nn.Module}` cases), and (3) verify that the loaded state_dict actually matches the model (key overlap sanity check) before proceeding, otherwise falling back as before. This should move the score upward toward your target without changing evaluation semantics. The submission writing/order stays exactly aligned to `sample_submission.csv`.'
+- What this solution (achieved 0.04339) has done: 'Your current 0.0 score strongly suggests the model is still running with random weights because the intended checkpoint is not present in this Kaggle environment. The smallest score-improving change (without touching architecture/inference/thresholds) is to automatically download the missing weights from timm (already installed) by instantiating the backbone with `pretrained=True` when no local checkpoint is found; this keeps your head layers the same but gives the backbone meaningful features, which should move QWK upward toward your target. I keep strict checkpoint loading exactly as-is when the file exists, and only apply the pretrained-backbone fallback when it doesn’t. I also make `regress2class` create predictions on the same device/dtype then move to CPU once, to avoid subtle device issues while keeping identical decision thresholds.'
+- What this solution (achieved -0.03497) has done: 'Your current gap to the target is large (0.043 → 0.925), so the smallest score-moving change is to stop relying on a missing checkpoint and instead use the model’s own outputs more effectively for QWK. I keep the exact same model and weights-loading behavior, but at inference I use the existing `final=True` head (already defined in your model) and ensemble it with the current regressor prediction; this is a minimal change that often improves ordinal agreement without changing architecture or training. I also add a lightweight, deterministic test-time augmentation (horizontal flip) and average predictions, which typically nudges QWK upward while preserving evaluation semantics and runtime constraints. Submission formatting and paths remain unchanged, and the script still write a valid `submission.csv`.'
+- What this solution (achieved -0.03497) has done: 'Your current score (-0.03497) is far below the target (0.92455), and the most likely reason is that the intended trained checkpoint still isn’t being used, so the model behaves close to random despite the pretrained-backbone fallback. I keep the exact same model architecture and inference pipeline (including your flip-TTA and averaging), but make the weight loading more reliable by also accepting checkpoints that were saved as a full `nn.Module` and by stripping common nested prefixes more thoroughly. I also ensure we don’t accidentally reject a correct checkpoint due to key-name mismatches by mapping keys like `backbone.*`/`model.*` consistently before the overlap check (still refusing clearly wrong files). These are minimal changes focused only on getting the correct weights loaded, which should move QWK sharply upward toward the target while keeping evaluation semantics the same and still writing a valid `submission.csv`.'
+- What this solution (achieved 0.02085) has done: 'Your current score is extremely low relative to the target, and the code strongly indicates you’re not actually using a trained checkpoint (so the model behaves close to random even with a pretrained backbone). The smallest score-moving change that preserves your core architecture and inference semantics is to (1) make the checkpoint loading accept *backbone-only* EfficientNet-B4 weights (common timm-style checkpoints) by remapping keys into `backbone.*` and loading them non-strictly, and (2) stop using the untrained `final_regressor` head when no full 3-stage checkpoint is loaded (keep the same regressor output and flip-TTA). These changes keep the same model, transforms, thresholds, and prediction mapping, but materially reduce “random head” damage so QWK should move upward toward the target. The script still runs end-to-end and writes a valid `submission.csv` with the correct columns and row order.'
+- What this solution (achieved 0.03495) has done: 'The current score (0.02085) is far below the target (0.92455), and the code shows you’re almost certainly not loading a trained full 3-stage checkpoint (or you’re loading only a backbone), so the model behaves close to random and QWK collapses. To move the score upward with minimal core-logic change, I add a tiny, deterministic calibration step that fits optimal regression-to-class thresholds on the training set using your existing model outputs (same regressor head, same `regress2class` mapping concept) and then applies those learned thresholds at test time. This doesn’t change architecture, loss, training loops, or feature extraction; it only replaces fixed hardcoded thresholds with data-driven ones, which is directly aligned to QWK and should yield a large jump when the model has any signal (even if only pretrained backbone + partially loaded head). I also add a safe fallback to the original thresholds if training images aren’t available, and keep submission formatting unchanged.'
+- What this solution (achieved 0.03495) has done: 'Your current score (0.03495) is far below the target (0.92455), so we should make a minimal change that legitimately increases QWK without altering your model architecture or training/inference approach. The biggest issue is that you “learn” thresholds on the same training set using in-sample predictions, which can produce thresholds that don’t generalize and can even collapse to a near-constant class distribution on test, tanking QWK. I keep your exact model, flip-TTA, and regress-to-class mapping, but fit thresholds on out-of-fold (OOF) predictions via a simple StratifiedKFold loop; this is still just calibration, but it avoids leakage and should move score upward substantially toward the target. I also add a tiny safety constraint to keep thresholds within a reasonable monotonic margin and fall back to the original defaults if anything goes wrong.'
+- What this solution (achieved 0.03495) has done: 'Your current QWK (0.03495) is extremely far below the target (0.92455), so the most likely score-limiting issue is not calibration but that inference is effectively “random/weak” because the intended trained checkpoint isn’t being loaded, and the current backbone fallback is `pretrained=False` for the `Regressor` class and only sometimes `pretrained=True` for the 3-stage model. I make the smallest score-moving change by (1) switching the backbone fallback to use timm pretrained weights whenever a full 3-stage checkpoint isn’t found/loaded, and (2) ensuring the checkpoint “full vs partial” detection is based on actual loaded keys from `load_state_dict` (not raw ckpt keys), so we don’t mistakenly skip a valid `final=True` head. Everything else (architecture, transforms, flip-TTA, threshold calibration, submission formatting/paths) stays the same, and the script still writes a valid `submission.csv`.'
+- What this solution (achieved 0.03495) has done: 'Your score is far below the target, so we should cautiously increase QWK with the smallest changes that don’t alter your model architecture or training approach. The current code likely never enables the `final=True` head because `loaded_full_3stage` detection is wrong: it checks `net.state_dict().keys()` (which always contains those keys even when weights weren’t loaded), so it can incorrectly use an untrained `final_regressor` and hurt predictions. I (1) determine whether the checkpoint actually contained/loaded `final_regressor` weights based on the checkpoint keys / load result (not the model’s own keys), and (2) only use `final=True` when those weights are truly present; otherwise we keep the regressor-only path (which is safer with partial/random heads). Everything else (transforms, flip-TTA, OOF threshold calibration, submission formatting/paths) stays the same.'
+- What this solution (achieved 0.03101) has done: 'Your score is far below the target, so the most likely issue is still that you’re not using a properly trained head (and/or thresholds), and the current “OOF thresholds” are actually computed from a single fixed model’s in-sample predictions (not true OOF), which can yield unstable/degenerate thresholds and hurt QWK. I keep your exact model/inference (same net, same flip-TTA, same regress-to-class via thresholds), but I (1) make threshold fitting more robust by optimizing thresholds directly for QWK using a fast coordinate-descent refinement around sensible percentiles of your model outputs, and (2) add a safety fallback: if the learned thresholds do not improve QWK on a held-out split, revert to the default thresholds. This is a minimal calibration-only change (no architecture/training changes) and is directly aligned to the evaluation metric, so it should move the score upward toward your target while keeping runtime within limits and still producing a valid `submission.csv`.'
+- What this solution (achieved 0.03101) has done: 'Your current score is far below the target, so we should increase QWK with the smallest change that improves ordinal agreement without changing the model, transforms, loss, or training approach. The biggest issue is that your `regress2class()` still uses a *fixed global* threshold list even after you “learn” better thresholds; so test-time class mapping ignores the learned thresholds entirely. I modify `regress2class()` to use the current `threshold` passed in (defaulting to the global), and use it consistently at inference; this preserves the same semantics (thresholding a continuous regressor) but actually applies the calibrated thresholds you already validated on a hold-out split. Everything else (architecture, checkpoint logic, flip-TTA, submission formatting/paths) remains unchanged.'
+- What this solution (achieved 0.02908) has done: 'Your current score (0.03101) is far below the target (0.92455), so we should increase QWK with the smallest change that improves ordinal agreement without changing the model or training loop. The most impactful minimal fix is to calibrate the regression-to-class thresholds using *true out-of-fold (OOF)* predictions (instead of a single train/valid split), which avoids threshold overfitting and typically improves QWK. I keep your exact model, transforms, flip-TTA, and `regress2class()` logic; I only replace the threshold-fitting block with a StratifiedKFold-based OOF procedure and keep your “accept only if it improves on a held-out fold” safety check. This should move the score upward toward the target while still producing the same `submission.csv` format.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import random
+import time
+import math
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.parameter import Parameter
+from torch.utils.data import DataLoader, Dataset
+import torchvision.transforms as transforms
+from torchvision.transforms import functional as FT
+from PIL import Image, ImageChops
+
+from sklearn.metrics import cohen_kappa_score
+from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
+import timm
+
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+torch.set_grad_enabled(False)
+
+random.seed(42)
+np.random.seed(42)
+torch.manual_seed(42)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(42)
+
+
+
+## === cell 1
+threshold = [0.75, 1.5, 2.5, 3.5]
+
+
+def regress2class(out, thr=None):
+    thr = threshold if thr is None else thr
+    prediction = torch.zeros(out.size(0), device=out.device)
+    for i in range(4):
+        prediction += (out.data >= thr[i]).squeeze().to(prediction.dtype)
+    return prediction.detach().cpu()
+
+
+def ordinal2class_prob(out):
+    pred_prob = torch.zeros(out.size(0), 5, device=out.device)
+    pred_prob[:, 0] = (1 - out[:, 0]).squeeze()
+    pred_prob[:, 1] = (out[:, 0] * (1 - out[:, 1])).squeeze()
+    pred_prob[:, 2] = (out[:, 1] * (1 - out[:, 2])).squeeze()
+    pred_prob[:, 3] = (out[:, 2] * (1 - out[:, 3])).squeeze()
+    pred_prob[:, 4] = out[:, 3].squeeze()
+    return F.softmax(pred_prob, dim=1)
+
+
+def regress2class_prob(out):
+    pred_prob = torch.zeros((out.size(0), 5), device=out.device)
+    for i in range(out.size(0)):
+        if out[i] < 4.0:
+            l1 = int(math.floor(float(out[i])))
+            l2 = int(math.ceil(float(out[i])))
+            pred_prob[i][l1] = 1 - (out[i] - l1)
+            pred_prob[i][l2] = 1 - (l2 - out[i])
+        else:
+            pred_prob[i][4] = 1.0
+    return pred_prob
+
+
+
+
+## === cell 2
+def gem(x, p=3, eps=1e-6):
+    return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1.0 / p)
+
+
+class GeM(nn.Module):
+    def __init__(self, p=3, eps=1e-6, flatten=False):
+        super(GeM, self).__init__()
+        self.p = Parameter(torch.ones(1) * p)
+        self.eps = eps
+        self.flatten = flatten
+
+    def forward(self, x):
+        x = gem(x, p=self.p, eps=self.eps)
+        if self.flatten:
+            x = x.flatten(1)
+        return x
+
+    def __repr__(self):
+        return (
+            self.__class__.__name__
+            + "("
+            + "p="
+            + "{:.4f}".format(self.p.data.tolist()[0])
+            + ", "
+            + "eps="
+            + str(self.eps)
+            + ")"
+        )
+
+
+class Regressor(nn.Module):
+    def __init__(self):
+        super(Regressor, self).__init__()
+        self.backbone = timm.models.tf_efficientnet_b5_ns(pretrained=False)
+        self.backbone.global_pool = GeM(flatten=True)
+        self.regressor = nn.Linear(1000, 1)
+
+    def forward(self, x):
+        x = self.backbone(x)
+        out = self.regressor(x)
+        out = torch.sigmoid(out) * 4.5
+        return out
+
+
+class ThreeStage_Model(nn.Module):
+    def __init__(self, backbone=None, backbone_pretrained=False):
+        super(ThreeStage_Model, self).__init__()
+
+        self.backbone = timm.models.tf_efficientnet_b4_ns(
+            pretrained=backbone_pretrained
+        )
+        self.backbone.global_pool = GeM(flatten=True)
+
+        self.classifier = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 5),
+        )
+
+        self.regressor = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 1),
+        )
+
+        self.ordinal = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 4),
+        )
+
+        self.final_regressor = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(10, 1),
+        )
+
+    def forward(self, x, final=False):
+        x = self.backbone(x)
+
+        c_out = self.classifier(x)
+        r_out = self.regressor(x)
+        o_out = self.ordinal(x)
+
+        if final:
+            out = torch.cat((c_out, r_out, o_out), 1)
+            out = self.final_regressor(out)
+            out = torch.sigmoid(out) * 4.5
+            return out
+        else:
+            r_out = torch.sigmoid(r_out) * 4.5
+            o_out = torch.sigmoid(o_out)
+            return c_out, r_out, o_out
+
+
+
+
+## === cell 3
+class photometric_distort(object):
+    def __call__(self, image):
+        distortions = [
+            FT.adjust_brightness,
+            FT.adjust_contrast,
+            FT.adjust_saturation,
+            FT.adjust_hue,
+        ]
+
+        random.shuffle(distortions)
+
+        for d in distortions:
+            if random.random() < 0.5:
+                if d.__name__ == "adjust_hue":
+                    adjust_factor = random.uniform(-16 / 255.0, 16 / 255.0)
+                else:
+                    adjust_factor = random.uniform(0.7, 1.3)
+                image = d(image, adjust_factor)
+
+        return image
+
+
+class cropTo4_3(object):
+    def __call__(self, image):
+        w, h = image.size
+
+        if (w / h) >= (4 / 3):
+            new_h = h
+            new_w = int(h * 4 / 3)
+        else:
+            new_h = int(w * 3 / 4)
+            new_w = w
+
+        left = (w - new_w) / 2
+        top = (h - new_h) / 2
+        right = left + new_w
+        bottom = top + new_h
+
+        return image.crop((left, top, right, bottom))
+
+
+class trim(object):
+    def __call__(self, image):
+        bg = Image.new(image.mode, image.size, image.getpixel((0, 0)))
+        diff = ImageChops.difference(image, bg)
+        diff = ImageChops.add(diff, diff, 2.0, -10)
+        bbox = diff.getbbox()
+        if bbox:
+            return image.crop(bbox)
+        return image
+
+
+
+
+## === cell 4
+BASE_CANDIDATES = [
+    "/kaggle/input/aptos2019-blindness-detection",
+    "../input/aptos2019-blindness-detection",
+    "/kaggle/data/aptos2019-blindness-detection",
+    "../kaggle/data/aptos2019-blindness-detection",
+]
+
+base_dir = next((p for p in BASE_CANDIDATES if os.path.isdir(p)), None)
+if base_dir is None:
+    raise FileNotFoundError(
+        f"Could not find competition directory in: {BASE_CANDIDATES}"
+    )
+
+test_csv_path = os.path.join(base_dir, "test.csv")
+sample_csv_path = os.path.join(base_dir, "sample_submission.csv")
+train_csv_path = os.path.join(base_dir, "train.csv")
+test_img_dir = os.path.join(base_dir, "test_images")
+train_img_dir = os.path.join(base_dir, "train_images")
+
+if not os.path.exists(test_csv_path):
+    raise FileNotFoundError(f"Missing test.csv at: {test_csv_path}")
+if not os.path.exists(sample_csv_path):
+    raise FileNotFoundError(f"Missing sample_submission.csv at: {sample_csv_path}")
+if not os.path.isdir(test_img_dir):
+    raise FileNotFoundError(f"Missing test_images dir at: {test_img_dir}")
+
+test_ids = pd.read_csv(test_csv_path)["id_code"].astype(str).values
+
+input_size = 384
+transform = transforms.Compose(
+    [
+        trim(),
+        cropTo4_3(),
+        transforms.Resize((input_size * 3 // 4, input_size)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.384, 0.258, 0.174], std=[0.124, 0.089, 0.094]),
+    ]
+)
+
+WEIGHT_NAME = "B4_3stage_6epoch_320finetune.pkl"
+
+_WEIGHT_ALIASES = [
+    WEIGHT_NAME,
+    WEIGHT_NAME.replace(".pkl", ".pth"),
+    WEIGHT_NAME.replace(".pkl", ".pt"),
+    WEIGHT_NAME.replace(".pkl", ".bin"),
+]
+
+WEIGHT_CANDIDATES = []
+for nm in _WEIGHT_ALIASES:
+    WEIGHT_CANDIDATES += [
+        "../input/weights/" + nm,
+        "/kaggle/input/weights/" + nm,
+        os.path.join(base_dir, nm),
+        os.path.join("/kaggle/input", nm),
+        os.path.join("/kaggle/data", nm),
+        os.path.join("/kaggle/working", nm),
+        os.path.join(base_dir, "weights", nm),
+    ]
+
+
+def _find_weight_file_any(names):
+    for p in WEIGHT_CANDIDATES:
+        if os.path.exists(p):
+            return p
+    search_roots = ["/kaggle/input", "/kaggle/data", "/kaggle/working", base_dir]
+    for root in search_roots:
+        if os.path.isdir(root):
+            for r, _, files in os.walk(root):
+                for fname in names:
+                    if fname in files:
+                        return os.path.join(r, fname)
+    return None
+
+
+def _unwrap_module(obj):
+    if isinstance(obj, nn.Module):
+        return obj.state_dict()
+    return obj
+
+
+def _extract_state_dict(ckpt):
+    ckpt = _unwrap_module(ckpt)
+
+    if isinstance(ckpt, dict):
+        candidate_keys = [
+            "state_dict",
+            "model",
+            "model_state_dict",
+            "net",
+            "ema",
+            "ema_state_dict",
+        ]
+
+        for k in candidate_keys:
+            if k in ckpt:
+                v = _unwrap_module(ckpt[k])
+                if isinstance(v, dict):
+                    for kk in candidate_keys:
+                        if kk in v and isinstance(v[kk], (dict, nn.Module)):
+                            return _unwrap_module(v[kk])
+                    return v
+                return v
+
+        if all(isinstance(v, torch.Tensor) for v in ckpt.values()):
+            return ckpt
+
+    return ckpt
+
+
+def _strip_prefix_if_present(state, prefix):
+    if isinstance(state, dict) and any(k.startswith(prefix) for k in state.keys()):
+        return {k[len(prefix) :]: v for k, v in state.items()}
+    return state
+
+
+def _maybe_remap_common_wrappers(state):
+    if not isinstance(state, dict):
+        return state
+    for pref in ("module.", "model.", "net."):
+        state = _strip_prefix_if_present(state, pref)
+    return state
+
+
+def _maybe_map_backbone_only_to_model(state, model):
+    if not isinstance(state, dict):
+        return state
+
+    model_keys = set(model.state_dict().keys())
+    state_keys = set(state.keys())
+
+    direct_overlap = len(model_keys.intersection(state_keys)) / max(1, len(state_keys))
+    if direct_overlap >= 0.30:
+        return state
+
+    backbone_prefixed = {("backbone." + k): v for k, v in state.items()}
+    pref_overlap = len(model_keys.intersection(backbone_prefixed.keys())) / max(
+        1, len(backbone_prefixed)
+    )
+    if pref_overlap >= 0.30:
+        return backbone_prefixed
+
+    return state
+
+
+def _key_overlap_ratio(model_state, loaded_state):
+    mk = set(model_state.keys())
+    lk = set(loaded_state.keys())
+    if len(lk) == 0:
+        return 0.0
+    return len(mk.intersection(lk)) / float(len(mk))
+
+
+weight_path = _find_weight_file_any(_WEIGHT_ALIASES)
+
+net = ThreeStage_Model(backbone_pretrained=(weight_path is None))
+
+loaded_full_3stage = False
+loaded_any_weights = False
+_loaded_key_set = set()
+
+if weight_path is not None:
+    ckpt = torch.load(weight_path, map_location="cpu")
+    state = _extract_state_dict(ckpt)
+
+    if not isinstance(state, dict):
+        print(
+            "WARNING: Loaded checkpoint is not a state_dict-like dict; ignoring:",
+            weight_path,
+        )
+        state = None
+
+    if isinstance(state, dict):
+        state = _maybe_remap_common_wrappers(state)
+        state = _maybe_map_backbone_only_to_model(state, net)
+
+        overlap = _key_overlap_ratio(net.state_dict(), state)
+        if overlap < 0.3:
+            print(
+                f"WARNING: checkpoint key overlap too low ({overlap:.2f}); likely wrong file. Will not load:",
+                weight_path,
+            )
+            state = None
+
+    if isinstance(state, dict):
+        try:
+            missing, unexpected = net.load_state_dict(state, strict=True)
+            print("Loaded weights (strict) from:", weight_path)
+            loaded_any_weights = True
+            _loaded_key_set = set(state.keys())
+        except Exception as e:
+            missing, unexpected = net.load_state_dict(state, strict=False)
+            print("Loaded weights (non-strict) from:", weight_path)
+            print(
+                "Non-strict load details. Missing:",
+                len(missing),
+                "Unexpected:",
+                len(unexpected),
+            )
+            print("Strict load error was:", repr(e))
+            loaded_any_weights = True
+            _loaded_key_set = set(state.keys())
+
+        loaded_full_3stage = ("final_regressor.1.weight" in _loaded_key_set) and (
+            "final_regressor.1.bias" in _loaded_key_set
+        )
+
+        if not loaded_full_3stage:
+            print(
+                "INFO: Checkpoint appears to be backbone-only/partial (final_regressor not present in loaded weights). "
+                "Will skip final=True head at inference to avoid random-head degradation."
+            )
+    else:
+        print(
+            "WARNING: checkpoint found but unusable; will run with timm pretrained backbone fallback."
+        )
+        net = ThreeStage_Model(backbone_pretrained=True)
+        loaded_full_3stage = False
+else:
+    print(
+        "WARNING: checkpoint not found; using timm pretrained backbone fallback (should improve score vs random init)."
+    )
+    loaded_full_3stage = False
+
+net = net.to(device)
+net.eval()
+
+
+
+
+## === cell 5
+def _apply_thresholds_np(y_cont, thr_list):
+    thr0, thr1, thr2, thr3 = thr_list
+    y = np.zeros_like(y_cont, dtype=np.int64)
+    y += (y_cont >= thr0).astype(np.int64)
+    y += (y_cont >= thr1).astype(np.int64)
+    y += (y_cont >= thr2).astype(np.int64)
+    y += (y_cont >= thr3).astype(np.int64)
+    return np.clip(y, 0, 4)
+
+
+def _fit_thresholds_coord_desc(
+    y_true, y_cont, init_thr=(0.75, 1.5, 2.5, 3.5), n_rounds=6
+):
+    y_true = y_true.astype(np.int64)
+    y_cont = y_cont.astype(np.float64)
+
+    def qwk(thr_vec):
+        pred = _apply_thresholds_np(y_cont, thr_vec)
+        return cohen_kappa_score(y_true, pred, weights="quadratic")
+
+    qs = np.percentile(y_cont, [20, 45, 70, 90]).astype(np.float64)
+    thr = 0.5 * np.array(init_thr, dtype=np.float64) + 0.5 * qs
+
+    thr = np.clip(thr, 0.0, 4.5)
+    thr.sort()
+    min_gap = 0.05
+    for i in range(1, 4):
+        if thr[i] <= thr[i - 1] + min_gap:
+            thr[i] = thr[i - 1] + min_gap
+    thr = np.clip(thr, 0.0, 4.5)
+
+    best_thr = thr.copy()
+    best_score = qwk(best_thr.tolist())
+
+    for rnd in range(n_rounds):
+        span = 0.6 * (0.7**rnd)
+        steps = 31
+        for i in range(4):
+            center = best_thr[i]
+            lo = max(0.0, center - span)
+            hi = min(4.5, center + span)
+            grid = np.linspace(lo, hi, steps, dtype=np.float64)
+
+            local_best_v = center
+            local_best_s = best_score
+            for v in grid:
+                cand = best_thr.copy()
+                cand[i] = v
+                cand.sort()
+                ok = True
+                for j in range(1, 4):
+                    if cand[j] <= cand[j - 1] + min_gap:
+                        ok = False
+                        break
+                if not ok:
+                    continue
+                s = qwk(cand.tolist())
+                if s > local_best_s:
+                    local_best_s = s
+                    local_best_v = v
+
+            best_thr[i] = local_best_v
+            best_thr.sort()
+            for j in range(1, 4):
+                if best_thr[j] <= best_thr[j - 1] + min_gap:
+                    best_thr[j] = best_thr[j - 1] + min_gap
+            best_thr = np.clip(best_thr, 0.0, 4.5)
+            best_score = qwk(best_thr.tolist())
+
+    return best_thr.tolist(), float(best_score)
+
+
+class TrainDataset(Dataset):
+    def __init__(self, df, img_dir, transform=None):
+        self.df = df.reset_index(drop=True)
+        self.img_dir = img_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, i):
+        idx = str(self.df.loc[i, "id_code"])
+        y = int(self.df.loc[i, "diagnosis"])
+        path = os.path.join(self.img_dir, f"{idx}.png")
+        img = Image.open(path).convert("RGB")
+        if self.transform is not None:
+            img = self.transform(img)
+        return i, y, img
+
+
+def _predict_continuous_for_df(df, img_dir, batch_size=8):
+    ds = TrainDataset(df, img_dir, transform=transform)
+    dl = DataLoader(
+        ds,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=2,
+        pin_memory=torch.cuda.is_available(),
+    )
+    cont = np.zeros(len(df), dtype=np.float64)
+    ytrue = df["diagnosis"].astype(np.int64).values
+
+    with torch.no_grad():
+        for idxb, yb, xb in dl:
+            xb = xb.to(device, non_blocking=True)
+
+            _, r_out, _ = net(xb)
+            x_flip = torch.flip(xb, dims=[3])
+            _, r_out_flip, _ = net(x_flip)
+            r_avg = 0.5 * (r_out + r_out_flip)
+
+            if loaded_full_3stage:
+                f_out = net(xb, final=True)
+                f_out_flip = net(x_flip, final=True)
+                f_avg = 0.5 * (f_out + f_out_flip)
+                out_avg = 0.5 * (r_avg.squeeze(1) + f_avg.squeeze(1))
+            else:
+                out_avg = r_avg.squeeze(1)
+
+            cont[idxb.numpy()] = out_avg.detach().cpu().numpy().astype(np.float64)
+    return ytrue, cont
+
+
+learned_threshold = None
+if os.path.exists(train_csv_path) and os.path.isdir(train_img_dir):
+    train_df = pd.read_csv(train_csv_path)[["id_code", "diagnosis"]].reset_index(
+        drop=True
+    )
+    y_all = train_df["diagnosis"].astype(np.int64).values
+
+    oof_cont = np.zeros(len(train_df), dtype=np.float64)
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+    t0 = time.time()
+    for fold, (_, va_idx) in enumerate(
+        skf.split(train_df["id_code"].values, y_all), start=1
+    ):
+        va_df = train_df.iloc[va_idx].reset_index(drop=True)
+        y_va_fold, cont_va_fold = _predict_continuous_for_df(
+            va_df, train_img_dir, batch_size=8
+        )
+        oof_cont[va_idx] = cont_va_fold
+        print(f"OOF fold {fold}/5 done. elapsed={time.time()-t0:.1f}s")
+
+    base_oof_pred = _apply_thresholds_np(oof_cont, threshold)
+    base_oof_qwk = cohen_kappa_score(y_all, base_oof_pred, weights="quadratic")
+    print("OOF QWK with default thresholds:", float(base_oof_qwk))
+
+    cand_thr, fit_oof_qwk = _fit_thresholds_coord_desc(
+        y_all, oof_cont, init_thr=tuple(threshold), n_rounds=6
+    )
+    cand_oof_pred = _apply_thresholds_np(oof_cont, cand_thr)
+    cand_oof_qwk = cohen_kappa_score(y_all, cand_oof_pred, weights="quadratic")
+    print("OOF QWK with learned thresholds:", float(cand_oof_qwk))
+    print("Candidate thresholds:", cand_thr)
+
+    if np.isfinite(cand_oof_qwk) and (cand_oof_qwk >= base_oof_qwk + 1e-4):
+        threshold = cand_thr
+        learned_threshold = cand_thr
+        print("Using learned thresholds (OOF-validated improvement).")
+    else:
+        print("Reverting to default thresholds (no OOF-validated improvement).")
+        learned_threshold = None
+else:
+    print(
+        "INFO: train.csv/train_images not available; keeping original fixed thresholds:",
+        threshold,
+    )
+
+
+
+
+## === cell 6
+class TestDataset(Dataset):
+    def __init__(self, ids, img_dir, transform=None):
+        self.ids = list(ids)
+        self.img_dir = img_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.ids)
+
+    def __getitem__(self, i):
+        idx = self.ids[i]
+        path = os.path.join(self.img_dir, f"{idx}.png")
+        img = Image.open(path).convert("RGB")
+        if self.transform is not None:
+            img = self.transform(img)
+        return idx, img
+
+
+ds = TestDataset(test_ids, test_img_dir, transform=transform)
+dl = DataLoader(
+    ds, batch_size=8, shuffle=False, num_workers=2, pin_memory=torch.cuda.is_available()
+)
+
+submission = []
+with torch.no_grad():
+    for ids_batch, x in dl:
+        x = x.to(device, non_blocking=True)
+
+        _, r_out, _ = net(x)
+
+        x_flip = torch.flip(x, dims=[3])
+        _, r_out_flip, _ = net(x_flip)
+
+        r_avg = 0.5 * (r_out + r_out_flip)
+
+        if loaded_full_3stage:
+            f_out = net(x, final=True)
+            f_out_flip = net(x_flip, final=True)
+            f_avg = 0.5 * (f_out + f_out_flip)
+            out_avg = 0.5 * (r_avg.squeeze(1) + f_avg.squeeze(1))
+        else:
+            out_avg = r_avg.squeeze(1)
+
+        pred = regress2class(out_avg, thr=threshold).numpy().astype(int)
+        pred = np.clip(pred, 0, 4)
+        for idx, p in zip(ids_batch, pred):
+            submission.append([str(idx), int(p)])
+
+submission = np.array(submission, dtype=object)
+
+
+
+## === cell 7
+df = pd.DataFrame(submission, columns=["id_code", "diagnosis"])
+df["id_code"] = df["id_code"].astype(str)
+df["diagnosis"] = df["diagnosis"].astype(int).clip(0, 4)
+
+sample = pd.read_csv(sample_csv_path)[["id_code"]]
+df = sample.merge(df, on="id_code", how="left")
+df["diagnosis"] = df["diagnosis"].fillna(0).astype(int).clip(0, 4)
+
+df.to_csv("submission.csv", index=False)
+print(df.head())
+print("Wrote submission.csv with shape:", df.shape)
+print("diagnosis value counts:\n", df["diagnosis"].value_counts().sort_index())
+print("Final thresholds used:", threshold)
+print("learned_threshold (accepted):", learned_threshold)
+print("loaded_full_3stage:", loaded_full_3stage)
+print("loaded_any_weights:", loaded_any_weights)
+print("weight_path:", weight_path)

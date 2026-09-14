@@ -1,0 +1,564 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given questions and answers from various StackExchange properties, predict target values of 30 labels for each question-answer pair.
+
+## Metric
+Mean column-wise Spearman's correlation coefficient. The Spearman's rank correlation is computed for each target column, and the mean of these values is calculated for the submission score.
+
+## Submission Format
+For each qa_id in the test set, you must predict a probability for each target variable. The predictions should be in the range [0,1]. The file should contain a header and have the following format:
+
+```
+qa_id,question_asker_intent_understanding,...,answer_well_written
+6,0.0,...,0.5
+8,0.5,...,0.1
+18,1.0,...,0.0
+etc.
+```
+
+## Dataset
+The list of 30 target labels are the same as the column names in the `sample_submission.csv` file. Target labels with the prefix `question_` relate to the `question_title` and/or `question_body` features in the data. Target labels with the prefix `answer_` relate to the `answer` feature.
+
+Target labels are aggregated from multiple raters, and can have continuous values in the range `[0,1]`. Therefore, predictions must also be in that range.
+
+- **train.csv** - the training data (target labels are the last 30 columns)
+- **test.csv** - the test set (you must predict 30 labels for each test set row)
+- **sample_submission.csv** - a sample submission file in the correct format; column names are the 30 target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (83 lines)
+            sample_submission.csv (609 lines)
+            sample_submission.csv.zip (8.9 kB)
+            test.csv (19551 lines)
+            test.csv.zip (471.7 kB)
+            train.csv (159837 lines)
+            train.csv.zip (4.2 MB)
+            google-quest-challenge/
+                description.md (83 lines)
+                sample_submission.csv (609 lines)
+                ... and 5 other files
+                google-quest-challenge/
+        input/
+            description.md (83 lines)
+            sample_submission.csv (609 lines)
+            sample_submission.csv.zip (8.9 kB)
+            test.csv (19551 lines)
+            test.csv.zip (471.7 kB)
+            train.csv (159837 lines)
+            train.csv.zip (4.2 MB)
+            google-quest-challenge/
+                description.md (83 lines)
+                sample_submission.csv (609 lines)
+                ... and 5 other files
+                google-quest-challenge/
+        working/
+            google-quest-challenge/
+                description.md (83 lines)
+                sample_submission.csv (609 lines)
+                ... and 5 other files
+                google-quest-challenge/
+```
+
+-> data/google-quest-challenge/sample_submission.csv has 608 rows and 31 columns.
+The columns are: qa_id, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer, question_fact_seeking, question_has_commonly_accepted_answer, question_interestingness_others, question_interestingness_self, question_multi_intent, question_not_really_a_question, question_opinion_seeking, question_type_choice, question_type_compare, question_type_consequence... and 16 more columns
+
+-> data/google-quest-challenge/test.csv has 19550 rows and 11 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host
+
+-> data/google-quest-challenge/train.csv has 159836 rows and 41 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer... and 26 more columns
+
+-> data/sample_submission.csv has 608 rows and 31 columns.
+The columns are: qa_id, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer, question_fact_seeking, question_has_commonly_accepted_answer, question_interestingness_others, question_interestingness_self, question_multi_intent, question_not_really_a_question, question_opinion_seeking, question_type_choice, question_type_compare, question_type_consequence... and 16 more columns
+
+-> data/test.csv has 19550 rows and 11 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host
+
+-> data/train.csv has 159836 rows and 41 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer... and 26 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.1475958055409032
+
+# 6. Current score
+
+0.08593
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.18869) has done: 'Your notebook fails because it depends on external Kaggle dataset files (`tokenizer.pickle` and `model.h5`) that are not present in your environment, and it also hits a TensorFlow/protobuf compatibility issue during import. I remove the unavailable file dependencies by training the same core BiGRU-style Keras model inside the notebook using the provided `train.csv`, and I build a tokenizer from the training text so `compute_sequences()` works. I also make the TensorFlow import more robust by avoiding the protobuf-triggering `load_model` path and by using standard `tqdm` instead of `tqdm_notebook`. Finally, I ensure the submission uses the exact column order from `sample_submission.csv`, clips predictions to `[0,1]`, and writes `submission.csv` successfully.'
+- What this solution (achieved 0.18869) has done: 'I fix the TensorFlow/protobuf import crash by forcing TensorFlow to use the pure-Python protobuf implementation before importing it (a common Kaggle runtime issue behind `MessageFactory.GetPrototype`). I also make the data path resolution more robust for both `/kaggle/input/...` and the alternative `/kaggle/data/...` layout you listed, without changing the training/prediction logic. Finally, I ensure the submission columns exactly match `sample_submission.csv` order, clip predictions to `[0,1]`, and always write a `submission.csv` in the working directory.'
+- What this solution (achieved 0.18869) has done: 'I fix the TensorFlow/protobuf import crash by switching to `tf.keras` via the standalone `keras` package if TensorFlow fails to import, while keeping the exact same model architecture/training loop/prediction flow. I also add deterministic seeding for the backend actually used (TF or Keras) so results are stable. Finally, I keep the submission formatting identical but make the file-path detection include your `/kaggle/data/...` and `/kaggle/input/...` layouts and ensure the output is always a valid `submission.csv` with the sample’s column order.'
+- What this solution (achieved 0.07692) has done: 'The crash happens before any training because importing TensorFlow (and even the standalone `keras` fallback) triggers a protobuf API mismatch (`MessageFactory.GetPrototype`). To make the notebook run end-to-end without changing your model/training core logic, I replace the TF/Keras dependency with a small NumPy-only baseline that preserves the same “tokenize text → fixed-length sequences → predict 30 sigmoid outputs” semantics and still writes a valid `submission.csv`. This avoids the protobuf issue entirely and is deterministic/reproducible in the Kaggle environment. Because your current score (0.18869) is above the target (0.1476) and higher-is-better, this change likely reduce the score toward the target band while ensuring correctness and stability.'
+- What this solution (achieved 0.07257) has done: 'Your current baseline likely underperforms the target because the feature hashing loop is extremely noisy and the optimizer is too aggressive for stable rank-based performance. I keep the same core approach (tokenize → padded sequences → hashed bag-of-words → linear sigmoid model trained with batch gradient steps), but (1) switch the hashed BOW construction to a sparse accumulator so counts are correct and deterministic without huge `np.bincount(minlength=n_features)` overhead, and (2) make training more stable by slightly increasing epochs and lowering the learning rate while keeping the same loss/updates. These are minimal changes that typically improve Spearman correlation by producing smoother, better-calibrated predictions without altering the modeling paradigm. Submission formatting and column order remain exactly aligned to `sample_submission.csv`.'
+- What this solution (achieved 0.05907) has done: 'Your current model likely undershoots the target because it uses plain cross-entropy against continuous labels and then outputs overly extreme probabilities, which hurts rank correlation. I keep the exact same hashed BOW + linear sigmoid training loop, but switch to mean-squared-error gradients (still a simple pointwise regression on [0,1]) to better match Spearman’s rank-oriented objective without changing the model form. I also add a tiny “de-extreming” calibration (shrink predictions slightly toward 0.5) which often improves Spearman by reducing saturation while keeping outputs in [0,1]. Finally, I keep paths and submission formatting identical and still write `submission.csv`.'
+- What this solution (achieved 0.05798) has done: 'Your current score (0.05907) is well below the target (0.1476), so we should gently improve the rank correlation without changing the overall “hashed BOW + linear sigmoid trained by minibatch gradient steps” core. The biggest low-risk gain here is to correct the gradient: your code still uses the cross-entropy-style sigmoid derivative term, which makes optimization unnecessarily weak/mismatched for your intended MSE regression. I change the gradient to the proper MSE-on-sigmoid gradient (drop the extra `pred*(1-pred)` factor) and slightly temper the learning rate to keep training stable given the larger effective gradients; everything else (features, model form, loop structure, output calibration, submission formatting) stays the same. This should move the score upward toward the target band while preserving semantics and producing a valid `submission.csv`.'
+- What this solution (achieved 0.05701) has done: 'We make two minimal, score-oriented changes while keeping your hashed-BOW + linear-sigmoid + minibatch gradient core intact. First, fix the MSE-on-sigmoid gradient to match your stated intent (remove the extra `pred*(1-pred)` term), and reduce the learning rate accordingly to keep updates stable with the larger correct gradient—this should raise Spearman toward your target. Second, compute hashed BOW features directly from the *un-padded* token sequences (padding currently injects many zeros that collide into the same hash bin and adds noise), without changing the feature type or model. Submission format, column order, and clipping to `[0,1]` remain unchanged and a valid `submission.csv` is always produced.'
+- What this solution (achieved 0.05597) has done: 'Your current score (0.05701) is far below the target (0.1476), so we should make the smallest stability/optimization fixes that improve rank correlation without changing your core “hashed BOW → linear sigmoid → minibatch GD” approach. The main issue is the gradient: you’re still using the cross-entropy-style `pred*(1-pred)` factor even though you’re training with MSE, which weakens/warps learning; switching to the correct MSE-on-logits gradient should improve learning signal and Spearman. Because that makes gradients larger, I also lower the learning rate slightly to keep training stable (same loop, same epochs, same features). Everything else (tokenization, hashed features from unpadded token lists, shrink-to-0.5 calibration, submission formatting) stays the same and still produces a valid `submission.csv`.'
+- What this solution (achieved 0.05738) has done: 'Your current score (0.05597) is far below the target (0.1476), so we should make the smallest changes that increase rank correlation without changing your core “hashed BOW → linear sigmoid → minibatch GD” approach. The main issue is that your training gradient still corresponds to MSE-on-sigmoid (it includes `pred*(1-pred)`), which tends to give very small gradients once predictions saturate; switching to the correct MSE-on-logits gradient (drop `pred*(1-pred)`) usually improves learning and Spearman while keeping the exact same model and loss intent. Because that increases gradient magnitude, I reduce the learning rate slightly to keep optimization stable. Everything else (tokenizer, hashed features, epochs/loop structure, prediction shrink/clipping, submission formatting) stays the same and it still writes a valid `submission.csv`.'
+- What this solution (achieved 0.05677) has done: 'Your current score is far below the target (0.05738 vs 0.1476, higher-is-better), so we should make small, low-risk improvements that better align training with Spearman without changing the model family. I keep your exact hashed BOW + linear logits + sigmoid prediction pipeline, but fix the mismatch in the training objective by doing plain MSE on probabilities (your current code computes an MSE-like gradient on logits, which is inconsistent with the sigmoid output used for scoring). I also add a tiny constant “bias feature” inside X so the model can learn per-target offsets without changing architecture (equivalent to having an effective bias inside the linear model), which typically improves ranking quality. Finally, I compute a simple validation Spearman (NumPy-only) to pick the shrink factor from a small fixed set (no early stopping, no extra training) to improve rank correlation calibration toward the target.'
+- What this solution (achieved 0.05711) has done: 'We make two very small, low-risk changes that should increase mean Spearman toward your target while preserving your exact core “hashed BOW → linear logits → sigmoid → minibatch GD” approach. First, we fix the MSE backprop mismatch: you’re currently computing gradients for MSE-on-sigmoid (extra `pred*(1-pred)`), which tends to stall learning; switching to MSE-on-logits gradient (drop that factor) usually improves rank correlation. Because that increases gradient magnitude, we lower `lr` a bit to keep training stable (same epochs/loop/features). Everything else (tokenizer, hashed features, split, shrink-grid calibration, submission formatting/paths) stays the same and still writes a valid `submission.csv`.'
+- What this solution (achieved 0.09016) has done: 'Your current score (0.05711) is far below the target (0.1476), so we should make the smallest changes that improve ranking (Spearman) without changing your core “hashed BOW → linear logits → sigmoid → minibatch GD” pipeline. The biggest issue is feature scale: you L2-normalize each row, which largely destroys informative length/coverage signals; we can preserve the same hashed-BOW features but switch to a TF-like log scaling plus IDF and then re-normalize, which typically improves rank correlation substantially. Second, we should train the final model on all training rows after selecting the shrink factor on the validation split (same training loop/epochs), because currently you calibrate on val but then keep weights trained without using val data. These changes keep architecture/training semantics intact, remain deterministic, and still write a valid `submission.csv`.'
+- What this solution (achieved 0.08593) has done: 'Your current score (0.09016) is below the target (0.14760), so we should make small, low-risk changes that typically improve mean Spearman without changing the overall “hashed TF‑IDF-like BOW → linear logits → sigmoid → minibatch GD” core. The biggest win within that core is to reduce optimization noise by switching the feature matrix to `float16` storage (still computing in float32) and using slightly larger batches to stabilize updates, while keeping epochs and the same gradient math. Second, we add per-target learning-rate scaling based on each target’s label variance (a tiny calibration of step sizes that doesn’t change the model) to prevent over/under-updating certain targets, which often helps average rank correlation. Finally, we keep your validation-selected shrink, but expand the shrink grid slightly to allow a better monotonic calibration for Spearman while keeping the same selection procedure.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import json
+import pickle
+import random
+
+import numpy as np
+import pandas as pd
+
+from tqdm import tqdm
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+
+
+
+
+## === cell 1
+class SimpleTokenizer:
+    def __init__(self, num_words=50000, lower=True, oov_token="<OOV>"):
+        self.num_words = int(num_words) if num_words is not None else None
+        self.lower = bool(lower)
+        self.oov_token = oov_token
+        self.word_index = {}
+        self.index_word = {}
+
+    def fit_on_texts(self, texts):
+        from collections import Counter
+
+        counter = Counter()
+        for t in texts:
+            if t is None:
+                continue
+            s = str(t)
+            if self.lower:
+                s = s.lower()
+            toks = s.split()
+            counter.update(toks)
+
+        word_index = {self.oov_token: 1}
+        start_idx = 2
+        most_common = counter.most_common()
+        if self.num_words is not None:
+            most_common = most_common[: max(0, self.num_words - start_idx)]
+        for i, (w, _) in enumerate(most_common):
+            word_index[w] = start_idx + i
+
+        self.word_index = word_index
+        self.index_word = {i: w for w, i in self.word_index.items()}
+
+    def texts_to_sequences(self, texts):
+        oov_id = self.word_index.get(self.oov_token, 1)
+        seqs = []
+        for t in texts:
+            s = "" if t is None else str(t)
+            if self.lower:
+                s = s.lower()
+            toks = s.split()
+            ids = [self.word_index.get(w, oov_id) for w in toks]
+            if self.num_words is not None:
+                ids = [i if i < self.num_words else oov_id for i in ids]
+            seqs.append(ids)
+        return seqs
+
+
+def pad_sequences(seqs, maxlen, padding="pre", truncating="pre", value=0):
+    maxlen = int(maxlen)
+    out = np.full((len(seqs), maxlen), fill_value=value, dtype=np.int32)
+    for i, s in enumerate(seqs):
+        if not s:
+            continue
+        if truncating == "pre":
+            s = s[-maxlen:]
+        else:
+            s = s[:maxlen]
+        s = np.asarray(s, dtype=np.int32)
+        if padding == "pre":
+            out[i, -len(s) :] = s
+        else:
+            out[i, : len(s)] = s
+    return out
+
+
+
+
+## === cell 2
+CANDIDATE_ROOTS = [
+    "/kaggle/input/google-quest-challenge",
+    "/kaggle/input/google-quest-challenge/google-quest-challenge",
+    "/kaggle/data/google-quest-challenge",
+    "/kaggle/data/google-quest-challenge/google-quest-challenge",
+]
+
+
+def _first_existing(*paths):
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
+TRAIN_PATH = _first_existing(*[os.path.join(r, "train.csv") for r in CANDIDATE_ROOTS])
+TEST_PATH = _first_existing(*[os.path.join(r, "test.csv") for r in CANDIDATE_ROOTS])
+SAMPLE_PATH = _first_existing(
+    *[os.path.join(r, "sample_submission.csv") for r in CANDIDATE_ROOTS]
+)
+
+if TRAIN_PATH is None or TEST_PATH is None or SAMPLE_PATH is None:
+    raise FileNotFoundError(
+        f"Could not locate competition files. Found: TRAIN={TRAIN_PATH}, TEST={TEST_PATH}, SAMPLE={SAMPLE_PATH}"
+    )
+
+train = pd.read_csv(TRAIN_PATH)
+test = pd.read_csv(TEST_PATH)
+submission = pd.read_csv(SAMPLE_PATH)
+
+print(
+    "train:", train.shape, "test:", test.shape, "sample_submission:", submission.shape
+)
+
+TARGET_COLS = submission.columns.tolist()[1:]  # exclude qa_id
+assert len(TARGET_COLS) == 30, f"Expected 30 targets, got {len(TARGET_COLS)}"
+
+
+
+## === cell 3
+TEXT_COLS = ["question_title", "question_body", "answer"]
+
+for c in TEXT_COLS:
+    train[c] = train[c].fillna("").astype(str)
+    test[c] = test[c].fillna("").astype(str)
+
+y = train[TARGET_COLS].values.astype(np.float32)
+
+
+
+## === cell 4
+MAX_FEATURES = 50000
+tokenizer = SimpleTokenizer(num_words=MAX_FEATURES, lower=True, oov_token="<OOV>")
+
+all_text = pd.concat(
+    [train["question_title"], train["question_body"], train["answer"]],
+    axis=0,
+    ignore_index=True,
+).values
+
+tokenizer.fit_on_texts(all_text)
+
+with open("tokenizer.pickle", "wb") as f:
+    pickle.dump(tokenizer, f)
+
+print("Tokenizer vocab size:", len(tokenizer.word_index))
+
+
+
+
+## === cell 5
+def compute_sequences(cols, tokenizer, maxlens):
+    sequences = []
+    for texts, maxlen in zip(cols, maxlens):
+        seq = tokenizer.texts_to_sequences(texts.values)
+        seq = pad_sequences(seq, maxlen=maxlen)
+        sequences.append(seq)
+    return sequences
+
+
+def compute_token_lists(cols, tokenizer, maxlens):
+    token_lists = []
+    for texts, maxlen in zip(cols, maxlens):
+        seqs = tokenizer.texts_to_sequences(texts.values)
+        trimmed = []
+        for s in seqs:
+            if not s:
+                trimmed.append([])
+            else:
+                trimmed.append(s[-maxlen:])
+        token_lists.append(trimmed)
+    return token_lists
+
+
+MAXLENS = [30, 300, 300]
+
+train_data = compute_sequences(
+    [train.question_title, train.question_body, train.answer], tokenizer, MAXLENS
+)
+test_data = compute_sequences(
+    [test.question_title, test.question_body, test.answer], tokenizer, MAXLENS
+)
+
+train_tokens = compute_token_lists(
+    [train.question_title, train.question_body, train.answer], tokenizer, MAXLENS
+)
+test_tokens = compute_token_lists(
+    [test.question_title, test.question_body, test.answer], tokenizer, MAXLENS
+)
+
+for i, arr in enumerate(train_data):
+    print(f"train_data[{i}]:", arr.shape, arr.dtype)
+
+
+
+
+## === cell 6
+def sigmoid(x):
+    x = np.clip(x, -50, 50)
+    return 1.0 / (1.0 + np.exp(-x))
+
+
+def build_hashed_bow_features_from_lists(seqs_list, n_features=2**18, return_df=False):
+    n = len(seqs_list[0])
+    X = np.zeros((n, n_features), dtype=np.float32)
+    df = np.zeros((n_features,), dtype=np.int32) if return_df else None
+
+    for b, seqs in enumerate(seqs_list):
+        salt = (b + 1) * 2654435761
+        for i in range(n):
+            row = seqs[i]
+            if not row:
+                continue
+            row = np.asarray(row, dtype=np.uint64)
+            h = (row * 1315423911 + salt) % n_features
+            h = h.astype(np.int64)
+            uniq, cnt = np.unique(h, return_counts=True)
+            X[i, uniq] += cnt.astype(np.float32)
+            if return_df:
+                df[uniq] += 1
+
+    return (X, df) if return_df else X
+
+
+def _rankdata_average(x):
+    x = np.asarray(x)
+    order = np.argsort(x, kind="mergesort")
+    ranks = np.empty(len(x), dtype=np.float64)
+    x_sorted = x[order]
+    i = 0
+    while i < len(x_sorted):
+        j = i + 1
+        while j < len(x_sorted) and x_sorted[j] == x_sorted[i]:
+            j += 1
+        avg_rank = 0.5 * (i + j - 1) + 1.0  # ranks start at 1
+        ranks[order[i:j]] = avg_rank
+        i = j
+    return ranks
+
+
+def spearman_corr(a, b):
+    a = np.asarray(a, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    ra = _rankdata_average(a)
+    rb = _rankdata_average(b)
+    ra -= ra.mean()
+    rb -= rb.mean()
+    denom = np.sqrt((ra * ra).sum()) * np.sqrt((rb * rb).sum()) + 1e-12
+    return float((ra * rb).sum() / denom)
+
+
+def mean_columnwise_spearman(y_true, y_pred):
+    vals = []
+    for j in range(y_true.shape[1]):
+        vals.append(spearman_corr(y_true[:, j], y_pred[:, j]))
+    return float(np.mean(vals))
+
+
+def apply_tfidf_like_transform_and_l2(X_counts, df, n_docs):
+    X = np.log1p(X_counts.astype(np.float32))
+
+    idf = (
+        np.log((n_docs + 1.0) / (df.astype(np.float32) + 1.0)).astype(np.float32) + 1.0
+    )
+    X *= idf[None, :]
+
+    norms = np.linalg.norm(X, axis=1, keepdims=True) + 1e-8
+    X /= norms
+    return X
+
+
+n = len(train)
+idx = np.arange(n)
+rng = np.random.RandomState(SEED)
+rng.shuffle(idx)
+
+val_frac = 0.1
+val_size = int(n * val_frac)
+val_idx = idx[:val_size]
+trn_idx = idx[val_size:]
+
+N_FEATURES = 2**18
+X_counts, df = build_hashed_bow_features_from_lists(
+    train_tokens, n_features=N_FEATURES, return_df=True
+)
+X_test_counts = build_hashed_bow_features_from_lists(
+    test_tokens, n_features=N_FEATURES, return_df=False
+)
+
+X = apply_tfidf_like_transform_and_l2(X_counts, df, n_docs=n)
+X_test = apply_tfidf_like_transform_and_l2(X_test_counts, df, n_docs=n)
+
+X = X.astype(np.float16, copy=False)
+X_test = X_test.astype(np.float16, copy=False)
+
+X = np.concatenate([X, np.ones((X.shape[0], 1), dtype=np.float16)], axis=1)
+X_test = np.concatenate(
+    [X_test, np.ones((X_test.shape[0], 1), dtype=np.float16)], axis=1
+)
+
+X_trn, y_trn = X[trn_idx], y[trn_idx]
+X_val, y_val = X[val_idx], y[val_idx]
+
+n_targets = y.shape[1]
+W = np.zeros((X.shape[1], n_targets), dtype=np.float32)
+b = np.zeros((n_targets,), dtype=np.float32)
+
+EPOCHS = 4
+
+BATCH_SIZE = 512
+
+lr = 0.003
+reg = 1e-4
+
+y_trn_var = np.var(y_trn, axis=0).astype(np.float32)
+target_lr_scale = (1.0 / np.sqrt(y_trn_var + 1e-4)).astype(np.float32)
+target_lr_scale /= np.mean(target_lr_scale)  # keep average scale ~1
+
+for epoch in range(EPOCHS):
+    perm = rng.permutation(X_trn.shape[0])
+    X_trn_s = X_trn[perm]
+    y_trn_s = y_trn[perm]
+
+    for start in tqdm(
+        range(0, X_trn_s.shape[0], BATCH_SIZE), desc=f"epoch {epoch+1}/{EPOCHS}"
+    ):
+        end = min(start + BATCH_SIZE, X_trn_s.shape[0])
+        xb = X_trn_s[start:end].astype(np.float32, copy=False)
+        yb = y_trn_s[start:end]
+
+        logits = xb @ W + b
+        pred = sigmoid(logits)
+
+        err = pred - yb
+        grad_logits = (2.0 * err) / xb.shape[0]
+
+        gW = xb.T @ grad_logits + reg * W
+        gb = grad_logits.sum(axis=0)
+
+        gW *= target_lr_scale[None, :]
+        gb *= target_lr_scale
+
+        W -= lr * gW
+        b -= lr * gb
+
+    val_pred = sigmoid(X_val.astype(np.float32, copy=False) @ W + b)
+    val_mse = float(np.mean((val_pred - y_val) ** 2))
+    val_sp = mean_columnwise_spearman(y_val, val_pred)
+    print(f"val_mse: {val_mse:.6f}  val_mean_spearman: {val_sp:.6f}")
+
+test_pred_raw = sigmoid(X_test.astype(np.float32, copy=False) @ W + b).astype(
+    np.float32
+)
+val_raw = sigmoid(X_val.astype(np.float32, copy=False) @ W + b).astype(np.float32)
+
+shrink_grid = [0.80, 0.85, 0.90, 0.95, 1.00, 1.05]
+best_shrink = shrink_grid[0]
+best_val_sp = -1e9
+for s in shrink_grid:
+    vp = 0.5 + s * (val_raw - 0.5)
+    vp = np.clip(vp, 0.0, 1.0)
+    sp = mean_columnwise_spearman(y_val, vp)
+    if sp > best_val_sp:
+        best_val_sp = sp
+        best_shrink = s
+print(f"Chosen shrink={best_shrink:.2f} by val_mean_spearman={best_val_sp:.6f}")
+
+W_full = np.zeros((X.shape[1], n_targets), dtype=np.float32)
+b_full = np.zeros((n_targets,), dtype=np.float32)
+
+y_var_full = np.var(y, axis=0).astype(np.float32)
+target_lr_scale_full = (1.0 / np.sqrt(y_var_full + 1e-4)).astype(np.float32)
+target_lr_scale_full /= np.mean(target_lr_scale_full)
+
+for epoch in range(EPOCHS):
+    perm = rng.permutation(X.shape[0])
+    X_s = X[perm]
+    y_s = y[perm]
+
+    for start in tqdm(
+        range(0, X_s.shape[0], BATCH_SIZE), desc=f"full epoch {epoch+1}/{EPOCHS}"
+    ):
+        end = min(start + BATCH_SIZE, X_s.shape[0])
+        xb = X_s[start:end].astype(np.float32, copy=False)
+        yb = y_s[start:end]
+
+        logits = xb @ W_full + b_full
+        pred = sigmoid(logits)
+
+        err = pred - yb
+        grad_logits = (2.0 * err) / xb.shape[0]
+
+        gW = xb.T @ grad_logits + reg * W_full
+        gb = grad_logits.sum(axis=0)
+
+        gW *= target_lr_scale_full[None, :]
+        gb *= target_lr_scale_full
+
+        W_full -= lr * gW
+        b_full -= lr * gb
+
+test_pred_raw_full = sigmoid(
+    X_test.astype(np.float32, copy=False) @ W_full + b_full
+).astype(np.float32)
+
+test_pred = 0.5 + best_shrink * (test_pred_raw_full - 0.5)
+test_pred = np.clip(test_pred, 0.0, 1.0)
+
+sub = submission.copy()
+sub = sub[["qa_id"] + TARGET_COLS]
+sub[TARGET_COLS] = test_pred
+
+if "qa_id" in test.columns and len(test) == len(sub):
+    sub["qa_id"] = test["qa_id"].values
+
+sub.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", sub.shape)
+print(sub.head())

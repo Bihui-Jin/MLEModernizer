@@ -1,0 +1,832 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean column-wise ROC AUC.
+
+## Submission Format
+For each image_id in the test set, you must predict a probability for each target variable. The file should contain a header and have the following format:
+
+```
+image_id,
+test_0,0.25,0.25,0.25,0.25
+test_1,0.25,0.25,0.25,0.25
+test_2,0.25,0.25,0.25,0.25
+etc.
+```
+
+## Dataset
+Given a photo of an apple leaf, can you accurately assess its health? This competition will challenge you to distinguish between leaves which are healthy, those which are infected with apple rust, those that have apple scab, and those with more than one disease.
+
+**train.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+**images**
+
+A folder containing the train and test images, in jpg format.
+
+**test.csv**
+
+- `image_id`: the foreign key
+
+**sample_submission.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scipy==1.15.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        input/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        working/
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+```
+
+-> data/plant-pathology-2020-fgvc7/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/plant-pathology-2020-fgvc7/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/plant-pathology-2020-fgvc7/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9669491813515626
+
+# 6. Current score
+
+0.5
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5) has done: 'Your notebook fails because it tries to read four external “../input/...” ensemble submissions that are not present in this environment, so all downstream variables are undefined. I keep the same “pick the lowest-entropy model per row” ensemble core logic, but make it robust by automatically using any available submission files if they exist, otherwise falling back to a valid baseline built from `sample_submission.csv` (uniform probabilities). I also enforce correct column order (`image_id, healthy, multiple_diseases, rust, scab`) and align predictions by `image_id` to avoid silent misalignment bugs. This run end-to-end and always write a valid `submission.csv`.'
+- What this solution (achieved 0.5776) has done: 'Your current 0.5 score is coming from the uniform-probability fallback (or from selecting an uninformative baseline) because no real model predictions exist in this environment. To move toward the 0.9669 target without changing the ensemble selection logic, I generate legitimate predictions from the provided train images using a minimal scikit-learn baseline: pixel-intensity features + One-vs-Rest Logistic Regression, then feed those predictions into your existing “lowest-entropy per row” selector. This keeps the core “choose lowest-entropy model per row” semantics intact, but ensures at least one non-uniform candidate model is available, which should substantially improve ROC AUC over 0.5. I also keep strict `image_id` alignment and correct submission columns/ordering, and still write `submission.csv` end-to-end.'
+- What this solution (achieved 0.65757) has done: 'Your current score is far below the target, so we should improve the predictive signal while keeping your ensemble’s core “pick lowest-entropy model per row” logic unchanged. The biggest issue is the very weak image representation (raw 64×64 RGB pixels) and a too-restrictive probability renormalization that can distort one-vs-rest probabilities for a ROC-AUC metric. I keep the same scikit-learn OneVsRest+LogisticRegression approach, but switch to a stronger yet still lightweight handcrafted feature (color + gradient HOG-like summary) and remove per-row probability sum-to-1 normalization (keeping only clipping), which typically improves multi-label ROC AUC. I also fix a masking/indexing bug risk by using positional indexing consistently when writing back selected predictions.'
+- What this solution (achieved 0.65245) has done: 'Your score gap to the target is large (0.6576 vs 0.9669), so we need more predictive signal while keeping your ensemble’s “pick lowest-entropy model per row” core logic unchanged. The biggest issue is that the entropy selector currently prefers overconfident models, but the entropy is computed on unnormalized one-vs-rest probabilities, which makes entropy comparisons inconsistent across models; we compute entropy on per-row normalized probabilities *only for selection*, while leaving the actual output probabilities untouched for ROC-AUC. We also strengthen the same scikit-learn OVR Logistic Regression baseline without changing the model family by standardizing features (crucial for LBFGS/LogReg) and enabling class balancing to help rare classes. Finally, we keep strict `image_id` alignment and still write a valid `submission.csv`.'
+- What this solution (achieved 0.67811) has done: 'Your current gap to the target is large, so we need more predictive signal while keeping your “train a scikit-learn OVR LogisticRegression on handcrafted image features + lowest-entropy per-row selection” core logic intact. The biggest low-risk gain is to fix a feature mismatch: you compute HOG-like histograms but don’t normalize gradient magnitude, so brightness/contrast dominate and reduce generalization; I L2-normalize gradients per image before building histograms. I also add a tiny amount of additional, still-handcrafted signal (simple RGB moments) to complement HSV and gradients without changing the model family or training loop. Finally, I make the entropy selection robust to pathological overconfidence by adding a tiny temperature smoothing only for the entropy computation (output probabilities remain unchanged), improving selector stability without changing evaluation semantics.'
+- What this solution (achieved 0.75084) has done: 'We need a sizable score lift (0.678 → 0.967), so we keep your core approach (handcrafted features + OVR LogisticRegression + lowest-entropy per-row selector) but strengthen it with minimal, safe changes that don’t alter the model family or training loop. The main upgrades are: (1) add a simple low-frequency spatial signal by computing the same RGB/HSV moments on a 4×4 grid and concatenating them (still handcrafted, still fast), (2) make the gradient histogram a bit more robust by using 8 spatial cells (4×2) instead of 4 (2×2) while keeping the same histogram logic, and (3) improve generalization via a tiny fixed Ridge-style regularization change by slightly lowering C (stronger regularization) and increasing max_iter for convergence stability. All submission alignment/column order logic stays identical, and we still write a valid `submission.csv`.'
+- What this solution (achieved 0.77166) has done: 'Your current gap to the target is large (0.75084 vs 0.96695), so we should increase predictive signal while keeping the same core pipeline (handcrafted features → OVR LogisticRegression → lowest-entropy per-row selector). The smallest high-impact change is to fix a mismatch between the metric (mean column-wise ROC AUC) and the way probabilities are produced: `OneVsRestClassifier.predict_proba` returns probabilities from independently-trained binary classifiers, which can be poorly calibrated; using the underlying per-class decision scores passed through a sigmoid (`expit`) typically improves ranking (AUC) without changing the model family or training loop. I also slightly strengthen generalization with a minimal, safe data-augmentation-by-feature step (horizontal flip) that only doubles the training features (still the same feature extractor and classifier) and tends to help image tasks. Everything else (alignment, column order, entropy selection, and writing `submission.csv`) stays the same.'
+- What this solution (achieved 0.77026) has done: 'Main runtime is spent in per-image feature extraction (Python loops over pixels/patches and repeated disk reads) and in training two LogisticRegression OVR models. To stay within 600s without changing the algorithm, I cache each image’s multiscale features (including flipped) so every image is decoded/resized only once, replace the slow per-bin HOG loop with a vectorized `np.bincount` equivalent, and avoid `iterrows()` overhead by iterating over NumPy arrays. I also parallelize feature extraction across CPU cores using `multiprocessing.Pool` (deterministic because extraction is pure) and keep the model/training settings identical. All file paths, targets, architecture (OVR LogisticRegression with StandardScaler), and ensemble entropy selection remain unchanged.'
+- What this solution (achieved 0.76991) has done: 'We’re far below the target (0.770 vs 0.967), so we should increase predictive signal without changing your core pipeline (handcrafted features → OVR LogisticRegression → entropy-based per-row selector). The lowest-risk score lift here is to add two more candidate LogisticRegression models with slightly different regularization strengths (C values) so the entropy selector can pick the best per-row; this preserves the exact ensemble-selection semantics and training approach. I also make the multiprocessing start method robust (use `fork` when available, otherwise `spawn`) to avoid silent feature-extraction failures on some runners, which can otherwise degrade predictions. Everything else (feature extractor, use of decision_function+sigmoid, entropy computed on normalized probs but output unchanged, alignment, submission columns) stays the same.'
+- What this solution (achieved 0.78359) has done: 'We’re still far below the target (0.7699 vs 0.9669), so we should add a bit more predictive signal without changing your core pipeline (handcrafted features → OVR LogisticRegression → entropy-based per-row selector). The lowest-risk gain is to train the same LogisticRegression models on both original and horizontally-flipped *test* features and then average the probabilities (a standard test-time augmentation) before passing them into your selector; this keeps the model family/training identical and usually improves ROC AUC. I also add two more nearby C values to give the entropy selector better candidates with minimal extra cost, and I make the training feature construction deterministic by iterating by position to avoid any subtle alignment mismatch when a training image is missing. The submission format, column order, alignment by `image_id`, entropy-on-normalized-probs (selection-only), and output probabilities remain unchanged.'
+- What this solution (achieved 0.5) has done: 'The timeout is dominated by repeated image feature extraction plus 18 separate LogisticRegression fits (9 C values × 2 feature sets), and extra overhead from multiprocessing returning large Python objects. I keep the exact feature definitions and training semantics, but cache extracted features to disk (so they’re computed once), streamline multiprocessing to return packed NumPy arrays, preallocate feature matrices instead of building huge Python lists, and avoid repeated DataFrame column-by-column assignment when building submissions. These changes are provably equivalent (same inputs → same features → same sklearn fits/predictions) and mainly reduce Python overhead, memory churn, and redundant work. The ensemble/entropy selection logic and output formatting stay identical.'
+- What this solution (achieved 0.5) has done: 'The timeout is dominated by (1) expensive per-image feature extraction (multiple resizes + percentiles inside Python loops) and (2) repeatedly fitting 18 OneVsRest logistic-regression models (9 C values × 2 feature sets) with a high `max_iter`. To keep the exact same modeling logic, the main speedups are: compute moments/grid moments without `np.percentile` (use `np.partition`, which is exactly equivalent for percentiles), avoid redundant array allocations in feature extraction, and parallelize train/test extraction more efficiently with `imap_unordered` plus a larger chunksize. For training, keep the same classifier and hyperparameters but run the per-C fits in parallel with joblib threading (safe and deterministic for sklearn here) to reduce wall time without changing results. Caching remains intact, so the first run becomes fast enough and subsequent runs are near-instant.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import glob
+import numpy as np
+import pandas as pd
+from scipy.stats import entropy
+from scipy.special import expit
+
+from PIL import Image
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+os.environ.setdefault("PYTHONHASHSEED", "0")
+np.random.seed(0)
+
+
+
+## === cell 1
+BASE_DIR = "/kaggle/data"
+COMP_DIR = os.path.join(BASE_DIR, "plant-pathology-2020-fgvc7")
+
+sample_path_candidates = [
+    os.path.join(COMP_DIR, "sample_submission.csv"),
+    os.path.join(BASE_DIR, "sample_submission.csv"),
+]
+test_path_candidates = [
+    os.path.join(COMP_DIR, "test.csv"),
+    os.path.join(BASE_DIR, "test.csv"),
+]
+train_path_candidates = [
+    os.path.join(COMP_DIR, "train.csv"),
+    os.path.join(BASE_DIR, "train.csv"),
+]
+
+images_dir_candidates = [
+    os.path.join(COMP_DIR, "images"),
+    os.path.join(BASE_DIR, "images"),
+]
+
+
+def first_existing(paths):
+    for p in paths:
+        if os.path.exists(p):
+            return p
+    return None
+
+
+SAMPLE_PATH = first_existing(sample_path_candidates)
+TEST_PATH = first_existing(test_path_candidates)
+TRAIN_PATH = first_existing(train_path_candidates)
+IMAGES_DIR = first_existing(images_dir_candidates)
+
+if SAMPLE_PATH is None or TEST_PATH is None or TRAIN_PATH is None or IMAGES_DIR is None:
+    raise FileNotFoundError(
+        f"Could not find required files. SAMPLE_PATH={SAMPLE_PATH}, TEST_PATH={TEST_PATH}, "
+        f"TRAIN_PATH={TRAIN_PATH}, IMAGES_DIR={IMAGES_DIR}"
+    )
+
+sub_template = pd.read_csv(SAMPLE_PATH)
+test_df = pd.read_csv(TEST_PATH)
+train_df = pd.read_csv(TRAIN_PATH)
+
+target_cols = [c for c in sub_template.columns if c != "image_id"]
+required_cols = ["image_id", "healthy", "multiple_diseases", "rust", "scab"]
+
+if list(sub_template.columns) != required_cols:
+    missing = set(required_cols) - set(sub_template.columns)
+    if missing:
+        raise ValueError(f"Sample submission missing required columns: {missing}")
+    sub_template = sub_template[required_cols]
+    target_cols = [c for c in sub_template.columns if c != "image_id"]
+
+sub = sub_template.merge(test_df[["image_id"]], on="image_id", how="right")
+sub = sub[required_cols]
+
+
+
+## === cell 2
+preferred_paths = [
+    "../input/average-efficientnet/submission.csv",
+    "../input/classification-densenet201-efficientnetb7/submission.csv",
+    "../input/tf-zoo-models-on-tpu/submission.csv",
+    "../input/fork-of-plant-2020-tpu-915e9c/submission.csv",
+]
+
+available_paths = [p for p in preferred_paths if os.path.exists(p)]
+
+search_roots = [
+    "/kaggle/input",
+    "/kaggle/data",
+    "/kaggle/working",
+]
+for root in search_roots:
+    if os.path.exists(root):
+        found = glob.glob(os.path.join(root, "**", "submission.csv"), recursive=True)
+        available_paths.extend(found)
+
+seen = set()
+dedup_paths = []
+for p in available_paths:
+    if p not in seen:
+        seen.add(p)
+        dedup_paths.append(p)
+available_paths = dedup_paths
+
+
+def load_and_align_submission(path, template_image_ids, required_cols, target_cols):
+    df = pd.read_csv(path)
+    if "image_id" not in df.columns:
+        return None
+    if not set(target_cols).issubset(df.columns):
+        return None
+    df = df[["image_id"] + target_cols].copy()
+    df = pd.DataFrame({"image_id": template_image_ids}).merge(
+        df, on="image_id", how="left"
+    )
+    if df[target_cols].isna().any().any():
+        return None
+    df = df[required_cols]
+    df[target_cols] = df[target_cols].astype(float).clip(1e-7, 1 - 1e-7)
+    return df
+
+
+template_image_ids = sub["image_id"].tolist()
+subs = []
+for p in available_paths:
+    aligned = load_and_align_submission(
+        p, template_image_ids, required_cols, target_cols
+    )
+    if aligned is not None:
+        subs.append(aligned)
+
+baseline = sub.copy()
+baseline[target_cols] = 1.0 / len(target_cols)
+
+
+
+## === cell 3
+import multiprocessing as mp
+
+
+def _pct10_50_90_flat(x_flat: np.ndarray):
+    n = x_flat.size
+    if n == 0:
+        return np.float32(0.0), np.float32(0.0), np.float32(0.0)
+    k10 = int(0.10 * (n - 1))
+    k50 = int(0.50 * (n - 1))
+    k90 = int(0.90 * (n - 1))
+    part = np.partition(x_flat, (k10, k50, k90))
+    return np.float32(part[k10]), np.float32(part[k50]), np.float32(part[k90])
+
+
+def _moments(ch2d: np.ndarray):
+    x = ch2d.ravel()
+    m = np.float32(x.mean())
+    s = np.float32(x.std())
+    p10, p50, p90 = _pct10_50_90_flat(x)
+    return np.array([m, s, p10, p50, p90], dtype=np.float32)
+
+
+def _grid_moments(ch2d: np.ndarray, gh=4, gw=4):
+    H, W = ch2d.shape
+    feats = np.empty((gh * gw, 5), dtype=np.float32)
+    t = 0
+    for i in range(gh):
+        i0 = (i * H) // gh
+        i1 = ((i + 1) * H) // gh
+        for j in range(gw):
+            j0 = (j * W) // gw
+            j1 = ((j + 1) * W) // gw
+            patch = ch2d[i0:i1, j0:j1]
+            feats[t] = _moments(patch)
+            t += 1
+    return feats.ravel()
+
+
+def _extract_features_from_rgb(rgb, bins=9):
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    mx = np.maximum(np.maximum(r, g), b)
+    mn = np.minimum(np.minimum(r, g), b)
+    diff = mx - mn
+
+    h = np.zeros_like(mx, dtype=np.float32)
+    mask = diff > 1e-8
+    idx = (mx == r) & mask
+    h[idx] = ((g[idx] - b[idx]) / diff[idx]) % 6.0
+    idx = (mx == g) & mask
+    h[idx] = ((b[idx] - r[idx]) / diff[idx]) + 2.0
+    idx = (mx == b) & mask
+    h[idx] = ((r[idx] - g[idx]) / diff[idx]) + 4.0
+    h = (h / 6.0).astype(np.float32)
+
+    s = np.zeros_like(mx, dtype=np.float32)
+    mpos = mx > 1e-8
+    s[mpos] = (diff[mpos] / mx[mpos]).astype(np.float32)
+    v = mx.astype(np.float32)
+
+    rgb_feat_global = np.concatenate([_moments(r), _moments(g), _moments(b)], axis=0)
+    hsv_feat_global = np.concatenate([_moments(h), _moments(s), _moments(v)], axis=0)
+
+    rgb_feat_grid = np.concatenate(
+        [_grid_moments(r), _grid_moments(g), _grid_moments(b)], axis=0
+    )
+    hsv_feat_grid = np.concatenate(
+        [_grid_moments(h), _grid_moments(s), _grid_moments(v)], axis=0
+    )
+
+    gray = (0.2989 * r + 0.5870 * g + 0.1140 * b).astype(np.float32)
+    gx = np.zeros_like(gray)
+    gy = np.zeros_like(gray)
+    gx[:, 1:-1] = gray[:, 2:] - gray[:, :-2]
+    gy[1:-1, :] = gray[2:, :] - gray[:-2, :]
+
+    mag = np.sqrt(gx * gx + gy * gy) + 1e-8
+    ang = (np.arctan2(gy, gx) + np.pi) / (2.0 * np.pi)  # 0..1
+
+    mag = mag / (np.sqrt((mag * mag).mean()) + 1e-8)
+
+    H, W = gray.shape
+    hs = (
+        slice(0, H // 4),
+        slice(H // 4, H // 2),
+        slice(H // 2, (3 * H) // 4),
+        slice((3 * H) // 4, H),
+    )
+    ws = (slice(0, W // 2), slice(W // 2, W))
+
+    hog_parts = []
+    for si in hs:
+        for sj in ws:
+            a = ang[si, sj].ravel()
+            m = mag[si, sj].ravel()
+            bi = np.minimum((a * bins).astype(np.int32), bins - 1)
+            hist = np.bincount(bi, weights=m, minlength=bins).astype(np.float32)
+            hist = hist / (hist.sum() + 1e-8)
+            hog_parts.append(hist)
+    hog_feat = np.concatenate(hog_parts, axis=0)
+
+    feat = np.concatenate(
+        [rgb_feat_global, hsv_feat_global, rgb_feat_grid, hsv_feat_grid, hog_feat],
+        axis=0,
+    ).astype(np.float32)
+    return feat
+
+
+def _extract_multiscale_pair_multi(
+    image_id,
+    images_dir,
+    sizes_a=((96, 96), (160, 160)),
+    sizes_b=((96, 96), (192, 192)),
+    bins=9,
+):
+    img_path = os.path.join(images_dir, f"{image_id}.jpg")
+    if not os.path.exists(img_path):
+        return None
+
+    feats_a_nf, feats_a_f = [], []
+    feats_b_nf, feats_b_f = [], []
+    with Image.open(img_path) as im:
+        im = im.convert("RGB")
+
+        for sz in sizes_a:
+            imr = im.resize(sz)
+            rgb = np.asarray(imr, dtype=np.float32) / 255.0
+            feats_a_nf.append(_extract_features_from_rgb(rgb, bins=bins))
+            imrf = imr.transpose(Image.FLIP_LEFT_RIGHT)
+            rgbf = np.asarray(imrf, dtype=np.float32) / 255.0
+            feats_a_f.append(_extract_features_from_rgb(rgbf, bins=bins))
+
+        for sz in sizes_b:
+            imr = im.resize(sz)
+            rgb = np.asarray(imr, dtype=np.float32) / 255.0
+            feats_b_nf.append(_extract_features_from_rgb(rgb, bins=bins))
+            imrf = imr.transpose(Image.FLIP_LEFT_RIGHT)
+            rgbf = np.asarray(imrf, dtype=np.float32) / 255.0
+            feats_b_f.append(_extract_features_from_rgb(rgbf, bins=bins))
+
+    f_a_nf = np.concatenate(feats_a_nf, axis=0).astype(np.float32, copy=False)
+    f_a_f = np.concatenate(feats_a_f, axis=0).astype(np.float32, copy=False)
+    f_b_nf = np.concatenate(feats_b_nf, axis=0).astype(np.float32, copy=False)
+    f_b_f = np.concatenate(feats_b_f, axis=0).astype(np.float32, copy=False)
+
+    return (image_id, f_a_nf, f_a_f, f_b_nf, f_b_f)
+
+
+_MP_IMAGES_DIR = None
+
+
+def _mp_init(images_dir):
+    global _MP_IMAGES_DIR
+    _MP_IMAGES_DIR = images_dir
+
+
+def _mp_worker(image_id):
+    return _extract_multiscale_pair_multi(image_id, _MP_IMAGES_DIR)
+
+
+def _feature_cache_paths(images_dir, tag="pp2020_v1"):
+    safe_dir = os.path.abspath(images_dir).replace(os.sep, "_").replace(":", "_")
+    cache_dir = "/kaggle/working"
+    train_cache = os.path.join(cache_dir, f"feat_cache_{tag}_train_{safe_dir}.npz")
+    test_cache = os.path.join(cache_dir, f"feat_cache_{tag}_test_{safe_dir}.npz")
+    return train_cache, test_cache
+
+
+def _load_cached_features(path):
+    if not os.path.exists(path):
+        return None
+    z = np.load(path, allow_pickle=False)
+    return {k: z[k] for k in z.files}
+
+
+def _save_cached_features(path, **arrays):
+    out_dir = os.path.dirname(path)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "wb") as f:
+        np.savez_compressed(f, **arrays)
+    os.replace(tmp, path)
+
+
+def build_sklearn_submissions(
+    train_df, test_df, images_dir, target_cols, required_cols
+):
+    train_ids = train_df["image_id"].to_numpy()
+    test_ids = test_df["image_id"].to_numpy()
+    y_arr = train_df[target_cols].to_numpy(dtype=np.int8, copy=False)
+
+    train_cache_path, test_cache_path = _feature_cache_paths(
+        images_dir, tag="pp2020_ms2_bins9"
+    )
+    train_cached = _load_cached_features(train_cache_path)
+    test_cached = _load_cached_features(test_cache_path)
+
+    _feat_dim = None
+
+    if train_cached is None or test_cached is None:
+        ctx = (
+            mp.get_context("fork")
+            if "fork" in mp.get_all_start_methods()
+            else mp.get_context("spawn")
+        )
+
+        nproc = max(1, min(8, (os.cpu_count() or 2)))
+        chunksize = 64
+
+        with ctx.Pool(
+            processes=nproc, initializer=_mp_init, initargs=(images_dir,)
+        ) as pool:
+            train_res = [None] * len(train_ids)
+            for i, r in pool.imap_unordered(
+                lambda x: (x[0], _mp_worker(x[1])),
+                enumerate(train_ids),
+                chunksize=chunksize,
+            ):
+                train_res[i] = r
+
+            test_res = [None] * len(test_ids)
+            for i, r in pool.imap_unordered(
+                lambda x: (x[0], _mp_worker(x[1])),
+                enumerate(test_ids),
+                chunksize=chunksize,
+            ):
+                test_res[i] = r
+
+        first_ok = next((r for r in train_res if r is not None), None)
+        if first_ok is None:
+            return []
+        _feat_dim = int(first_ok[1].shape[0])
+
+        X_train_a_nf = np.empty((len(train_ids), _feat_dim), dtype=np.float32)
+        X_train_a_f = np.empty((len(train_ids), _feat_dim), dtype=np.float32)
+        X_train_b_nf = np.empty((len(train_ids), _feat_dim), dtype=np.float32)
+        X_train_b_f = np.empty((len(train_ids), _feat_dim), dtype=np.float32)
+        train_ok = np.zeros(len(train_ids), dtype=bool)
+
+        for i, r in enumerate(train_res):
+            if r is None:
+                continue
+            _, f_a_nf, f_a_f, f_b_nf, f_b_f = r
+            X_train_a_nf[i] = f_a_nf
+            X_train_a_f[i] = f_a_f
+            X_train_b_nf[i] = f_b_nf
+            X_train_b_f[i] = f_b_f
+            train_ok[i] = True
+
+        first_ok_t = next((r for r in test_res if r is not None), None)
+        if first_ok_t is None:
+            return []
+        if _feat_dim is None:
+            _feat_dim = int(first_ok_t[1].shape[0])
+
+        X_test_a_nf = np.empty((len(test_ids), _feat_dim), dtype=np.float32)
+        X_test_a_f = np.empty((len(test_ids), _feat_dim), dtype=np.float32)
+        X_test_b_nf = np.empty((len(test_ids), _feat_dim), dtype=np.float32)
+        X_test_b_f = np.empty((len(test_ids), _feat_dim), dtype=np.float32)
+        ok_ids = []
+
+        for i, r in enumerate(test_res):
+            if r is None:
+                return []
+            image_id, f_a_nf, f_a_f, f_b_nf, f_b_f = r
+            X_test_a_nf[i] = f_a_nf
+            X_test_a_f[i] = f_a_f
+            X_test_b_nf[i] = f_b_nf
+            X_test_b_f[i] = f_b_f
+            ok_ids.append(image_id)
+
+        X_train_a = np.empty((train_ok.sum() * 2, _feat_dim), dtype=np.float32)
+        y_train_a = np.empty((train_ok.sum() * 2, len(target_cols)), dtype=np.int8)
+        X_train_b = np.empty((train_ok.sum() * 2, _feat_dim), dtype=np.float32)
+        y_train_b = np.empty((train_ok.sum() * 2, len(target_cols)), dtype=np.int8)
+
+        idxs = np.flatnonzero(train_ok)
+        for t, i in enumerate(idxs):
+            X_train_a[2 * t] = X_train_a_nf[i]
+            X_train_a[2 * t + 1] = X_train_a_f[i]
+            y_train_a[2 * t] = y_arr[i]
+            y_train_a[2 * t + 1] = y_arr[i]
+
+            X_train_b[2 * t] = X_train_b_nf[i]
+            X_train_b[2 * t + 1] = X_train_b_f[i]
+            y_train_b[2 * t] = y_arr[i]
+            y_train_b[2 * t + 1] = y_arr[i]
+
+        _save_cached_features(
+            train_cache_path,
+            X_train_a=X_train_a,
+            y_train_a=y_train_a,
+            X_train_b=X_train_b,
+            y_train_b=y_train_b,
+        )
+        _save_cached_features(
+            test_cache_path,
+            ok_ids=np.array(ok_ids, dtype=object),
+            X_test_a_nf=X_test_a_nf,
+            X_test_a_f=X_test_a_f,
+            X_test_b_nf=X_test_b_nf,
+            X_test_b_f=X_test_b_f,
+        )
+    else:
+        X_train_a = train_cached["X_train_a"]
+        y_train_a = train_cached["y_train_a"]
+        X_train_b = train_cached["X_train_b"]
+        y_train_b = train_cached["y_train_b"]
+
+        ok_ids = list(test_cached["ok_ids"].tolist())
+        X_test_a_nf = test_cached["X_test_a_nf"]
+        X_test_a_f = test_cached["X_test_a_f"]
+        X_test_b_nf = test_cached["X_test_b_nf"]
+        X_test_b_f = test_cached["X_test_b_f"]
+
+    submissions = []
+
+    C_values = (0.6, 0.7, 0.8, 1.0, 1.2, 1.6, 2.0, 3.0, 4.0)
+
+    def fit_and_predict(X_train, y_train, X_nf, X_f, C):
+        base_lr = LogisticRegression(
+            solver="lbfgs",
+            max_iter=1600,
+            C=C,
+            class_weight="balanced",
+            n_jobs=-1,
+        )
+        clf = OneVsRestClassifier(
+            make_pipeline(StandardScaler(with_mean=True, with_std=True), base_lr)
+        )
+        clf.fit(X_train, y_train)
+        scores_nf = clf.decision_function(X_nf)
+        scores_f = clf.decision_function(X_f)
+        proba_nf = expit(scores_nf).astype(float, copy=False)
+        proba_f = expit(scores_f).astype(float, copy=False)
+        proba = 0.5 * (proba_nf + proba_f)
+        return np.clip(proba, 1e-7, 1 - 1e-7)
+
+    try:
+        from joblib import Parallel, delayed
+
+        def _one_C(C):
+            out = []
+            proba_a = fit_and_predict(X_train_a, y_train_a, X_test_a_nf, X_test_a_f, C)
+            df_a = pd.DataFrame(proba_a, columns=target_cols)
+            df_a.insert(0, "image_id", ok_ids)
+            df_a = df_a[required_cols]
+            out.append(df_a)
+
+            proba_b = fit_and_predict(X_train_b, y_train_b, X_test_b_nf, X_test_b_f, C)
+            df_b = pd.DataFrame(proba_b, columns=target_cols)
+            df_b.insert(0, "image_id", ok_ids)
+            df_b = df_b[required_cols]
+            out.append(df_b)
+            return out
+
+        n_jobs = max(1, min(4, (os.cpu_count() or 2)))
+        nested = Parallel(n_jobs=n_jobs, backend="threading", prefer="threads")(
+            delayed(_one_C)(C) for C in C_values
+        )
+        for pair in nested:
+            submissions.extend(pair)
+    except Exception:
+        for C in C_values:
+            proba_a = fit_and_predict(X_train_a, y_train_a, X_test_a_nf, X_test_a_f, C)
+            df_a = pd.DataFrame(proba_a, columns=target_cols)
+            df_a.insert(0, "image_id", ok_ids)
+            df_a = df_a[required_cols]
+            submissions.append(df_a)
+
+            proba_b = fit_and_predict(X_train_b, y_train_b, X_test_b_nf, X_test_b_f, C)
+            df_b = pd.DataFrame(proba_b, columns=target_cols)
+            df_b.insert(0, "image_id", ok_ids)
+            df_b = df_b[required_cols]
+            submissions.append(df_b)
+
+    return submissions
+
+
+sk_model_subs = build_sklearn_submissions(
+    train_df, test_df, IMAGES_DIR, target_cols, required_cols
+)
+for d in sk_model_subs:
+    subs.append(d)
+
+if len(subs) == 0:
+    subs = [baseline]
+else:
+    subs.append(baseline)
+
+sub1 = subs[0]
+sub2 = subs[1] if len(subs) > 1 else subs[0]
+sub3 = subs[2] if len(subs) > 2 else subs[0]
+sub4 = subs[3] if len(subs) > 3 else subs[0]
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+/tmp/ipykernel_11/23305269.py in <cell line: 0>()
+    392 
+    393 
+--> 394 sk_model_subs = build_sklearn_submissions(
+    395     train_df, test_df, IMAGES_DIR, target_cols, required_cols
+    396 )
+
+/tmp/ipykernel_11/23305269.py in build_sklearn_submissions(train_df, test_df, images_dir, target_cols, required_cols)
+    223         ) as pool:
+    224             train_res = [None] * len(train_ids)
+--> 225             for i, r in pool.imap_unordered(
+    226                 lambda x: (x[0], _mp_worker(x[1])),
+    227                 enumerate(train_ids),
+
+/usr/lib/python3.11/multiprocessing/pool.py in <genexpr>(.0)
+    449                     result._set_length
+    450                 ))
+--> 451             return (item for chunk in result for item in chunk)
+    452 
+    453     def apply_async(self, func, args=(), kwds={}, callback=None,
+
+/usr/lib/python3.11/multiprocessing/pool.py in next(self, timeout)
+    871         if success:
+    872             return value
+--> 873         raise value
+    874 
+    875     __next__ = next                    # XXX
+
+/usr/lib/python3.11/multiprocessing/pool.py in _handle_tasks(taskqueue, put, outqueue, pool, cache)
+    538                         break
+    539                     try:
+--> 540                         put(task)
+    541                     except Exception as e:
+    542                         job, idx = task[:2]
+
+/usr/lib/python3.11/multiprocessing/connection.py in send(self, obj)
+    204         self._check_closed()
+    205         self._check_writable()
+--> 206         self._send_bytes(_ForkingPickler.dumps(obj))
+    207 
+    208     def recv_bytes(self, maxlength=None):
+
+/usr/lib/python3.11/multiprocessing/reduction.py in dumps(cls, obj, protocol)
+     49     def dumps(cls, obj, protocol=None):
+     50         buf = io.BytesIO()
+---> 51         cls(buf, protocol).dump(obj)
+     52         return buf.getbuffer()
+     53 
+
+AttributeError: Can't pickle local object 'build_sklearn_submissions.<locals>.<lambda>'
+
+## === cell 4
+pred_stack = np.stack(
+    [s[target_cols].to_numpy(dtype=float) for s in subs], axis=0
+)  # (M, N, C)
+pred_stack = np.clip(pred_stack, 1e-12, 1.0)  # avoid log(0) in entropy
+
+row_sums = pred_stack.sum(axis=2, keepdims=True)  # (M, N, 1)
+row_sums = np.where(row_sums <= 0, 1.0, row_sums)
+pred_stack_for_entropy = pred_stack / row_sums
+
+eps = 1e-4
+pred_stack_for_entropy = (1.0 - eps) * pred_stack_for_entropy + eps * (
+    1.0 / len(target_cols)
+)
+
+entropies = entropy(pred_stack_for_entropy, base=2, axis=2)  # (M, N)
+selected = np.argmin(entropies, axis=0)
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/4153649983.py in <cell line: 0>()
+----> 1 pred_stack = np.stack(
+      2     [s[target_cols].to_numpy(dtype=float) for s in subs], axis=0
+      3 )  # (M, N, C)
+      4 pred_stack = np.clip(pred_stack, 1e-12, 1.0)  # avoid log(0) in entropy
+      5 
+
+/usr/local/lib/python3.11/dist-packages/numpy/core/shape_base.py in stack(arrays, axis, out, dtype, casting)
+    443     arrays = [asanyarray(arr) for arr in arrays]
+    444     if not arrays:
+--> 445         raise ValueError('need at least one array to stack')
+    446 
+    447     shapes = {arr.shape for arr in arrays}
+
+ValueError: need at least one array to stack
+
+## === cell 5
+final_preds = np.zeros((len(sub), len(target_cols)), dtype=float)
+
+subs_np = [s[target_cols].to_numpy(dtype=float, copy=False) for s in subs]
+for m_idx, arr in enumerate(subs_np):
+    mask = selected == m_idx
+    if np.any(mask):
+        final_preds[mask] = arr[mask]
+
+sub[target_cols] = final_preds
+sub[target_cols] = sub[target_cols].astype(float).clip(1e-7, 1 - 1e-7)
+sub = sub[required_cols]
+sub.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", sub.shape)
+print("Number of candidate models in entropy stack:", len(subs))
+print(sub.head())

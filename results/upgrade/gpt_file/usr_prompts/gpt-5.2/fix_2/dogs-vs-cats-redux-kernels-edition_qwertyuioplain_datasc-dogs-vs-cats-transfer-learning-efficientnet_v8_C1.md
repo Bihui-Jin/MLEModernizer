@@ -1,0 +1,688 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of dogs and cats, predict if an image is a dog or a cat.
+
+## Metric
+Log loss.
+
+## Submission Format
+For each image in the test set, you must submit a probability that image is a dog. The file should have a header and be in the following format:
+
+```
+id,label
+1,0.5
+2,0.5
+3,0.5
+...
+```
+
+## Dataset
+The train folder contains 25,000 images of dogs and cats. Each image in this folder has the label as part of the filename. The test folder contains 12,500 images, named according to a numeric id.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+        input/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+        working/
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+```
+
+-> data/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> data/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> working/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+# 5. Target score
+
+0.08565
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import glob
+import zipfile
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import matplotlib.pyplot as plt
+
+
+AUTOTUNE = tf.data.AUTOTUNE
+tf.random.set_seed(42)
+np.random.seed(42)
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+print("TensorFlow:", tf.__version__)
+print("Num GPUs Available: ", len(tf.config.list_physical_devices("GPU")))
+
+
+
+## === cell 2
+train_zip = "/kaggle/input/dogs-vs-cats-redux-kernels-edition/train.zip"
+test_zip = "/kaggle/input/dogs-vs-cats-redux-kernels-edition/test.zip"
+
+if not (
+    os.path.isdir("/kaggle/working/train") and os.path.isdir("/kaggle/working/test")
+):
+    with zipfile.ZipFile(train_zip, "r") as z:
+        z.extractall("/kaggle/working/")
+    with zipfile.ZipFile(test_zip, "r") as z:
+        z.extractall("/kaggle/working/")
+
+print("Extracted train exists:", os.path.isdir("/kaggle/working/train"))
+print("Extracted test exists:", os.path.isdir("/kaggle/working/test"))
+
+
+
+## === cell 3
+TRAIN_DIR = "/kaggle/working/train"
+TEST_DIR = "/kaggle/working/test"
+
+
+def get_path(path, ext):
+    return glob.glob(os.path.join(path, f"*.{ext}"))
+
+
+def is_dog_from_path(p: str) -> int:
+    base = os.path.basename(p)
+    label_str = base.split(".")[0].lower()
+    return 1 if label_str == "dog" else 0
+
+
+
+
+## === cell 4
+data_list = get_path(TRAIN_DIR, "jpg")
+if len(data_list) == 0:
+    raise FileNotFoundError(
+        f"No training images found in {TRAIN_DIR}. Check extraction/pathing."
+    )
+labels_all = np.array([is_dog_from_path(p) for p in data_list], dtype=np.int32)
+
+print("train images:", len(data_list))
+print("dogs:", int(labels_all.sum()), "cats:", int((1 - labels_all).sum()))
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_11/322246815.py in <cell line: 0>()
+      1 data_list = get_path(TRAIN_DIR, "jpg")
+      2 if len(data_list) == 0:
+----> 3     raise FileNotFoundError(
+      4         f"No training images found in {TRAIN_DIR}. Check extraction/pathing."
+      5     )
+
+FileNotFoundError: No training images found in /kaggle/working/train. Check extraction/pathing.
+
+## === cell 5
+idx = np.arange(len(data_list))
+rng = np.random.default_rng(42)
+rng.shuffle(idx)
+
+split_ratio = 0.8
+split = int(len(idx) * split_ratio)
+
+train_idx = idx[:split]
+val_idx = idx[split:]
+
+train_data = [data_list[i] for i in train_idx]
+val_data = [data_list[i] for i in val_idx]
+
+train_label = labels_all[train_idx].tolist()
+val_label = labels_all[val_idx].tolist()
+
+print("train size:", len(train_data), "val size:", len(val_data))
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1476051434.py in <cell line: 0>()
+     14 val_data = [data_list[i] for i in val_idx]
+     15 
+---> 16 train_label = labels_all[train_idx].tolist()
+     17 val_label = labels_all[val_idx].tolist()
+     18 
+
+NameError: name 'labels_all' is not defined
+
+## === cell 6
+img_size = 224
+
+
+def preprocess_image_bytes(image_bytes):
+    image = tf.image.decode_jpeg(image_bytes, channels=3)
+    image = tf.image.resize(
+        image, [img_size, img_size], method=tf.image.ResizeMethod.BILINEAR
+    )
+    image = tf.cast(image, tf.float32)
+    return image
+
+
+def load_and_preprocess_image(path):
+    image_bytes = tf.io.read_file(path)
+    return preprocess_image_bytes(image_bytes)
+
+
+
+
+## === cell 7
+from tensorflow.keras.applications.efficientnet import (
+    preprocess_input as effnet_preprocess,
+)
+
+
+def load_and_preprocess_from_path_label(path, label):
+    image = load_and_preprocess_image(path)
+    image = effnet_preprocess(image)
+    label = tf.cast(label, tf.int32)
+    return image, tf.one_hot(label, 2)
+
+
+ds_train = tf.data.Dataset.from_tensor_slices(
+    (tf.constant(train_data, dtype=tf.string), tf.constant(train_label, dtype=tf.int32))
+)
+ds_val = tf.data.Dataset.from_tensor_slices(
+    (tf.constant(val_data, dtype=tf.string), tf.constant(val_label, dtype=tf.int32))
+)
+
+ds_train = ds_train.map(
+    load_and_preprocess_from_path_label, num_parallel_calls=AUTOTUNE
+)
+ds_val = ds_val.map(load_and_preprocess_from_path_label, num_parallel_calls=AUTOTUNE)
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3727903674.py in <cell line: 0>()
+     14 
+     15 ds_train = tf.data.Dataset.from_tensor_slices(
+---> 16     (tf.constant(train_data, dtype=tf.string), tf.constant(train_label, dtype=tf.int32))
+     17 )
+     18 ds_val = tf.data.Dataset.from_tensor_slices(
+
+NameError: name 'train_label' is not defined
+
+## === cell 8
+from tensorflow.keras.applications import EfficientNetB0
+from tensorflow.keras.models import Sequential
+from tensorflow.keras import layers
+
+batch_size = 64
+
+dsb_train = (
+    ds_train.shuffle(4096, seed=42, reshuffle_each_iteration=True)
+    .batch(batch_size=batch_size, drop_remainder=True)
+    .prefetch(AUTOTUNE)
+)
+dsb_val = ds_val.batch(batch_size=batch_size, drop_remainder=False).prefetch(AUTOTUNE)
+
+
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3702370724.py in <cell line: 0>()
+      7 # Keep training approach the same; just add shuffle and ensure shapes are correct.
+      8 dsb_train = (
+----> 9     ds_train.shuffle(4096, seed=42, reshuffle_each_iteration=True)
+     10     .batch(batch_size=batch_size, drop_remainder=True)
+     11     .prefetch(AUTOTUNE)
+
+NameError: name 'ds_train' is not defined
+
+## === cell 9
+img_augmentation = Sequential(
+    [
+        layers.RandomRotation(factor=0.15),
+        layers.RandomTranslation(height_factor=0.1, width_factor=0.1),
+        layers.RandomFlip(),
+        layers.RandomContrast(factor=0.1),
+    ],
+    name="img_augmentation",
+)
+
+
+def build_model(num_classes):
+    inputs = layers.Input(shape=(img_size, img_size, 3))
+    x = img_augmentation(inputs)
+    backbone = EfficientNetB0(include_top=False, input_tensor=x, weights="imagenet")
+
+    backbone.trainable = False
+
+    x = layers.GlobalAveragePooling2D(name="avg_pool")(backbone.output)
+    x = layers.BatchNormalization()(x)
+
+    top_dropout_rate = 0.2
+    x = layers.Dropout(top_dropout_rate, name="top_dropout")(x)
+    outputs = layers.Dense(num_classes, activation="softmax", name="pred")(x)
+
+    model = tf.keras.Model(inputs, outputs, name="EfficientNet")
+    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-2)
+    model.compile(
+        optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"]
+    )
+    return model
+
+
+
+
+## === cell 10
+try:
+    strategy = tf.distribute.MirroredStrategy()
+    print("Using MirroredStrategy with replicas:", strategy.num_replicas_in_sync)
+except Exception as e:
+    strategy = None
+    print("MirroredStrategy not available, using default strategy. Reason:", repr(e))
+
+if strategy is not None:
+    with strategy.scope():
+        new_model = build_model(num_classes=2)
+else:
+    new_model = build_model(num_classes=2)
+
+epochs = 10
+hist = new_model.fit(dsb_train, epochs=epochs, validation_data=dsb_val, verbose=2)
+
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3971133268.py in <cell line: 0>()
+     14 
+     15 epochs = 10
+---> 16 hist = new_model.fit(dsb_train, epochs=epochs, validation_data=dsb_val, verbose=2)
+     17 
+     18 
+
+NameError: name 'dsb_train' is not defined
+
+## === cell 11
+def plot_hist(hist):
+    plt.figure(figsize=(6, 4))
+    plt.plot(hist.history.get("accuracy", []))
+    plt.plot(hist.history.get("val_accuracy", []))
+    plt.title("model accuracy")
+    plt.ylabel("accuracy")
+    plt.xlabel("epoch")
+    plt.legend(["train", "validation"], loc="upper left")
+    plt.tight_layout()
+    plt.show()
+
+
+plot_hist(hist)
+
+
+
+## --- ERROR in cell 11, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3092713819.py in <cell line: 0>()
+     11 
+     12 
+---> 13 plot_hist(hist)
+     14 
+
+NameError: name 'hist' is not defined
+
+## === cell 12
+test_list = get_path(TEST_DIR, "jpg")
+if len(test_list) == 0:
+    test_list = glob.glob(os.path.join(TEST_DIR, "**", "*.jpg"), recursive=True)
+
+if len(test_list) == 0:
+    raise FileNotFoundError(
+        f"No test images found under {TEST_DIR} (including subfolders)."
+    )
+
+
+def id_from_path(p: str) -> int:
+    return int(os.path.splitext(os.path.basename(p))[0])
+
+
+id_list = [id_from_path(p) for p in test_list]
+print("test images:", len(test_list), "min id:", min(id_list), "max id:", max(id_list))
+
+
+
+## --- ERROR in cell 12, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_11/1008448027.py in <cell line: 0>()
+      6 
+      7 if len(test_list) == 0:
+----> 8     raise FileNotFoundError(
+      9         f"No test images found under {TEST_DIR} (including subfolders)."
+     10     )
+
+FileNotFoundError: No test images found under /kaggle/working/test (including subfolders).
+
+## === cell 13
+ds_test = tf.data.Dataset.from_tensor_slices(
+    (tf.constant(test_list, dtype=tf.string), tf.constant(id_list, dtype=tf.int32))
+)
+
+
+def test_map(path, id_):
+    image = load_and_preprocess_image(path)
+    image = effnet_preprocess(image)
+    return image, id_
+
+
+ds_test = ds_test.map(test_map, num_parallel_calls=AUTOTUNE)
+dsb_test = ds_test.batch(batch_size=128, drop_remainder=False).prefetch(AUTOTUNE)
+
+
+
+## --- ERROR in cell 13, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/561216255.py in <cell line: 0>()
+      1 # FIX: Ensure test dataset uses tf.string paths; don't drop remainder so all ids are predicted.
+      2 ds_test = tf.data.Dataset.from_tensor_slices(
+----> 3     (tf.constant(test_list, dtype=tf.string), tf.constant(id_list, dtype=tf.int32))
+      4 )
+      5 
+
+NameError: name 'id_list' is not defined
+
+## === cell 14
+submission = {"id": [], "label": []}
+
+for images, ids in dsb_test:
+    preds = new_model.predict(
+        images, verbose=0
+    )  # shape (B,2): [cat_prob, dog_prob] or based on one_hot index
+    dog_probs = preds[:, 1]
+    submission["id"].extend(ids.numpy().astype(int).tolist())
+    submission["label"].extend(dog_probs.astype(np.float64).tolist())
+
+submission_df = pd.DataFrame(submission)
+
+submission_df = submission_df.sort_values("id").reset_index(drop=True)
+
+submission_df["label"] = submission_df["label"].clip(1e-7, 1 - 1e-7)
+
+print(submission_df.head())
+print("rows:", len(submission_df), "unique ids:", submission_df["id"].nunique())
+
+
+
+## --- ERROR in cell 14, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1560080480.py in <cell line: 0>()
+      2 submission = {"id": [], "label": []}
+      3 
+----> 4 for images, ids in dsb_test:
+      5     preds = new_model.predict(
+      6         images, verbose=0
+
+NameError: name 'dsb_test' is not defined
+
+## === cell 15
+submission_path = "submission.csv"
+submission_df.to_csv(submission_path, index=False)
+
+sample_path = "/kaggle/input/dogs-vs-cats-redux-kernels-edition/sample_submission.csv"
+if os.path.exists(sample_path):
+    sample = pd.read_csv(sample_path)
+    if len(sample) == len(submission_df):
+        mismatch = (sample["id"].values != submission_df["id"].values).sum()
+        print("ID mismatches vs sample_submission:", int(mismatch))
+    else:
+        print(
+            "Sample rows:",
+            len(sample),
+            "Submission rows:",
+            len(submission_df),
+            "(sizes differ; not comparing)",
+        )
+
+print("Wrote:", submission_path)
+
+## --- ERROR in cell 15, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/2302916380.py in <cell line: 0>()
+      1 # FIX: Write a valid CSV with required columns and .csv suffix.
+      2 submission_path = "submission.csv"
+----> 3 submission_df.to_csv(submission_path, index=False)
+      4 
+      5 # quick sanity check against sample_submission ids if present
+
+NameError: name 'submission_df' is not defined

@@ -1,0 +1,802 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+colorama==0.4.6
+cufflinks==0.17.3
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+plotly==5.24.1
+plotly-express==0.4.1
+pydicom==3.0.1
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-7.3851
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved -10.65317) has done: 'I fix the runtime errors that stop the notebook early: `train_data.corr()` fails because it includes string columns, and `pydicom.read_file` was removed in newer pydicom versions (use `pydicom.dcmread`). To ensure the solution runs end-to-end and actually produces a Kaggle-valid `.csv` submission, I add a minimal baseline prediction block at the end that builds `Patient_Week`, predicts FVC using the provided baseline FVC (from `test.csv`), and writes `submission.csv` with the required columns. These changes keep all existing exploratory logic intact while unblocking execution and guaranteeing a valid output file. The baseline submission should yield a reasonable score (likely in the right ballpark for the target), and can be improved later once the full model pipeline is added.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import sys
+import glob
+from os import listdir
+import glob
+import tqdm
+from typing import Dict
+import cv2
+import pydicom as dicom
+
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+plt.style.use("fivethirtyeight")
+
+import plotly.express as px
+import plotly.graph_objs as go
+from plotly.offline import iplot
+import plotly.figure_factory as ff
+import cufflinks
+
+cufflinks.go_offline()
+cufflinks.set_config_file(world_readable=True, theme="pearl")
+
+import pydicom
+
+import warnings
+
+warnings.filterwarnings("ignore")
+
+
+from colorama import Fore, Back, Style
+
+y_ = Fore.YELLOW
+r_ = Fore.RED
+g_ = Fore.GREEN
+b_ = Fore.BLUE
+m_ = Fore.MAGENTA
+sr_ = Style.RESET_ALL
+
+
+
+## === cell 1
+folder_path = "../input/osic-pulmonary-fibrosis-progression"
+if not os.path.exists(folder_path):
+    alt1 = "/kaggle/input/osic-pulmonary-fibrosis-progression"
+    alt2 = "/kaggle/data/osic-pulmonary-fibrosis-progression"
+    if os.path.exists(alt1):
+        folder_path = alt1
+    elif os.path.exists(alt2):
+        folder_path = alt2
+
+train_csv = folder_path + "/train.csv"
+test_csv = folder_path + "/test.csv"
+sample_csv = folder_path + "/sample_submission.csv"
+
+train_data = pd.read_csv(train_csv)
+test_data = pd.read_csv(test_csv)
+sample = pd.read_csv(sample_csv)
+
+print(
+    f"{y_}Number of rows in train data: {r_}{train_data.shape[0]}\n{y_}Number of columns in train data: {r_}{train_data.shape[1]}"
+)
+print(
+    f"{g_}Number of rows in test data: {r_}{test_data.shape[0]}\n{g_}Number of columns in test data: {r_}{test_data.shape[1]}"
+)
+print(
+    f"{b_}Number of rows in submission data: {r_}{sample.shape[0]}\n{b_}Number of columns in submission data:{r_}{sample.shape[1]}"
+)
+
+train_data.head().style.applymap(lambda x: "background-color:lightgreen")
+
+
+
+
+## === cell 2
+def distribution(feature, color):
+    plt.figure(dpi=100)
+    sns.distplot(train_data[feature], color=color)
+    print(
+        "{}Max value of {} is: {} {:.2f} \n{}Min value of {} is: {} {:.2f}\n{}Mean of {} is: {}{:.2f}\n{}Standard Deviation of {} is:{}{:.2f}".format(
+            y_,
+            feature,
+            r_,
+            train_data[feature].max(),
+            g_,
+            feature,
+            r_,
+            train_data[feature].min(),
+            b_,
+            feature,
+            r_,
+            train_data[feature].mean(),
+            m_,
+            feature,
+            r_,
+            train_data[feature].std(),
+        )
+    )
+
+
+
+
+## === cell 3
+distribution("FVC", "blue")
+
+
+
+## === cell 4
+distribution("Age", "brown")
+
+
+
+## === cell 5
+distribution("Percent", "blue")
+
+
+
+## === cell 6
+distribution("Weeks", "yellow")
+
+
+
+## === cell 7
+plt.figure(dpi=100)
+sns.countplot(data=train_data, x="SmokingStatus", hue="Sex")
+
+
+
+
+## === cell 8
+def distribution2(feature):
+    plt.figure(figsize=(15, 7))
+    plt.subplot(121)
+    for i in train_data.Sex.unique():
+        sns.distplot(train_data[train_data["Sex"] == i][feature], label=i)
+    plt.title(f"Distribution of {feature} based on Sex")
+    plt.legend()
+
+    plt.subplot(122)
+    for i in train_data.SmokingStatus.unique():
+        sns.distplot(train_data[train_data["SmokingStatus"] == i][feature], label=i)
+    plt.title(f"Distribution of {feature}  based on Smoking Status")
+    plt.legend()
+
+
+
+
+## === cell 9
+distribution2("FVC")
+
+
+
+## === cell 10
+distribution2("Percent")
+
+
+
+## === cell 11
+distribution2("Age")
+
+
+
+## === cell 12
+distribution2("Weeks")
+
+
+
+
+## === cell 13
+def vs(feature1, feature2, color=None):
+    fig = px.scatter(train_data, x=feature1, y=feature2, color=color)
+    fig.show()
+
+
+
+
+## === cell 14
+vs("FVC", "Percent", "SmokingStatus")
+
+
+
+## === cell 15
+vs("FVC", "Age", "SmokingStatus")
+
+
+
+## === cell 16
+vs("FVC", "Weeks", "SmokingStatus")
+
+
+
+## === cell 17
+rn = np.random.randint(0, train_data.Patient.nunique() - 20, 1)[0]
+patients_ids = train_data.Patient.unique()[rn : rn + 20]
+fig = go.Figure()
+
+for patient in patients_ids:
+    df = train_data[train_data["Patient"] == patient]
+    fig.add_trace(go.Scatter(x=df.Weeks, y=df.FVC, mode="lines", name=str(patient)))
+fig.show()
+
+
+
+## === cell 18
+print(f"{y_}Number of unique patient is {r_}{train_data.Patient.nunique()}")
+
+df = train_data.Patient.value_counts()
+fig = px.bar(x=[f"Patient {i}" for i in range(len(df.index))], y=df.values)
+fig.show()
+
+
+
+
+## === cell 19
+def box(feature1, feature2, color=None):
+    fig = px.box(train_data, x=feature2, y=feature1, color=color)
+    fig.show()
+
+
+
+
+## === cell 20
+box("FVC", "Sex", "SmokingStatus")
+
+
+
+## === cell 21
+box("Percent", "Sex", "SmokingStatus")
+
+
+
+## === cell 22
+box("Age", "Sex", "SmokingStatus")
+
+
+
+## === cell 23
+plt.figure(dpi=100)
+sns.heatmap(train_data.corr(numeric_only=True), annot=True)
+
+
+
+## === cell 24
+train_image_path = folder_path + "/train/"
+test_image_path = folder_path + "/test/"
+
+train_images = os.listdir(train_image_path)
+test_images = os.listdir(test_image_path)
+
+image = train_image_path + train_images[0] + "/1.dcm"
+
+
+def show_image(image):
+    print(f"{y_} Image {r_}{image}")
+    image = dicom.dcmread(image)
+    image = image.pixel_array
+    plt.figure(figsize=(7, 7))
+    plt.imshow(image, cmap="gray")
+    plt.axis("off")
+    plt.show()
+
+
+show_image(image)
+
+
+
+
+## === cell 25
+def show_grid(cmap="gray"):
+    rn = np.random.randint(0, len(train_images), 1)[0]
+    path = train_image_path + train_images[rn]
+    files = [os.path.join(path, img) for img in os.listdir(path)]
+    images = [dicom.dcmread(fp) for fp in files]
+
+    def zpos(ds):
+        try:
+            return float(ds.ImagePositionPatient[2])
+        except Exception:
+            return float(getattr(ds, "InstanceNumber", 0))
+
+    images.sort(key=zpos)
+
+    plt.figure(figsize=(10, 10))
+    for i, image in enumerate(images[:100]):
+        plt.subplot(10, 10, i + 1)
+        plt.imshow(image.pixel_array, cmap=cmap)
+        plt.axis("off")
+    plt.show()
+
+
+show_grid()
+
+
+
+## === cell 26
+show_grid(cmap="jet")
+
+
+
+## === cell 27
+show_grid(cmap="RdYlBu")
+
+
+
+## === cell 28
+import matplotlib.animation as animation
+from IPython.display import HTML
+
+
+def show_animation():
+    rn = np.random.randint(0, len(train_images), 1)[0]
+    fig = plt.figure()
+    path = train_image_path + train_images[rn]
+    files = [os.path.join(path, img) for img in os.listdir(path)]
+    images = [dicom.dcmread(fp) for fp in files]
+
+    def zpos(ds):
+        try:
+            return float(ds.ImagePositionPatient[2])
+        except Exception:
+            return float(getattr(ds, "InstanceNumber", 0))
+
+    images.sort(key=zpos)
+
+    ims = []
+    for ds in images:
+        im = plt.imshow(ds.pixel_array, cmap="gray", animated=True)
+        plt.axis("off")
+        ims.append([im])
+    ani = animation.ArtistAnimation(
+        fig, ims, interval=100, blit=False, repeat_delay=1000
+    )
+    return ani
+
+
+ani = show_animation()
+
+
+
+## === cell 29
+HTML(ani.to_jshtml())
+
+
+
+## === cell 30
+
+
+def _safe_mode(s: pd.Series):
+    m = s.mode(dropna=True)
+    return m.iloc[0] if len(m) else np.nan
+
+
+train_data_sorted = train_data.sort_values(["Patient", "Weeks"])
+train_base = train_data_sorted.groupby("Patient", as_index=False).first()
+
+slopes = []
+for pid, dfp in train_data.groupby("Patient"):
+    x = dfp["Weeks"].values.astype(float)
+    y = dfp["FVC"].values.astype(float)
+    if len(dfp) < 2 or np.all(x == x[0]):
+        slope = 0.0
+    else:
+        x0 = x.mean()
+        denom = np.sum((x - x0) ** 2)
+        slope = float(np.sum((x - x0) * (y - y.mean())) / denom) if denom > 0 else 0.0
+    slopes.append((pid, slope))
+slopes = pd.DataFrame(slopes, columns=["Patient", "Slope"])
+
+train_pat = train_base.merge(slopes, on="Patient", how="left")
+
+for col in ["Sex", "SmokingStatus"]:
+    if col in train_pat.columns:
+        train_pat[col] = train_pat[col].fillna(_safe_mode(train_pat[col]))
+
+train_pat["AgeBin"] = pd.cut(
+    train_pat["Age"], bins=[0, 55, 65, 75, 120], include_lowest=True
+)
+train_pat["PercentBin"] = pd.cut(
+    train_pat["Percent"], bins=[0, 55, 70, 85, 100, 200], include_lowest=True
+)
+
+group_cols = ["Sex", "SmokingStatus", "AgeBin", "PercentBin"]
+group_slope = (
+    train_pat.groupby(group_cols, dropna=False)["Slope"]
+    .median()
+    .reset_index()
+    .rename(columns={"Slope": "GroupSlope"})
+)
+
+global_slope = float(train_pat["Slope"].median())
+
+train_rows = train_data.merge(
+    train_base[["Patient", "Weeks", "FVC", "Sex", "SmokingStatus", "Age", "Percent"]],
+    on="Patient",
+    how="left",
+    suffixes=("", "_base"),
+)
+
+train_rows["AgeBin"] = pd.cut(
+    train_rows["Age_base"], bins=[0, 55, 65, 75, 120], include_lowest=True
+)
+train_rows["PercentBin"] = pd.cut(
+    train_rows["Percent_base"], bins=[0, 55, 70, 85, 100, 200], include_lowest=True
+)
+
+train_rows = train_rows.merge(group_slope, on=group_cols, how="left")
+train_rows["GroupSlope"] = train_rows["GroupSlope"].fillna(global_slope)
+
+delta_w = (train_rows["Weeks"] - train_rows["Weeks_base"]).astype(float)
+train_rows["FVC_pred"] = (
+    train_rows["FVC_base"].astype(float)
+    + train_rows["GroupSlope"].astype(float) * delta_w
+)
+
+val_mae = float(
+    np.mean(
+        np.abs(train_rows["FVC"].astype(float) - train_rows["FVC_pred"].astype(float))
+    )
+)
+conf_value = max(70.0, val_mae * np.sqrt(2.0))
+
+print(
+    f"Calibrated confidence (from train MAE): MAE={val_mae:.2f} => Confidence={conf_value:.2f}"
+)
+
+sub = sample.copy()
+sub[["Patient", "Weeks"]] = sub["Patient_Week"].str.split("_", expand=True)
+sub["Weeks"] = sub["Weeks"].astype(int)
+
+test_base = test_data[
+    ["Patient", "Weeks", "FVC", "Sex", "SmokingStatus", "Age", "Percent"]
+].drop_duplicates("Patient")
+
+test_base["AgeBin"] = pd.cut(
+    test_base["Age"], bins=[0, 55, 65, 75, 120], include_lowest=True
+)
+test_base["PercentBin"] = pd.cut(
+    test_base["Percent"], bins=[0, 55, 70, 85, 100, 200], include_lowest=True
+)
+
+test_base = test_base.merge(group_slope, on=group_cols, how="left")
+test_base["GroupSlope"] = test_base["GroupSlope"].fillna(global_slope)
+
+sub = sub.merge(
+    test_base[["Patient", "Weeks", "FVC", "GroupSlope"]],
+    on="Patient",
+    how="left",
+    suffixes=("", "_base"),
+)
+
+sub["FVC"] = sub["FVC"].astype(float) + sub["GroupSlope"].astype(float) * (
+    sub["Weeks_x"].astype(float) - sub["Weeks_y"].astype(float)
+)
+sub["FVC"] = sub["FVC"].round().astype(int)
+
+sub["Confidence"] = float(conf_value)
+
+submission = sub[["Patient_Week", "FVC", "Confidence"]]
+submission.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with shape:", submission.shape)
+print(submission.head())
+
+## --- ERROR in cell 30, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3804         try:
+-> 3805             return self._engine.get_loc(casted_key)
+   3806         except KeyError as err:
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+KeyError: 'Weeks_x'
+
+The above exception was the direct cause of the following exception:
+
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_11/3484564224.py in <cell line: 0>()
+    125 # Predict
+    126 sub["FVC"] = sub["FVC"].astype(float) + sub["GroupSlope"].astype(float) * (
+--> 127     sub["Weeks_x"].astype(float) - sub["Weeks_y"].astype(float)
+    128 )
+    129 sub["FVC"] = sub["FVC"].round().astype(int)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4100             if self.columns.nlevels > 1:
+   4101                 return self._getitem_multilevel(key)
+-> 4102             indexer = self.columns.get_loc(key)
+   4103             if is_integer(indexer):
+   4104                 indexer = [indexer]
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3810             ):
+   3811                 raise InvalidIndexError(key)
+-> 3812             raise KeyError(key) from err
+   3813         except TypeError:
+   3814             # If we have a listlike key, _check_indexing_error will raise
+
+KeyError: 'Weeks_x'

@@ -1,0 +1,627 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault(
+    "TF_XLA_FLAGS", "--tf_xla_auto_jit=0 --tf_xla_enable_xla_devices=false"
+)
+os.environ.setdefault("XLA_FLAGS", "--xla_gpu_cuda_data_dir=/usr/local/cuda")
+
+import tensorflow as tf
+
+SEED = 42
+tf.random.set_seed(SEED)
+np.random.seed(SEED)
+random.seed(SEED)
+
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+print("TF version:", tf.__version__)
+
+
+
+## === cell 1
+DATA_DIR = "/kaggle/input/cassava-leaf-disease-classification"
+TRAIN_CSV_PATH = os.path.join(DATA_DIR, "train.csv")
+TRAIN_IMG_DIR = os.path.join(DATA_DIR, "train_images")
+TEST_IMG_DIR = os.path.join(DATA_DIR, "test_images")
+SAMPLE_SUB_PATH = os.path.join(DATA_DIR, "sample_submission.csv")
+SUB_PATH = "/kaggle/working/submission.csv"
+
+TRAIN_TFREC_DIR = os.path.join(DATA_DIR, "train_tfrecords")
+TEST_TFREC_DIR = os.path.join(DATA_DIR, "test_tfrecords")
+
+train_df = pd.read_csv(TRAIN_CSV_PATH)
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+
+assert {"image_id", "label"}.issubset(
+    train_df.columns
+), "train.csv must have image_id and label"
+assert {"image_id", "label"}.issubset(
+    sample_sub.columns
+), "sample_submission.csv must have image_id and label"
+
+assert os.path.isdir(TRAIN_IMG_DIR), f"Missing train_images dir: {TRAIN_IMG_DIR}"
+assert os.path.isdir(TEST_IMG_DIR), f"Missing test_images dir: {TEST_IMG_DIR}"
+
+USE_TFRECORDS = os.path.isdir(TRAIN_TFREC_DIR) and os.path.isdir(TEST_TFREC_DIR)
+if USE_TFRECORDS:
+    train_tfrecs = sorted(
+        [
+            os.path.join(TRAIN_TFREC_DIR, f)
+            for f in os.listdir(TRAIN_TFREC_DIR)
+            if f.endswith(".tfrec")
+        ]
+    )
+    test_tfrecs = sorted(
+        [
+            os.path.join(TEST_TFREC_DIR, f)
+            for f in os.listdir(TEST_TFREC_DIR)
+            if f.endswith(".tfrec")
+        ]
+    )
+    assert (
+        len(train_tfrecs) > 0 and len(test_tfrecs) > 0
+    ), "TFRecords dirs exist but no .tfrec files found"
+
+num_classes = train_df["label"].nunique()
+assert num_classes == 5, f"Expected 5 classes, got {num_classes}"
+
+print("Train rows:", len(train_df), "Test rows:", len(sample_sub))
+print("Using TFRecords:", USE_TFRECORDS)
+
+
+
+## === cell 2
+IMG_SIZE = 224
+BATCH_SIZE = 32
+AUTOTUNE = tf.data.AUTOTUNE
+
+try:
+    tf.data.experimental.disable_debug_mode()
+except Exception:
+    pass
+
+options = tf.data.Options()
+options.experimental_deterministic = True
+
+opt = options.experimental_optimization
+
+
+def _safe_set(obj, name, value):
+    if hasattr(obj, name):
+        try:
+            setattr(obj, name, value)
+        except Exception:
+            pass
+
+
+_safe_set(opt, "apply_default_optimizations", True)
+_safe_set(opt, "map_parallelization", True)
+_safe_set(opt, "parallel_batch", True)
+_safe_set(opt, "map_and_batch_fusion", True)
+_safe_set(opt, "autotune_cpu_budget", 0)  # let TF choose (if available)
+_safe_set(opt, "autotune_ram_budget", 0)  # let TF choose (if available)
+
+_safe_set(options, "experimental_slack", True)
+
+threading = options.threading
+_safe_set(threading, "private_threadpool_size", 0)
+_safe_set(threading, "max_intra_op_parallelism", 0)
+
+
+@tf.function
+def decode_and_resize_from_jpeg_bytes(img_bytes):
+    img = tf.image.decode_jpeg(img_bytes, channels=3)
+    img = tf.image.resize(img, [IMG_SIZE, IMG_SIZE])
+    img = tf.cast(img, tf.float32) / 255.0
+    return img
+
+
+@tf.function
+def decode_and_resize(path, label=None):
+    img_bytes = tf.io.read_file(path)
+    img = decode_and_resize_from_jpeg_bytes(img_bytes)
+    if label is None:
+        return img
+    return img, tf.cast(label, tf.int32)
+
+
+TFREC_FEATURES = {
+    "image": tf.io.FixedLenFeature([], tf.string),
+    "image_name": tf.io.FixedLenFeature([], tf.string),
+    "target": tf.io.FixedLenFeature([], tf.int64, default_value=-1),
+}
+
+
+@tf.function
+def parse_train_tfrecord(example_proto):
+    ex = tf.io.parse_single_example(example_proto, TFREC_FEATURES)
+    img = decode_and_resize_from_jpeg_bytes(ex["image"])
+    label = tf.cast(ex["target"], tf.int32)
+    return img, label
+
+
+@tf.function
+def parse_test_tfrecord(example_proto):
+    ex = tf.io.parse_single_example(example_proto, TFREC_FEATURES)
+    img = decode_and_resize_from_jpeg_bytes(ex["image"])
+    return img
+
+
+train_df_shuffled = train_df.sample(frac=1.0, random_state=SEED).reset_index(drop=True)
+val_frac = 0.1
+val_size = int(len(train_df_shuffled) * val_frac)
+val_df = train_df_shuffled.iloc[:val_size].copy()
+trn_df = train_df_shuffled.iloc[val_size:].copy()
+
+CACHE_VAL_TEST_INMEM = True
+
+if USE_TFRECORDS:
+    n_train_files = len(train_tfrecs)
+    n_val_files = max(1, int(round(n_train_files * val_frac)))
+    val_files = train_tfrecs[:n_val_files]
+    trn_files = train_tfrecs[n_val_files:]
+
+    raw_train = tf.data.TFRecordDataset(
+        trn_files, num_parallel_reads=AUTOTUNE
+    ).with_options(options)
+    raw_train = raw_train.map(
+        parse_train_tfrecord, num_parallel_calls=AUTOTUNE, deterministic=True
+    )
+    raw_train = raw_train.shuffle(2048, seed=SEED, reshuffle_each_iteration=True)
+    train_ds = raw_train.batch(BATCH_SIZE, drop_remainder=True).prefetch(AUTOTUNE)
+
+    raw_val = tf.data.TFRecordDataset(
+        val_files, num_parallel_reads=AUTOTUNE
+    ).with_options(options)
+    raw_val = raw_val.map(
+        parse_train_tfrecord, num_parallel_calls=AUTOTUNE, deterministic=True
+    )
+    if CACHE_VAL_TEST_INMEM:
+        raw_val = raw_val.cache()
+    val_ds = raw_val.batch(BATCH_SIZE, drop_remainder=True).prefetch(AUTOTUNE)
+
+    raw_test = tf.data.TFRecordDataset(
+        test_tfrecs, num_parallel_reads=AUTOTUNE
+    ).with_options(options)
+    raw_test = raw_test.map(
+        parse_test_tfrecord, num_parallel_calls=AUTOTUNE, deterministic=True
+    )
+    if CACHE_VAL_TEST_INMEM:
+        raw_test = raw_test.cache()
+    test_ds = raw_test.batch(BATCH_SIZE, drop_remainder=False).prefetch(AUTOTUNE)
+
+    train_steps = len(trn_df) // BATCH_SIZE
+    val_steps = int(np.ceil(len(val_df) / BATCH_SIZE))
+else:
+    trn_image_ids_np = trn_df["image_id"].to_numpy()
+    val_image_ids_np = val_df["image_id"].to_numpy()
+    trn_labels_np = trn_df["label"].to_numpy(dtype=np.int32)
+    val_labels_np = val_df["label"].to_numpy(dtype=np.int32)
+
+    trn_image_ids = tf.constant(trn_image_ids_np)
+    val_image_ids = tf.constant(val_image_ids_np)
+    trn_labels = tf.constant(trn_labels_np)
+    val_labels = tf.constant(val_labels_np)
+
+    trn_paths = tf.strings.join([TRAIN_IMG_DIR + "/", trn_image_ids])
+    val_paths = tf.strings.join([TRAIN_IMG_DIR + "/", val_image_ids])
+
+    assert os.path.exists(
+        os.path.join(TRAIN_IMG_DIR, trn_df["image_id"].iloc[0])
+    ), "Example train image not found: " + os.path.join(
+        TRAIN_IMG_DIR, trn_df["image_id"].iloc[0]
+    )
+
+    train_ds = tf.data.Dataset.from_tensor_slices((trn_paths, trn_labels)).with_options(
+        options
+    )
+    train_ds = train_ds.shuffle(2048, seed=SEED, reshuffle_each_iteration=True)
+    train_ds = train_ds.map(
+        decode_and_resize, num_parallel_calls=AUTOTUNE, deterministic=True
+    )
+    train_ds = train_ds.batch(BATCH_SIZE, drop_remainder=True).prefetch(AUTOTUNE)
+
+    val_ds = tf.data.Dataset.from_tensor_slices((val_paths, val_labels)).with_options(
+        options
+    )
+    val_ds = val_ds.map(
+        decode_and_resize, num_parallel_calls=AUTOTUNE, deterministic=True
+    )
+    if CACHE_VAL_TEST_INMEM:
+        val_ds = val_ds.cache()
+    val_ds = val_ds.batch(BATCH_SIZE, drop_remainder=True).prefetch(AUTOTUNE)
+
+    test_image_ids = tf.constant(sample_sub["image_id"].to_numpy())
+    test_paths = tf.strings.join([TEST_IMG_DIR + "/", test_image_ids])
+    test_ds = tf.data.Dataset.from_tensor_slices(test_paths).with_options(options)
+    test_ds = test_ds.map(
+        lambda p: decode_and_resize(p, None),
+        num_parallel_calls=AUTOTUNE,
+        deterministic=True,
+    )
+    if CACHE_VAL_TEST_INMEM:
+        test_ds = test_ds.cache()
+    test_ds = test_ds.batch(BATCH_SIZE, drop_remainder=False).prefetch(AUTOTUNE)
+
+    train_steps = len(trn_df) // BATCH_SIZE
+    val_steps = int(np.ceil(len(val_df) / BATCH_SIZE))
+
+test_steps = int(np.ceil(len(sample_sub) / BATCH_SIZE))
+
+print(
+    "Datasets ready:",
+    "train steps =",
+    train_steps,
+    "val steps =",
+    val_steps,
+    "test steps =",
+    test_steps,
+)
+
+
+
+## === cell 3
+inputs = tf.keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+x = tf.keras.layers.Conv2D(32, 3, padding="same", activation="relu")(inputs)
+x = tf.keras.layers.MaxPooling2D()(x)
+x = tf.keras.layers.Conv2D(64, 3, padding="same", activation="relu")(x)
+x = tf.keras.layers.MaxPooling2D()(x)
+x = tf.keras.layers.Conv2D(128, 3, padding="same", activation="relu")(x)
+x = tf.keras.layers.GlobalAveragePooling2D()(x)
+x = tf.keras.layers.Dropout(0.2)(x)
+outputs = tf.keras.layers.Dense(5, activation="softmax")(x)
+
+model = tf.keras.Model(inputs, outputs)
+
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"],
+    jit_compile=False,
+)
+
+EPOCHS = 5
+
+history = model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=EPOCHS,
+    steps_per_epoch=train_steps,
+    validation_steps=val_steps,
+    verbose=2,
+)
+
+
+
+## === cell 4
+probs = model.predict(test_ds, steps=test_steps, verbose=0)
+preds = np.argmax(probs, axis=1).astype(int).tolist()
+preds = preds[: len(sample_sub)]
+
+my_submission = pd.DataFrame(
+    {"image_id": sample_sub["image_id"].values, "label": preds}
+)
+my_submission.to_csv(SUB_PATH, index=False)
+
+assert os.path.exists(SUB_PATH), "submission.csv was not created"
+assert len(my_submission) == len(sample_sub), "Submission row count mismatch"
+assert set(my_submission.columns) == {"image_id", "label"}, "Wrong submission columns"
+assert (
+    pd.api.types.is_integer_dtype(my_submission["label"])
+    or my_submission["label"].map(type).eq(int).all()
+)
+assert my_submission["label"].between(0, 4).all(), "Labels must be integers in [0,4]"
+
+print("Wrote:", SUB_PATH)
+print(my_submission.head())

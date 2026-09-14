@@ -1,0 +1,243 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the class of a given image from a synthetic dataset.
+
+## MetricMulti-class classification accuracy.
+
+## Submission FormatFor each `Id` in the test set, you must predict the `Cover_Type` class. The file should contain a header and have the following format:
+```
+Id,Cover_Type
+4000000,2
+4000001,1
+4000001,3
+etc.
+```
+
+## Dataset 
+- train.csv - the training data with the target `Cover_Type` column
+- test.csv - the test set; you will be predicting the `Cover_Type` for each row in this file (the target integer class)
+- sample_submission.csv - a sample submission file in the correct format
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        input/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        working/
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+```
+
+-> data/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/tabular-playground-series-dec-2021/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> data/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> input/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+
+
+
+
+## === cell 1
+BASE_1 = "/kaggle/input/tabular-playground-series-dec-2021"
+BASE_2 = (
+    "/kaggle/input"  # files also appear directly under /kaggle/input in your listing
+)
+
+
+def _pick_path(rel_name: str) -> str:
+    p1 = os.path.join(BASE_1, rel_name)
+    if os.path.exists(p1):
+        return p1
+    p2 = os.path.join(BASE_2, rel_name)
+    if os.path.exists(p2):
+        return p2
+    raise FileNotFoundError(f"Could not find {rel_name} in {BASE_1} or {BASE_2}")
+
+
+train_path = _pick_path("train.csv")
+test_path = _pick_path("test.csv")
+sub_path = _pick_path("sample_submission.csv")
+
+target_col = "Cover_Type"
+id_col = "Id"
+
+train_cols = pd.read_csv(train_path, nrows=0).columns.tolist()
+test_cols = pd.read_csv(test_path, nrows=0).columns.tolist()
+
+feature_cols = [c for c in train_cols if c not in (id_col, target_col)]
+
+dtype_train = {c: np.int32 for c in feature_cols}
+dtype_train[id_col] = np.int32
+dtype_train[target_col] = np.int32
+
+dtype_test = {c: np.int32 for c in test_cols if c != id_col}
+dtype_test[id_col] = np.int32
+
+train = pd.read_csv(
+    train_path, usecols=[id_col, target_col] + feature_cols, dtype=dtype_train
+)
+test = pd.read_csv(test_path, usecols=[id_col] + feature_cols, dtype=dtype_test)
+sample_submission = pd.read_csv(
+    sub_path,
+    usecols=[id_col, target_col],
+    dtype={id_col: np.int32, target_col: np.int32},
+)
+
+
+
+## === cell 2
+y_train = train[target_col]
+X_train = train.drop([id_col, target_col], axis=1)
+X_test = test.drop([id_col], axis=1)
+
+
+
+## === cell 3
+from catboost import CatBoostClassifier
+
+clf_CatBoostClassifier = CatBoostClassifier(
+    verbose=0,
+    task_type="CPU",
+    random_seed=42,
+    thread_count=-1,
+)
+
+clf_CatBoostClassifier.fit(X_train, y_train)
+
+pred = clf_CatBoostClassifier.predict(X_test)
+pred = np.asarray(pred).reshape(-1).astype(int)
+
+submission = sample_submission.copy()
+submission[target_col] = pred
+submission.to_csv("submission_CatBoostClassifier.csv", index=False)
+
+submission.head()
+
+
+
+## === cell 4
+pass
+
+
+
+## === cell 5
+pass
+
+
+
+## === cell 6
+pass
+
+
+
+## === cell 7
+pass
+
+
+
+## === cell 8
+pass
+
+
+
+## === cell 9
+pass
+
+
+
+## === cell 10
+pass
+
+
+
+## === cell 11
+pass
+
+
+
+## === cell 12
+pass
+
+
+
+## === cell 13
+pass
+
+
+
+## === cell 14
+pass

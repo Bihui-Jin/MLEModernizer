@@ -1,0 +1,465 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.2047625866504067
+
+# 6. Current score
+
+2.00254
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 8.14572) has done: 'I fix the runtime failure by removing dependencies on external Kaggle datasets that aren’t present (those `../input/.../submission.csv` files), and instead generate predictions directly from the provided `train.csv`/`test.csv`. To keep changes minimal while ensuring a valid, reasonably competitive score, I use a simple, deterministic per-(R,C,time_step,u_in,u_out) aggregation from training to predict test pressures, with a sensible fallback hierarchy when an exact key isn’t found. This preserves the competition’s evaluation semantics (predict `pressure` per `id`) and guarantees `submission.csv` is written with the correct columns. The approach is fast, stable, and runs end-to-end within the time limit.'
+- What this solution (achieved 3.79549) has done: 'Your current score (8.14572 MAE, lower is better) is far from the target (~0.205), and the main reason is that the current “exact (R,C,time_step,u_in,u_out) mean lookup” almost never matches because `u_in` and `time_step` are continuous floats, so you fall back to very coarse/global means. To move sharply toward the target while keeping the same core idea (deterministic aggregation from train → predict test), I (1) add minimally-invasive discretization (rounding) for `u_in` and `time_step` so lookups match far more often, and (2) incorporate `breath_id` time-series context via a simple per-breath cumulative `u_in` feature (commonly predictive in this competition) into the aggregation keys, still using the same groupby-mean + fallback hierarchy. This stays within the same “non-ML aggregation baseline” logic, runs fast, and should reduce MAE by a large margin without changing evaluation semantics. The submission writing and column alignment remain identical and still produce `submission.csv`.'
+- What this solution (achieved 2.95016) has done: 'Your current score (3.79549 MAE) is still far from the target (0.2048), so we should increase lookup hit-rate while keeping the same “train groupby-mean → test merge with fallback hierarchy” core logic. The biggest remaining mismatch comes from rounding `u_in` and `time_step` too finely for a deterministic dictionary-style join on continuous signals; I change only the discretization granularity (coarser binning) and keep the same fallback structure. I also add a tiny, deterministic “forward-fill within breath” step after merging so that short NA streaks caused by discretization boundaries don’t immediately fall back to much coarser aggregates. Everything still runs end-to-end and writes a valid `submission.csv` with `id,pressure`.'
+- What this solution (achieved 2.02573) has done: 'To move your MAE down toward the ~0.205 target while keeping the same “deterministic groupby-mean lookup with fallback” core logic, I increase match hit-rate by (1) using a slightly coarser, more stable discretization for `time_step` and `u_in` (binning instead of rounding quirks) and (2) adding a very lightweight, competition-standard lag feature (`u_in_lag1`) into the top lookup keys to better capture local dynamics without changing the approach. I keep your existing fallback hierarchy, global mean fallback, and within-breath ffill/bfill smoothing intact. These are minimal changes that typically reduce error substantially for this competition without introducing ML training loops or changing evaluation semantics. The script still run end-to-end and write a valid `submission.csv` with `id,pressure`.'
+- What this solution (achieved 2.03113) has done: 'Your current MAE (2.02573) is still far above the target (0.2048), so we need a small change that increases “lookup” accuracy without changing the overall approach (groupby-mean keys + fallback + within-breath fill). The biggest remaining mismatch is that your bins are still slightly misaligned with the true 80-step grid and `u_in` noise; I (1) derive an exact within-breath step index (`t_idx`) to replace the time bin, and (2) add a tiny `u_in_diff` (first difference) as an additional discretized key at the top level (and an immediate fallback without it). This keeps the same deterministic aggregation logic but typically boosts hit-rate and reduces error substantially on this competition. The script still run end-to-end and write a valid `submission.csv` with `id,pressure`.'
+- What this solution (achieved 2.03312) has done: 'Your current MAE (2.03113, lower is better) is still far above the target (~0.205), so we should improve accuracy without changing your core “deterministic groupby-mean lookup + fallback + within-breath fill” approach. The biggest gain with minimal risk here is to align training and prediction with the evaluation rule: only inspiratory timesteps (u_out==0) are scored, so we should compute group means using only inspiratory rows, and also treat expiratory rows in test by simply carrying forward the last inspiratory prediction within each breath. Additionally, your current feature binning uses `round`, which can create unstable boundary effects; switching to deterministic integer binning via `floor(x + 0.5)` keeps the same semantics (nearest-integer) but is more stable and consistent across platforms. These changes keep the same keys, hierarchy, and no ML training loop, but typically reduce MAE substantially in this competition because they stop expiratory-phase noise from contaminating learned mappings.'
+- What this solution (achieved 2.21893) has done: 'Your current MAE (2.03312, lower is better) is still far above the target (0.2048), so we need a small but meaningful accuracy gain while keeping the same “deterministic groupby-mean lookup + fallback + within-breath fill” core approach. The biggest issue is that we trained the mapping only on inspiratory rows but still used `u_out` inside some keys, which creates unnecessary mismatches and forces fallbacks; I remove `u_out` from lookup keys and instead enforce inspiratory-only training + expiratory forward-fill at prediction time (still identical evaluation semantics). I also make `u_in_cum_b` binning much finer (it’s currently too coarse at /5), which increases match precision without changing the approach. Finally, I clamp predictions to the observed pressure range to avoid rare outliers that can inflate MAE.'
+- What this solution (achieved 2.15216) has done: 'You’re far worse than the target (MAE 2.21893 vs 0.20476, lower is better), so we should make a small, legitimate change that improves the same deterministic “groupby-mean lookup + fallback + within-breath fill” approach. The highest-impact minimal fix here is to stop using a **breath-dependent** key (`u_in_cum_b`) in test: because breath_ids in test are unseen, `u_in_cum_b` shifts systematically and causes massive lookup misses, forcing coarse fallbacks. I keep your exact pipeline and fallback hierarchy, but replace `u_in_cum_b` with a **time-local, breath-invariant** cumulative feature: `u_in_cum_delta_b = round(u_in_cum - u_in_cum_at_inspiration_start)`, which aligns across breaths and preserves the same “use cumulative u_in context” idea. Everything else (inspiratory-only training, expiratory forward-fill, clipping, submission format/path) remains unchanged.'
+- What this solution (achieved 2.71346) has done: 'Your current MAE (2.15216) is still far above the target (0.20476; lower is better), so we should improve accuracy while keeping your same deterministic “inspiratory-only groupby mean lookup + fallback + expiratory forward-fill” core logic. The biggest minimal win is to stop using a continuous-ish cumulative key that still mismatches across breaths (`u_in_cum_delta_b`) as a top-level join driver, and instead use two breath-invariant local context keys that generalize better: a binned `u_in` and binned `u_in` lags (lag1/lag2), plus a binned `u_in_diff`, all anchored by the exact within-breath step index `t_idx`. This keeps the same approach (feature engineering → hierarchical groupby means → left-merge fallback) but should materially increase hit-rate and reduce error. I also keep your inspiratory-only training and expiratory forward-fill, and still clamp to the observed pressure range and write a valid `submission.csv`.'
+- What this solution (achieved 2.77834) has done: 'Your current MAE (2.71346, lower is better) is still far above the target (~0.2048), so we need a small change that improves prediction accuracy without changing the core “inspiratory-only groupby-mean lookup + hierarchical fallback + expiratory forward-fill” approach. The main issue is that your highest-priority keys (`u_in_b`, lags, diff) are too brittle (integer-rounded), causing many lookup misses and forcing coarse fallbacks; I add a *slightly coarser* binned version of those same signals (e.g., 0.5 and 1.0 step bins) and use them only in the top levels of the hierarchy to increase hit-rate while preserving the same logic. I also compute group means with `observed=True` for categorical-like columns to reduce groupby overhead, and keep the same inspiratory-only mapping, forward-fill for expiratory, clipping, and submission writing. These are minimal, deterministic changes intended to move MAE down substantially toward the target band without altering evaluation semantics.'
+- What this solution (achieved 2.75294) has done: 'Your current MAE is far above the target (lower is better), so we need a small change that legitimately improves accuracy while keeping the exact same “inspiratory-only groupby-mean lookup + hierarchical fallback + expiratory forward-fill” core approach. The most impactful minimal fix is to align the discretization with the true data structure: each breath has (effectively) 80 discrete steps and `u_in` has many near-integer/half values, so we (1) compute `t_idx` robustly by sorting within each breath by `time_step`, and (2) discretize `u_in`/lags/diffs with slightly coarser, stable bins (e.g., 0.25 resolution) to reduce lookup misses without changing the logic. Everything else (keys, fallback hierarchy, inspiratory-only training, expiratory forward-fill, clipping, and submission writing) stays the same. This should reduce fallback frequency and move MAE downward toward your target band.'
+- What this solution (achieved 2.00258) has done: 'Your current MAE (2.75294, lower is better) is still far above the target (0.20476), so we need a small accuracy gain while keeping the same deterministic “inspiratory-only groupby-mean lookup + hierarchical fallback + expiratory forward-fill” core approach. The most impactful minimal change here is to add lung-mechanics-aware, breath-invariant features that are standard for this dataset: cumulative inhaled volume proxy (`area = cumsum(u_in * dt)`) and a simple lagged version, then use their coarse bins in the top lookup levels to increase match quality without relying on test breath_id identity. I keep your existing keys and fallback hierarchy intact, only inserting a couple of higher-priority lookup levels (and their groupbys/merges) so this remains the same approach but with better context. Everything still runs end-to-end, preserves evaluation semantics, and writes a valid `submission.csv` with `id,pressure`.'
+- What this solution (achieved 2.00254) has done: 'Your score is far above the target (2.00258 vs 0.20476 MAE; lower is better), so we need a small change that improves accuracy without changing your core “inspiratory-only groupby-mean lookup + hierarchical fallback + expiratory forward-fill” approach. The biggest remaining weakness is that the model predicts continuous pressures, but in this competition the true pressures lie on a small discrete grid; snapping predictions to the learned pressure grid is a minimal post-processing step that typically reduces MAE a lot. I keep every feature, key, groupby, and fallback exactly the same, and only add (1) extraction of the unique pressure levels from training inspiratory data and (2) a fast nearest-level quantization before writing the submission. This preserves evaluation semantics and stays deterministic and fast.'
+- What this solution (achieved 2.00254) has done: 'Your current MAE (2.00254) is still far above the target (0.20476, lower is better), so we need a small change that improves accuracy while keeping your exact “inspiratory-only groupby-mean lookup + hierarchical fallback + expiratory forward-fill + pressure-grid snapping” approach. The most damaging issue in the current pipeline is that `add_features()` sorts and resets index, which breaks alignment between computed features/predictions and the original `id` order, then you later write `submission` using `test_f["id"]` (now mismatched) and merge back to sample by `id`, effectively attaching wrong pressures to ids and inflating MAE. I modify `add_features()` to preserve the original row order by computing features on a stably sorted view and then reindexing back to the original rows, so `id` ↔ prediction stays correct. Everything else (feature definitions, keys, groupby means, fallbacks, fill policy, clipping, and quantization) remains the same.'
+- What this solution (achieved 2.00254) has done: 'Your current MAE (2.00254) is still far above the target (0.20476; lower is better), so we should make a small change that improves accuracy while preserving your exact “hierarchical groupby-mean lookup + inspiratory-only training + expiratory forward-fill + pressure-grid snapping” core approach. The most impactful minimal fix here is to correctly compute and use the competition’s scoring mask: training mappings should use only inspiratory rows (already done), but at prediction time we should avoid bfill-ing expiratory NaNs from *future* inspiratory steps (which can distort the inspiratory segment near phase transitions); instead, forward-fill within breath is sufficient and more faithful to causal dynamics, then fallback to a per-(R,C,t_idx) mean for remaining NaNs before global mean. This is a minimal change (only fill/fallback policy), keeps all your features/keys/merges intact, and typically reduces MAE by preventing leakage-like smoothing artifacts. The submission writing stays identical and still produces a valid `submission.csv` with `id,pressure`.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+
+BASE_PATH = "../input/ventilator-pressure-prediction"
+if not os.path.exists(BASE_PATH):
+    BASE_PATH = "/kaggle/input/ventilator-pressure-prediction"
+
+train_path = os.path.join(BASE_PATH, "train.csv")
+test_path = os.path.join(BASE_PATH, "test.csv")
+sample_sub_path = os.path.join(BASE_PATH, "sample_submission.csv")
+
+train = pd.read_csv(train_path)
+test = pd.read_csv(test_path)
+sub = pd.read_csv(sample_sub_path)
+
+required_train_cols = {"breath_id", "R", "C", "time_step", "u_in", "u_out", "pressure"}
+required_test_cols = {"id", "breath_id", "R", "C", "time_step", "u_in", "u_out"}
+assert required_train_cols.issubset(
+    train.columns
+), f"train missing cols: {required_train_cols - set(train.columns)}"
+assert required_test_cols.issubset(
+    test.columns
+), f"test missing cols: {required_test_cols - set(test.columns)}"
+assert {"id", "pressure"}.issubset(
+    sub.columns
+), "sample_submission must have id,pressure"
+
+
+
+
+## === cell 1
+def add_features(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+
+    orig_index = out.index
+
+    sorted_df = out.sort_values(["breath_id", "time_step"], kind="mergesort")
+    t_idx = sorted_df.groupby("breath_id", sort=False).cumcount().astype("int16")
+
+    dt = (
+        sorted_df.groupby("breath_id", sort=False)["time_step"]
+        .diff()
+        .fillna(0.0)
+        .to_numpy(dtype="float64")
+    )
+    u = sorted_df["u_in"].to_numpy(dtype="float64")
+
+    area = (
+        pd.Series(u * dt, index=sorted_df.index)
+        .groupby(sorted_df["breath_id"], sort=False)
+        .cumsum()
+        .to_numpy(dtype="float64")
+    )
+    area_lag1 = (
+        pd.Series(area, index=sorted_df.index)
+        .groupby(sorted_df["breath_id"], sort=False)
+        .shift(1)
+        .fillna(0.0)
+        .to_numpy(dtype="float64")
+    )
+
+    u_in_lag1 = (
+        sorted_df.groupby("breath_id", sort=False)["u_in"]
+        .shift(1)
+        .fillna(0.0)
+        .to_numpy(dtype="float64")
+    )
+    u_in_lag2 = (
+        sorted_df.groupby("breath_id", sort=False)["u_in"]
+        .shift(2)
+        .fillna(0.0)
+        .to_numpy(dtype="float64")
+    )
+
+    u_in_diff1 = u - u_in_lag1
+
+    feats_sorted = pd.DataFrame(index=sorted_df.index)
+    feats_sorted["t_idx"] = t_idx.to_numpy()
+    feats_sorted["area"] = area
+    feats_sorted["area_lag1"] = area_lag1
+
+    a = feats_sorted["area"].to_numpy(dtype="float64")
+    a1 = feats_sorted["area_lag1"].to_numpy(dtype="float64")
+    feats_sorted["area_b1"] = np.floor(a * 1.0 + 0.5).astype("int16")  # ~1.0 unit bins
+    feats_sorted["area_b2"] = np.floor(a * 2.0 + 0.5).astype("int16")  # ~0.5 unit bins
+    feats_sorted["area_lag1_b1"] = np.floor(a1 * 1.0 + 0.5).astype("int16")
+    feats_sorted["area_lag1_b2"] = np.floor(a1 * 2.0 + 0.5).astype("int16")
+
+    feats_sorted["u_in_b4"] = np.floor(u * 4.0 + 0.5).astype("int16")  # 0.25 bins
+    feats_sorted["u_in_b2"] = np.floor(u * 2.0 + 0.5).astype("int16")  # 0.5 bins (kept)
+    feats_sorted["u_in_b"] = np.floor(u + 0.5).astype("int16")  # 1.0 bins (kept)
+
+    feats_sorted["u_in_lag1"] = u_in_lag1
+    feats_sorted["u_in_lag2"] = u_in_lag2
+
+    u1 = u_in_lag1
+    u2 = u_in_lag2
+    feats_sorted["u_in_lag1_b4"] = np.floor(u1 * 4.0 + 0.5).astype("int16")
+    feats_sorted["u_in_lag2_b4"] = np.floor(u2 * 4.0 + 0.5).astype("int16")
+    feats_sorted["u_in_lag1_b2"] = np.floor(u1 * 2.0 + 0.5).astype("int16")
+    feats_sorted["u_in_lag2_b2"] = np.floor(u2 * 2.0 + 0.5).astype("int16")
+    feats_sorted["u_in_lag1_b"] = np.floor(u1 + 0.5).astype("int16")
+    feats_sorted["u_in_lag2_b"] = np.floor(u2 + 0.5).astype("int16")
+
+    feats_sorted["u_in_diff1"] = u_in_diff1
+    d1 = u_in_diff1
+    feats_sorted["u_in_diff1_b4"] = np.floor(d1 * 4.0 + 0.5).astype("int16")
+    feats_sorted["u_in_diff1_b1"] = np.floor(d1 + 0.5).astype("int16")
+    feats_sorted["u_in_diff1_b"] = feats_sorted["u_in_diff1_b1"].astype("int16")
+
+    feats = feats_sorted.reindex(orig_index)
+
+    for c in feats.columns:
+        out[c] = feats[c].values
+
+    return out
+
+
+train_f = add_features(train)
+test_f = add_features(test)
+
+train_insp = train_f[train_f["u_out"].values == 0].copy()
+
+global_mean = float(train_insp["pressure"].mean())
+p_min = float(train_insp["pressure"].min())
+p_max = float(train_insp["pressure"].max())
+
+pressure_levels = np.sort(train_insp["pressure"].round(5).unique().astype("float64"))
+
+keyA0 = [
+    "R",
+    "C",
+    "t_idx",
+    "u_in_b4",
+    "u_in_lag1_b4",
+    "u_in_lag2_b4",
+    "u_in_diff1_b4",
+    "area_b2",
+    "area_lag1_b2",
+]
+keyA1 = [
+    "R",
+    "C",
+    "t_idx",
+    "u_in_b2",
+    "u_in_lag1_b2",
+    "u_in_lag2_b2",
+    "u_in_diff1_b1",
+    "area_b1",
+    "area_lag1_b1",
+]
+
+key0 = ["R", "C", "t_idx", "u_in_b4", "u_in_lag1_b4", "u_in_lag2_b4", "u_in_diff1_b4"]
+key1 = ["R", "C", "t_idx", "u_in_b2", "u_in_lag1_b2", "u_in_lag2_b2", "u_in_diff1_b1"]
+key2 = ["R", "C", "t_idx", "u_in_b2", "u_in_lag1_b2", "u_in_lag2_b2"]  # drop diff first
+key3 = ["R", "C", "t_idx", "u_in_b2", "u_in_lag1_b2"]  # drop lag2
+key4 = ["R", "C", "t_idx", "u_in_b", "u_in_lag1_b", "u_in_lag2_b", "u_in_diff1_b"]
+key5 = ["R", "C", "t_idx", "u_in_b", "u_in_lag1_b", "u_in_lag2_b"]
+key6 = ["R", "C", "t_idx", "u_in_b", "u_in_lag1_b"]
+key7 = ["R", "C", "t_idx", "u_in_b"]
+key8 = ["R", "C", "t_idx"]
+key9 = ["R", "C"]
+
+gA0 = train_insp.groupby(keyA0, sort=False, observed=True)["pressure"].mean()
+gA1 = train_insp.groupby(keyA1, sort=False, observed=True)["pressure"].mean()
+g0 = train_insp.groupby(key0, sort=False, observed=True)["pressure"].mean()
+g1 = train_insp.groupby(key1, sort=False, observed=True)["pressure"].mean()
+g2 = train_insp.groupby(key2, sort=False, observed=True)["pressure"].mean()
+g3 = train_insp.groupby(key3, sort=False, observed=True)["pressure"].mean()
+g4 = train_insp.groupby(key4, sort=False, observed=True)["pressure"].mean()
+g5 = train_insp.groupby(key5, sort=False, observed=True)["pressure"].mean()
+g6 = train_insp.groupby(key6, sort=False, observed=True)["pressure"].mean()
+g7 = train_insp.groupby(key7, sort=False, observed=True)["pressure"].mean()
+g8 = train_insp.groupby(key8, sort=False, observed=True)["pressure"].mean()
+g9 = train_insp.groupby(key9, sort=False, observed=True)["pressure"].mean()
+
+pred = test_f.merge(gA0.rename("pA0"), on=keyA0, how="left")["pA0"]
+if pred.isna().any():
+    predA1 = test_f.merge(gA1.rename("pA1"), on=keyA1, how="left")["pA1"]
+    pred = pred.fillna(predA1)
+
+if pred.isna().any():
+    pred0 = test_f.merge(g0.rename("p0"), on=key0, how="left")["p0"]
+    pred = pred.fillna(pred0)
+if pred.isna().any():
+    pred1 = test_f.merge(g1.rename("p1"), on=key1, how="left")["p1"]
+    pred = pred.fillna(pred1)
+if pred.isna().any():
+    pred2 = test_f.merge(g2.rename("p2"), on=key2, how="left")["p2"]
+    pred = pred.fillna(pred2)
+if pred.isna().any():
+    pred3 = test_f.merge(g3.rename("p3"), on=key3, how="left")["p3"]
+    pred = pred.fillna(pred3)
+if pred.isna().any():
+    pred4 = test_f.merge(g4.rename("p4"), on=key4, how="left")["p4"]
+    pred = pred.fillna(pred4)
+if pred.isna().any():
+    pred5 = test_f.merge(g5.rename("p5"), on=key5, how="left")["p5"]
+    pred = pred.fillna(pred5)
+if pred.isna().any():
+    pred6 = test_f.merge(g6.rename("p6"), on=key6, how="left")["p6"]
+    pred = pred.fillna(pred6)
+if pred.isna().any():
+    pred7 = test_f.merge(g7.rename("p7"), on=key7, how="left")["p7"]
+    pred = pred.fillna(pred7)
+if pred.isna().any():
+    pred8 = test_f.merge(g8.rename("p8"), on=key8, how="left")["p8"]
+    pred = pred.fillna(pred8)
+if pred.isna().any():
+    pred9 = test_f.merge(g9.rename("p9"), on=key9, how="left")["p9"]
+    pred = pred.fillna(pred9)
+
+pred_series = pd.Series(
+    pred.to_numpy(dtype="float64"), index=test_f.index, dtype="float64"
+)
+
+pred_series = pred_series.mask(test_f["u_out"].values == 1, np.nan)
+pred_series = pred_series.groupby(test_f["breath_id"], sort=False).ffill()
+
+if pred_series.isna().any():
+    fallback_rc_t = test_f.merge(g8.rename("p_rc_t"), on=key8, how="left")["p_rc_t"]
+    pred_series = pred_series.fillna(fallback_rc_t.to_numpy(dtype="float64"))
+if pred_series.isna().any():
+    fallback_rc = test_f.merge(g9.rename("p_rc"), on=key9, how="left")["p_rc"]
+    pred_series = pred_series.fillna(fallback_rc.to_numpy(dtype="float64"))
+
+pred_series = pred_series.fillna(global_mean).astype("float64")
+pred_series = pred_series.clip(p_min, p_max)
+
+p = pred_series.to_numpy(dtype="float64")
+idx = np.searchsorted(pressure_levels, p, side="left")
+idx0 = np.clip(idx - 1, 0, len(pressure_levels) - 1)
+idx1 = np.clip(idx, 0, len(pressure_levels) - 1)
+p0 = pressure_levels[idx0]
+p1 = pressure_levels[idx1]
+choose1 = np.abs(p1 - p) <= np.abs(p - p0)
+p_quant = np.where(choose1, p1, p0).astype("float64")
+pred_series = pd.Series(p_quant, index=pred_series.index, dtype="float64")
+
+submission = pd.DataFrame({"id": test_f["id"].values, "pressure": pred_series.values})
+submission = sub[["id"]].merge(submission, on="id", how="left")
+submission["pressure"] = submission["pressure"].fillna(global_mean).astype("float64")
+
+p2 = submission["pressure"].to_numpy(dtype="float64")
+idx = np.searchsorted(pressure_levels, p2, side="left")
+idx0 = np.clip(idx - 1, 0, len(pressure_levels) - 1)
+idx1 = np.clip(idx, 0, len(pressure_levels) - 1)
+p0 = pressure_levels[idx0]
+p1 = pressure_levels[idx1]
+choose1 = np.abs(p1 - p2) <= np.abs(p2 - p0)
+submission["pressure"] = np.where(choose1, p1, p0).astype("float64")
+
+submission.to_csv("submission.csv", index=False)
+
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)
+print(
+    "pressure range in submission:",
+    float(submission["pressure"].min()),
+    float(submission["pressure"].max()),
+)
+print("n_pressure_levels:", int(len(pressure_levels)))

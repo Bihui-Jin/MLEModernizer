@@ -1,0 +1,910 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8986098519190088
+
+# 6. Current score
+
+0.05867
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.27205) has done: 'I fix the Albumentations `RandomResizedCrop` API breakage by switching to the v2 signature that expects a `size=(H, W)` tuple, which unblocks augmentation construction without changing intent. Then I fix the missing checkpoint path by auto-detecting the correct Kaggle input root (`/kaggle/input/...`) and falling back to a safe, built-in pretrained TIMM initialization if the ensemble weight files aren’t present, ensuring the notebook always runs end-to-end and produces `submission.csv`. I also make inference deterministic/stable (proper device handling, `map_location`, RGB conversion) and speed-safe (batched DataLoader inference instead of per-file loops) without changing the ensemble logic (two models + normalized logits + weighted sum + argmax). Finally, I ensure the submission uses exactly the sample submission `image_id` order and required columns.'
+- What this solution (achieved 0.26457) has done: 'I fix the immediate Albumentations v2 runtime error by replacing the removed `A.Cutout` with the v2 equivalent (`A.CoarseDropout`) while keeping the same augmentation intent (random rectangular holes). I also remove the accidental double-application of dropout (you already have `A.CoarseDropout` once) so training/inference semantics remain consistent and not overly destructive. To move score toward the target, I ensure the intended learned ensemble is actually used by loading the provided weights from the correct Kaggle input directory when available (and only fall back to pretrained backbone initialization if the weights truly aren’t present). Finally, I keep submission ordering exactly as `sample_submission.csv` and write `submission.csv` end-to-end.'
+- What this solution (achieved 0.27354) has done: 'Your current score (0.26457) is far below the target (0.8986), and the biggest likely cause is that inference is effectively random because the competition weight files are not being found/loaded, so the fallback path initializes new random classification heads. I make the smallest changes that (1) reliably locate the weights under any Kaggle input folder (without changing your ensemble logic), and (2) fix the TTA loop so it actually applies different stochastic augmentations per pass (right now it re-runs the exact same tensor, which can’t help). I also ensure the weight-loader can handle common checkpoint formats (`state_dict`, `model`, or raw state dict) and strip `module.` safely, while keeping the same models, heads, normalization, weighting, and argmax submission semantics. These changes should move accuracy sharply upward toward the target if the intended weights exist; if they don’t, it still run end-to-end and write a valid `submission.csv`.'
+- What this solution (achieved 0.26868) has done: 'Your score is far below the target, so the priority is to make sure you’re actually using trained weights and not accidentally running with randomly initialized heads (which would cap accuracy near chance). I make the smallest change to the weight-loading fallback: if the `.pth` files are not found, I *not* reinitialize a new random classification head; instead I keep the pretrained model’s own classifier head so predictions are at least meaningful. I also fix a subtle focal-loss bug (currently `p_t` is computed from logits, not probabilities), which doesn’t change your current inference-only path but prevents training from being broken if you run it. Everything else (models, ensemble math, normalization, TTA loop, submission formatting) stays the same.'
+- What this solution (achieved 0.26943) has done: 'I fix the DataLoader batching error by removing the uncollatable PIL Image object from the dataset output and instead returning the raw NumPy image (which can be stacked) alongside the transformed tensor. Then I update the TTA loop to use those returned NumPy images so augmentation is still applied per-pass without changing your ensemble math or model architecture. Finally, I add a small robustness tweak to the DataLoader (persistent_workers only when num_workers>0) so it runs reliably in Kaggle, and ensure `labels` is produced so `submission.csv` is written end-to-end.'
+- What this solution (achieved 0.26981) has done: 'Your current score (0.269) is near random for 5 classes, which strongly suggests the intended trained checkpoints still aren’t being loaded (you’re effectively using pretrained backbones + randomly initialized 5-class heads). The smallest change to move toward the target is to make weight loading actually succeed by (1) searching for the weight files by basename anywhere under Kaggle input roots, and (2) loading them into the *unwrapped* model first (then optionally wrapping with DataParallel) to avoid key-mismatch issues. I also add a lightweight sanity print that shows whether the classifier/fc weights changed after loading (to confirm we’re not accidentally leaving the random head). Everything else (models, heads, ensemble math, augmentations, TTA, submission ordering/format) stays the same.'
+- What this solution (achieved 0.27392) has done: 'Your score is near random for 5 classes, so the most likely blocker is still that the intended trained checkpoints aren’t actually being applied to the correct layer names (your model heads are named `fc`/`classifier`, but many saved timm checkpoints use `head.*`). I add a minimal “key-alias” remap during weight loading (`head.*`↔`fc.*`/`classifier.*`) and handle both `model.*` and `module.*` prefixes so the loaded weights land in the right place without changing your ensemble logic. I also tighten the weight-file search to specifically prefer the cassava dataset directory (and still fall back to broad search), because your current default `../input/ensemble-1023/` likely doesn’t exist in this environment. Finally, I keep the same inference/TTA/ensemble math and still write `submission.csv` in sample order.'
+- What this solution (achieved 0.58857) has done: 'Your score is near chance for 5 classes, so the most likely issue is still that the intended trained checkpoints aren’t being found/loaded, leaving you with randomly initialized 5-class heads. I make the smallest change that improves this without touching the ensemble/model logic: (1) broaden the weight-file search to also look under `/kaggle/working` and to prefer filename matches anywhere, and (2) if weights still can’t be found, switch to `pretrained=True` for the backbones *from the start* (instead of building `pretrained=False` + random head first), so inference is at least meaningful rather than near-random. I also set `persistent_workers` only when `num_workers>0` (it currently forces True even when 0 on some setups) to avoid any silent DataLoader issues, while keeping prediction/TTA/normalization/weighting identical. These changes should move accuracy upward toward the target by ensuring real weights are used when present, and otherwise avoiding a random-head baseline.'
+- What this solution (achieved 0.06129) has done: 'Your current score (0.5886) is far below the target (0.8986), and the biggest likely reason is that you are still using randomly re-initialized 5-class heads when the external `.pth` weights aren’t found/compatible, which caps accuracy. I keep your ensemble + TTA logic identical, but make the smallest fix that reliably improves predictions: if checkpoints can’t be loaded, do **not** Xavier-init new heads; instead keep the pretrained ImageNet heads (by using `num_classes=OUT_FEATURES` at creation time) so the classifier is not random. I also make weight loading slightly more robust for timm checkpoints by handling `head.fc.*` and `head.classifier.*` key variants (in addition to `head.*`), which helps the intended trained heads actually load when present. Nothing else about your inference flow, normalization, weighting, or submission formatting changes.'
+- What this solution (achieved 0.05643) has done: 'Your 0.061 score is far below the target, which strongly suggests the current pipeline is producing near-random labels due to a broken test-time augmentation (TTA) input path: the DataLoader is currently collating `raw_nps` into a batched tensor, so Albumentations receives an invalid image shape and returns essentially garbage augmentations. I make the smallest change to ensure `raw_nps` stays as a list of per-image HWC uint8 arrays (so TTA truly applies image augmentations per sample), without changing your models, ensemble math, normalization, weights, or submission order. I also fix `persistent_workers` to only be enabled when `num_workers > 0` (it can error on some Kaggle setups), and keep everything else identical to preserve evaluation semantics while moving accuracy toward the target.'
+- What this solution (achieved 0.05867) has done: 'Your score (0.056) is far below the target (0.8986), and the biggest “minimal-change” win is to stop doing heavy stochastic TTA at inference (your test-time pipeline includes RandomResizedCrop/rotations, which tends to destroy accuracy when you don’t have matching trained weights). I keep your exact ensemble logic (two timm models, L2-normalized logits, 0.45/0.55 blend, argmax), but change the test augmentation to a deterministic resize/center-crop normalization so predictions become stable and much more accurate. I also make the TTA loop deterministic-safe by setting `tta=1` (since the transform becomes deterministic anyway), avoiding repeated compute without changing the evaluation semantics (still argmax of averaged logits). Everything else (paths, weight loading, submission ordering/format) stays the same and it still write `submission.csv`.'
+- What this solution (achieved 0.05867) has done: 'Your current score (0.05867) is far below the target (0.8986), which strongly suggests the submission is effectively garbage due to a label-space mismatch (predicting 5 classes when the competition expects 0–4, but your prompt says “four disease categories or a fifth healthy” while also calling it “four disease categories”; if your environment is a 4-class variant, this would collapse accuracy). I make the minimal change to *auto-detect the number of classes from `train.csv`* and build both models with that `OUT_FEATURES`, while keeping the same two-model ensemble, normalization, and argmax. I also add a strict sanity check that the produced labels are within `[0, OUT_FEATURES-1]` and keep the submission in exactly `sample_submission.csv` order. These changes preserve your core inference logic but align the classifier head dimension with the dataset’s true label space, which is the most likely reason for near-random accuracy.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import math
+import random
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from PIL import Image
+
+import torch
+from torch import nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+import timm
+
+
+
+
+## === cell 1
+def resolve_kaggle_input_path(rel_path: str) -> str:
+    """
+    Try common Kaggle roots for a given relative '../input/...' style path.
+    Returns the first existing candidate, else returns the original path.
+    """
+    rel_path = rel_path.replace("\\", "/")
+    candidates = [
+        rel_path,
+        rel_path.replace("../input/", "/kaggle/input/"),
+        rel_path.replace("../input/", "/kaggle/data/input/"),
+        rel_path.replace("../input/", "/kaggle/data/"),
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return rel_path
+
+
+
+
+## === cell 2
+INPUT_PATH = "../input/ensemble-1023/"
+TRAIN_CSV_PATH = "../input/cassava-leaf-disease-classification/train.csv"
+TRAIN_IMAGE_PATH = "../input/cassava-leaf-disease-classification/train_images/"
+TEST_IMAGE_PATH = "../input/cassava-leaf-disease-classification/test_images/"
+SUBMISSION_PATH = "submission.csv"
+RESNEXT_PATH = "1022_res50.pth"
+B4_PATH = "1022_b4ns.pth"
+DEVICES = [torch.device(f"cuda:{i}") for i in range(torch.cuda.device_count())]
+NUM_EPOCHS = 17
+BATCH_SIZE = 32
+IMAGE_SIZE = 512
+OPTIMIZER = torch.optim.AdamW
+SEED = 42
+LR_START = 1e-5
+LR_MAX = 2e-4
+LR_FINAL = 1e-5
+LR_FINAL = 1e-5
+TTA = 8
+
+INPUT_PATH = resolve_kaggle_input_path(INPUT_PATH)
+TRAIN_CSV_PATH = resolve_kaggle_input_path(TRAIN_CSV_PATH)
+TRAIN_IMAGE_PATH = resolve_kaggle_input_path(TRAIN_IMAGE_PATH)
+TEST_IMAGE_PATH = resolve_kaggle_input_path(TEST_IMAGE_PATH)
+
+
+def _auto_find_weights_dir(expected_dir: str, weight_filenames: list[str]) -> str:
+    expected_dir = expected_dir.replace("\\", "/")
+    if os.path.isdir(expected_dir) and all(
+        os.path.exists(os.path.join(expected_dir, w)) for w in weight_filenames
+    ):
+        return expected_dir
+
+    preferred_roots = [
+        "/kaggle/input/cassava-leaf-disease-classification",
+        "/kaggle/data/input/cassava-leaf-disease-classification",
+        "/kaggle/data/cassava-leaf-disease-classification",
+    ]
+    roots = preferred_roots + ["/kaggle/input", "/kaggle/data/input", "/kaggle/data"]
+    for root in roots:
+        if not os.path.isdir(root):
+            continue
+        for dirpath, _, filenames in os.walk(root):
+            if all(w in filenames for w in weight_filenames):
+                return dirpath
+    return expected_dir
+
+
+INPUT_PATH = _auto_find_weights_dir(INPUT_PATH, [RESNEXT_PATH, B4_PATH])
+
+
+def _auto_find_weight_file(weight_filename: str) -> str | None:
+    roots = [
+        INPUT_PATH,
+        "/kaggle/input/cassava-leaf-disease-classification",
+        "/kaggle/data/input/cassava-leaf-disease-classification",
+        "/kaggle/data/cassava-leaf-disease-classification",
+        "/kaggle/input",
+        "/kaggle/data/input",
+        "/kaggle/data",
+        "/kaggle/working",
+    ]
+    seen = set()
+    for root in roots:
+        if not root or root in seen:
+            continue
+        seen.add(root)
+        if os.path.isdir(root):
+            for dirpath, _, filenames in os.walk(root):
+                if weight_filename in filenames:
+                    return os.path.join(dirpath, weight_filename)
+        else:
+            if os.path.isfile(root) and os.path.basename(root) == weight_filename:
+                return root
+    return None
+
+
+
+
+## === cell 3
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+
+
+
+## === cell 4
+def sigmoid_focal_cross_entropy(y_hat, y_true, alpha=0.25, gamma=2.0):
+    def smooth(y, smooth_factor):
+        assert len(y.shape) == 2
+        y = y * (1 - smooth_factor)
+        y = y + smooth_factor / y.shape[1]
+        return y
+
+    smooth_factor = 0.1
+
+    if not isinstance(y_true, torch.Tensor):
+        y_true = torch.tensor(y_true)
+    if not isinstance(y_hat, torch.Tensor):
+        y_hat = torch.tensor(y_hat)
+
+    y_true = smooth(y_true, smooth_factor).to(y_hat.device).type_as(y_hat)
+
+    bce = F.binary_cross_entropy_with_logits(y_hat, y_true, reduction="none")
+    p = torch.sigmoid(y_hat)
+    p_t = y_true * p + (1 - y_true) * (1 - p)
+
+    alpha_t = y_true * alpha + (1 - y_true) * (1 - alpha)
+    modulating_factor = (1.0 - p_t).pow(gamma)
+
+    return torch.sum(alpha_t * modulating_factor * bce, dim=-1)
+
+
+
+
+## === cell 5
+def lr_tune(epoch, num_epochs=NUM_EPOCHS):
+    lr_start = LR_START
+    lr_max = LR_MAX
+    lr_final = LR_FINAL
+    lr_warmup_epoch = 4
+    lr_sustain_epoch = 0
+    lr_decay_epoch = num_epochs - lr_warmup_epoch - lr_sustain_epoch - 1
+
+    if epoch <= lr_warmup_epoch:
+        lr = lr_start + (lr_max - lr_start) * (epoch / lr_warmup_epoch) ** 2.5
+    elif epoch < lr_warmup_epoch + lr_sustain_epoch:
+        lr = lr_max
+    else:
+        epoch_diff = epoch - lr_warmup_epoch - lr_sustain_epoch
+        decay_factor = (epoch_diff / lr_decay_epoch) * math.pi
+        decay_factor = (torch.cos(torch.tensor(decay_factor)).numpy() + 1) / 2
+        lr = lr_final + (lr_max - lr_final) * decay_factor
+    return lr
+
+
+
+
+## === cell 6
+train_augs = A.Compose(
+    [
+        A.RandomResizedCrop(size=(IMAGE_SIZE, IMAGE_SIZE)),
+        A.Transpose(p=0.5),
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.5),
+        A.ShiftScaleRotate(p=0.5),
+        A.HueSaturationValue(
+            hue_shift_limit=0.2, sat_shift_limit=0.2, val_shift_limit=0.2, p=0.5
+        ),
+        A.RandomBrightnessContrast(
+            brightness_limit=(-0.1, 0.1), contrast_limit=(-0.1, 0.1), p=0.5
+        ),
+        A.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+            max_pixel_value=255.0,
+            p=1.0,
+        ),
+        A.CoarseDropout(p=0.5),
+        ToTensorV2(p=1.0),
+    ],
+    p=1.0,
+)
+
+valid_augs = A.Compose(
+    [
+        A.Resize(IMAGE_SIZE, IMAGE_SIZE),
+        A.CenterCrop(IMAGE_SIZE, IMAGE_SIZE),
+        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ToTensorV2(),
+    ]
+)
+
+
+
+## === cell 7
+test_augs = A.Compose(
+    [
+        A.Resize(IMAGE_SIZE, IMAGE_SIZE),
+        A.CenterCrop(IMAGE_SIZE, IMAGE_SIZE),
+        A.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+            max_pixel_value=255.0,
+            p=1.0,
+        ),
+        ToTensorV2(p=1.0),
+    ],
+    p=1.0,
+)
+
+
+
+
+## === cell 8
+def seed_everything(seed=42):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+seed_everything(SEED)
+
+
+
+
+## === cell 9
+class CassavaTestDataset(Dataset):
+    def __init__(self, image_ids, image_dir, transform):
+        self.image_ids = list(image_ids)
+        self.image_dir = image_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_ids)
+
+    def __getitem__(self, idx):
+        img_name = self.image_ids[idx]
+        img_path = os.path.join(self.image_dir, img_name)
+
+        img_pil = Image.open(img_path).convert("RGB")
+        img_np = np.array(img_pil)  # uint8 HWC
+        img_t = self.transform(image=img_np)["image"]
+        return img_name, img_np, img_t  # (name, raw_np, tensor)
+
+
+
+
+## === cell 10
+train_df = pd.read_csv(TRAIN_CSV_PATH)
+OUT_FEATURES = int(train_df["label"].nunique())
+assert (
+    OUT_FEATURES >= 2
+), f"Unexpected OUT_FEATURES={OUT_FEATURES} from {TRAIN_CSV_PATH}"
+
+model_name1 = "resnext50_32x4d"
+my_model_1 = timm.create_model(model_name1, pretrained=True, num_classes=OUT_FEATURES)
+
+model_name2 = "tf_efficientnet_b4_ns"
+my_model_2 = timm.create_model(model_name2, pretrained=True, num_classes=OUT_FEATURES)
+
+
+
+
+## === cell 11
+def _extract_state_dict(obj):
+    if isinstance(obj, dict):
+        if "state_dict" in obj and isinstance(obj["state_dict"], dict):
+            return obj["state_dict"]
+        if "model" in obj and isinstance(obj["model"], dict):
+            return obj["model"]
+    return obj
+
+
+def _strip_known_prefixes(state_dict: dict) -> dict:
+    """
+    Change (moves score toward target): handle common wrappers so keys match the base model.
+    Supports stripping 'module.' (DataParallel) and 'model.' (Lightning/custom).
+    """
+    if not isinstance(state_dict, dict):
+        return state_dict
+    out = {}
+    for k, v in state_dict.items():
+        ks = str(k)
+        if ks.startswith("module."):
+            ks = ks[len("module.") :]
+        if ks.startswith("model."):
+            ks = ks[len("model.") :]
+        out[ks] = v
+    return out
+
+
+def _remap_head_keys_for_timm(state_dict: dict, head_attr_name: str) -> dict:
+    """
+    Change (moves score toward target): timm checkpoints may store classifier as:
+      - head.weight/bias
+      - head.fc.weight/bias
+      - head.classifier.weight/bias
+    while this notebook uses '.fc' (resnext) and '.classifier' (efficientnet).
+    We alias these variants so loading applies the trained classifier if present.
+    """
+    if not isinstance(state_dict, dict):
+        return state_dict
+
+    if head_attr_name == "fc":
+        target = "fc"
+    elif head_attr_name == "classifier":
+        target = "classifier"
+    else:
+        return state_dict
+
+    remapped = dict(state_dict)
+
+    source_keys = [
+        ("head.weight", f"{target}.weight"),
+        ("head.bias", f"{target}.bias"),
+        ("head.fc.weight", f"{target}.weight"),
+        ("head.fc.bias", f"{target}.bias"),
+        ("head.classifier.weight", f"{target}.weight"),
+        ("head.classifier.bias", f"{target}.bias"),
+    ]
+    for src, dst in source_keys:
+        if src in remapped and dst not in remapped:
+            remapped[dst] = remapped[src]
+
+    reverse_keys = [
+        (f"{target}.weight", "head.weight"),
+        (f"{target}.bias", "head.bias"),
+    ]
+    for src, dst in reverse_keys:
+        if src in remapped and dst not in remapped:
+            remapped[dst] = remapped[src]
+
+    return remapped
+
+
+def _try_load_state_dict_flexible(model: nn.Module, state: dict) -> bool:
+    """
+    Change (moves score toward target): keep strict=True first, then strict=False fallback.
+    """
+    try:
+        model.load_state_dict(state, strict=True)
+        return True
+    except Exception:
+        model.load_state_dict(state, strict=False)
+        return True
+
+
+def try_load_weights_or_pretrain(model, model_name, weight_path, head_attr_name):
+    """
+    Try to load state_dict from a .pth (searching broadly if needed).
+    If not found, keep the already-pretrained model and its non-random OUT_FEATURES head
+    (created via timm num_classes=OUT_FEATURES).
+    """
+    weight_full_path = os.path.join(INPUT_PATH, weight_path)
+    if not os.path.exists(weight_full_path):
+        found = _auto_find_weight_file(os.path.basename(weight_path))
+        if found is not None:
+            weight_full_path = found
+
+    if os.path.exists(weight_full_path):
+        with torch.no_grad():
+            head_before = None
+            if (
+                head_attr_name == "fc"
+                and hasattr(model, "fc")
+                and hasattr(model.fc, "weight")
+            ):
+                head_before = model.fc.weight.detach().cpu().clone()
+            elif (
+                head_attr_name == "classifier"
+                and hasattr(model, "classifier")
+                and hasattr(model.classifier, "weight")
+            ):
+                head_before = model.classifier.weight.detach().cpu().clone()
+
+        state = torch.load(weight_full_path, map_location="cpu")
+        state = _extract_state_dict(state)
+        state = _strip_known_prefixes(state)
+        state = _remap_head_keys_for_timm(state, head_attr_name)
+
+        _try_load_state_dict_flexible(model, state)
+
+        with torch.no_grad():
+            head_after = None
+            if (
+                head_attr_name == "fc"
+                and hasattr(model, "fc")
+                and hasattr(model.fc, "weight")
+            ):
+                head_after = model.fc.weight.detach().cpu().clone()
+            elif (
+                head_attr_name == "classifier"
+                and hasattr(model, "classifier")
+                and hasattr(model.classifier, "weight")
+            ):
+                head_after = model.classifier.weight.detach().cpu().clone()
+
+        head_changed = None
+        if (
+            head_before is not None
+            and head_after is not None
+            and head_before.shape == head_after.shape
+        ):
+            head_changed = not torch.allclose(head_before, head_after)
+        model._head_changed_after_load = head_changed  # for printing
+        return model, True, weight_full_path
+
+    model._head_changed_after_load = False
+    return model, False, weight_full_path
+
+
+my_model_1, loaded1, wpath1 = try_load_weights_or_pretrain(
+    my_model_1, model_name1, RESNEXT_PATH, "fc"
+)
+my_model_2, loaded2, wpath2 = try_load_weights_or_pretrain(
+    my_model_2, model_name2, B4_PATH, "classifier"
+)
+
+
+
+## === cell 12
+sample_sub_path = resolve_kaggle_input_path(
+    "../input/cassava-leaf-disease-classification/sample_submission.csv"
+)
+sample_df = pd.read_csv(sample_sub_path)
+test_image_list = sample_df["image_id"].tolist()
+
+test_ds = CassavaTestDataset(test_image_list, TEST_IMAGE_PATH, test_augs)
+
+
+def cassava_test_collate(batch):
+    names, raw_nps, tensors = zip(*batch)
+    tensors = torch.stack(tensors, dim=0)
+    return list(names), list(raw_nps), tensors
+
+
+num_workers = min(4, os.cpu_count() or 1)
+test_loader = DataLoader(
+    test_ds,
+    batch_size=BATCH_SIZE,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=torch.cuda.is_available(),
+    drop_last=False,
+    persistent_workers=(num_workers > 0),
+    collate_fn=cassava_test_collate,
+)
+
+
+
+## === cell 13
+torch.cuda.empty_cache()
+
+
+def predict_logits(model, loader, tta: int, transform_for_tta):
+    model.eval()
+    model = model.to(device)
+
+    use_dp = torch.cuda.device_count() > 1 and device.type == "cuda"
+    model_infer = nn.DataParallel(model) if use_dp else model
+
+    all_logits = []
+    with torch.no_grad():
+        for _, raw_nps, images in loader:
+            if tta <= 1:
+                batch = images.to(device, non_blocking=True).float()
+                logits = model_infer(batch)
+            else:
+                logits = torch.zeros((images.size(0), OUT_FEATURES), device=device)
+
+                batch0 = images.to(device, non_blocking=True).float()
+                logits += model_infer(batch0)
+
+                for _ in range(tta - 1):
+                    aug_tensors = []
+                    for img_np in raw_nps:
+                        img_np = np.asarray(img_np)
+                        t = transform_for_tta(image=img_np)["image"]
+                        aug_tensors.append(t)
+                    batch_aug = (
+                        torch.stack(aug_tensors, dim=0)
+                        .to(device, non_blocking=True)
+                        .float()
+                    )
+                    logits += model_infer(batch_aug)
+
+                logits /= tta
+
+            all_logits.append(logits.detach().cpu())
+    return torch.cat(all_logits, dim=0)
+
+
+logits_1 = predict_logits(my_model_1, test_loader, tta=1, transform_for_tta=test_augs)
+normalize_pred_1 = F.normalize(logits_1.T, p=2, dim=0).T
+
+torch.cuda.empty_cache()
+
+logits_2 = predict_logits(my_model_2, test_loader, tta=1, transform_for_tta=test_augs)
+normalize_pred_2 = F.normalize(logits_2.T, p=2, dim=0).T
+
+final_pred = (normalize_pred_1 * 0.45) + (normalize_pred_2 * 0.55)
+labels = final_pred.argmax(dim=-1).numpy().astype(int).tolist()
+
+assert (
+    min(labels) >= 0 and max(labels) < OUT_FEATURES
+), f"Label out of range: min={min(labels)} max={max(labels)} OUT_FEATURES={OUT_FEATURES}"
+
+
+
+## === cell 14
+df_submission = pd.DataFrame({"image_id": test_image_list, "label": labels})
+df_submission.to_csv(SUBMISSION_PATH, index=False)
+
+print(f"Wrote submission: {SUBMISSION_PATH} rows={len(df_submission)}")
+print(f"Detected OUT_FEATURES={OUT_FEATURES} from train.csv unique labels")
+print(f"Ensemble weights dir (auto): {INPUT_PATH}")
+print(
+    f"Weight1 loaded={loaded1} from {wpath1} head_changed={getattr(my_model_1, '_head_changed_after_load', None)}"
+)
+print(
+    f"Weight2 loaded={loaded2} from {wpath2} head_changed={getattr(my_model_2, '_head_changed_after_load', None)}"
+)
+print(df_submission.head())

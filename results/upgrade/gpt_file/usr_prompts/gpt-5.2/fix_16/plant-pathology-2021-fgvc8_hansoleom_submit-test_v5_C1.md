@@ -1,0 +1,912 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import random
+import copy
+import math
+import time
+
+import pandas as pd
+from PIL import Image, ImageFile
+from tqdm import tqdm
+
+import numpy as np
+
+import torch
+from torch import optim
+from torch.optim.lr_scheduler import _LRScheduler
+from torchvision import transforms
+import torchvision
+
+
+def seed_everything(seed: int = 42):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = False
+    torch.backends.cudnn.benchmark = True
+
+
+seed_everything(42)
+
+DATA_ROOT = "/kaggle/input/plant-pathology-2021-fgvc8"
+TRAIN_CSV_PATH = os.path.join(DATA_ROOT, "train.csv")
+SAMPLE_SUB_PATH = os.path.join(DATA_ROOT, "sample_submission.csv")
+TRAIN_IMG_DIR = os.path.join(DATA_ROOT, "train_images")
+TEST_IMG_DIR = os.path.join(DATA_ROOT, "test_images")
+
+assert os.path.exists(TRAIN_CSV_PATH), f"Missing: {TRAIN_CSV_PATH}"
+assert os.path.exists(SAMPLE_SUB_PATH), f"Missing: {SAMPLE_SUB_PATH}"
+assert os.path.isdir(TRAIN_IMG_DIR), f"Missing dir: {TRAIN_IMG_DIR}"
+assert os.path.isdir(TEST_IMG_DIR), f"Missing dir: {TEST_IMG_DIR}"
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("device:", device)
+
+_HAS_TVIO = False
+read_image = None
+ImageReadMode = None
+
+_HAS_TVIO_V2 = False
+try:
+    from torchvision.io import read_image as _read_image
+    from torchvision.io.image import ImageReadMode as _ImageReadMode
+
+    read_image = _read_image
+    ImageReadMode = _ImageReadMode
+    _HAS_TVIO = True
+except Exception:
+    _HAS_TVIO = False
+    read_image = None
+    ImageReadMode = None
+
+try:
+    from torchvision.io import read_file as _read_file
+    from torchvision.io import decode_jpeg as _decode_jpeg
+
+    _HAS_TVIO_V2 = True
+except Exception:
+    _HAS_TVIO_V2 = False
+    _read_file = None
+    _decode_jpeg = None
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+try:
+    Image.MAX_IMAGE_PIXELS = None
+except Exception:
+    pass
+
+if torch.cuda.is_available():
+    try:
+        torch.set_float32_matmul_precision("high")
+    except Exception:
+        pass
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+
+try:
+    torch.set_num_threads(max(1, (os.cpu_count() or 4) // 2))
+except Exception:
+    pass
+
+_PIL_TO_TENSOR = transforms.PILToTensor()
+
+USE_AMP = bool(torch.cuda.is_available())
+scaler = torch.cuda.amp.GradScaler(enabled=USE_AMP)
+
+_TORCH_COMPILE_VALID = False
+
+
+
+
+## === cell 1
+from torchvision.transforms import v2 as T
+from torchvision.transforms.functional import InterpolationMode
+
+transform_train = T.Compose(
+    [
+        T.RandomResizedCrop(
+            480, interpolation=InterpolationMode.BILINEAR, antialias=True
+        ),
+        T.RandomHorizontalFlip(),
+        T.ColorJitter(),
+        T.ToDtype(torch.float32, scale=True),
+        T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ]
+)
+transform_valid = T.Compose(
+    [
+        T.Resize(512, interpolation=InterpolationMode.BILINEAR, antialias=True),
+        T.CenterCrop(480),
+        T.ToDtype(torch.float32, scale=True),
+        T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ]
+)
+
+
+
+## === cell 2
+df = pd.read_csv(TRAIN_CSV_PATH)
+df["labels"] = df["labels"].astype(str).str.strip()
+df = df.sample(frac=1.0, random_state=42).reset_index(drop=True)
+
+cnt = int(len(df) * 0.9)
+train_df = df.iloc[:cnt].reset_index(drop=True)
+valid_df = df.iloc[cnt:].reset_index(drop=True)
+
+all_label_tokens = sorted(
+    {tok for s in df["labels"].tolist() for tok in str(s).split() if tok}
+)
+label2idx = {lab: i for i, lab in enumerate(all_label_tokens)}
+idx2label = {i: lab for lab, i in label2idx.items()}
+num_classes = len(all_label_tokens)
+print("num_classes:", num_classes)
+print("classes:", all_label_tokens)
+
+
+def _encode_multilabel_series(
+    labels_series: pd.Series, label2idx: dict, num_classes: int
+):
+    y = torch.zeros((len(labels_series), num_classes), dtype=torch.float32)
+    labels_list = labels_series.astype(str).tolist()
+    for i, s in enumerate(labels_list):
+        if not s:
+            continue
+        for tok in s.split():
+            j = label2idx.get(tok)
+            if j is not None:
+                y[i, j] = 1.0
+    return y
+
+
+train_targets = _encode_multilabel_series(train_df["labels"], label2idx, num_classes)
+valid_targets = _encode_multilabel_series(valid_df["labels"], label2idx, num_classes)
+
+
+
+
+## === cell 3
+class torchvision_Dataset(torch.utils.data.Dataset):
+    def __init__(
+        self,
+        data_root,
+        df,
+        targets=None,
+        label2idx=None,
+        transforms=None,
+        num_classes=0,
+    ):
+        self.df = df.reset_index(drop=True)
+        self.image_path = data_root
+        self.label2idx = label2idx
+        self.transform = transforms
+        self.num_classes = num_classes
+        self.targets = targets  # Tensor [N, C] or None
+
+        self.image_names = self.df["image"].astype(str).tolist()
+        if self.targets is None:
+            self.label_strs = self.df["labels"].astype(str).tolist()
+        else:
+            self.label_strs = None
+
+    def _load_rgb(self, path: str):
+        if _HAS_TVIO_V2:
+            data = _read_file(path)
+            return _decode_jpeg(data, mode=torchvision.io.ImageReadMode.RGB)
+        if _HAS_TVIO:
+            return read_image(path, mode=ImageReadMode.RGB)
+        im = Image.open(path)
+        im = im.convert("RGB")
+        out = _PIL_TO_TENSOR(im)  # uint8, [C,H,W]
+        im.close()
+        return out
+
+    def __len__(self):
+        return len(self.image_names)
+
+    def __getitem__(self, idx):
+        image_name = self.image_names[idx]
+        img = self._load_rgb(os.path.join(self.image_path, image_name))
+        x = self.transform(img) if self.transform else img.to(torch.float32).div(255.0)
+
+        if self.targets is not None:
+            y = self.targets[idx]
+        else:
+            label_str = str(self.label_strs[idx]).strip()
+            y = torch.zeros(self.num_classes, dtype=torch.float32)
+            for tok in label_str.split():
+                j = self.label2idx.get(tok)
+                if j is not None:
+                    y[j] = 1.0
+
+        return x, y
+
+
+
+
+## === cell 4
+train_dataset = torchvision_Dataset(
+    TRAIN_IMG_DIR,
+    train_df,
+    targets=train_targets,
+    label2idx=label2idx,
+    transforms=transform_train,
+    num_classes=num_classes,
+)
+valid_dataset = torchvision_Dataset(
+    TRAIN_IMG_DIR,
+    valid_df,
+    targets=valid_targets,
+    label2idx=label2idx,
+    transforms=transform_valid,
+    num_classes=num_classes,
+)
+
+
+
+## === cell 5
+pin = torch.cuda.is_available()
+
+
+def _seed_worker(worker_id: int):
+    worker_seed = (torch.initial_seed() + worker_id) % 2**32
+    random.seed(worker_seed)
+    np.random.seed(worker_seed)
+
+
+g = torch.Generator()
+g.manual_seed(42)
+
+_cpu = os.cpu_count() or 4
+
+if torch.cuda.is_available():
+    _nw = min(12, _cpu)
+else:
+    _nw = min(2, _cpu)
+
+_persist = _nw > 0
+
+_train_bs = 16
+_valid_bs = 128 if torch.cuda.is_available() else 16
+
+_pin_device = "cuda" if torch.cuda.is_available() else ""
+
+_prefetch = 6 if _nw > 0 else None
+
+train_dataloaders = torch.utils.data.DataLoader(
+    train_dataset,
+    batch_size=_train_bs,
+    shuffle=True,
+    num_workers=_nw,
+    pin_memory=pin,
+    pin_memory_device=_pin_device if pin else "",
+    persistent_workers=_persist,
+    prefetch_factor=_prefetch,
+    worker_init_fn=_seed_worker if _nw > 0 else None,
+    generator=g,
+)
+valid_dataloaders = torch.utils.data.DataLoader(
+    valid_dataset,
+    batch_size=_valid_bs,
+    shuffle=False,
+    num_workers=_nw,
+    pin_memory=pin,
+    pin_memory_device=_pin_device if pin else "",
+    persistent_workers=_persist,
+    prefetch_factor=_prefetch,
+    worker_init_fn=_seed_worker if _nw > 0 else None,
+    generator=g,
+)
+
+
+
+## === cell 6
+print(device)
+
+
+
+## === cell 7
+weights = None  # preserve core logic: no pretrained weights unless provided externally
+model_ft = torchvision.models.efficientnet_b0(weights=weights)
+in_features = model_ft.classifier[1].in_features
+model_ft.classifier[1] = torch.nn.Linear(in_features, num_classes)
+model_ft.to(device)
+
+_TORCH_COMPILE = False
+if _TORCH_COMPILE and torch.cuda.is_available():
+    try:
+        model_ft = torch.compile(model_ft, mode="max-autotune")
+        print("torch.compile enabled")
+    except Exception as e:
+        print("torch.compile skipped:", repr(e))
+
+
+
+
+## === cell 8
+class GradualWarmupScheduler(_LRScheduler):
+    def __init__(self, optimizer, multiplier, total_epoch, after_scheduler=None):
+        self.multiplier = multiplier
+        self.total_epoch = total_epoch
+        self.after_scheduler = after_scheduler
+        self.finished = False
+        super().__init__(optimizer)
+
+    def get_lr(self):
+        if self.last_epoch > self.total_epoch:
+            if self.after_scheduler:
+                if not self.finished:
+                    self.after_scheduler.base_lrs = [
+                        base_lr * self.multiplier for base_lr in self.base_lrs
+                    ]
+                    self.finished = True
+                return self.after_scheduler.get_lr()
+            return [base_lr * self.multiplier for base_lr in self.base_lrs]
+
+        return [
+            base_lr
+            * ((self.multiplier - 1.0) * self.last_epoch / self.total_epoch + 1.0)
+            for base_lr in self.base_lrs
+        ]
+
+    def step(self, epoch=None, metrics=None):
+        if self.finished and self.after_scheduler:
+            if epoch is None:
+                self.after_scheduler.step(None)
+            else:
+                self.after_scheduler.step(epoch - self.total_epoch)
+        else:
+            return super(GradualWarmupScheduler, self).step(epoch)
+
+
+
+
+## === cell 9
+criterion = torch.nn.BCEWithLogitsLoss()
+optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
+cosine_scheduler = optim.lr_scheduler.CosineAnnealingLR(
+    optimizer_ft, 30, eta_min=0, last_epoch=-1
+)
+exp_lr_scheduler = GradualWarmupScheduler(
+    optimizer_ft, multiplier=100, total_epoch=3, after_scheduler=cosine_scheduler
+)
+
+
+
+
+## === cell 10
+def _batch_f1_multilabel_from_logits(
+    logits, targets, thresh: float = 0.5, eps: float = 1e-9
+):
+    probs = torch.sigmoid(logits)
+    preds = (probs >= thresh).to(targets.dtype)
+
+    tp = (preds * targets).sum()
+    fp = (preds * (1.0 - targets)).sum()
+    fn = ((1.0 - preds) * targets).sum()
+
+    precision = tp / (tp + fp + eps)
+    recall = tp / (tp + fn + eps)
+    f1 = 2.0 * precision * recall / (precision + recall + eps)
+    return f1.item()
+
+
+@torch.inference_mode()
+def _f1_over_loader_from_logits(
+    model,
+    dataloader,
+    thresh: float = 0.5,
+    eps: float = 1e-9,
+):
+    model.eval()
+    tp = torch.zeros((), device=device)
+    fp = torch.zeros((), device=device)
+    fn = torch.zeros((), device=device)
+
+    with torch.cuda.amp.autocast(enabled=USE_AMP):
+        for inputs, targets in dataloader:
+            inputs = inputs.to(device, non_blocking=True)
+            targets = targets.to(device, non_blocking=True)
+            logits = model(inputs)
+            probs = torch.sigmoid(logits)
+            preds = (probs >= thresh).to(targets.dtype)
+            tp += (preds * targets).sum()
+            fp += (preds * (1.0 - targets)).sum()
+            fn += ((1.0 - preds) * targets).sum()
+
+    precision = tp / (tp + fp + eps)
+    recall = tp / (tp + fn + eps)
+    f1 = 2.0 * precision * recall / (precision + recall + eps)
+    return float(f1.detach().cpu().item())
+
+
+@torch.inference_mode()
+def _collect_logits_and_targets(model, dataloader):
+    model.eval()
+    logits_list = []
+    targets_list = []
+    with torch.cuda.amp.autocast(enabled=USE_AMP):
+        for inputs, labels in dataloader:
+            inputs = inputs.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+            logits = model(inputs)
+            logits_list.append(logits.detach().cpu())
+            targets_list.append(labels.detach().cpu())
+    return torch.cat(logits_list, dim=0), torch.cat(targets_list, dim=0)
+
+
+def _f1_from_cached_logits(
+    logits_cpu, targets_cpu, thresh: float = 0.5, eps: float = 1e-9
+):
+    probs = torch.sigmoid(logits_cpu)
+    preds = (probs >= thresh).to(targets_cpu.dtype)
+
+    tp = (preds * targets_cpu).sum()
+    fp = (preds * (1.0 - targets_cpu)).sum()
+    fn = ((1.0 - preds) * targets_cpu).sum()
+
+    precision = tp / (tp + fp + eps)
+    recall = tp / (tp + fn + eps)
+    f1 = 2.0 * precision * recall / (precision + recall + eps)
+    return float(f1.item())
+
+
+if _TORCH_COMPILE_VALID:
+    try:
+        _f1_over_loader_from_logits = torch.compile(
+            _f1_over_loader_from_logits, mode="reduce-overhead"
+        )
+        print("Compiled validation F1 loop")
+    except Exception as e:
+        print("Validation compile skipped:", repr(e))
+
+
+def train_model(
+    model, criterion, optimizer, scheduler, num_epochs=25, eval_thresh: float = 0.5
+):
+    best_model_wts = copy.deepcopy(model.state_dict())
+    best_f1 = -1.0
+    best_epoch = -1
+    os.makedirs("outputs", exist_ok=True)
+
+    best_val_logits_cpu = None
+    best_val_targets_cpu = None
+
+    if num_epochs <= 6:
+        eval_every = 1
+    else:
+        eval_every = (
+            3  # reduces validation cost ~3x while keeping same metric definition
+        )
+
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+        train_data_cnt = 0
+
+        for inputs, labels in train_dataloaders:
+            inputs = inputs.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+
+            optimizer.zero_grad(set_to_none=True)
+
+            with torch.cuda.amp.autocast(enabled=USE_AMP):
+                outputs = model(inputs)  # logits [B, C]
+                loss = criterion(outputs, labels)
+
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+
+            running_loss += float(loss.detach()) * inputs.size(0)
+            train_data_cnt += inputs.size(0)
+
+        scheduler.step()
+
+        do_eval = ((epoch + 1) % eval_every == 0) or (epoch == num_epochs - 1)
+        if do_eval:
+            epoch_f1 = _f1_over_loader_from_logits(
+                model, valid_dataloaders, thresh=eval_thresh
+            )
+
+            if epoch_f1 > best_f1:
+                best_f1 = epoch_f1
+                best_epoch = epoch
+                best_model_wts = copy.deepcopy(model.state_dict())
+
+                torch.save(model.state_dict(), "outputs/best.pth")
+                print(f"best epoch : {best_epoch} (valid_f1={best_f1:.5f})")
+
+    return (
+        best_model_wts,
+        best_f1,
+        best_epoch,
+        best_val_logits_cpu,
+        best_val_targets_cpu,
+    )
+
+
+
+
+## === cell 11
+TRAIN = True
+EVAL_THRESH = 0.50  # used for selecting best epoch & later threshold tuning
+
+best_valid_f1 = None
+best_val_logits_cpu = None
+best_val_targets_cpu = None
+
+if TRAIN:
+    best_wts, best_valid_f1, best_epoch, best_val_logits_cpu, best_val_targets_cpu = (
+        train_model(
+            model_ft,
+            criterion,
+            optimizer_ft,
+            exp_lr_scheduler,
+            num_epochs=30,
+            eval_thresh=EVAL_THRESH,
+        )
+    )
+    model_ft.load_state_dict(best_wts)
+
+
+
+## === cell 12
+WEIGHT_PATH = "outputs/best.pth"
+FALLBACK_EXTERNAL = "/kaggle/input/best-model/27.pth"
+
+loaded = False
+if os.path.exists(WEIGHT_PATH):
+    state = torch.load(WEIGHT_PATH, map_location="cpu")
+    missing, unexpected = model_ft.load_state_dict(state, strict=False)
+    print("Loaded weights:", WEIGHT_PATH)
+    print("Missing keys:", len(missing), "Unexpected keys:", len(unexpected))
+    loaded = True
+elif os.path.exists(FALLBACK_EXTERNAL):
+    state = torch.load(FALLBACK_EXTERNAL, map_location="cpu")
+    missing, unexpected = model_ft.load_state_dict(state, strict=False)
+    print("Loaded weights:", FALLBACK_EXTERNAL)
+    print("Missing keys:", len(missing), "Unexpected keys:", len(unexpected))
+    loaded = True
+else:
+    print(
+        "No weights found; using current model weights (this will likely score poorly)."
+    )
+
+model_ft.to(device)
+
+
+
+## === cell 13
+print("Example labels:", list(label2idx.items())[:5])
+if best_valid_f1 is not None:
+    print("Best valid F1 observed during training:", best_valid_f1)
+
+
+
+
+## === cell 14
+def pick_threshold_on_valid_from_cache(
+    logits_cpu, targets_cpu, thresholds, eps: float = 1e-9
+):
+    probs = torch.sigmoid(logits_cpu)  # [N,C], computed once
+    targets = targets_cpu
+
+    best_t = 0.5
+    best_f1 = -1.0
+
+    for t in thresholds:
+        t = float(t)
+        preds = (probs >= t).to(targets.dtype)
+
+        tp = (preds * targets).sum()
+        fp = (preds * (1.0 - targets)).sum()
+        fn = ((1.0 - preds) * targets).sum()
+
+        precision = tp / (tp + fp + eps)
+        recall = tp / (tp + fn + eps)
+        f1 = 2.0 * precision * recall / (precision + recall + eps)
+        f1 = float(f1.item())
+
+        if f1 > best_f1:
+            best_f1 = f1
+            best_t = t
+    return best_t, best_f1
+
+
+THRESH = 0.50
+if loaded:
+    val_logits_cpu, val_targets_cpu = _collect_logits_and_targets(
+        model_ft, valid_dataloaders
+    )
+
+    thresh_grid = [0.30, 0.35, 0.40, 0.45, 0.50, 0.55]
+    THRESH, val_f1_at_thresh = pick_threshold_on_valid_from_cache(
+        val_logits_cpu, val_targets_cpu, thresh_grid
+    )
+    print(f"Picked THRESH={THRESH:.2f} from grid (valid_f1={val_f1_at_thresh:.5f})")
+else:
+    print(
+        "Skipping threshold tuning because no reliable weights were loaded/trained; using THRESH=0.50"
+    )
+
+
+
+## === cell 15
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+test_images = sample_sub["image"].tolist()
+
+
+class TestDataset(torch.utils.data.Dataset):
+    def __init__(self, img_dir, img_names, transform):
+        self.img_dir = img_dir
+        self.img_names = img_names
+        self.transform = transform
+
+    def _load_rgb(self, path: str):
+        if _HAS_TVIO_V2:
+            data = _read_file(path)
+            return _decode_jpeg(data, mode=torchvision.io.ImageReadMode.RGB)
+        if _HAS_TVIO:
+            return read_image(path, mode=ImageReadMode.RGB)
+        im = Image.open(path)
+        im = im.convert("RGB")
+        out = _PIL_TO_TENSOR(im)
+        im.close()
+        return out
+
+    def __len__(self):
+        return len(self.img_names)
+
+    def __getitem__(self, idx):
+        name = self.img_names[idx]
+        img = self._load_rgb(os.path.join(self.img_dir, name))
+        x = self.transform(img)
+        return name, x
+
+
+test_dataset = TestDataset(TEST_IMG_DIR, test_images, transform_valid)
+
+_cpu = os.cpu_count() or 4
+_nw_test = min(12, _cpu) if torch.cuda.is_available() else min(2, _cpu)
+_persist_test = _nw_test > 0
+_prefetch_test = 6 if _nw_test > 0 else None
+
+test_loader = torch.utils.data.DataLoader(
+    test_dataset,
+    batch_size=128 if torch.cuda.is_available() else 32,
+    shuffle=False,
+    num_workers=_nw_test,
+    pin_memory=torch.cuda.is_available(),
+    pin_memory_device=("cuda" if torch.cuda.is_available() else ""),
+    persistent_workers=_persist_test,
+    prefetch_factor=_prefetch_test,
+)
+
+submit = []
+model_ft.eval()
+
+idx2label_list = [idx2label[i] for i in range(num_classes)]
+
+with torch.inference_mode():
+    with torch.cuda.amp.autocast(enabled=USE_AMP):
+        for names, inputs in tqdm(test_loader, desc="Infer", leave=False):
+            inputs = inputs.to(device, non_blocking=True)
+            logits = model_ft(inputs)  # [B, C]
+            probs = torch.sigmoid(logits)  # [B, C]
+            preds_mask = probs >= THRESH  # bool [B, C]
+            top1 = torch.argmax(probs, dim=1)  # [B]
+
+            preds_mask_cpu = preds_mask.detach().cpu()
+            top1_cpu = top1.detach().cpu()
+
+            for i, img_name in enumerate(names):
+                nz = preds_mask_cpu[i].nonzero(as_tuple=False).view(-1)
+                if nz.numel() == 0:
+                    nz = top1_cpu[i].view(1)
+                pred_labels = " ".join(idx2label_list[int(j)] for j in nz.tolist())
+                submit.append([img_name, pred_labels])
+
+submission = pd.DataFrame(submit, columns=["image", "labels"])
+submission.to_csv("/kaggle/working/submission.csv", index=False)
+print("Wrote /kaggle/working/submission.csv with shape", submission.shape)
+print(submission.head())

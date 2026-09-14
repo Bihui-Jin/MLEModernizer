@@ -1,0 +1,643 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given pairs of phrases (an `anchor` and a `target` phrase), build a model to rate how similar they are.  
+
+## Metric
+Pearson correlation coefficient.
+
+## Submission Format
+For each `id` (representing a pair of phrases) in the test set, you must predict the similarity `score`. The file should contain a header and have the following format:
+
+```
+id,score
+4112d61851461f60,0
+09e418c93a776564,0.25
+36baf228038e314b,1
+etc.
+
+```
+
+## Dataset
+The scores are in the 0-1 range with increments of 0.25 with the following meanings:
+
+- **1.0** - Very close match. This is typically an exact match except possibly for differences in conjugation, quantity (e.g. singular vs. plural), and addition or removal of stopwords (e.g. "the", "and", "or").
+- **0.75** - Close synonym, e.g. "mobile phone" vs. "cellphone". This also includes abbreviations, e.g. "TCP" -> "transmission control protocol".
+- **0.5** - Synonyms which don't have the same meaning (same function, same properties). This includes broad-narrow (hyponym) and narrow-broad (hypernym) matches.
+- **0.25** - Somewhat related, e.g. the two phrases are in the same high level domain but are not synonyms. This also includes antonyms.
+- **0.0** - Unrelated.
+
+Files
+-----
+
+- **train.csv** - the training set, containing phrases, contexts, and their similarity scores
+- **test.csv** - the test set set, identical in structure to the training set but without the score
+- **sample_submission.csv** - a sample submission file in the correct format
+
+Columns
+-------
+
+- `id` - a unique identifier for a pair of phrases
+- `anchor` - the first phrase
+- `target` - the second phrase
+- `context` - the [CPC classification (version 2021.05)](https://en.wikipedia.org/wiki/Cooperative_Patent_Classification), which indicates the subject within which the similarity is to be scored
+- `score` - the similarity. This is sourced from a combination of one or more manual expert ratings.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        working/
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+```
+
+-> data/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> data/us-patent-phrase-to-phrase-matching/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/us-patent-phrase-to-phrase-matching/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/us-patent-phrase-to-phrase-matching/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> input/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8046283730655472
+
+# 6. Current score
+
+0.67468
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.51199) has done: 'I fix the Ridge runtime error by explicitly selecting a compatible solver so sklearn doesn’t call SciPy’s `cg()` with an unsupported `tol` argument in this environment. This allow the CV loop and final model fit to complete, which in turn defines `model` so inference works and `pred` exists for submission creation. I keep the same TF‑IDF + Ridge core approach and only adjust the Ridge configuration to be robust. Finally, I ensure the script always writes `submission.csv` with the required `id,score` columns.'
+- What this solution (achieved 0.42027) has done: 'Your current TF‑IDF + Ridge pipeline is likely under-scoring because the regression target is discrete (0, 0.25, …, 1.0) while the model outputs continuous values; lightly aligning predictions to that discrete scale (via minimal post-processing) typically improves Pearson for this competition without changing the model/training core. I keep the exact same model architecture and training approach, and only adjust inference post-processing by snapping predictions to the nearest allowed label (and keeping clipping). I also keep the Ridge solver fix you already made for runtime stability. This is a small, targeted change that should move your score upward toward the target.'
+- What this solution (achieved 0.54792) has done: 'Your current score is far below the target, and the biggest issue is the discrete “snapping” of predictions to {0,0.25,…,1.0}, which typically harms Pearson correlation because Pearson rewards preserving relative ordering/continuous variation. To move the score upward toward the target while keeping the same TF‑IDF + Ridge core logic, I remove the snapping step and keep only clipping to [0,1]. I also make a minimal, metric-aligned tweak by selecting the Ridge regularization strength via the existing 5-fold CV loop (same training approach, just choosing `alpha` from a small grid) and then refit on all training data with that alpha. These are small, legitimate changes that usually improve Pearson for this competition without changing the overall pipeline or adding new dependencies, and they still write a valid `submission.csv`.'
+- What this solution (achieved 0.57589) has done: 'Your current TF‑IDF + Ridge setup is valid but underperforms mainly because (a) the evaluation is Pearson correlation (ranking/linear association), while you select `alpha` using RMSE, and (b) you’re leaving easy signal on the table by not explicitly modeling the *difference/overlap* between anchor and target. I keep the same core pipeline (TF‑IDF → Ridge, same training loop style) but (1) choose `alpha` by mean CV Pearson instead of RMSE, and (2) minimally enrich the input text with a few lightweight, deterministic overlap features (shared tokens and context prefix) baked into the same text string so the model can learn them without changing architecture. These changes are directly metric-aligned and typically move scores upward toward your target while preserving the overall approach and producing the same `submission.csv` format.'
+- What this solution (achieved 0.60247) has done: 'Your current TF‑IDF + Ridge pipeline is valid, but it’s likely under-scoring because the default word-level TF‑IDF misses a lot of the short-phrase morphology and abbreviation/variant matching that matters here. To move the Pearson score upward toward the target while keeping the same model/training approach, I minimally expand the vectorizer to include character n‑grams (a standard, lightweight improvement for phrase similarity) using `FeatureUnion`, still feeding a single sparse matrix into the same Ridge. I also keep your metric-aligned CV-by-Pearson, but slightly broaden the `alpha` grid to avoid being stuck on a suboptimal regularization strength. Everything else (data paths, Ridge solver stability, clipping, and submission format) stays the same.'
+- What this solution (achieved 0.6525) has done: 'Your current TF‑IDF + Ridge pipeline is sound, but it’s likely leaving correlation on the table because the text representation under-emphasizes strict pairwise interactions (how anchor and target differ/overlap) that Pearson rewards. I keep the exact same model family and training loop (same CV-by-Pearson, same Ridge), but minimally enrich the single input string with deterministic pairwise features (token overlap ratios + character-level similarity hints) embedded as text so we don’t change the architecture. I also make the word TF‑IDF a bit more robust for short phrases by allowing `min_df=1` and adding a tiny amount of context normalization, while keeping the char TF‑IDF as-is. These small representation tweaks typically improve Pearson for this competition and should move your score upward toward the target band without changing evaluation semantics or adding dependencies.'
+- What this solution (achieved 0.67944) has done: 'Your current gap to the target is large (0.6525 → 0.8046), so we should improve representation and metric alignment without changing the core TF‑IDF→Ridge pipeline. I keep the exact same training loop (5‑fold CV selecting alpha by Pearson, then refit) and model family, but make two minimal, high-signal changes: (1) include a TF‑IDF branch over a compact “diff” string capturing anchor-only vs target-only tokens (pair interaction signal), and (2) slightly broaden char n‑grams to (3,6) to better capture abbreviations/variants common in this task. I also expand the alpha grid modestly (same procedure) to reduce the chance we’re stuck at a suboptimal regularization strength. Submission writing stays identical and still outputs a valid `submission.csv` with `id,score`.'
+- What this solution (achieved 0.67468) has done: 'The timeout is dominated by refitting the full TF‑IDF FeatureUnion 65 times (13 alphas × 5 folds). To preserve identical model logic and CV semantics, the main speedup is to compute the full sparse design matrices once per fold and reuse them across all alphas, training only the Ridge step repeatedly (which is fast relative to TF‑IDF). Additionally, we precompute and cache all text/feature strings once for train/test to eliminate repeated Python-loop feature building inside every vectorizer fit/transform. These changes keep the same feature extraction, same vectorizers, same folds, same Ridge solver, and same alpha selection criterion—only avoiding redundant work.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import re
+import numpy as np
+import pandas as pd
+
+np.random.seed(42)
+
+DATA_DIR = "/kaggle/input/us-patent-phrase-to-phrase-matching"
+train_data_path = os.path.join(DATA_DIR, "train.csv")
+test_data_path = os.path.join(DATA_DIR, "test.csv")
+sample_sub_path = os.path.join(DATA_DIR, "sample_submission.csv")
+
+print("Exists train_data_path:", os.path.exists(train_data_path), train_data_path)
+print("Exists test_data_path:", os.path.exists(test_data_path), test_data_path)
+print("Exists sample_sub_path:", os.path.exists(sample_sub_path), sample_sub_path)
+
+
+
+
+## === cell 1
+class SimpleWordPieceTokenizer:
+    def __init__(
+        self,
+        vocab_file: str,
+        do_lower_case: bool = True,
+        unk_token="[UNK]",
+        cls_token="[CLS]",
+        sep_token="[SEP]",
+        pad_token="[PAD]",
+    ):
+        if not os.path.isfile(vocab_file):
+            raise FileNotFoundError(f"vocab_file not found: {vocab_file}")
+        self.do_lower_case = do_lower_case
+        self.unk_token = unk_token
+        self.cls_token = cls_token
+        self.sep_token = sep_token
+        self.pad_token = pad_token
+
+        with open(vocab_file, "r", encoding="utf-8") as f:
+            vocab = [line.strip() for line in f if line.strip()]
+        self.token_to_id = {tok: i for i, tok in enumerate(vocab)}
+        self.id_to_token = {i: tok for tok, i in self.token_to_id.items()}
+
+        for tok in [unk_token, cls_token, sep_token, pad_token]:
+            if tok not in self.token_to_id:
+                raise ValueError(f"Special token {tok} missing from vocab")
+        self.unk_id = self.token_to_id[unk_token]
+        self.cls_id = self.token_to_id[cls_token]
+        self.sep_id = self.token_to_id[sep_token]
+        self.pad_id = self.token_to_id[pad_token]
+
+    def _basic_tokenize(self, text: str):
+        if text is None:
+            text = ""
+        text = str(text)
+        if self.do_lower_case:
+            text = text.lower()
+        return re.findall(r"[a-z0-9]+|[^\s\w]", text)
+
+    def _wordpiece_tokenize(self, token: str):
+        if token in self.token_to_id:
+            return [token]
+        chars = token
+        start = 0
+        sub_tokens = []
+        while start < len(chars):
+            end = len(chars)
+            cur_substr = None
+            while start < end:
+                substr = chars[start:end]
+                if start > 0:
+                    substr = "##" + substr
+                if substr in self.token_to_id:
+                    cur_substr = substr
+                    break
+                end -= 1
+            if cur_substr is None:
+                return [self.unk_token]
+            sub_tokens.append(cur_substr)
+            start = end
+        return sub_tokens
+
+    def tokenize(self, text: str):
+        out = []
+        for tok in self._basic_tokenize(text):
+            out.extend(self._wordpiece_tokenize(tok))
+        return out
+
+    def encode(self, text: str, add_special_tokens: bool = False):
+        toks = self.tokenize(text)
+        ids = [self.token_to_id.get(t, self.unk_id) for t in toks]
+        if add_special_tokens:
+            ids = [self.cls_id] + ids + [self.sep_id]
+        return ids
+
+    def build_inputs_with_special_tokens(self, token_ids_0, token_ids_1=None):
+        if token_ids_1 is None:
+            return [self.cls_id] + list(token_ids_0) + [self.sep_id]
+        return (
+            [self.cls_id]
+            + list(token_ids_0)
+            + [self.sep_id]
+            + list(token_ids_1)
+            + [self.sep_id]
+        )
+
+    def create_token_type_ids_from_sequences(self, token_ids_0, token_ids_1=None):
+        if token_ids_1 is None:
+            return [0] * (1 + len(token_ids_0) + 1)
+        return [0] * (1 + len(token_ids_0) + 1) + [1] * (len(token_ids_1) + 1)
+
+    def convert_tokens_to_ids(self, token: str):
+        return self.token_to_id.get(token, self.unk_id)
+
+    def decode(self, ids):
+        toks = [self.id_to_token.get(int(i), self.unk_token) for i in ids]
+        return " ".join(toks)
+
+
+print("Tokenizer class defined (not instantiated: external vocab not available).")
+
+
+
+## === cell 2
+train_data = pd.read_csv(train_data_path)
+test_data = pd.read_csv(test_data_path)
+
+print(train_data.head())
+print("Train rows:", len(train_data), "cols:", list(train_data.columns))
+print(test_data.head())
+print("Test rows:", len(test_data), "cols:", list(test_data.columns))
+
+required_train_cols = {"anchor", "target", "context", "score"}
+required_test_cols = {"id", "anchor", "target", "context"}
+missing_train = required_train_cols - set(train_data.columns)
+missing_test = required_test_cols - set(test_data.columns)
+if missing_train:
+    raise RuntimeError(f"train.csv missing columns: {missing_train}")
+if missing_test:
+    raise RuntimeError(f"test.csv missing columns: {missing_test}")
+
+
+
+## === cell 3
+from sklearn.model_selection import KFold
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import FunctionTransformer
+from scipy import sparse
+
+_tok_re = re.compile(r"[a-z0-9]+", flags=re.IGNORECASE)
+
+
+def _simple_tokens(s: str):
+    if s is None:
+        return []
+    return _tok_re.findall(str(s).lower())
+
+
+def _pair_features_as_text(anchor_s: str, target_s: str):
+    a_toks = _simple_tokens(anchor_s)
+    t_toks = _simple_tokens(target_s)
+    a_set = set(a_toks)
+    t_set = set(t_toks)
+    inter = a_set.intersection(t_set)
+    union = a_set.union(t_set)
+
+    jacc = (len(inter) / len(union)) if len(union) else 0.0
+    overlap_a = (len(inter) / len(a_set)) if len(a_set) else 0.0
+    overlap_t = (len(inter) / len(t_set)) if len(t_set) else 0.0
+    len_a = len(a_toks)
+    len_t = len(t_toks)
+    len_min = min(len_a, len_t)
+    len_max = max(len_a, len_t)
+    len_ratio = (len_min / len_max) if len_max else 0.0
+
+    def q(x, step=0.1):
+        return int(np.clip(np.round(x / step), 0, int(1.0 / step)))
+
+    ca = len(str(anchor_s)) if anchor_s is not None else 0
+    ct = len(str(target_s)) if target_s is not None else 0
+    cmin = min(ca, ct)
+    cmax = max(ca, ct)
+    char_ratio = (cmin / cmax) if cmax else 0.0
+
+    feats = [
+        f"F_JACC_{q(jacc)}",
+        f"F_OVA_{q(overlap_a)}",
+        f"F_OVT_{q(overlap_t)}",
+        f"F_LR_{q(len_ratio)}",
+        f"F_CR_{q(char_ratio)}",
+    ]
+    return " ".join(feats)
+
+
+def _diff_features_as_text(anchor_s: str, target_s: str):
+    """
+    Keep existing diff features (already part of your core representation).
+    """
+    a_set = set(_simple_tokens(anchor_s))
+    t_set = set(_simple_tokens(target_s))
+    a_only = sorted(list(a_set - t_set))[:20]
+    t_only = sorted(list(t_set - a_set))[:20]
+    a_part = " ".join([f"AONLY_{w}" for w in a_only])
+    t_part = " ".join([f"TONLY_{w}" for w in t_only])
+    return (a_part + " " + t_part).strip()
+
+
+_TEXT_CACHE = {}
+
+
+def _ensure_precomputed_text_columns(df: pd.DataFrame) -> pd.DataFrame:
+    key = id(df)
+    if _TEXT_CACHE.get(("precomputed", key), False):
+        return df
+
+    anchor = df["anchor"].fillna("").astype(str)
+    target = df["target"].fillna("").astype(str)
+    context = (
+        df["context"]
+        .fillna("")
+        .astype(str)
+        .str.replace(r"\s+", " ", regex=True)
+        .str.strip()
+    )
+    ctx0 = context.str.slice(0, 1).fillna("")
+
+    shared_parts = []
+    pair_feat_parts = []
+    diff_feat_parts = []
+
+    for a, t in zip(anchor.values, target.values):
+        a_toks = set(_simple_tokens(a))
+        t_toks = set(_simple_tokens(t))
+        shared = sorted(a_toks.intersection(t_toks))
+        shared_parts.append(" ".join(shared[:20]))
+        pair_feat_parts.append(_pair_features_as_text(a, t))
+        diff_feat_parts.append(_diff_features_as_text(a, t))
+
+    df["_anchor_txt"] = anchor.values
+    df["_target_txt"] = target.values
+    df["_context_txt"] = context.values
+    df["_ctx0_txt"] = ctx0.values
+    df["_shared_txt"] = np.asarray(shared_parts, dtype=object)
+    df["_pair_txt"] = np.asarray(pair_feat_parts, dtype=object)
+    df["_diff_txt"] = np.asarray(diff_feat_parts, dtype=object)
+    df["_text_all"] = (
+        "anchor: "
+        + df["_anchor_txt"].astype(str)
+        + " [SEP] target: "
+        + df["_target_txt"].astype(str)
+        + " [CTX] "
+        + df["_context_txt"].astype(str)
+        + " [CTX0] "
+        + df["_ctx0_txt"].astype(str)
+        + " [PAIR] "
+        + df["_pair_txt"].astype(str)
+        + " [DIFF] "
+        + df["_diff_txt"].astype(str)
+        + " [SHARED] "
+        + df["_shared_txt"].astype(str)
+    ).values
+    df["_interact_all"] = (
+        "A "
+        + df["_anchor_txt"].astype(str)
+        + " T "
+        + df["_target_txt"].astype(str)
+        + " C "
+        + df["_context_txt"].astype(str)
+    ).values
+
+    _TEXT_CACHE[("precomputed", key)] = True
+    return df
+
+
+def _make_text_df(df: pd.DataFrame) -> pd.Series:
+    _ensure_precomputed_text_columns(df)
+    return pd.Series(df["_text_all"], index=df.index)
+
+
+def _make_anchor_text(df: pd.DataFrame) -> pd.Series:
+    _ensure_precomputed_text_columns(df)
+    return pd.Series(df["_anchor_txt"], index=df.index)
+
+
+def _make_target_text(df: pd.DataFrame) -> pd.Series:
+    _ensure_precomputed_text_columns(df)
+    return pd.Series(df["_target_txt"], index=df.index)
+
+
+def _make_interaction_text(df: pd.DataFrame) -> pd.Series:
+    _ensure_precomputed_text_columns(df)
+    return pd.Series(df["_interact_all"], index=df.index)
+
+
+y = train_data["score"].astype(np.float32).values
+
+
+def _pearsonr_np(a: np.ndarray, b: np.ndarray) -> float:
+    a = np.asarray(a, dtype=np.float64).reshape(-1)
+    b = np.asarray(b, dtype=np.float64).reshape(-1)
+    a = a - a.mean()
+    b = b - b.mean()
+    denom = np.sqrt((a * a).sum()) * np.sqrt((b * b).sum())
+    if denom == 0:
+        return 0.0
+    return float((a * b).sum() / denom)
+
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+RIDGE_SOLVER = "lsqr"
+
+
+def _make_vectorizer():
+    return FeatureUnion(
+        transformer_list=[
+            (
+                "word",
+                Pipeline(
+                    steps=[
+                        ("sel", FunctionTransformer(_make_text_df, validate=False)),
+                        (
+                            "tfidf",
+                            TfidfVectorizer(ngram_range=(1, 2), min_df=1, max_df=0.95),
+                        ),
+                    ]
+                ),
+            ),
+            (
+                "char",
+                Pipeline(
+                    steps=[
+                        ("sel", FunctionTransformer(_make_text_df, validate=False)),
+                        (
+                            "tfidf",
+                            TfidfVectorizer(
+                                analyzer="char_wb",
+                                ngram_range=(3, 7),
+                                min_df=1,
+                                max_df=0.95,
+                            ),
+                        ),
+                    ]
+                ),
+            ),
+            (
+                "anchor_word",
+                Pipeline(
+                    steps=[
+                        ("sel", FunctionTransformer(_make_anchor_text, validate=False)),
+                        (
+                            "tfidf",
+                            TfidfVectorizer(ngram_range=(1, 2), min_df=1, max_df=0.98),
+                        ),
+                    ]
+                ),
+            ),
+            (
+                "target_word",
+                Pipeline(
+                    steps=[
+                        ("sel", FunctionTransformer(_make_target_text, validate=False)),
+                        (
+                            "tfidf",
+                            TfidfVectorizer(ngram_range=(1, 2), min_df=1, max_df=0.98),
+                        ),
+                    ]
+                ),
+            ),
+            (
+                "interact_char",
+                Pipeline(
+                    steps=[
+                        (
+                            "sel",
+                            FunctionTransformer(_make_interaction_text, validate=False),
+                        ),
+                        (
+                            "tfidf",
+                            TfidfVectorizer(
+                                analyzer="char_wb",
+                                ngram_range=(4, 6),
+                                min_df=2,
+                                max_df=0.98,
+                            ),
+                        ),
+                    ]
+                ),
+            ),
+        ],
+        n_jobs=-1,
+    )
+
+
+alpha_grid = [0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.75, 1.0, 2.0, 5.0, 10.0]
+
+alpha_to_pearson = {alpha: [] for alpha in alpha_grid}
+for fold_i, (tr_idx, va_idx) in enumerate(kf.split(train_data), start=1):
+    vec = _make_vectorizer()
+    X_tr = vec.fit_transform(train_data.iloc[tr_idx])
+    X_va = vec.transform(train_data.iloc[va_idx])
+
+    y_tr = y[tr_idx]
+    y_va = y[va_idx]
+
+    for alpha in alpha_grid:
+        ridge = Ridge(alpha=alpha, solver=RIDGE_SOLVER, random_state=42)
+        ridge.fit(X_tr, y_tr)
+        va_pred = ridge.predict(X_va).astype(np.float32)
+        va_pred = np.clip(va_pred, 0.0, 1.0)
+        alpha_to_pearson[alpha].append(_pearsonr_np(y_va, va_pred))
+
+alpha_to_pearson = {a: float(np.mean(ps)) for a, ps in alpha_to_pearson.items()}
+best_alpha = max(alpha_to_pearson, key=alpha_to_pearson.get)
+print("Alpha grid mean CV Pearson:", alpha_to_pearson)
+print("Selected best_alpha (by Pearson):", best_alpha)
+
+model = Pipeline(
+    steps=[
+        ("tfidf", _make_vectorizer()),
+        ("ridge", Ridge(alpha=best_alpha, solver=RIDGE_SOLVER, random_state=42)),
+    ]
+)
+model.fit(train_data, y)
+
+
+
+
+## === cell 4
+def _find_savedmodel_dir(base_dir: str):
+    candidates = [
+        base_dir,
+        os.path.join(base_dir, "saved_model"),
+        os.path.join(base_dir, "SavedModel"),
+        os.path.join(base_dir, "model"),
+        os.path.join(base_dir, "export"),
+        os.path.join(base_dir, "tf_saved_model"),
+    ]
+    for c in candidates:
+        if (
+            os.path.isdir(c)
+            and os.path.isdir(os.path.join(c, "variables"))
+            and os.path.isfile(os.path.join(c, "saved_model.pb"))
+        ):
+            return c
+
+    if os.path.isdir(base_dir):
+        for name in os.listdir(base_dir):
+            c = os.path.join(base_dir, name)
+            if (
+                os.path.isdir(c)
+                and os.path.isdir(os.path.join(c, "variables"))
+                and os.path.isfile(os.path.join(c, "saved_model.pb"))
+            ):
+                return c
+
+    return None
+
+
+print("SavedModel search (expected None here):", _find_savedmodel_dir(DATA_DIR))
+
+
+
+## === cell 5
+pred = model.predict(test_data)
+pred = np.asarray(pred, dtype=np.float32).reshape(-1)
+pred = np.clip(pred, 0.0, 1.0)
+
+print("Pred shape:", pred.shape, "min/max:", float(pred.min()), float(pred.max()))
+
+
+
+## === cell 6
+submission = pd.read_csv(sample_sub_path)
+
+if len(submission) != len(test_data):
+    raise RuntimeError(
+        f"Row mismatch: submission has {len(submission)} rows but test has {len(test_data)} rows"
+    )
+
+submission["score"] = pred
+submission = submission[["id", "score"]]
+submission["id"] = submission["id"].astype(str)
+submission["score"] = submission["score"].astype(np.float32)
+
+submission.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", submission.shape)
+print(submission.head())

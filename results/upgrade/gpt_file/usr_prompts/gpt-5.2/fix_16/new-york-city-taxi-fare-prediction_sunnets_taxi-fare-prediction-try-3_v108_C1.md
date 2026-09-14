@@ -1,0 +1,845 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+4.031294871457426
+
+# 6. Current score
+
+14.63006
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 96.7295) has done: 'I fix the TensorFlow import crash by forcing the pure-Python protobuf implementation early, which avoids the `MessageFactory.GetPrototype` error in Kaggle environments with protobuf/TensorFlow mismatches. Then I fix the `Invalid dtype: object` training error by ensuring all model input columns are numeric, dropping the non-numeric `key` column from train/val/test features, and aligning feature columns across train/val/testKaggle. Finally, I fix the inference shape mismatch (15 vs 14) by using a single shared feature column list and reindexing all splits to that list before scaling and prediction, so the submission CSV is produced correctly with `key,fare_amount`.'
+- What this solution (achieved 14.55537) has done: 'I fix the TensorFlow/protobuf crash by switching to the supported workaround (forcing the pure-Python protobuf implementation *and* disabling the C++ implementation via `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION=2`) before importing TensorFlow, and I add a safe fallback to a non-TF baseline so the notebook always produces a valid submission CSV even if TF still fails in the environment. To move the RMSE score strongly toward the target (lower is better) without changing your model architecture/training semantics, I correct a major scaling logic bug: you currently re-fit the `MinMaxScaler` separately for each column, effectively only using the last column’s scaling for all features; I replace it with a single scaler fit on the full feature matrix and applied consistently to train/val/test/Kaggle. I also clamp extreme/invalid predictions to a reasonable range (non-negative and capped) to avoid RMSE blow-ups from outliers, which is a minimal, metric-aligned post-processing step. All paths, feature engineering, and the Keras model/loss/training loop remain the same otherwise, and the script always write `submissiontry_water.csv`.'
+- What this solution (achieved 36.43955) has done: 'I fix the TensorFlow/protobuf import crash by forcing the pure-Python protobuf implementation *and* pre-importing `google.protobuf.message_factory` before importing TensorFlow, which avoids the `MessageFactory.GetPrototype` AttributeError seen in this environment. To move RMSE substantially toward your target (lower is better) without changing your model/training loop, I remove the TF fallback path so the network actually trains instead of outputting near-constant predictions (which explains the very poor 14.55 score). I also ensure we load the checkpointed best model weights (`load_weights`) before predicting/evaluating, which is a minimal, metric-aligned fix that improves stability and score without altering architecture. All file paths, feature engineering, scaling approach, and the Keras model definition/training semantics remain the same, and the script always write a valid `submissiontry_water.csv`.'
+- What this solution (achieved 19.56485) has done: 'We fix the current hard crash (`MessageFactory.GetPrototype`) by removing the protobuf/TensorFlow import workaround that triggers the incompatible codepath, and instead rely on a safe TF import with a no-TF fallback that still produces a valid CSV. To move RMSE strongly toward your target (lower is better) while keeping the same feature engineering and data cleaning, we use a fast, deterministic scikit-learn regression fallback (trained on the same scaled features) only if TensorFlow fails to import; otherwise your original Keras model trains and predicts as before. We also correct the checkpoint loading to use `load_model` when saving a full `.keras` model (rather than `load_weights`), which is a score-positive correctness fix without changing the architecture/training loop. Finally, we ensure the submission file is always written with the required `key,fare_amount` columns and `.csv` suffix.'
+- What this solution (achieved 36.29647) has done: 'I fix the TensorFlow/protobuf crash (`MessageFactory.GetPrototype`) by forcing the pure-Python protobuf implementation *before* importing anything that may touch protobuf/TensorFlow, and by pre-importing `google.protobuf.message_factory` to avoid the incompatible C++ path. This should make TF reliably available again, which is necessary because your sklearn fallback currently yields a much worse RMSE than the target. I keep your model, feature engineering, scaling, and training loop the same, but also make the fallback model closer to the neural net’s performance (still only used if TF import fails) by switching to a fast linear regression baseline that is typically much better than RF on this problem. The script still always write a valid `submissiontry_water.csv` with `key,fare_amount`.'
+- What this solution (achieved 36.47572) has done: 'I fix the TensorFlow/protobuf import crash (`MessageFactory.GetPrototype`) by avoiding the incompatible protobuf codepath entirely: import TensorFlow normally, and if it still fails, fall back to a deterministic sklearn model so the notebook always completes and writes a valid CSV. Because your current score (36.30 RMSE) is far worse than the target (4.03), I also upgrade the fallback from linear Ridge to a stronger (but still lightweight) GradientBoostingRegressor using the exact same cleaned/scaled features and train/val split, which should move RMSE substantially toward the target without changing your core feature engineering or neural-net logic. I keep the Keras architecture/training loop unchanged when TF is available, and ensure the submission is always `key,fare_amount` with a `.csv` suffix. All paths and the overall pipeline remain the same.'
+- What this solution (achieved 36.5123) has done: 'I fix the TensorFlow/protobuf import crash so the Keras model actually trains (your current run always falls back to sklearn, which explains the very poor RMSE). This is done by forcing the pure-Python protobuf implementation (and version 2 API) and pre-importing protobuf’s message_factory before importing TensorFlow—this combination is the standard workaround for the `MessageFactory.GetPrototype` error in Kaggle. I keep your existing model, features, scaling, and training loop unchanged; the only behavioral change is enabling TF so you get the intended neural-net predictions (and keeping the sklearn fallback only if TF still fails). The script still write a valid `submissiontry_water.csv` with `key,fare_amount`.'
+- What this solution (achieved 18.58737) has done: 'I fix the TensorFlow/protobuf crash that currently happens before any training by removing the incompatible protobuf workaround and instead using a safe “try TF, else fallback” import path that won’t trigger `MessageFactory.GetPrototype`. Because your current RMSE (36.51, lower is better) is far from the target (~4.03), I also strengthen the fallback model (only used if TF is unavailable) with a minimal, metric-aligned upgrade that stays within scikit-learn and keeps the same features/cleaning/scaling. I keep your existing feature engineering, scaling, and Keras model/training loop unchanged when TensorFlow imports successfully. Finally, I ensure the pipeline always completes and writes a valid `submissiontry_water.csv` with the required `key,fare_amount` columns.'
+- What this solution (achieved 14.73537) has done: 'I fix the TensorFlow/protobuf crash (`MessageFactory.GetPrototype`) by applying the known Kaggle-safe workaround *before any protobuf/TensorFlow imports*, so the intended Keras model can train instead of always falling back to sklearn (your current RMSE is far from the target largely because TF never loads). I keep your exact feature engineering, scaler usage, model architecture, and training loop unchanged, only making the TF import robust and deterministic. I also keep the sklearn fallback as a safety net, but it should no longer be the default path. Finally, I ensure the submission CSV is always written with the required `key,fare_amount` columns and the same filename.'
+- What this solution (achieved 36.5073) has done: 'I fix the crash happening before training by removing the protobuf environment forcing that triggers the `MessageFactory.GetPrototype` incompatibility, and instead try a normal TensorFlow import first while keeping your existing sklearn fallback so the pipeline always completes. This change is directly tied to enabling your intended Keras model path (which should improve RMSE versus the current fallback-driven score), without changing your model architecture, features, scaling, or training loop. I also keep submission generation unchanged (`key,fare_amount` to `submissiontry_water.csv`) and preserve deterministic seeds. No other refactors are introduced.'
+- What this solution (achieved 14.58023) has done: 'I fix the TensorFlow/protobuf import crash (`MessageFactory.GetPrototype`) by forcing the pure-Python protobuf implementation *before* any protobuf/TensorFlow imports, which should let your intended Keras training run instead of always falling back. If TensorFlow still fails, the script keep the existing sklearn fallback so it always produces a valid submission CSV. To move RMSE strongly toward the target without changing your model/feature logic, I also make the fallback model (only used when TF is unavailable) closer to the Keras behavior by using a stronger and more standard baseline for this problem, while keeping the same cleaned/scaled features. Finally, I ensure the submission is always written as `submissiontry_water.csv` with the required `key,fare_amount` columns.'
+- What this solution (achieved 36.50789) has done: 'I fix the hard crash in the TensorFlow/protobuf import by avoiding the protobuf environment forcing that triggers the `MessageFactory.GetPrototype` incompatibility, while still keeping a safe try/except and the existing sklearn fallback so the script always completes. This should let TensorFlow load in more Kaggle environments and therefore move your RMSE substantially toward the target, since your current score indicates the TF path is not being used reliably. I also add a small guard so that if TF is available but training/model loading fails for any reason, we still fall back to the existing GradientBoostingRegressor rather than crashing before writing the submission. No changes are made to your feature engineering, scaling, model architecture, loss, or training loop.'
+- What this solution (achieved 36.3829) has done: 'I fix the TensorFlow/protobuf import crash (`MessageFactory.GetPrototype`) by applying the Kaggle-safe protobuf environment workaround before importing TensorFlow and pre-importing `google.protobuf.message_factory`, so the intended Keras path can run instead of always falling back to sklearn (which is driving the very poor RMSE). I also make the fallback more robust by ensuring it triggers not only on TF import failure but also when TF training/model-loading fails, so the notebook always produces a valid submission CSV. These changes keep your model architecture, feature engineering, scaling, and training loop intact; they only unblock TensorFlow and stabilize execution. The submission writing remains unchanged and always produce `submissiontry_water.csv` with `key,fare_amount`.'
+- What this solution (achieved 14.63006) has done: 'I fix the hard crash (`MessageFactory.GetPrototype`) by removing the protobuf environment forcing that triggers the incompatible protobuf/TensorFlow codepath, and instead do a safe TensorFlow import in a try/except so the pipeline always completes. Because your current score (36.38 RMSE) is far worse than the target (4.03) and TF is currently not usable, I upgrade only the fallback path (used when TF is unavailable) from GradientBoostingRegressor to HistGradientBoostingRegressor, which is a stronger, fast, deterministic sklearn baseline for this feature set and should move RMSE substantially toward the target without touching your NN architecture/training semantics. I also keep the existing scaler/feature alignment, ensure predictions are finite and clipped, and always write `submissiontry_water.csv` with the required `key,fare_amount` columns. All data paths, feature engineering, and the Keras model definition/training loop remain unchanged when TensorFlow is available.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", None)
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", None)
+
+import numpy as np
+import pandas as pd
+from datetime import datetime
+import matplotlib.pyplot as plt
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+
+SUBMISSION_NAME = "submissiontry_water.csv"
+
+TRAIN_PATH = "/kaggle/input/new-york-city-taxi-fare-prediction/train.csv"
+TEST_PATH = "/kaggle/input/new-york-city-taxi-fare-prediction/test.csv"
+
+BATCH_SIZE = 1000
+EPOCHS = 100
+LEARNING_RATE = 0.001
+DATASET_SIZE = 80000
+
+np.random.seed(1)
+
+TF_AVAILABLE = False
+TF_IMPORT_ERROR = None
+TF_RUNTIME_OK = (
+    False  # will be set True only after model is successfully trained/loaded
+)
+
+try:
+    import tensorflow as tf
+    from tensorflow.keras.models import Sequential
+    from tensorflow.keras.layers import Dense
+    from tensorflow.keras.callbacks import ModelCheckpoint
+    from tensorflow.keras import optimizers, regularizers
+    from tensorflow.keras import backend
+    from tensorflow.keras.models import load_model
+
+    tf.random.set_seed(1)
+    TF_AVAILABLE = True
+except Exception as e:
+    TF_IMPORT_ERROR = repr(e)
+    TF_AVAILABLE = False
+
+print("TF_AVAILABLE:", TF_AVAILABLE)
+if not TF_AVAILABLE:
+    print(
+        "TensorFlow import failed; will use sklearn fallback. Error:", TF_IMPORT_ERROR
+    )
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+def remove_datapoints_from_water(df):
+    return df
+
+
+def clean(df):
+    print(" Old size: %d" % len(df))
+    df = df.dropna(how="any", axis="rows")
+    print(" New size after dropna: %d" % len(df))
+
+    df = df[
+        (df["dropoff_longitude"] != df["pickup_longitude"])
+        & (df["dropoff_latitude"] != df["pickup_latitude"])
+    ]
+    print(" New size after removing same long lat: %d" % len(df))
+
+    df = df[
+        (df["dropoff_longitude"] != 0)
+        & (df["pickup_longitude"] != 0)
+        & (df["dropoff_latitude"] != 0)
+        & (df["pickup_latitude"] != 0)
+    ]
+    print(" New size after removing 0 long lat: %d" % len(df))
+
+    MinMax = (-74.5, -72.8, 40.5, 41.8)
+    df = df[
+        (MinMax[0] <= df["pickup_longitude"]) & (df["pickup_longitude"] <= MinMax[1])
+    ]
+    df = df[
+        (MinMax[0] <= df["dropoff_longitude"]) & (df["dropoff_longitude"] <= MinMax[1])
+    ]
+    df = df[(MinMax[2] <= df["pickup_latitude"]) & (df["pickup_latitude"] <= MinMax[3])]
+    df = df[
+        (MinMax[2] <= df["dropoff_latitude"]) & (df["dropoff_latitude"] <= MinMax[3])
+    ]
+    print(" New size after NYC lang lot: %d" % len(df))
+
+    df = df[(df["pickup_latitude"] != 0)]
+    df = df[(df["pickup_latitude"] != 0)]
+    df = df[(df["dropoff_longitude"] != 0)]
+    df = df[(df["dropoff_latitude"] != 0)]
+    print(" New size after lang lot > 0: %d" % len(df))
+
+    df = df[((df["pickup_latitude"] - df["dropoff_latitude"]).abs() > 0.001)]
+    df = df[((df["pickup_longitude"] - df["dropoff_longitude"]).abs() > 0.001)]
+    print(" New size after lang - lot > 0.001: %d" % len(df))
+
+    print(" New size after only NYC: %d" % len(df))
+
+    if "fare_amount" in df.columns:
+        df = df[(0 < df["fare_amount"]) & (df["fare_amount"] <= 50)]
+        print(" New size after removing outliers: %d" % len(df))
+
+    if "passenger_count" in df.columns:
+        df = df[(df["passenger_count"] > 0)]
+        print(" New size after removing 6=>passenger_count > 0 : %d" % len(df))
+
+    nyc_coord = (40.7141667, -74.0063889)
+    fk_coord = (40.639722, -73.778889)
+    ewr_coord = (40.6925, -74.168611)
+    lga_coord = (40.77725, -73.872611)
+    sol_coord = (40.6892, -74.0445)  # Statue of Liberty
+
+    df = df[
+        (nyc_coord[1] != df["pickup_longitude"])
+        & (df["pickup_latitude"] != nyc_coord[0])
+    ]
+    df = df[
+        (nyc_coord[1] != df["dropoff_longitude"])
+        & (df["dropoff_latitude"] != nyc_coord[0])
+    ]
+    print(" New size after NY airport: %d" % len(df))
+
+    df = df[
+        (fk_coord[1] != df["pickup_longitude"]) & (df["pickup_latitude"] != fk_coord[0])
+    ]
+    df = df[
+        (fk_coord[1] != df["dropoff_longitude"])
+        & (df["dropoff_latitude"] != fk_coord[0])
+    ]
+    print(" New size after jfk airport: %d" % len(df))
+
+    df = df[
+        (ewr_coord[1] != df["pickup_longitude"])
+        & (df["pickup_latitude"] != ewr_coord[0])
+    ]
+    df = df[
+        (ewr_coord[1] != df["dropoff_longitude"])
+        & (df["dropoff_latitude"] != ewr_coord[0])
+    ]
+    print(" New size after ewr airport: %d" % len(df))
+
+    df = df[
+        (lga_coord[1] != df["pickup_longitude"])
+        & (df["pickup_latitude"] != lga_coord[0])
+    ]
+    df = df[
+        (lga_coord[1] != df["dropoff_longitude"])
+        & (df["dropoff_latitude"] != lga_coord[0])
+    ]
+    print(" New size after lgr airport: %d" % len(df))
+
+    df = df[
+        (sol_coord[1] != df["pickup_longitude"])
+        & (df["pickup_latitude"] != sol_coord[0])
+    ]
+    df = df[
+        (sol_coord[1] != df["dropoff_longitude"])
+        & (df["dropoff_latitude"] != sol_coord[0])
+    ]
+    print(" New size after sol removed: %d" % len(df))
+
+    print("Old size: %d" % len(df))
+    df = remove_datapoints_from_water(df)
+    print("New size: %d" % len(df))
+
+    print(" New size: %d" % len(df))
+    return df
+
+
+def manhattan(pickup_lat, pickup_long, dropoff_lat, dropoff_long):
+    return np.abs(dropoff_lat - pickup_lat) + np.abs(dropoff_long - pickup_long)
+
+
+def add_time_features(df):
+    df["pickup_datetime"] = pd.to_datetime(
+        df["pickup_datetime"], utc=True, errors="coerce"
+    )
+    df["year"] = df["pickup_datetime"].dt.year
+    df["month"] = df["pickup_datetime"].dt.month
+    df["day"] = df["pickup_datetime"].dt.day
+    df["hour"] = df["pickup_datetime"].dt.hour
+    df["minute"] = df["pickup_datetime"].dt.minute
+    df["second"] = df["pickup_datetime"].dt.second
+    return df
+
+
+def add_coordinate_features(df):
+    lat1 = df["pickup_latitude"]
+    lat2 = df["dropoff_latitude"]
+    lon1 = df["pickup_longitude"]
+    lon2 = df["dropoff_longitude"]
+    df["latdiff"] = lat1 - lat2
+    df["londiff"] = lon1 - lon2
+    return df
+
+
+def add_distances_features(df):
+    lat1 = df["pickup_latitude"]
+    lat2 = df["dropoff_latitude"]
+    lon1 = df["pickup_longitude"]
+    lon2 = df["dropoff_longitude"]
+    df["manhattan"] = manhattan(lat1, lon1, lat2, lon2)
+    return df
+
+
+def output_submission(raw_test, prediction, id_column, prediction_column, file_name):
+    df = pd.DataFrame(prediction, columns=[prediction_column])
+    df[id_column] = raw_test[id_column].values
+    df[[id_column, prediction_column]].to_csv((file_name), index=False)
+    print("Output complete ->", file_name, "rows:", len(df))
+
+
+def plot_loss_accuracy_rmse(history):
+    plt.figure(figsize=(20, 10))
+    plt.plot(history.history["loss"])
+    plt.plot(history.history["val_loss"])
+    plt.title("model loss")
+    plt.ylabel("loss")
+    plt.xlabel("epoch")
+    plt.legend(["train", "test"], loc="upper right")
+    plt.show()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(history.history.get("rmse", []))
+    plt.plot(history.history.get("val_rmse", []))
+    plt.title("Model rmse")
+    plt.ylabel("rmse")
+    plt.xlabel("epoch")
+    plt.legend(["train", "test"], loc="upper right")
+    plt.show()
+
+
+
+
+## === cell 2
+datatypes_train = {
+    "key": "str",
+    "fare_amount": "float32",
+    "pickup_datetime": "str",
+    "pickup_longitude": "float32",
+    "pickup_latitude": "float32",
+    "dropoff_longitude": "float32",
+    "dropoff_latitude": "float32",
+    "passenger_count": "uint8",
+}
+datatypes_test = {
+    "key": "str",
+    "pickup_datetime": "str",
+    "pickup_longitude": "float32",
+    "pickup_latitude": "float32",
+    "dropoff_longitude": "float32",
+    "dropoff_latitude": "float32",
+    "passenger_count": "uint8",
+}
+
+train_df_full = pd.read_csv(TRAIN_PATH, nrows=DATASET_SIZE, dtype=datatypes_train)
+testKaggle = pd.read_csv(TEST_PATH, dtype=datatypes_test)
+
+train_df, test_df = train_test_split(train_df_full, test_size=0.10, random_state=1)
+
+
+
+## === cell 3
+print("testKaggle Size %d" % len(testKaggle))
+print("train_df Size %d" % len(train_df))
+print("test_df Size %d" % len(test_df))
+
+
+
+## === cell 4
+print("train_df clean")
+train_df = clean(train_df)
+print("test_df clean")
+test_df = clean(test_df)
+
+
+
+## === cell 5
+print("train_df add_time_features")
+train_df = add_time_features(train_df)
+print("test_df add_time_features")
+test_df = add_time_features(test_df)
+print("testKaggle add_time_features")
+testKaggle = add_time_features(testKaggle)
+
+train_df = train_df.dropna(subset=["pickup_datetime"])
+test_df = test_df.dropna(subset=["pickup_datetime"])
+testKaggle = testKaggle.dropna(subset=["pickup_datetime"])
+
+
+
+## === cell 6
+print("train_df add_coordinate_features")
+train_df = add_coordinate_features(train_df)
+print("test_df add_coordinate_features")
+test_df = add_coordinate_features(test_df)
+print("testKaggle add_coordinate_features")
+testKaggle = add_coordinate_features(testKaggle)
+
+
+
+## === cell 7
+print("train_df add_distances_features")
+train_df = add_distances_features(train_df)
+print("test_df add_distances_features")
+test_df = add_distances_features(test_df)
+print("testKaggle add_distances_features")
+testKaggle = add_distances_features(testKaggle)
+
+print("Done with Adding features")
+
+
+
+## === cell 8
+_ = train_df.iloc[:2000].plot.scatter("fare_amount", "passenger_count")
+_ = train_df.iloc[:2000].plot.scatter("fare_amount", "year")
+_ = train_df.iloc[:2000].plot.scatter("fare_amount", "month")
+_ = train_df.iloc[:2000].plot.scatter("fare_amount", "day")
+_ = train_df.iloc[:2000].plot.scatter("fare_amount", "hour")
+
+
+
+## === cell 9
+dropped_columns = ["pickup_datetime"]
+
+train_df = train_df.drop(dropped_columns + ["key"], axis=1)
+test_df = test_df.drop(dropped_columns + ["key"], axis=1)
+testKaggle_clean = testKaggle.drop(dropped_columns + ["key"], axis=1)
+
+print("Done with dropped_columns")
+
+
+
+## === cell 10
+feature_cols = [c for c in train_df.columns if c != "fare_amount"]
+
+train_df = train_df[["fare_amount"] + feature_cols].copy()
+test_df = test_df[["fare_amount"] + feature_cols].copy()
+testKaggle_clean = testKaggle_clean.reindex(columns=feature_cols).copy()
+
+for c in feature_cols:
+    train_df[c] = pd.to_numeric(train_df[c], errors="coerce")
+    test_df[c] = pd.to_numeric(test_df[c], errors="coerce")
+    testKaggle_clean[c] = pd.to_numeric(testKaggle_clean[c], errors="coerce")
+
+train_df = train_df.dropna(subset=feature_cols + ["fare_amount"])
+test_df = test_df.dropna(subset=feature_cols + ["fare_amount"])
+testKaggle_clean = testKaggle_clean.fillna(0.0)
+
+scaler = preprocessing.MinMaxScaler()
+train_scaled_values = scaler.fit_transform(train_df[feature_cols].values)
+test_scaled_values = scaler.transform(test_df[feature_cols].values)
+kaggle_scaled_values = scaler.transform(testKaggle_clean[feature_cols].values)
+
+train_df_scaled = pd.DataFrame(
+    train_scaled_values, columns=feature_cols, index=train_df.index
+)
+test_df_scaled = pd.DataFrame(
+    test_scaled_values, columns=feature_cols, index=test_df.index
+)
+testKaggle_scaled = pd.DataFrame(
+    kaggle_scaled_values, columns=feature_cols, index=testKaggle_clean.index
+)
+
+train_df_scaled.insert(
+    0, "fare_amount", train_df["fare_amount"].astype("float32").values
+)
+test_df_scaled.insert(0, "fare_amount", test_df["fare_amount"].astype("float32").values)
+
+
+
+## === cell 11
+train_df_scaled, validation_df_scaled = train_test_split(
+    train_df_scaled, test_size=0.10, random_state=1
+)
+
+train_df_main = train_df_scaled
+validation_df_main = validation_df_scaled
+
+print(train_df_scaled.shape)
+print(validation_df_scaled.shape)
+print(test_df_scaled.shape)
+print("Num features:", len(feature_cols))
+
+
+
+## === cell 12
+train_labels = train_df_scaled["fare_amount"].values.astype("float32")
+validation_labels = validation_df_scaled["fare_amount"].values.astype("float32")
+test_labels = test_df_scaled["fare_amount"].values.astype("float32")
+
+train_df_scaled = train_df_scaled.drop(["fare_amount"], axis=1)
+validation_df_scaled = validation_df_scaled.drop(["fare_amount"], axis=1)
+test_df_scaled = test_df_scaled.drop(["fare_amount"], axis=1)
+
+train_df_scaled = train_df_scaled.astype("float32")
+validation_df_scaled = validation_df_scaled.astype("float32")
+test_df_scaled = test_df_scaled.astype("float32")
+testKaggle_scaled = testKaggle_scaled.astype("float32")
+
+print("Done with Labels")
+print(train_labels.shape)
+print(validation_labels.shape)
+print(test_labels.shape)
+
+
+
+## === cell 13
+if TF_AVAILABLE:
+
+    def rmse(y_true, y_pred):
+        return backend.sqrt(backend.mean(backend.square(y_pred - y_true), axis=-1))
+
+
+
+
+## === cell 14
+if TF_AVAILABLE:
+    try:
+        checkpoint = ModelCheckpoint(
+            filepath="my_model.keras",
+            verbose=1,
+            save_best_only=True,
+            monitor="val_loss",
+            mode="min",
+        )
+
+        model = Sequential()
+        model.add(
+            Dense(
+                256,
+                activation="linear",
+                input_dim=train_df_scaled.shape[1],
+                activity_regularizer=regularizers.l1(0.01),
+            )
+        )
+        model.add(Dense(128, activation="relu"))
+        model.add(Dense(64, activation="relu"))
+        model.add(Dense(32, activation="relu"))
+        model.add(Dense(8, activation="relu"))
+        model.add(Dense(1, activation="linear"))
+
+        adam = optimizers.Adam(learning_rate=LEARNING_RATE)
+        model.compile(
+            loss="mean_squared_error",
+            optimizer=adam,
+            metrics=["mae", "accuracy", rmse, "mse"],
+        )
+
+        print("Dataset size: %s" % DATASET_SIZE)
+        print("Epochs: %s" % EPOCHS)
+        print("Learning rate: %s" % LEARNING_RATE)
+        print("Batch size: %s" % BATCH_SIZE)
+        print("Input dimension: %s" % train_df_scaled.shape[1])
+        print("Features used: %s" % feature_cols)
+        model.summary()
+
+        history = model.fit(
+            x=train_df_scaled,
+            y=train_labels,
+            batch_size=BATCH_SIZE,
+            epochs=EPOCHS,
+            verbose=1,
+            callbacks=[checkpoint],
+            validation_data=(validation_df_scaled, validation_labels),
+            shuffle=True,
+        )
+
+        TF_RUNTIME_OK = True
+    except Exception as e:
+        print(
+            "WARNING: TensorFlow training failed; will use sklearn fallback. Error:",
+            repr(e),
+        )
+        history = None
+        model = None
+        TF_RUNTIME_OK = False
+else:
+    history = None
+    model = None
+    TF_RUNTIME_OK = False
+
+
+
+## === cell 15
+if TF_AVAILABLE and TF_RUNTIME_OK and history is not None:
+    plot_loss_accuracy_rmse(history)
+
+
+
+## === cell 16
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    if os.path.exists("my_model.keras"):
+        try:
+            model = load_model("my_model.keras", custom_objects={"rmse": rmse})
+            print("Loaded best model from my_model.keras")
+        except Exception as e:
+            print("WARNING: Could not load model from my_model.keras:", repr(e))
+
+    score = model.evaluate(train_df_scaled, train_labels, verbose=1)
+    print(score)
+    print("train mean_squared_error:", score[0])
+    print("train mae:", score[1])
+    print("train accuracy:", score[2])
+    print("train rmse:", score[3])
+    print("train mse:", score[4])
+
+
+
+## === cell 17
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    score = model.evaluate(validation_df_scaled, validation_labels, verbose=1)
+    print(score)
+    print("Validation mean_squared_error:", score[0])
+    print("Validation mae:", score[1])
+    print("Validation accuracy:", score[2])
+    print("Validation rmse:", score[3])
+    print("Validation mse:", score[4])
+
+
+
+## === cell 18
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    score = model.evaluate(test_df_scaled, test_labels, verbose=1)
+    print(score)
+    print("Test mean_squared_error:", score[0])
+    print("Test mae:", score[1])
+    print("Test accuracy:", score[2])
+    print("Test rmse:", score[3])
+    print("Test mse:", score[4])
+
+
+
+## === cell 19
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    validation_predictions = model.predict(validation_df_scaled, verbose=0).flatten()
+
+    plt.scatter(validation_labels, validation_predictions)
+    plt.xlabel("True Values")
+    plt.ylabel("Predictions")
+    plt.axis("equal")
+    plt.xlim(plt.xlim())
+    plt.ylim(plt.ylim())
+    _ = plt.plot(
+        [validation_predictions.min(), validation_predictions.max()],
+        [validation_predictions.min(), validation_predictions.max()],
+        "k--",
+        lw=4,
+    )
+
+
+
+## === cell 20
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    test_predictions = model.predict(test_df_scaled, verbose=0).flatten()
+
+    plt.scatter(test_labels, test_predictions)
+    plt.xlabel("True Values")
+    plt.ylabel("Predictions")
+    plt.axis("equal")
+    plt.xlim(plt.xlim())
+    plt.ylim(plt.ylim())
+    _ = plt.plot(
+        [test_predictions.min(), test_predictions.max()],
+        [test_predictions.min(), test_predictions.max()],
+        "k--",
+        lw=4,
+    )
+
+
+
+## === cell 21
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    fig, ax = plt.subplots()
+    ax.scatter(test_labels, test_predictions)
+    ax.plot(
+        [test_labels.min(), test_labels.max()],
+        [test_labels.min(), test_labels.max()],
+        "k--",
+        lw=4,
+    )
+    ax.set_xlabel("Measured")
+    ax.set_ylabel("Predicted")
+    plt.show()
+
+
+
+## === cell 22
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    plt.figure(figsize=(20, 10))
+    plt.plot(validation_labels[:100])
+    plt.plot(validation_predictions[:100])
+    plt.title("Prediction vs Actual")
+    plt.ylabel("Fare Amount")
+    plt.xlabel("Transaction")
+    plt.legend(["Actual", "prediction"], loc="upper right")
+    plt.show()
+
+
+
+## === cell 23
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    plt.figure(figsize=(20, 10))
+    plt.plot(test_labels[:100])
+    plt.plot(test_predictions[:100])
+    plt.title("Prediction vs Actual")
+    plt.ylabel("Fare Amount")
+    plt.xlabel("Transaction")
+    plt.legend(["Actual", "prediction"], loc="upper right")
+    plt.show()
+
+
+
+## === cell 24
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    error = validation_predictions - validation_labels
+    plt.hist(error, bins=100)
+    plt.xlabel("Prediction Error")
+    _ = plt.ylabel("Count")
+
+
+
+## === cell 25
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    error = test_predictions - test_labels
+    plt.hist(error, bins=50)
+    plt.xlabel("Prediction Error")
+    _ = plt.ylabel("Count")
+
+
+
+## === cell 26
+if TF_AVAILABLE and TF_RUNTIME_OK:
+    print(len(error))
+    errorGreaterZero = error[(np.logical_or(error <= -1, error >= 1))]
+    print(len(errorGreaterZero))
+    plt.hist(errorGreaterZero, bins=100)
+    plt.xlabel("Prediction Error")
+    _ = plt.ylabel("Count")
+
+
+
+## === cell 27
+if TF_AVAILABLE and TF_RUNTIME_OK and model is not None:
+    predictionKaggle = model.predict(
+        testKaggle_scaled, batch_size=128, verbose=1
+    ).reshape(-1)
+else:
+    from sklearn.ensemble import HistGradientBoostingRegressor
+
+    hgb = HistGradientBoostingRegressor(
+        loss="squared_error",
+        learning_rate=0.06,
+        max_depth=8,
+        max_iter=600,
+        l2_regularization=0.0,
+        random_state=1,
+    )
+    hgb.fit(train_df_scaled.values, train_labels)
+    predictionKaggle = hgb.predict(testKaggle_scaled.values)
+
+predictionKaggle = np.asarray(predictionKaggle, dtype="float32")
+predictionKaggle[~np.isfinite(predictionKaggle)] = 0.0
+predictionKaggle = np.clip(predictionKaggle, 0.0, 250.0)
+
+output_submission(testKaggle, predictionKaggle, "key", "fare_amount", SUBMISSION_NAME)
+print("Wrote:", SUBMISSION_NAME)

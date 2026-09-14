@@ -1,0 +1,1196 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import glob
+import random
+import numpy as np
+import pandas as pd
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+
+from torchvision import models
+from torchvision.models import EfficientNet_V2_S_Weights, MobileNet_V3_Large_Weights
+
+import cv2
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+from tqdm import tqdm
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed_all(SEED)
+
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+torch.backends.cuda.matmul.allow_tf32 = False
+torch.backends.cudnn.allow_tf32 = False
+
+try:
+    cv2.setNumThreads(0)  # avoid OpenCV oversubscription inside multi-worker DataLoader
+except Exception:
+    pass
+
+
+def seed_worker(worker_id: int):
+    worker_seed = (SEED + worker_id) % (2**32)
+    random.seed(worker_seed)
+    np.random.seed(worker_seed)
+    torch.manual_seed(worker_seed)
+
+
+_dl_generator = torch.Generator()
+_dl_generator.manual_seed(SEED)
+
+
+
+## === cell 1
+num_tta = 5
+
+
+
+## === cell 2
+test_image_dir = "/kaggle/input/cassava-leaf-disease-classification/test_images"
+train_image_dir = "/kaggle/input/cassava-leaf-disease-classification/train_images"
+
+
+
+## === cell 3
+test_df = pd.read_csv(
+    "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+)
+train_df = pd.read_csv("/kaggle/input/cassava-leaf-disease-classification/train.csv")
+test_df.head()
+
+
+
+## === cell 4
+EFF_SIZE = 384
+
+eff_normalize = A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+eff_to_tensor = ToTensorV2()
+
+_eff_post_compose = A.Compose([eff_normalize, eff_to_tensor])
+
+
+def preprocess_efficientnet_np_rgb_from_albu(augmented_np_rgb):
+    """augmented_np_rgb: HWC uint8/float RGB -> CHW float tensor normalized as EfficientNet expects."""
+    out = _eff_post_compose(image=augmented_np_rgb)["image"]
+    return out
+
+
+mobilenet_base_transform = A.Compose(
+    [
+        A.Resize(224, 224),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+
+
+
+## === cell 5
+class CassavaTestDataset(Dataset):
+    def __init__(self, dataframe, image_dir):
+        self.dataframe = dataframe.reset_index(drop=True)
+        self.image_dir = image_dir
+
+    def __len__(self):
+        return len(self.dataframe)
+
+    def __getitem__(self, idx):
+        img_name = str(self.dataframe.iloc[idx, 0])  # image_id
+        img_path = os.path.join(self.image_dir, img_name)
+
+        image = cv2.imread(img_path)
+        if image is None:
+            raise FileNotFoundError(f"Could not read image: {img_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        return image, img_name
+
+
+
+
+## === cell 6
+class CassavaTrainDataset(Dataset):
+    def __init__(self, dataframe, image_dir, transform):
+        self.df = dataframe.reset_index(drop=True)
+        self.image_dir = image_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        img_name = str(self.df.iloc[idx]["image_id"])
+        y = int(self.df.iloc[idx]["label"])
+        img_path = os.path.join(self.image_dir, img_name)
+
+        image = cv2.imread(img_path)
+        if image is None:
+            raise FileNotFoundError(f"Could not read image: {img_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        x = self.transform(image=image)["image"]
+        return x, y
+
+
+
+
+## === cell 7
+common_transforms_rgb_only = [
+    A.ShiftScaleRotate(shift_limit=0.1, scale_limit=0.1, rotate_limit=20, p=0.7),
+    A.HueSaturationValue(
+        hue_shift_limit=10, sat_shift_limit=15, val_shift_limit=10, p=0.5
+    ),
+    A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
+    A.HorizontalFlip(p=0.5),
+    A.GaussNoise(var_limit=(10.0, 50.0), p=0.4),
+]
+
+tta_transform_rgb_eff = A.Compose(
+    common_transforms_rgb_only
+    + [
+        A.RandomResizedCrop(size=(EFF_SIZE, EFF_SIZE), scale=(0.8, 1.0), p=1.0),
+    ]
+)
+
+tta_transform_mobilenet = A.Compose(
+    common_transforms_rgb_only
+    + [
+        A.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.0), p=1.0),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+
+
+
+## === cell 8
+def identity_collate(batch):
+    return batch
+
+
+class CassavaTestDatasetCached(Dataset):
+    def __init__(self, dataframe, image_dir):
+        self.dataframe = dataframe.reset_index(drop=True)
+        self.image_dir = image_dir
+        self.image_names = self.dataframe.iloc[:, 0].astype(str).tolist()
+        self._cache = [None] * len(self.image_names)
+
+    def __len__(self):
+        return len(self.image_names)
+
+    def _load_rgb(self, idx: int):
+        img_name = self.image_names[idx]
+        img_path = os.path.join(self.image_dir, img_name)
+        image = cv2.imread(img_path)
+        if image is None:
+            raise FileNotFoundError(f"Could not read image: {img_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        return image
+
+    def __getitem__(self, idx):
+        im = self._cache[idx]
+        if im is None:
+            im = self._load_rgb(idx)
+            self._cache[idx] = im
+        return im, self.image_names[idx]
+
+
+test_dataset = CassavaTestDatasetCached(test_df, test_image_dir)
+
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=48,  # fewer iterations; identical semantics (order preserved)
+    shuffle=False,
+    num_workers=0,
+    pin_memory=torch.cuda.is_available(),
+    collate_fn=identity_collate,
+)
+
+
+
+## === cell 9
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device
+
+
+
+
+## === cell 10
+def _try_load_state_dict(model: torch.nn.Module, ckpt_path: str) -> bool:
+    try:
+        sd = torch.load(ckpt_path, map_location="cpu")
+        if isinstance(sd, dict) and "state_dict" in sd:
+            sd = sd["state_dict"]
+        if isinstance(sd, dict):
+            new_sd = {}
+            for k, v in sd.items():
+                nk = k
+                if nk.startswith("module."):
+                    nk = nk[len("module.") :]
+                if nk.startswith("model."):
+                    nk = nk[len("model.") :]
+                new_sd[nk] = v
+            sd = new_sd
+        missing, unexpected = model.load_state_dict(sd, strict=False)
+        loaded_any = (len(missing) < len(model.state_dict())) and (
+            len(unexpected) <= len(sd)
+        )
+        return bool(loaded_any)
+    except Exception:
+        return False
+
+
+def find_candidate_checkpoints(patterns):
+    roots = ["/kaggle/working"]
+    found = []
+    for r in roots:
+        for pat in patterns:
+            found.extend(glob.glob(os.path.join(r, pat), recursive=False))
+    return sorted(set(found), key=lambda x: (len(x), x))
+
+
+ALL_CKPTS = find_candidate_checkpoints(["*.pth", "*.pt", "*.ckpt"])
+
+
+
+## === cell 11
+resnet_model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+num_ftrs = resnet_model.fc.in_features
+resnet_model.fc = nn.Linear(num_ftrs, 5)
+resnet_model = resnet_model.to(device)
+
+
+
+## === cell 12
+from sklearn.model_selection import train_test_split
+
+resnet_ckpt_path = "/kaggle/working/resnet50_cassava_fc.pth"
+
+resnet_train_tf = A.Compose(
+    [
+        A.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.0), p=1.0),
+        A.HorizontalFlip(p=0.5),
+        A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+resnet_val_tf = A.Compose(
+    [
+        A.Resize(224, 224),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+train_idx, val_idx = train_test_split(
+    np.arange(len(train_df)),
+    test_size=0.08,
+    random_state=SEED,
+    stratify=train_df["label"].values,
+)
+tr_df = train_df.iloc[train_idx].reset_index(drop=True)
+va_df = train_df.iloc[val_idx].reset_index(drop=True)
+
+tr_ds = CassavaTrainDataset(tr_df, train_image_dir, resnet_train_tf)
+va_ds = CassavaTrainDataset(va_df, train_image_dir, resnet_val_tf)
+
+_cpu = os.cpu_count() or 1
+_tr_workers = min(4, _cpu)
+train_loader = DataLoader(
+    tr_ds,
+    batch_size=64,
+    shuffle=True,
+    num_workers=_tr_workers,
+    pin_memory=torch.cuda.is_available(),
+    persistent_workers=True if _tr_workers > 0 else False,
+    prefetch_factor=2 if _tr_workers > 0 else None,
+    worker_init_fn=seed_worker,
+    generator=_dl_generator,
+)
+val_loader = DataLoader(
+    va_ds,
+    batch_size=128,
+    shuffle=False,
+    num_workers=_tr_workers,
+    pin_memory=torch.cuda.is_available(),
+    persistent_workers=True if _tr_workers > 0 else False,
+    prefetch_factor=2 if _tr_workers > 0 else None,
+    worker_init_fn=seed_worker,
+    generator=_dl_generator,
+)
+
+for p in resnet_model.parameters():
+    p.requires_grad = False
+for p in resnet_model.fc.parameters():
+    p.requires_grad = True
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.AdamW(resnet_model.fc.parameters(), lr=2e-3, weight_decay=1e-4)
+
+
+def _evaluate_resnet(model, loader):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.inference_mode():
+        for xb, yb in loader:
+            xb = xb.to(device, non_blocking=True)
+            yb = yb.to(device, non_blocking=True)
+            logits = model(xb)
+            pred = logits.argmax(dim=1)
+            correct += (pred == yb).sum().item()
+            total += yb.numel()
+    return correct / max(1, total)
+
+
+_loaded_resnet = False
+if os.path.exists(resnet_ckpt_path):
+    sd = torch.load(resnet_ckpt_path, map_location="cpu")
+    resnet_model.load_state_dict(sd, strict=True)
+    _loaded_resnet = True
+else:
+    for p in ALL_CKPTS:
+        lp = p.lower()
+        if "resnet" in lp and _try_load_state_dict(resnet_model, p):
+            resnet_ckpt_path = p
+            _loaded_resnet = True
+            break
+
+if not _loaded_resnet:
+    resnet_model.train()
+    epochs = 3  # unchanged
+    for ep in range(epochs):
+        resnet_model.train()
+        running = 0.0
+        n = 0
+        for xb, yb in tqdm(
+            train_loader, desc=f"Train ResNet fc ep{ep+1}/{epochs}", leave=False
+        ):
+            xb = xb.to(device, non_blocking=True)
+            yb = yb.to(device, non_blocking=True)
+
+            optimizer.zero_grad(set_to_none=True)
+            logits = resnet_model(xb)
+            loss = criterion(logits, yb)
+            loss.backward()
+            optimizer.step()
+
+            running += float(loss.item()) * yb.size(0)
+            n += yb.size(0)
+
+        val_acc = _evaluate_resnet(resnet_model, val_loader)
+        print(
+            f"[ResNet fc] ep {ep+1}/{epochs} train_loss={running/max(1,n):.4f} val_acc={val_acc:.4f}"
+        )
+
+    torch.save(resnet_model.state_dict(), resnet_ckpt_path)
+
+resnet_model.eval()
+print("ResNet checkpoint:", resnet_ckpt_path, "loaded/trained:", True)
+
+
+
+
+## === cell 13
+def _evaluate_top1(model, loader):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.inference_mode():
+        for xb, yb in loader:
+            xb = xb.to(device, non_blocking=True)
+            yb = yb.to(device, non_blocking=True)
+            logits = model(xb)
+            pred = logits.argmax(dim=1)
+            correct += (pred == yb).sum().item()
+            total += yb.numel()
+    return correct / max(1, total)
+
+
+def _train_classifier_head_only(
+    model: nn.Module,
+    head_parameters,
+    train_loader: DataLoader,
+    val_loader: DataLoader,
+    ckpt_path: str,
+    tag: str,
+    lr: float = 2e-3,
+    weight_decay: float = 1e-4,
+    epochs: int = 3,
+):
+    for p in model.parameters():
+        p.requires_grad = False
+    for p in head_parameters:
+        p.requires_grad = True
+
+    opt = torch.optim.AdamW(head_parameters, lr=lr, weight_decay=weight_decay)
+    crit = nn.CrossEntropyLoss()
+
+    for ep in range(epochs):
+        model.train()
+        running = 0.0
+        n = 0
+        for xb, yb in tqdm(
+            train_loader, desc=f"Train {tag} head ep{ep+1}/{epochs}", leave=False
+        ):
+            xb = xb.to(device, non_blocking=True)
+            yb = yb.to(device, non_blocking=True)
+
+            opt.zero_grad(set_to_none=True)
+            logits = model(xb)
+            loss = crit(logits, yb)
+            loss.backward()
+            opt.step()
+
+            running += float(loss.item()) * yb.size(0)
+            n += yb.size(0)
+
+        val_acc = _evaluate_top1(model, val_loader)
+        print(
+            f"[{tag} head] ep {ep+1}/{epochs} train_loss={running/max(1,n):.4f} val_acc={val_acc:.4f}"
+        )
+
+    torch.save(model.state_dict(), ckpt_path)
+    model.eval()
+    return model
+
+
+def build_efficientnet_cassava_or_fallback(dropout_p: float, tag: str, ckpts):
+    m = models.efficientnet_v2_s(weights=EfficientNet_V2_S_Weights.DEFAULT)
+    in_features = m.classifier[1].in_features
+    m.classifier = nn.Sequential(nn.Dropout(p=dropout_p), nn.Linear(in_features, 5))
+
+    preferred = []
+    for p in ckpts:
+        lp = p.lower()
+        if any(
+            s in lp
+            for s in ["cassava", "efficientnet", "effnet", "eff", "v2", "ev2", "fold"]
+        ):
+            preferred.append(p)
+    preferred = preferred if preferred else ckpts
+
+    loaded_path = None
+    for p in preferred:
+        if _try_load_state_dict(m, p):
+            loaded_path = p
+            break
+
+    m = m.to(device)
+
+    if loaded_path is not None:
+        m.eval()
+        return m, True, loaded_path
+
+    eff_ckpt_path = f"/kaggle/working/{tag}_efficientnetv2s_cassava_head.pth"
+    if os.path.exists(eff_ckpt_path):
+        sd = torch.load(eff_ckpt_path, map_location="cpu")
+        m.load_state_dict(sd, strict=True)
+        m.eval()
+        return m, True, eff_ckpt_path
+
+    eff_train_tf = A.Compose(
+        [
+            A.RandomResizedCrop(size=(EFF_SIZE, EFF_SIZE), scale=(0.8, 1.0), p=1.0),
+            A.HorizontalFlip(p=0.5),
+            A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
+            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            ToTensorV2(),
+        ]
+    )
+    eff_val_tf = A.Compose(
+        [
+            A.Resize(EFF_SIZE, EFF_SIZE),
+            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            ToTensorV2(),
+        ]
+    )
+
+    eff_tr_ds = CassavaTrainDataset(tr_df, train_image_dir, eff_train_tf)
+    eff_va_ds = CassavaTrainDataset(va_df, train_image_dir, eff_val_tf)
+
+    _eff_workers = min(4, _cpu)
+    eff_train_loader = DataLoader(
+        eff_tr_ds,
+        batch_size=32,
+        shuffle=True,
+        num_workers=_eff_workers,
+        pin_memory=torch.cuda.is_available(),
+        persistent_workers=True if _eff_workers > 0 else False,
+        prefetch_factor=2 if _eff_workers > 0 else None,
+        worker_init_fn=seed_worker,
+        generator=_dl_generator,
+    )
+    eff_val_loader = DataLoader(
+        eff_va_ds,
+        batch_size=64,
+        shuffle=False,
+        num_workers=_eff_workers,
+        pin_memory=torch.cuda.is_available(),
+        persistent_workers=True if _eff_workers > 0 else False,
+        prefetch_factor=2 if _eff_workers > 0 else None,
+        worker_init_fn=seed_worker,
+        generator=_dl_generator,
+    )
+
+    head_params = list(m.classifier.parameters())
+    m = _train_classifier_head_only(
+        m,
+        head_params,
+        eff_train_loader,
+        eff_val_loader,
+        eff_ckpt_path,
+        tag=f"{tag}-EffNetV2S",
+        lr=2e-3,
+        weight_decay=1e-4,
+        epochs=3,
+    )
+    return m, True, eff_ckpt_path
+
+
+efficientnet_model_7, eff7_is_5class, eff7_ckpt = (
+    build_efficientnet_cassava_or_fallback(0.2, "eff7", ALL_CKPTS)
+)
+efficientnet_model_1, eff1_is_5class, eff1_ckpt = (
+    build_efficientnet_cassava_or_fallback(0.8, "eff1", ALL_CKPTS)
+)
+efficientnet_model_8, eff8_is_5class, eff8_ckpt = (
+    build_efficientnet_cassava_or_fallback(0.8, "eff8", ALL_CKPTS)
+)
+
+print("EfficientNet model status:")
+print(" - eff7:", "5-class", eff7_ckpt)
+print(" - eff1:", "5-class", eff1_ckpt)
+print(" - eff8:", "5-class", eff8_ckpt)
+
+
+
+## === cell 14
+mobile_model = models.mobilenet_v3_large(weights=MobileNet_V3_Large_Weights.DEFAULT)
+in_features_m = mobile_model.classifier[-1].in_features
+mobile_model.classifier[-1] = nn.Linear(in_features_m, 5)
+mobile_model = mobile_model.to(device)
+
+mobile_ckpt_path = "/kaggle/working/mobilenetv3large_cassava_head.pth"
+
+_loaded_mobile = False
+if os.path.exists(mobile_ckpt_path):
+    sd = torch.load(mobile_ckpt_path, map_location="cpu")
+    mobile_model.load_state_dict(sd, strict=True)
+    mobile_model.eval()
+    _loaded_mobile = True
+else:
+    for p in ALL_CKPTS:
+        lp = p.lower()
+        if "mobilenet" in lp and _try_load_state_dict(mobile_model, p):
+            mobile_ckpt_path = p
+            mobile_model.eval()
+            _loaded_mobile = True
+            break
+
+if not _loaded_mobile:
+    mob_train_tf = A.Compose(
+        [
+            A.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.0), p=1.0),
+            A.HorizontalFlip(p=0.5),
+            A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
+            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            ToTensorV2(),
+        ]
+    )
+    mob_val_tf = A.Compose(
+        [
+            A.Resize(224, 224),
+            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            ToTensorV2(),
+        ]
+    )
+
+    mob_tr_ds = CassavaTrainDataset(tr_df, train_image_dir, mob_train_tf)
+    mob_va_ds = CassavaTrainDataset(va_df, train_image_dir, mob_val_tf)
+
+    _mob_workers = min(4, _cpu)
+    mob_train_loader = DataLoader(
+        mob_tr_ds,
+        batch_size=64,
+        shuffle=True,
+        num_workers=_mob_workers,
+        pin_memory=torch.cuda.is_available(),
+        persistent_workers=True if _mob_workers > 0 else False,
+        prefetch_factor=2 if _mob_workers > 0 else None,
+        worker_init_fn=seed_worker,
+        generator=_dl_generator,
+    )
+    mob_val_loader = DataLoader(
+        mob_va_ds,
+        batch_size=128,
+        shuffle=False,
+        num_workers=_mob_workers,
+        pin_memory=torch.cuda.is_available(),
+        persistent_workers=True if _mob_workers > 0 else False,
+        prefetch_factor=2 if _mob_workers > 0 else None,
+        worker_init_fn=seed_worker,
+        generator=_dl_generator,
+    )
+
+    for p in mobile_model.parameters():
+        p.requires_grad = False
+    for p in mobile_model.classifier.parameters():
+        p.requires_grad = True
+
+    crit = nn.CrossEntropyLoss()
+    opt = torch.optim.AdamW(
+        mobile_model.classifier.parameters(), lr=2e-3, weight_decay=1e-4
+    )
+
+    epochs = 3  # unchanged style vs ResNet head training
+    for ep in range(epochs):
+        mobile_model.train()
+        running = 0.0
+        n = 0
+        for xb, yb in tqdm(
+            mob_train_loader,
+            desc=f"Train MobileNet head ep{ep+1}/{epochs}",
+            leave=False,
+        ):
+            xb = xb.to(device, non_blocking=True)
+            yb = yb.to(device, non_blocking=True)
+
+            opt.zero_grad(set_to_none=True)
+            logits = mobile_model(xb)
+            loss = crit(logits, yb)
+            loss.backward()
+            opt.step()
+
+            running += float(loss.item()) * yb.size(0)
+            n += yb.size(0)
+
+        val_acc = _evaluate_top1(mobile_model, mob_val_loader)
+        print(
+            f"[MobileNet head] ep {ep+1}/{epochs} train_loss={running/max(1,n):.4f} val_acc={val_acc:.4f}"
+        )
+
+    torch.save(mobile_model.state_dict(), mobile_ckpt_path)
+    mobile_model.eval()
+
+print(
+    "MobileNet checkpoint:",
+    mobile_ckpt_path,
+    "loaded/trained:",
+    True,
+)
+
+
+
+
+## === cell 15
+def eff_logits_to_5class_probs_if_needed(logits, is_5class: bool):
+    if is_5class:
+        return F.softmax(logits, dim=1)
+    probs = F.softmax(logits, dim=1)
+    chunks = torch.chunk(probs, chunks=5, dim=1)
+    probs5 = torch.stack([c.mean(dim=1) for c in chunks], dim=1)
+    probs5 = probs5 / probs5.sum(dim=1, keepdim=True)
+    return probs5
+
+
+def _prep_model_for_fast_infer(m: nn.Module) -> nn.Module:
+    m.eval()
+    if device.type == "cuda":
+        m.to(memory_format=torch.channels_last)
+    return m
+
+
+def _to_device_infer_batch(
+    batch_cpu: torch.Tensor, device: torch.device
+) -> torch.Tensor:
+    if batch_cpu.device.type != "cpu":
+        batch_cpu = batch_cpu.cpu()
+    if device.type == "cuda":
+        batch_cpu = batch_cpu.contiguous(memory_format=torch.channels_last)
+        return batch_cpu.to(device, non_blocking=True)
+    return batch_cpu
+
+
+resnet_tta_transform = A.Compose(
+    common_transforms_rgb_only
+    + [
+        A.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.0), p=1.0),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+
+def build_tta_batches_for_batch(imgs, n_tta: int):
+    B = len(imgs)
+    eff_cpu = torch.empty((B * n_tta, 3, EFF_SIZE, EFF_SIZE), dtype=torch.float32)
+    mob_cpu = torch.empty((B * n_tta, 3, 224, 224), dtype=torch.float32)
+    res_cpu = torch.empty((B * n_tta, 3, 224, 224), dtype=torch.float32)
+
+    for i in range(B):
+        image = imgs[i]
+        if not isinstance(image, np.ndarray):
+            image = np.asarray(image)
+        if not image.flags["C_CONTIGUOUS"]:
+            image = np.ascontiguousarray(image)
+        base = i * n_tta
+        for t in range(n_tta):
+            aug_eff = tta_transform_rgb_eff(image=image)["image"]
+            eff_cpu[base + t] = preprocess_efficientnet_np_rgb_from_albu(aug_eff)
+            mob_cpu[base + t] = tta_transform_mobilenet(image=image)["image"]
+            res_cpu[base + t] = resnet_tta_transform(image=image)["image"]
+
+    return eff_cpu, mob_cpu, res_cpu
+
+
+ensemble_predictions = []
+image_names = []
+
+models_for_ensemble = [
+    ("eff7", efficientnet_model_7, "eff", eff7_is_5class),
+    ("eff1", efficientnet_model_1, "eff", eff1_is_5class),
+    ("eff8", efficientnet_model_8, "eff", eff8_is_5class),
+    ("mobile", mobile_model, "mobile", True),
+    ("resnet", resnet_model, "resnet", True),
+]
+models_for_ensemble = [m for m in models_for_ensemble if bool(m[3])]
+assert len(models_for_ensemble) >= 1
+
+has_eff = any(t[2] == "eff" for t in models_for_ensemble)
+has_mobile = any(t[2] == "mobile" for t in models_for_ensemble)
+has_resnet = any(t[2] == "resnet" for t in models_for_ensemble)
+
+if device.type == "cuda":
+    torch.backends.cudnn.benchmark = (
+        True  # inference-only; does not affect already-completed deterministic training
+    )
+if has_eff:
+    efficientnet_model_7 = _prep_model_for_fast_infer(efficientnet_model_7)
+    efficientnet_model_1 = _prep_model_for_fast_infer(efficientnet_model_1)
+    efficientnet_model_8 = _prep_model_for_fast_infer(efficientnet_model_8)
+if has_mobile:
+    mobile_model = _prep_model_for_fast_infer(mobile_model)
+if has_resnet:
+    resnet_model = _prep_model_for_fast_infer(resnet_model)
+
+eff_models = []
+if has_eff:
+    for name, model, family, is5 in models_for_ensemble:
+        if family == "eff":
+            eff_models.append((model, is5))
+
+with torch.inference_mode():
+    for batch in tqdm(test_loader, total=len(test_loader), desc="Predict"):
+        imgs = [b[0] for b in batch]
+        names = [str(b[1]) for b in batch]
+
+        eff_batch_cpu, mob_batch_cpu, res_batch_cpu = build_tta_batches_for_batch(
+            imgs, n_tta=num_tta
+        )
+
+        eff_batch = _to_device_infer_batch(eff_batch_cpu, device) if has_eff else None
+        mob_batch = (
+            _to_device_infer_batch(mob_batch_cpu, device) if has_mobile else None
+        )
+        res_batch = (
+            _to_device_infer_batch(res_batch_cpu, device) if has_resnet else None
+        )
+
+        probs_accum = None
+        n_models = 0
+        B = len(imgs)
+
+        if has_eff:
+            for model, is5 in eff_models:
+                out = model(eff_batch)
+                probs = eff_logits_to_5class_probs_if_needed(out, is_5class=is5)
+                probs = probs.view(B, num_tta, -1).mean(dim=1)  # [B,5]
+                probs_accum = probs if probs_accum is None else (probs_accum + probs)
+                n_models += 1
+
+        if has_mobile:
+            out_m = mobile_model(mob_batch)
+            probs_m = F.softmax(out_m, dim=1)
+            probs_m = probs_m.view(B, num_tta, -1).mean(dim=1)
+            probs_accum = probs_m if probs_accum is None else (probs_accum + probs_m)
+            n_models += 1
+
+        if has_resnet:
+            out_r = resnet_model(res_batch)
+            probs_r = F.softmax(out_r, dim=1)
+            probs_r = probs_r.view(B, num_tta, -1).mean(dim=1)
+            probs_accum = probs_r if probs_accum is None else (probs_accum + probs_r)
+            n_models += 1
+
+        combined_probs = probs_accum / float(n_models)
+        final_preds = (
+            combined_probs.argmax(dim=1).detach().cpu().numpy().astype(int).tolist()
+        )
+
+        ensemble_predictions.extend(final_preds)
+        image_names.extend(names)
+
+len(image_names), len(ensemble_predictions), len(test_df)
+
+
+
+## === cell 16
+submission_df = pd.DataFrame({"image_id": image_names, "label": ensemble_predictions})
+submission_df = (
+    submission_df.set_index("image_id").reindex(test_df["image_id"]).reset_index()
+)
+
+assert len(submission_df) == len(
+    test_df
+), "Submission must have the same length as sample_submission."
+assert list(submission_df.columns) == [
+    "image_id",
+    "label",
+], "Submission must have columns: image_id,label"
+assert submission_df["label"].notna().all(), "Found NaN labels after reindexing."
+
+submission_path = "submission.csv"
+submission_df.to_csv(submission_path, index=False)
+print(f"Submission file saved as '{submission_path}' with shape {submission_df.shape}")
+submission_df.head()

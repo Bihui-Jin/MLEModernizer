@@ -1,0 +1,518 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+fastai==2.8.5
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+3.5071
+
+# 6. Current score
+
+6.78738
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 6.78738) has done: 'I fix the datetime handling bug in `add_datepart` caused by timezone-aware `datetime64[ns, UTC]` dtypes by switching the dtype check to Pandas’ `is_datetime64_any_dtype`, which safely supports tz-aware timestamps. This ensure `pickup_datetime` is expanded into numeric date features and then dropped, preventing `Timestamp` objects from leaking into the RandomForest input (which caused the downstream `.fit()`/`.predict()` errors). I also keep the original modeling approach intact and only add a small, standard NYC Taxi feature (`haversine` distance) to help RMSE move toward the target without changing the overall pipeline structure. Finally, the script reliably write a valid `submission.csv` with the required `key,fare_amount` columns.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+import scipy
+import matplotlib.pyplot as plt
+
+from sklearn.ensemble import RandomForestRegressor
+from IPython.display import display
+
+
+def set_plot_sizes(sml, med, big):
+    plt.rc("figure", figsize=(med, med))
+    plt.rc("axes", titlesize=med)
+    plt.rc("axes", labelsize=med)
+    plt.rc("xtick", labelsize=sml)
+    plt.rc("ytick", labelsize=sml)
+    plt.rc("legend", fontsize=sml)
+    plt.rc("font", size=med)
+
+
+def display_all(df):
+    with pd.option_context("display.max_rows", 1000, "display.max_columns", 1000):
+        display(df)
+
+
+def train_cats(df: pd.DataFrame):
+    for col in df.columns:
+        if pd.api.types.is_object_dtype(df[col]) or pd.api.types.is_string_dtype(
+            df[col]
+        ):
+            df[col] = df[col].astype("category")
+
+
+def add_datepart(
+    df: pd.DataFrame, field_name: str, drop: bool = True, time: bool = False
+):
+    field = df[field_name]
+    if not pd.api.types.is_datetime64_any_dtype(field):
+        df[field_name] = pd.to_datetime(field, errors="coerce", utc=True)
+    field = df[field_name]
+
+    prefix = field_name.replace("date", "").replace("Date", "")
+    attrs = [
+        "Year",
+        "Month",
+        "Week",
+        "Day",
+        "Dayofweek",
+        "Dayofyear",
+        "Is_month_end",
+        "Is_month_start",
+        "Is_quarter_end",
+        "Is_quarter_start",
+        "Is_year_end",
+        "Is_year_start",
+    ]
+    for a in attrs:
+        if a == "Week":
+            df[prefix + a] = field.dt.isocalendar().week.astype("Int16")
+        else:
+            df[prefix + a] = (
+                getattr(field.dt, a.lower())
+                if hasattr(field.dt, a.lower())
+                else getattr(field.dt, a)
+            )
+    if time:
+        for a in ["Hour", "Minute", "Second"]:
+            df[prefix + a] = getattr(field.dt, a.lower())
+
+    if drop:
+        df.drop(columns=[field_name], inplace=True)
+
+
+def proc_df(
+    df: pd.DataFrame, y_fld: str = None, na_dict: dict = None, add_missing: bool = True
+):
+    df = df.copy()
+    y = None
+    if y_fld is not None and y_fld in df.columns:
+        y = df[y_fld].astype(np.float32).values
+        df.drop(columns=[y_fld], inplace=True)
+
+    if na_dict is None:
+        na_dict = {}
+
+    for col in df.columns:
+        s = df[col]
+        if pd.api.types.is_categorical_dtype(s):
+            df[col] = s.cat.codes.replace({-1: np.nan}).astype("float32")
+        elif pd.api.types.is_object_dtype(s) or pd.api.types.is_string_dtype(s):
+            df[col] = (
+                s.astype("category").cat.codes.replace({-1: np.nan}).astype("float32")
+            )
+
+        if pd.api.types.is_numeric_dtype(df[col]):
+            if df[col].isnull().any():
+                if col not in na_dict:
+                    na_dict[col] = df[col].median()
+                if add_missing:
+                    df[col + "_na"] = df[col].isnull().astype("int8")
+                df[col] = df[col].fillna(na_dict[col])
+
+    if y_fld is None:
+        return df
+    return df, y, na_dict
+
+
+def rf_feat_importance(m, df):
+    return pd.DataFrame(
+        {"cols": df.columns, "imp": m.feature_importances_}
+    ).sort_values("imp", ascending=False)
+
+
+def haversine_np(lon1, lat1, lon2, lat2):
+    lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
+    return 2 * 6371.0 * np.arcsin(np.sqrt(a))  # km
+
+
+
+
+## === cell 1
+set_plot_sizes(12, 14, 16)
+
+
+
+## === cell 2
+PATH = "/kaggle/input/"
+
+train_path = os.path.join(PATH, "train.csv")
+test_path = os.path.join(PATH, "test.csv")
+
+df_raw = pd.read_csv(
+    train_path,
+    nrows=100000,
+    parse_dates=["pickup_datetime"],
+    dtype={"passenger_count": "int8", "fare_amount": "float32"},
+    usecols=[
+        "fare_amount",
+        "pickup_datetime",
+        "pickup_longitude",
+        "pickup_latitude",
+        "dropoff_longitude",
+        "dropoff_latitude",
+        "passenger_count",
+    ],
+)
+
+df_raw_test = pd.read_csv(
+    test_path, parse_dates=["pickup_datetime"], dtype={"passenger_count": "int8"}
+)
+
+
+
+
+## === cell 3
+def display_all(df):
+    with pd.option_context("display.max_rows", 1000, "display.max_columns", 1000):
+        display(df)
+
+
+
+
+## === cell 4
+display_all(df_raw.tail().T)
+
+
+
+## === cell 5
+display_all(df_raw.describe(include="all").T)
+
+
+
+## === cell 6
+display_all(df_raw_test.describe(include="all").T)
+
+
+
+## === cell 7
+df_raw[df_raw["fare_amount"] < 0]
+
+
+
+## === cell 8
+df_raw[df_raw["pickup_longitude"] < -75]
+
+
+
+## === cell 9
+df_raw[df_raw["pickup_longitude"] > -73]
+
+
+
+## === cell 10
+df_raw[df_raw["pickup_latitude"] < 40]
+
+
+
+## === cell 11
+df_raw[df_raw["pickup_latitude"] > 42]
+
+
+
+## === cell 12
+df_raw.shape
+
+
+
+## === cell 13
+df_raw = df_raw[df_raw["pickup_longitude"] > -76]
+df_raw = df_raw[df_raw["pickup_longitude"] < -73]
+df_raw = df_raw[df_raw["pickup_latitude"] > 40]
+df_raw = df_raw[df_raw["pickup_latitude"] < 44]
+
+
+
+## === cell 14
+df_raw.shape
+
+
+
+## === cell 15
+df_raw["haversine_km"] = haversine_np(
+    df_raw["pickup_longitude"].values,
+    df_raw["pickup_latitude"].values,
+    df_raw["dropoff_longitude"].values,
+    df_raw["dropoff_latitude"].values,
+).astype("float32")
+
+
+
+## === cell 16
+train_cats(df_raw)
+
+
+
+## === cell 17
+add_datepart(df_raw, "pickup_datetime")
+
+
+
+## === cell 18
+df_raw.info()
+
+
+
+## === cell 19
+df, y, nas = proc_df(df_raw, "fare_amount")
+
+
+
+## === cell 20
+m = RandomForestRegressor(
+    n_estimators=30, min_samples_leaf=3, oob_score=True, n_jobs=-1, random_state=42
+)
+m.fit(df, y)
+
+
+
+## === cell 21
+fi = rf_feat_importance(m, df)
+fi[:10]
+
+
+
+## === cell 22
+fi.plot("cols", "imp", figsize=(10, 6), legend=False)
+plt.title("Feature Importance by Feature")
+
+
+
+
+## === cell 23
+def plot_fi(fi):
+    return fi.plot("cols", "imp", "barh", figsize=(12, 7), legend=False)
+
+
+
+
+## === cell 24
+plot_fi(fi[:30])
+plt.title("Feature Importance by Feature")
+
+
+
+## === cell 25
+from scipy.cluster import hierarchy as hc
+
+
+
+## === cell 26
+corr = np.round(scipy.stats.spearmanr(df).correlation, 4)
+corr_condensed = hc.distance.squareform(1 - corr)
+z = hc.linkage(corr_condensed, method="average")
+fig = plt.figure(figsize=(16, 10))
+_ = hc.dendrogram(z, labels=df.columns, orientation="left", leaf_font_size=10)
+plt.title("Feature Similarities")
+plt.show()
+
+
+
+## === cell 27
+df_raw_test["haversine_km"] = haversine_np(
+    df_raw_test["pickup_longitude"].values,
+    df_raw_test["pickup_latitude"].values,
+    df_raw_test["dropoff_longitude"].values,
+    df_raw_test["dropoff_latitude"].values,
+).astype("float32")
+
+
+
+## === cell 28
+train_cats(df_raw_test)
+
+
+
+## === cell 29
+add_datepart(df_raw_test, "pickup_datetime")
+
+
+
+## === cell 30
+df_test = proc_df(df_raw_test.drop(columns=["key"]), y_fld=None, na_dict=nas)
+
+missing_cols = [c for c in df.columns if c not in df_test.columns]
+for c in missing_cols:
+    df_test[c] = 0
+df_test = df_test[df.columns]
+
+
+
+## === cell 31
+y_pred = m.predict(df_test).astype(np.float32)
+y_pred = np.maximum(y_pred, 0)
+
+
+
+## === cell 32
+my_submission = pd.DataFrame({"key": df_raw_test["key"], "fare_amount": y_pred})
+my_submission.to_csv("submission.csv", index=False)
+
+print(my_submission.head())
+print("Wrote submission.csv with shape:", my_submission.shape)
+print("Submission columns:", list(my_submission.columns))
+print("Submission path:", os.path.abspath("submission.csv"))

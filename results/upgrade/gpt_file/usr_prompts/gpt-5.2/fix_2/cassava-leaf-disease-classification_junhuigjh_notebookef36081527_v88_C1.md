@@ -1,0 +1,703 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8856149894227864
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+from PIL import Image
+
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+
+from torchvision import transforms
+from torchvision.transforms import v2
+from torchvision.models import vit_h_14, efficientnet_v2_l, densenet121
+
+from sklearn.ensemble import RandomForestClassifier
+
+os.environ["PYTHONHASHSEED"] = "0"
+
+
+def seed_everything(seed: int = 11):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+seed_everything(11)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Device:", device)
+
+DATA_ROOT = "/kaggle/input/cassava-leaf-disease-classification"
+TRAIN_CSV = os.path.join(DATA_ROOT, "train.csv")
+SAMPLE_SUB = os.path.join(DATA_ROOT, "sample_submission.csv")
+TRAIN_IMG_DIR = os.path.join(DATA_ROOT, "train_images")
+TEST_IMG_DIR = os.path.join(DATA_ROOT, "test_images")
+
+assert os.path.exists(TRAIN_CSV), f"Missing: {TRAIN_CSV}"
+assert os.path.exists(SAMPLE_SUB), f"Missing: {SAMPLE_SUB}"
+assert os.path.isdir(TRAIN_IMG_DIR), f"Missing dir: {TRAIN_IMG_DIR}"
+assert os.path.isdir(TEST_IMG_DIR), f"Missing dir: {TEST_IMG_DIR}"
+
+N_CLASSES = 5
+
+
+
+## === cell 1
+torch_transforms_ResNet = transforms.Compose(
+    [
+        transforms.Resize((512, 512)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    ]
+)
+
+
+def invert_square_pad(img):
+    width, height = img.size
+    img_t = torch.tensor(np.array(img)).permute(2, 0, 1)
+    img_t = torch.roll(img_t, shifts=(height // 2, width // 2), dims=(1, 2))
+    img_pil = transforms.functional.to_pil_image(img_t)
+    max_side = max(width, height)
+    padding = (
+        (max_side - width) // 2,
+        (max_side - height) // 2,
+        (max_side - width) - (max_side - width) // 2,
+        (max_side - height) - (max_side - height) // 2,
+    )
+    padded_img = transforms.functional.pad(img_pil, padding, padding_mode="reflect")
+    return padded_img
+
+
+torch_transforms_VIT = transforms.Compose(
+    [
+        v2.Lambda(invert_square_pad),
+        v2.ToImage(),
+        v2.ToDtype(torch.float32, scale=True),
+        v2.Resize((518, 518)),
+        v2.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ]
+)
+
+torch_transforms_EfficientNet = transforms.Compose(
+    [
+        v2.ToImage(),
+        v2.ToDtype(torch.float32, scale=True),
+        v2.Resize((480, 480)),
+        v2.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ]
+)
+
+
+
+## === cell 2
+
+
+def build_models(num_classes=5, device=device):
+    m_resnet_like = densenet121(
+        weights=None
+    )  # placeholder for the original TF DenseNet role
+    m_resnet_like.classifier = nn.Linear(
+        m_resnet_like.classifier.in_features, num_classes
+    )
+
+    m_vit = vit_h_14(weights=None)
+    if hasattr(m_vit, "heads") and hasattr(m_vit.heads, "head"):
+        in_f = m_vit.heads.head.in_features
+        m_vit.heads.head = nn.Linear(in_f, num_classes)
+    else:
+        m_vit.heads = nn.Sequential(nn.Linear(m_vit.hidden_dim, num_classes))
+
+    m_eff = efficientnet_v2_l(weights=None)
+    if isinstance(m_eff.classifier, nn.Sequential):
+        in_f = m_eff.classifier[-1].in_features
+        m_eff.classifier[-1] = nn.Linear(in_f, num_classes)
+    else:
+        in_f = m_eff.classifier.in_features
+        m_eff.classifier = nn.Linear(in_f, num_classes)
+
+    m_aux = densenet121(weights=None)
+    m_aux.classifier = nn.Linear(m_aux.classifier.in_features, num_classes)
+
+    for m in (m_resnet_like, m_vit, m_eff, m_aux):
+        m.to(device)
+        m.eval()
+    return m_resnet_like, m_aux, m_vit, m_eff
+
+
+model1, model2, model3, model4 = build_models(N_CLASSES, device)
+print("Models initialized (eval mode).")
+
+softmax = nn.Softmax(dim=1)
+
+
+
+
+## === cell 3
+class CassavaImageDataset(Dataset):
+    def __init__(self, df: pd.DataFrame, img_dir: str, return_label: bool):
+        self.df = df.reset_index(drop=True)
+        self.img_dir = img_dir
+        self.return_label = return_label
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx: int):
+        row = self.df.iloc[idx]
+        image_id = row["image_id"]
+        img_path = os.path.join(self.img_dir, image_id)
+        img = Image.open(img_path).convert("RGB")
+
+        x1 = torch_transforms_ResNet(img)  # 512
+        x2 = torch_transforms_ResNet(img)  # 512 (reusing for model2 to keep structure)
+        x3 = torch_transforms_VIT(img)  # 518
+        x4 = torch_transforms_EfficientNet(img)  # 480
+
+        if self.return_label:
+            y = int(row["label"])
+            return image_id, x1, x2, x3, x4, y
+        return image_id, x1, x2, x3, x4
+
+
+@torch.no_grad()
+def predict_features(dataloader: DataLoader):
+    image_ids = []
+    feats = []
+    labels = []
+
+    for batch in dataloader:
+        if len(batch) == 6:
+            b_ids, x1, x2, x3, x4, y = batch
+            labels.append(y.numpy())
+        else:
+            b_ids, x1, x2, x3, x4 = batch
+
+        x1 = x1.to(device, non_blocking=True)
+        x2 = x2.to(device, non_blocking=True)
+        x3 = x3.to(device, non_blocking=True)
+        x4 = x4.to(device, non_blocking=True)
+
+        p1 = softmax(model1(x1)).cpu().numpy()
+        p2 = softmax(model2(x2)).cpu().numpy()
+        p3 = softmax(model3(x3)).cpu().numpy()
+        p4 = softmax(model4(x4)).cpu().numpy()
+
+        f = np.concatenate([p1, p2, p3, p4], axis=1)
+        feats.append(f)
+        image_ids.extend(list(b_ids))
+
+    feats = np.concatenate(feats, axis=0)
+    if labels:
+        labels = np.concatenate(labels, axis=0)
+        return image_ids, feats, labels
+    return image_ids, feats
+
+
+
+
+## === cell 4
+train_df = pd.read_csv(TRAIN_CSV)
+train_df = train_df[["image_id", "label"]].copy()
+
+MAX_TRAIN_FOR_STACKER = 2500
+if len(train_df) > MAX_TRAIN_FOR_STACKER:
+    train_df_fit = train_df.iloc[:MAX_TRAIN_FOR_STACKER].copy()
+else:
+    train_df_fit = train_df
+
+train_ds = CassavaImageDataset(train_df_fit, TRAIN_IMG_DIR, return_label=True)
+train_loader = DataLoader(
+    train_ds,
+    batch_size=8,
+    shuffle=False,
+    num_workers=2,
+    pin_memory=torch.cuda.is_available(),
+)
+
+train_ids, train_feats, train_labels = predict_features(train_loader)
+print("Train features:", train_feats.shape, "labels:", train_labels.shape)
+
+decision_tree = RandomForestClassifier(
+    n_estimators=40, criterion="gini", max_depth=8, random_state=11, n_jobs=-1
+)
+decision_tree.fit(train_feats, train_labels)
+print("Stacker trained.")
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+AssertionError                            Traceback (most recent call last)
+/tmp/ipykernel_55/1580345425.py in <cell line: 0>()
+     21 )
+     22 
+---> 23 train_ids, train_feats, train_labels = predict_features(train_loader)
+     24 print("Train features:", train_feats.shape, "labels:", train_labels.shape)
+     25 
+
+/usr/local/lib/python3.11/dist-packages/torch/utils/_contextlib.py in decorate_context(*args, **kwargs)
+    114     def decorate_context(*args, **kwargs):
+    115         with ctx_factory():
+--> 116             return func(*args, **kwargs)
+    117 
+    118     return decorate_context
+
+/tmp/ipykernel_55/64399309.py in predict_features(dataloader)
+     45         p1 = softmax(model1(x1)).cpu().numpy()
+     46         p2 = softmax(model2(x2)).cpu().numpy()
+---> 47         p3 = softmax(model3(x3)).cpu().numpy()
+     48         p4 = softmax(model4(x4)).cpu().numpy()
+     49 
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py in _wrapped_call_impl(self, *args, **kwargs)
+   1737             return self._compiled_call_impl(*args, **kwargs)  # type: ignore[misc]
+   1738         else:
+-> 1739             return self._call_impl(*args, **kwargs)
+   1740 
+   1741     # torchrec tests the code consistency with the following code
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py in _call_impl(self, *args, **kwargs)
+   1748                 or _global_backward_pre_hooks or _global_backward_hooks
+   1749                 or _global_forward_hooks or _global_forward_pre_hooks):
+-> 1750             return forward_call(*args, **kwargs)
+   1751 
+   1752         result = None
+
+/usr/local/lib/python3.11/dist-packages/torchvision/models/vision_transformer.py in forward(self, x)
+    289     def forward(self, x: torch.Tensor):
+    290         # Reshape and permute the input tensor
+--> 291         x = self._process_input(x)
+    292         n = x.shape[0]
+    293 
+
+/usr/local/lib/python3.11/dist-packages/torchvision/models/vision_transformer.py in _process_input(self, x)
+    269         n, c, h, w = x.shape
+    270         p = self.patch_size
+--> 271         torch._assert(h == self.image_size, f"Wrong image height! Expected {self.image_size} but got {h}!")
+    272         torch._assert(w == self.image_size, f"Wrong image width! Expected {self.image_size} but got {w}!")
+    273         n_h = h // p
+
+/usr/local/lib/python3.11/dist-packages/torch/__init__.py in _assert(condition, message)
+   2130             _assert, (condition,), condition, message
+   2131         )
+-> 2132     assert condition, message
+   2133 
+   2134 
+
+AssertionError: Wrong image height! Expected 224 but got 518!
+
+## === cell 5
+sample_sub = pd.read_csv(SAMPLE_SUB)
+test_df = sample_sub[["image_id"]].copy()
+
+test_ds = CassavaImageDataset(test_df, TEST_IMG_DIR, return_label=False)
+test_loader = DataLoader(
+    test_ds,
+    batch_size=8,
+    shuffle=False,
+    num_workers=2,
+    pin_memory=torch.cuda.is_available(),
+)
+
+test_ids, test_feats = predict_features(test_loader)
+print("Test features:", test_feats.shape, "test ids:", len(test_ids))
+
+prediction = decision_tree.predict(test_feats).astype(int)
+
+submission = pd.DataFrame({"image_id": test_ids, "label": prediction})
+submission = submission.merge(sample_sub[["image_id"]], on="image_id", how="right")
+submission["label"] = submission["label"].fillna(0).astype(int)
+
+assert (
+    submission.shape[0] == sample_sub.shape[0]
+), "Submission row count mismatch vs sample_submission."
+submission.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", submission.shape)
+
+submission.head()
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+AssertionError                            Traceback (most recent call last)
+/tmp/ipykernel_55/4174710484.py in <cell line: 0>()
+     13 )
+     14 
+---> 15 test_ids, test_feats = predict_features(test_loader)
+     16 print("Test features:", test_feats.shape, "test ids:", len(test_ids))
+     17 
+
+/usr/local/lib/python3.11/dist-packages/torch/utils/_contextlib.py in decorate_context(*args, **kwargs)
+    114     def decorate_context(*args, **kwargs):
+    115         with ctx_factory():
+--> 116             return func(*args, **kwargs)
+    117 
+    118     return decorate_context
+
+/tmp/ipykernel_55/64399309.py in predict_features(dataloader)
+     45         p1 = softmax(model1(x1)).cpu().numpy()
+     46         p2 = softmax(model2(x2)).cpu().numpy()
+---> 47         p3 = softmax(model3(x3)).cpu().numpy()
+     48         p4 = softmax(model4(x4)).cpu().numpy()
+     49 
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py in _wrapped_call_impl(self, *args, **kwargs)
+   1737             return self._compiled_call_impl(*args, **kwargs)  # type: ignore[misc]
+   1738         else:
+-> 1739             return self._call_impl(*args, **kwargs)
+   1740 
+   1741     # torchrec tests the code consistency with the following code
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py in _call_impl(self, *args, **kwargs)
+   1748                 or _global_backward_pre_hooks or _global_backward_hooks
+   1749                 or _global_forward_hooks or _global_forward_pre_hooks):
+-> 1750             return forward_call(*args, **kwargs)
+   1751 
+   1752         result = None
+
+/usr/local/lib/python3.11/dist-packages/torchvision/models/vision_transformer.py in forward(self, x)
+    289     def forward(self, x: torch.Tensor):
+    290         # Reshape and permute the input tensor
+--> 291         x = self._process_input(x)
+    292         n = x.shape[0]
+    293 
+
+/usr/local/lib/python3.11/dist-packages/torchvision/models/vision_transformer.py in _process_input(self, x)
+    269         n, c, h, w = x.shape
+    270         p = self.patch_size
+--> 271         torch._assert(h == self.image_size, f"Wrong image height! Expected {self.image_size} but got {h}!")
+    272         torch._assert(w == self.image_size, f"Wrong image width! Expected {self.image_size} but got {w}!")
+    273         n_h = h // p
+
+/usr/local/lib/python3.11/dist-packages/torch/__init__.py in _assert(condition, message)
+   2130             _assert, (condition,), condition, message
+   2131         )
+-> 2132     assert condition, message
+   2133 
+   2134 
+
+AssertionError: Wrong image height! Expected 224 but got 518!

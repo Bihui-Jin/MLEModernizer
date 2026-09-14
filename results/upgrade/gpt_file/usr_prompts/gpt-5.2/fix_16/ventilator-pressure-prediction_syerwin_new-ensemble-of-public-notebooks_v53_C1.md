@@ -1,0 +1,577 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.1436976763936639
+
+# 6. Current score
+
+3.88782
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 17.65486) has done: 'Your notebook fails because it tries to read four external Kaggle Dataset submission files that are not present in this environment, so `sub_1`…`sub_4` never get created and the blend crashes. To keep the original “blend multiple submissions” core logic while making it runnable end-to-end, I (1) load `sample_submission.csv` as the base, (2) attempt to load the four external submissions but gracefully fall back to using the base submission when they’re missing, and (3) robustly align on `id` before blending so the output is always valid. This generate a correct `submission.csv` with the required columns; since the fallback is the all-zero sample submission, the score likely won’t reach your target unless those external files are available.'
+- What this solution (achieved 6.10613) has done: 'Your current score is far worse than the target because the ensemble inputs are missing, so you’re effectively submitting the all-zero sample submission. To move the score much closer to the target while preserving the “blend multiple predictions” core idea, I keep your blending code but add a lightweight, local “fallback model” that generates a reasonable pressure estimate from the provided train/test (no external datasets). Specifically, when an external submission file is missing, we replace that missing component with an in-notebook baseline that predicts the mean inspiratory pressure per (R, C, time_step, u_out) bucket, with a global fallback, and then blend exactly as you already do. This is a minimal change that should dramatically reduce MAE versus zeros and head toward your target without changing evaluation semantics or introducing new training loops/models.'
+- What this solution (achieved 3.89158) has done: 'Your score is still far above the target because the fallback predictions are too coarse: binning only by `(R, C, u_out, time_step)` ignores the strong dependence on `u_in` (and the competition only scores inspiratory phase where `u_out=0`). To move the MAE much closer to the target while keeping your “blend multiple submissions with fallback when missing” core logic intact, I upgrade the local fallback to a slightly richer, still non-model baseline: mean pressure by `(R, C, u_out, time_step_bin, u_in_bin)` with a safe multi-level backoff when a bin is unseen. I also ensure that for `u_out==1` in test we predict 0 (not scored, and reduces noise), and keep your blending weights unchanged so changes are minimal and focused on improving fallback quality.'
+- What this solution (achieved 3.89137) has done: 'Your current score is still far above the target, so we should legitimately improve the fallback predictions while keeping your “blend multiple submissions; if missing, use local fallback” core logic unchanged. The smallest high-impact fix is to make the fallback much closer to the known pressure discretization used in this competition by snapping predictions to the nearest valid pressure value from the training set (this is a standard, legal post-processing step and does not change your modeling approach). I also add one more backoff level that uses `(R,C,ts_bin,uin_bin)` (since `u_out` is constant 0 in inspiratory train used for lookups), which improves coverage without introducing any new model/training loop. Blending weights and file paths remain unchanged, and the script still writes a valid `submission.csv`.'
+- What this solution (achieved 2.62534) has done: 'Your current score is still far above the target, so we should legitimately improve the fallback predictions while keeping your existing “blend multiple submissions; if missing, use local fallback” approach unchanged. The smallest high-impact change is to make the local fallback use a breath-wise time index (`step` 0–79) instead of rounding `time_step`, and to add simple, standard ventilator features (`u_in_cum`, `u_in_lag1`, `u_out_lag1`) that don’t change the modeling paradigm but greatly sharpen the lookup. I keep the same multi-level backoff merging and the same blend weights, and I still snap inspiratory predictions to the nearest valid training pressure value. This should reduce MAE substantially versus the current coarse binning while remaining fast and within Kaggle constraints.'
+- What this solution (achieved 3.0096) has done: 'Your current score is far worse than the target (lower is better), so we need a modest but meaningful improvement while keeping your “blend multiple submissions with a local fallback” logic intact. The biggest issue is that, in this environment, all four external submission files are missing, so you’re effectively blending four identical fallback predictions (no ensemble benefit). To improve the fallback without changing the overall approach, I add a stronger (still lookup-based) backoff level that uses within-breath delta features (`du_in`, `du_in_lag1`) and a slightly finer binning for `u_in_cum`, and I also snap the final blended predictions (not just the fallback) to the discrete training pressure grid, which typically reduces MAE in this competition. These are minimal, fast changes that preserve the same overall pipeline and still produce a valid `submission.csv`.'
+- What this solution (achieved 3.07625) has done: 'Your score is still far above the target (lower is better), so we should legitimately improve the fallback predictions while keeping your existing “blend multiple submissions with a local lookup fallback” core logic unchanged. The biggest gain with minimal risk is to (1) avoid predicting 0 for `u_out==1` (even if not scored, Kaggle still includes those rows in the MAE with masking by inspiratory phase; the safe move is to use the same fallback/backoff there too), and (2) make the lookup slightly more faithful by using a stable within-breath `step` plus a small additional backoff keyed on `(R,C,step,u_in)` without the delta features (improves coverage when deltas are noisy/unseen). Finally, keep snapping to the discrete pressure grid but do it after the final blended prediction (already done) and also ensure the fallback uses the *full* train pressure grid (not only inspiratory unique values) to reduce edge cases. These changes preserve your blending weights/structure and stay within the same lookup-and-backoff approach.'
+- What this solution (achieved 3.07625) has done: 'Your current score is still far above the target (lower is better), so we need a modest, safe improvement in the fallback predictions while keeping your ensemble/blend structure unchanged. The biggest issue in your fallback is that you only snap predictions to the discrete pressure grid for `u_out==0`, leaving `u_out==1` rows unsnapped (even if not scored, this can still hurt depending on how the mask is applied and it also makes the blend noisier). I also fix the `id` alignment: you’re using `sample_submission.csv` as the master `id` list, but its `id` range info suggests it may not match the full test set in this environment; using `test.csv` `id` as the master avoids silent misalignment and ensures row count correctness. Finally, I keep your exact blend weights and lookup/backoff logic, only adding snapping for all rows and ensuring the output uses the test ids in correct order.'
+- What this solution (achieved 3.07625) has done: 'Your current score (3.07625, lower is better) is still far above the target (0.1437), so we need a legitimate accuracy improvement while keeping your “blend multiple submissions with a local lookup fallback” core logic intact. The smallest high-impact fix is to stop “teaching” the fallback from all inspiratory rows globally and instead use only the inspiratory portion up to the per-breath switch to expiration (first `u_out==1`), which better matches the competition’s inspiratory scoring mask. Additionally, the MAE strongly benefits from using the well-known pressure discretization: we keep snapping, but we also clip predictions to the train pressure range before snapping to avoid edge-bin artifacts. Finally, because all external subs are missing here, we keep your blend structure but shift weight toward the improved fallback component (still a blend, same semantics) so the output moves closer to the target.'
+- What this solution (achieved 8.04613) has done: 'Your current blend is effectively just the local fallback (all external submission files are missing), so the most direct way to move the score toward the target is to strengthen that fallback without changing the overall “lookup/backoff + blend + snap to pressure grid” core logic. I keep your feature set and backoff structure, but fix a key mismatch: the fallback is trained only on inspiratory rows, yet it’s used for both `u_out=0` and `u_out=1` in test—so many expiratory rows fall back to a weak global mean, which can hurt the final MAE computation. Concretely, I build two lookups: an inspiratory-trained set applied to `u_out=0` rows and an all-phases-trained set applied to `u_out=1` rows, then concatenate back in original order and keep the same snapping and blend weights. This is a minimal, metric-aligned change that should reduce error vs. the current global-mean fallback for `u_out=1` rows while preserving your pipeline.'
+- What this solution (achieved 14.60484) has done: 'Your current score is far above the target (lower is better), so we should make a small but high-impact improvement inside the existing “lookup/backoff fallback + blend + snap-to-grid” pipeline. The biggest gap is that the fallback learns pressure as a function of within-breath dynamics but does not include any memory of prior predicted pressure; adding a single lagged-pressure feature to the *most specific* lookup level improves fidelity without changing the modeling paradigm. Concretely, we compute a lag-1 pressure per breath in train (teacher-forced) and a lag-1 **u_in-conditioned expected pressure** for test (from an existing lookup), then use that as an extra key in the top lookup. Everything else (blend weights, backoff structure, snapping/clipping, file paths, and submission writing) stays the same.'
+- What this solution (achieved 7.5483) has done: 'Your current score is far worse than the target (lower is better), so we should make a small, metric-aligned fix inside your existing lookup/backoff + blend + snap pipeline. The main bug-like issue is index misalignment: you compute predictions on `test` after sorting by (`breath_id`,`time_step`), but then you write them back into an array using the *old* index, which no longer matches the sorted row order—this can catastrophically scramble predictions and inflate MAE. I preserve your exact fallback feature set, lookups, and blending weights, but ensure we carry an `orig_pos` column through sorting and always assign predictions back by that position (not by the stale index). This is a minimal change that should materially reduce MAE and move the score toward your target while keeping the core logic identical.'
+- What this solution (achieved 7.7364) has done: 'Your current score is far above the target (lower is better), so we should make a small change that is very likely to reduce MAE without altering your core “lookup/backoff fallback + blend + snap-to-grid” approach. The biggest remaining accuracy issue is that the lookup means are computed on raw pressure values even though the true target lies on a discrete grid; averaging introduces non-grid values that then get snapped, which can be suboptimal. We keep your exact features, backoff levels, blending weights, and snapping, but change each lookup table to use the median (more robust) and then snap each lookup value onto the pressure grid once at build time. This is a minimal, metric-aligned change that typically improves VPP MAE while preserving the same overall logic and runtime.'
+- What this solution (achieved 3.88782) has done: 'Your score (7.7364) is far worse than the target (0.1437; lower is better), so we should make one minimal, high-impact metric-aligned fix without changing your overall “blend + local lookup fallback + snap-to-grid” core approach. The most likely reason for such a large MAE is `id` misalignment: you’re sorting and merging by `id`, but in this dataset `id` is only unique within a breath/time-step pattern and is not a stable global key—so merging on `id` can scramble predictions across rows. I keep your fallback model and blending logic intact, but switch all alignment/merging to use the test row order (from `test.csv`) and assign predictions back by that order (or by a preserved row position), and only use `id` when writing the final submission. This should dramatically reduce error while remaining fast and producing a valid `submission.csv`.'
+- What this solution (achieved 3.88782) has done: 'Your current MAE is far above target, so we need a small but high-impact fix inside the existing lookup/backoff fallback while preserving the same blending pipeline. The biggest likely remaining issue is that the fallback uses a `p_lag1_bin` key in its most-specific lookup, but for test this lag is only a crude expectation built from a separate lookup; making this test-side `p_lag1_bin` consistent with the same snapping-to-grid used elsewhere reduces key-noise and improves match rates. Additionally, your external submissions are still missing, so blending weights effectively don’t matter; we keep the blend structure but shift almost all weight onto the improved local fallback (still a blend, same semantics) to move the score toward the target. Finally, we keep strict row-order alignment (no `id` merges) and still snap the final blended predictions to the discrete pressure grid.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+
+
+## === cell 1
+BASE_PATH = "../input/ventilator-pressure-prediction/sample_submission.csv"
+TRAIN_PATH = "../input/ventilator-pressure-prediction/train.csv"
+TEST_PATH = "../input/ventilator-pressure-prediction/test.csv"
+
+test_ids = pd.read_csv(TEST_PATH, usecols=["id"]).copy()  # preserves test.csv row order
+sub = pd.DataFrame({"row_id": np.arange(len(test_ids), dtype=np.int32)})
+
+paths = {
+    "sub_1": "../input/vpp-a-basic-ensembling-technique/submission_pp.csv",
+    "sub_2": "../input/blend-of-blend-of-blend-of-blend-of-blend-of-ble/submission.csv",
+    "sub_3": "../input/gb-vpp-whoppity-dub-dub/median_submission.csv",
+    "sub_4": "../input/ensemble-without-overfitting-risk/submission_median.csv",
+}
+
+
+def _snap_to_train_pressures(
+    pred: np.ndarray, train_pressures: np.ndarray
+) -> np.ndarray:
+    """
+    Keep: pressure values are discrete; snapping reduces MAE without changing evaluation semantics.
+    """
+    pred = pred.astype("float32", copy=False)
+    idx = np.searchsorted(train_pressures, pred, side="left")
+    idx = np.clip(idx, 0, len(train_pressures) - 1)
+
+    left_idx = np.clip(idx - 1, 0, len(train_pressures) - 1)
+    right_idx = idx
+
+    left_val = train_pressures[left_idx]
+    right_val = train_pressures[right_idx]
+
+    choose_right = np.abs(right_val - pred) <= np.abs(pred - left_val)
+    return np.where(choose_right, right_val, left_val).astype("float32")
+
+
+def build_local_fallback_submission(train_path: str, test_path: str) -> pd.DataFrame:
+    """
+    Fallback baseline: binned lookup with safe multi-level backoff.
+
+    Keep: existing lookup/backoff core logic, features, snapping.
+    Output is keyed by `row_id` (test row order) to guarantee correct alignment.
+    """
+    usecols_train = ["breath_id", "R", "C", "time_step", "u_in", "u_out", "pressure"]
+    usecols_test = ["id", "breath_id", "R", "C", "time_step", "u_in", "u_out"]
+
+    train = pd.read_csv(train_path, usecols=usecols_train)
+    test = pd.read_csv(test_path, usecols=usecols_test)
+
+    pressure_values_full = np.sort(train["pressure"].astype("float32").unique())
+
+    test["row_id"] = np.arange(len(test), dtype=np.int32)
+
+    train = train.sort_values(["breath_id", "time_step"], kind="mergesort").reset_index(
+        drop=True
+    )
+    test = test.sort_values(["breath_id", "time_step"], kind="mergesort").reset_index(
+        drop=True
+    )
+
+    train["step"] = train.groupby("breath_id").cumcount().astype("int16")
+    test["step"] = test.groupby("breath_id").cumcount().astype("int16")
+
+    train["u_in_cum"] = train.groupby("breath_id")["u_in"].cumsum().astype("float32")
+    test["u_in_cum"] = test.groupby("breath_id")["u_in"].cumsum().astype("float32")
+
+    train["u_in_lag1"] = (
+        train.groupby("breath_id")["u_in"].shift(1).fillna(0.0).astype("float32")
+    )
+    test["u_in_lag1"] = (
+        test.groupby("breath_id")["u_in"].shift(1).fillna(0.0).astype("float32")
+    )
+
+    train["u_out_lag1"] = (
+        train.groupby("breath_id")["u_out"].shift(1).fillna(0).astype("int8")
+    )
+    test["u_out_lag1"] = (
+        test.groupby("breath_id")["u_out"].shift(1).fillna(0).astype("int8")
+    )
+
+    train["du_in"] = (train["u_in"] - train["u_in_lag1"]).astype("float32")
+    test["du_in"] = (test["u_in"] - test["u_in_lag1"]).astype("float32")
+
+    train["du_in_lag1"] = (
+        train.groupby("breath_id")["du_in"].shift(1).fillna(0.0).astype("float32")
+    )
+    test["du_in_lag1"] = (
+        test.groupby("breath_id")["du_in"].shift(1).fillna(0.0).astype("float32")
+    )
+
+    train["uin_bin"] = (np.round(train["u_in"].values * 2.0) / 2.0).astype("float32")
+    test["uin_bin"] = (np.round(test["u_in"].values * 2.0) / 2.0).astype("float32")
+
+    train["uinc_bin"] = (np.round(train["u_in_cum"].values / 2.5) * 2.5).astype(
+        "float32"
+    )
+    test["uinc_bin"] = (np.round(test["u_in_cum"].values / 2.5) * 2.5).astype("float32")
+
+    train["uinlag_bin"] = (np.round(train["u_in_lag1"].values * 2.0) / 2.0).astype(
+        "float32"
+    )
+    test["uinlag_bin"] = (np.round(test["u_in_lag1"].values * 2.0) / 2.0).astype(
+        "float32"
+    )
+
+    train["duin_bin"] = (np.round(train["du_in"].values * 2.0) / 2.0).astype("float32")
+    test["duin_bin"] = (np.round(test["du_in"].values * 2.0) / 2.0).astype("float32")
+
+    train["duinlag_bin"] = (np.round(train["du_in_lag1"].values * 2.0) / 2.0).astype(
+        "float32"
+    )
+    test["duinlag_bin"] = (np.round(test["du_in_lag1"].values * 2.0) / 2.0).astype(
+        "float32"
+    )
+
+    train["p_lag1"] = (
+        train.groupby("breath_id")["pressure"].shift(1).fillna(train["pressure"].mean())
+    ).astype("float32")
+    train["p_lag1_bin"] = (np.round(train["p_lag1"].values * 5.0) / 5.0).astype(
+        "float32"
+    )
+
+    first_uout_step = (
+        train.loc[train["u_out"].eq(1), ["breath_id", "step"]]
+        .groupby("breath_id", observed=True)["step"]
+        .min()
+    )
+    train = train.join(first_uout_step.rename("first_uout_step"), on="breath_id")
+    train["first_uout_step"] = train["first_uout_step"].fillna(10_000).astype("int16")
+    train_insp = train[
+        (train["u_out"] == 0) & (train["step"] < train["first_uout_step"])
+    ].copy()
+
+    grp0 = ["R", "C", "step", "uin_bin", "duin_bin", "duinlag_bin", "p_lag1_bin"]
+    grp0b = ["R", "C", "step", "uin_bin"]
+    grp1 = [
+        "R",
+        "C",
+        "u_out",
+        "step",
+        "uin_bin",
+        "uinc_bin",
+        "uinlag_bin",
+        "u_out_lag1",
+    ]
+    grp1b = ["R", "C", "step", "uin_bin", "uinc_bin", "uinlag_bin"]
+    grp2 = ["R", "C", "u_out", "step", "uin_bin"]
+    grp3 = ["R", "C", "u_out", "step"]
+    grp4 = ["R", "C", "u_out"]
+
+    exp_key = ["R", "C", "step", "uin_bin"]
+
+    exp_lookup_insp = (
+        train_insp.groupby(exp_key, observed=True)["pressure"]
+        .median()
+        .reset_index()
+        .rename(columns={"pressure": "exp_p_insp"})
+    )
+    exp_lookup_insp["exp_p_insp"] = _snap_to_train_pressures(
+        np.clip(
+            exp_lookup_insp["exp_p_insp"].astype("float32").values,
+            pressure_values_full[0],
+            pressure_values_full[-1],
+        ),
+        pressure_values_full,
+    )
+
+    exp_lookup_all = (
+        train.groupby(exp_key, observed=True)["pressure"]
+        .median()
+        .reset_index()
+        .rename(columns={"pressure": "exp_p_all"})
+    )
+    exp_lookup_all["exp_p_all"] = _snap_to_train_pressures(
+        np.clip(
+            exp_lookup_all["exp_p_all"].astype("float32").values,
+            pressure_values_full[0],
+            pressure_values_full[-1],
+        ),
+        pressure_values_full,
+    )
+
+    def _attach_test_plag1_bin(
+        test_df: pd.DataFrame, exp_lookup: pd.DataFrame, exp_col: str
+    ) -> pd.DataFrame:
+        tmp = test_df.merge(exp_lookup, on=exp_key, how="left")
+        tmp[exp_col] = (
+            tmp[exp_col].fillna(float(train["pressure"].median())).astype("float32")
+        )
+
+        tmp[exp_col] = _snap_to_train_pressures(
+            np.clip(
+                tmp[exp_col].to_numpy(dtype="float32"),
+                pressure_values_full[0],
+                pressure_values_full[-1],
+            ),
+            pressure_values_full,
+        )
+
+        tmp["exp_p_lag1"] = (
+            tmp.groupby("breath_id")[exp_col]
+            .shift(1)
+            .fillna(tmp[exp_col])
+            .astype("float32")
+        )
+        tmp["exp_p_lag1"] = _snap_to_train_pressures(
+            np.clip(
+                tmp["exp_p_lag1"].to_numpy(dtype="float32"),
+                pressure_values_full[0],
+                pressure_values_full[-1],
+            ),
+            pressure_values_full,
+        )
+        tmp["p_lag1_bin"] = (np.round(tmp["exp_p_lag1"].values * 5.0) / 5.0).astype(
+            "float32"
+        )
+        tmp = tmp.drop(columns=[exp_col, "exp_p_lag1"])
+        return tmp
+
+    test_u0 = test[test["u_out"].eq(0)].copy()
+    test_u1 = test[test["u_out"].eq(1)].copy()
+    test_u0 = _attach_test_plag1_bin(test_u0, exp_lookup_insp, "exp_p_insp")
+    test_u1 = _attach_test_plag1_bin(test_u1, exp_lookup_all, "exp_p_all")
+
+    def _make_lookups(df: pd.DataFrame, prefix: str) -> dict:
+        def _group_median_snap(keys, outcol):
+            tbl = (
+                df.groupby(keys, observed=True)["pressure"]
+                .median()
+                .reset_index()
+                .rename(columns={"pressure": outcol})
+            )
+            vals = tbl[outcol].astype("float32").values
+            vals = np.clip(
+                vals, pressure_values_full[0], pressure_values_full[-1]
+            ).astype("float32")
+            tbl[outcol] = _snap_to_train_pressures(vals, pressure_values_full)
+            return tbl
+
+        return {
+            "lookup0": _group_median_snap(grp0, f"{prefix}p0"),
+            "lookup0b": _group_median_snap(grp0b, f"{prefix}p0b"),
+            "lookup1": _group_median_snap(grp1, f"{prefix}p1"),
+            "lookup1b": _group_median_snap(grp1b, f"{prefix}p1b"),
+            "lookup2": _group_median_snap(grp2, f"{prefix}p2"),
+            "lookup3": _group_median_snap(grp3, f"{prefix}p3"),
+            "lookup4": _group_median_snap(grp4, f"{prefix}p4"),
+            "global_mean": float(df["pressure"].median()),
+        }
+
+    look_insp = _make_lookups(train_insp, prefix="i_")
+    look_all = _make_lookups(train, prefix="a_")
+
+    def _predict_with_lookups(
+        test_df: pd.DataFrame, look: dict, prefix: str
+    ) -> np.ndarray:
+        merged = test_df.merge(look["lookup0"], on=grp0, how="left")
+        merged = merged.merge(look["lookup0b"], on=grp0b, how="left")
+        merged = merged.merge(look["lookup1"], on=grp1, how="left")
+        merged = merged.merge(look["lookup1b"], on=grp1b, how="left")
+        merged = merged.merge(look["lookup2"], on=grp2, how="left")
+        merged = merged.merge(look["lookup3"], on=grp3, how="left")
+        merged = merged.merge(look["lookup4"], on=grp4, how="left")
+
+        p0, p0b, p1, p1b, p2, p3, p4 = (
+            f"{prefix}p0",
+            f"{prefix}p0b",
+            f"{prefix}p1",
+            f"{prefix}p1b",
+            f"{prefix}p2",
+            f"{prefix}p3",
+            f"{prefix}p4",
+        )
+
+        pred = merged[p0]
+        pred = pred.fillna(merged[p0b])
+        pred = pred.fillna(merged[p1])
+        pred = pred.fillna(merged[p1b])
+        pred = pred.fillna(merged[p2])
+        pred = pred.fillna(merged[p3])
+        pred = pred.fillna(merged[p4])
+        pred = pred.fillna(look["global_mean"]).astype("float32").values
+        return pred
+
+    pred_u0 = _predict_with_lookups(test_u0, look_insp, prefix="i_")
+    pred_u1 = _predict_with_lookups(test_u1, look_all, prefix="a_")
+
+    pred = np.empty(len(test), dtype="float32")
+    pred[test_u0["row_id"].to_numpy(dtype=np.int32)] = pred_u0
+    pred[test_u1["row_id"].to_numpy(dtype=np.int32)] = pred_u1
+
+    pred = np.clip(pred, pressure_values_full[0], pressure_values_full[-1])
+    pred = _snap_to_train_pressures(pred, pressure_values_full)
+
+    out = pd.DataFrame(
+        {"row_id": np.arange(len(pred), dtype=np.int32), "pressure": pred}
+    )
+    return out
+
+
+local_fallback = build_local_fallback_submission(TRAIN_PATH, TEST_PATH)
+
+
+def load_submission_or_fallback(
+    path: str, fallback: pd.DataFrame, n_rows: int
+) -> pd.DataFrame:
+    """
+    Load a submission file if present; otherwise return fallback.
+    Keep: align by row order (length) rather than merging on `id`.
+    """
+    if os.path.exists(path):
+        df = pd.read_csv(path)
+        if "pressure" not in df.columns:
+            raise ValueError(
+                f"Loaded file at {path} but did not find 'pressure' column."
+            )
+        p = df["pressure"].astype("float32").to_numpy()
+        if len(p) != n_rows:
+            p = fallback["pressure"].astype("float32").to_numpy()
+    else:
+        p = fallback["pressure"].astype("float32").to_numpy()
+
+    out = pd.DataFrame({"row_id": np.arange(n_rows, dtype=np.int32), "pressure": p})
+    return out
+
+
+n_test = len(test_ids)
+sub_1 = load_submission_or_fallback(paths["sub_1"], local_fallback, n_test)
+sub_2 = load_submission_or_fallback(paths["sub_2"], local_fallback, n_test)
+sub_3 = load_submission_or_fallback(paths["sub_3"], local_fallback, n_test)
+sub_4 = load_submission_or_fallback(paths["sub_4"], local_fallback, n_test)
+
+sub = sub.merge(sub_1, on="row_id", how="left").rename(columns={"pressure": "p1"})
+sub = sub.merge(sub_2, on="row_id", how="left").rename(columns={"pressure": "p2"})
+sub = sub.merge(sub_3, on="row_id", how="left").rename(columns={"pressure": "p3"})
+sub = sub.merge(sub_4, on="row_id", how="left").rename(columns={"pressure": "p4"})
+
+for c in ["p1", "p2", "p3", "p4"]:
+    sub[c] = sub[c].astype("float32").fillna(0.0)
+
+
+
+## === cell 2
+w1, w2, w3, w4 = 1.00, 0.00, 0.00, 0.00
+
+sub["pressure"] = (
+    (sub["p1"].values * w1)
+    + (sub["p2"].values * w2)
+    + (sub["p3"].values * w3)
+    + (sub["p4"].values * w4)
+).astype("float32")
+
+train_pressures = np.sort(
+    pd.read_csv(TRAIN_PATH, usecols=["pressure"])["pressure"].astype("float32").unique()
+)
+
+sub["pressure"] = np.clip(
+    sub["pressure"].values, train_pressures[0], train_pressures[-1]
+).astype("float32")
+sub["pressure"] = _snap_to_train_pressures(sub["pressure"].values, train_pressures)
+
+submission = pd.DataFrame(
+    {"id": test_ids["id"].to_numpy(), "pressure": sub["pressure"].to_numpy()}
+)
+submission["pressure"] = submission["pressure"].astype("float32").fillna(0.0)
+
+submission.to_csv("submission.csv", index=False)
+print(submission.head(5))
+print("submission.csv written with rows:", len(submission))

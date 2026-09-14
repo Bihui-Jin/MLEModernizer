@@ -1,0 +1,1697 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.3288975818168823
+
+# 6. Current score
+
+1.39779
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.39779) has done: 'I fix the TensorFlow/protobuf crash by forcing the pure-Python protobuf implementation before importing TensorFlow (this addresses the `MessageFactory GetPrototype` error). Then I fix the missing-weights runtime by automatically falling back to inference-time “no model available” behavior: if the expected fold weight files aren’t present, the script produce a valid, properly-normalized submission using the empirical class prior from `train.csv` (score be worse than a real model, but it run end-to-end and yield a valid `.csv`). I also make the path handling more robust by checking both `/kaggle/input/...` and `/kaggle/data/...` for models. Finally, I keep the existing core modeling and prediction logic unchanged when weights are found; only the fallback path is added to guarantee a submission is written.'
+- What this solution (achieved 1.39779) has done: 'I fix the TensorFlow/protobuf import crash by forcing pure-Python protobuf **before any protobuf/tensorflow import**, and by not attempting the incompatible `cpp` implementation in this Kaggle image. Then I make the script robust to missing TensorFlow entirely: if TF can’t import, it still write a valid `submission.csv` using a train-prior fallback (properly normalized and clipped), so you always get a submission. Finally, I ensure `df`/`TARGETS` are defined regardless of TF availability and keep the existing model/inference logic unchanged when TF + weights are available, so score improves toward target whenever weights exist.'
+- What this solution (achieved 1.39779) has done: 'I fix the TensorFlow/protobuf crash that currently happens before your try/except can catch it by forcing the pure-Python protobuf backend even earlier and by applying a safe runtime monkey-patch for the specific missing `MessageFactory.GetPrototype` symbol (this keeps your TF-based path available instead of always falling back). I also make the Kaggle data/model root detection robust by auto-resolving `/kaggle/input/...` vs `/kaggle/data/...` for both the competition dataset and the model-weights dataset, without changing any training/inference logic. Finally, I keep your model, generator, and prediction pipeline identical, only ensuring that when TF successfully imports and fold weights exist, it actually runs (which should improve score from the current prior-fallback level toward the target). The script always write a valid `submission.csv` with normalized probabilities.'
+- What this solution (achieved 1.39779) has done: 'Your score (1.39779, lower-is-better) is far from the target (0.3289), and the most likely reason is that the script is still taking the prior-fallback path because it can’t find your fold weight files (or the expected filenames don’t match what exists). I make the smallest change that improves score: broaden weight discovery to accept either `fold{i}_stage2.h5` or `fold{i}_stage1.h5` (and common alternative patterns) and then run inference if *any* full set is found, only falling back to the prior if no usable set exists. I also add a tiny, metric-consistent post-processing: blend model predictions with the empirical class prior using a very small epsilon (e.g., 0.02) to reduce catastrophic KL when the model outputs overconfident near-zeros—this typically improves KL without changing core architecture/training. Everything else (model, generator, preprocessing, evaluation semantics) stays the same and it still always writes a valid `submission.csv`.'
+- What this solution (achieved 1.39779) has done: 'Your current score (1.39779, lower-is-better) is far above the target (0.3289), and the most likely cause is still that the script is not actually loading any trained fold weights and/or is producing misaligned predictions due to batch-wise concatenation/order issues. I make two minimal, score-relevant fixes: (1) broaden and harden fold-weight discovery (including common nested paths and `.keras`/checkpoint variants) and ensure we only run the prior fallback if no weights can be found, and (2) enforce strict row-order alignment by predicting on the full `test` dataframe in one generator (or, if memory requires batching, by preallocating and filling by absolute indices) so `eeg_id` ↔ prediction rows can’t drift. I also add a very small numerically-stable probability floor + renormalization (and keep your existing tiny prior-blend) to reduce KL spikes from near-zero probabilities without changing the model or loss. All core model/data logic remains the same; these changes only ensure the intended trained ensemble is actually used and correctly aligned.'
+- What this solution (achieved 1.39779) has done: 'Your current score (1.39779, lower-is-better) is far above the target (0.3289), so we should improve prediction quality with the smallest changes that don’t alter the model/training core. The most likely cause is that the model is still not actually being used (weights not found/loaded) or inference is mis-specified (test generator returning `(x, y, sample_weights)` even in test mode, which can break/alter Keras predict semantics). I (1) fix the `DataGenerator` to return only `x` in `mode="test"` (while keeping train/valid behavior identical), (2) harden weight discovery/loading to support nested directories and “missing some folds” by averaging only successfully loaded folds (instead of falling back to priors), and (3) keep your existing safe probability floor + tiny prior blend, but only apply it after confirming valid model predictions exist. These are minimal, score-relevant changes and should move KL substantially toward your target when weights are present.'
+- What this solution (achieved 1.39779) has done: 'Your current score (1.39779, lower-is-better) is far above the target (0.3289), so we should improve prediction quality with minimal, metric-aligned fixes while preserving your model and training/inference structure. The biggest likely score killer here is test-time randomness: your `DataGenerator` applies EEG augmentations whenever `mode!="test"`, but in your batched inference you reset the batch dataframe index to 0 and the generator then treats it as `mode="test"` (good) yet it still uses `self.dataframe.iloc[i]` and relies on `eegs_test` dictionaries keyed by the true `eeg_id`; that part is fine—however, the *model itself* can still be stochastic at inference if TF runs in training mode or if layers like Dropout are not forced to inference, and mixed-precision + non-determinism can amplify KL spikes. I (1) force deterministic inference by ensuring `training=False` during prediction via a tiny wrapper model call (without changing architecture), (2) make the probability smoothing more KL-safe by replacing the fixed prior-blend epsilon with a smaller value and adding a per-row adaptive floor+renorm that prevents near-zero probabilities (which heavily penalize KL), and (3) fix a subtle but important bug: your `DataGenerator` always returns `(x,y,sample_weights)` for non-test modes, and in inference you set `sample_weights=False` but still allocate and fill it; we keep behavior but ensure the generator never touches `df`/label-lookup code in test mode (hard stop), preventing any accidental train-row mixing if mode mis-specified. These are minimal changes that should move the score substantially toward the target if your fold weights are actually being loaded.'
+- What this solution (achieved 1.39779) has done: 'Your current KL (1.39779, lower-is-better) is far above the target (0.3289), and the most likely reason is that your script is still not actually using trained weights (or is loading the wrong files) and/or your predictions are being made with a mismatch between the model input shape and the generator output. I make minimal, score-relevant fixes: (1) broaden fold-weight discovery to also accept `.weights.h5`/`.keras`/nested locations and load *any* available folds rather than requiring a complete set, (2) ensure the test generator always returns exactly the input list expected by the model (and nothing else), and (3) keep your current KL-safe probability smoothing but make it conditional on having real model predictions (so the prior fallback doesn’t get “double-smoothed”). These changes preserve your architecture and inference approach while making it much more likely that the intended ensemble inference actually runs and produces correctly-aligned probabilities.'
+
+# 9. Code solution
+
+## === cell 0
+"""
+Created on Tue Oct 22 20:48:49 2024
+
+@author: yuri
+
+email: syuri@tju.edu.cn
+"""
+
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "3")
+
+try:
+    from google.protobuf import message_factory as _message_factory  # noqa: E402
+
+    if hasattr(_message_factory, "MessageFactory") and not hasattr(
+        _message_factory.MessageFactory, "GetPrototype"
+    ):
+
+        def _GetPrototype(self, descriptor):
+            if hasattr(self, "GetMessageClass"):
+                return self.GetMessageClass(descriptor)
+            raise AttributeError(
+                "MessageFactory has neither GetPrototype nor GetMessageClass"
+            )
+
+        _message_factory.MessageFactory.GetPrototype = _GetPrototype  # type: ignore[attr-defined]
+except Exception:
+    pass
+
+PLATFORM = "kaggle"  # *** local kaggle *** local training or online testing
+NEEDTRAIN = False  # train the model
+
+DATATYPE = ["eeg"]  # *** spe, eeg, stft, img *** the data type used
+print(DATATYPE)
+
+LOAD_MODELS_FROM = "models20241112b"  # the path of trained model weights for testing
+
+
+def _resolve_kaggle_path(preferred_path: str, fallbacks: list[str]) -> str:
+    if preferred_path and os.path.exists(preferred_path):
+        return preferred_path
+    for p in fallbacks:
+        if p and os.path.exists(p):
+            return p
+    return preferred_path
+
+
+if PLATFORM == "local":
+    LOAD_MODELS_FROM = f"./input/{LOAD_MODELS_FROM}"
+    LOAD_DATA_FROM = "./input/hms-harmful-brain-activity-classification"
+elif PLATFORM == "kaggle":
+    LOAD_MODELS_FROM = f"/kaggle/input/{LOAD_MODELS_FROM}"
+    LOAD_DATA_FROM = "/kaggle/input/hms-harmful-brain-activity-classification"
+    LOAD_DATA_FROM = _resolve_kaggle_path(
+        LOAD_DATA_FROM,
+        [
+            "/kaggle/data/hms-harmful-brain-activity-classification",
+            "/kaggle/input/hms-harmful-brain-activity-classification/hms-harmful-brain-activity-classification",
+            "/kaggle/data/hms-harmful-brain-activity-classification/hms-harmful-brain-activity-classification",
+        ],
+    )
+    LOAD_MODELS_FROM = _resolve_kaggle_path(
+        LOAD_MODELS_FROM,
+        [
+            f"/kaggle/data/{os.path.basename(LOAD_MODELS_FROM)}",
+            f"/kaggle/input/{os.path.basename(LOAD_MODELS_FROM)}",
+        ],
+    )
+
+SFREQ = 200  # EEG sampling rate
+RSFREQ = 200  # resampled EEG sampling rate
+EEG_LENGTH = 50  # the length of EEG data used for each sample
+EEG_LENGTH_USED = 50
+EEG_MULTIPLY = 10
+
+IMG_LENGTH = 20
+IMG_HIGH = 324
+IMG_WIDE = 324
+
+SPE_HIGH = 100  # the height of the spectrogram
+SPE_WIDE = 256  # the width of the spectrogram  10 * 30
+
+STFT_LENGTH = 50
+STFT_HIGH = 32  # the height of the STFT (eeg spectrogram)
+STFT_WIDE = round(STFT_LENGTH / 0.4)  # the width of the STFT (eeg spectrogram)  50 * 5
+
+filter_range = [0.5, 45]  # eeg filtering range
+filter_range2 = [0.1, 35]  # eeg filtering range
+
+SEED = 2024  # seed
+
+BATCHSIZE = 16  # batch size
+
+LEARN_RATE = 1e-3
+EPOCHS = 15
+PATIENCE = 5
+
+SPLITS = 5
+
+READ_EEG_FILES = False  # preprocess eeg
+READ_SPE_FILES = False  # preprocess spectrogram
+
+spectrograms = {}  # preprocessed spectrograms for training
+eegs = {}  # preprocessed eegs for training
+stfts = {}  # preprocessed short-time fourier transform plots for training
+imgs = {}
+
+spectrograms_test = {}
+eegs_test = {}
+stfts_test = {}
+imgs_test = {}
+
+BRAIN = [
+    "Fp1-F7",
+    "F7-T3",
+    "T3-T5",
+    "T5-O1",  # LL
+    "Fp1-F3",
+    "F3-C3",
+    "C3-P3",
+    "P3-O1",  # LP
+    "Fz-Cz",
+    "Cz-Pz",
+    "Fp2-F4",
+    "F4-C4",
+    "C4-P4",
+    "P4-O2",  # RP
+    "Fp2-F8",
+    "F8-T4",
+    "T4-T6",
+    "T6-O2",  # RL
+]
+
+TEST_BATCHSIZE = 128
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import io
+from PIL import Image
+import pandas as pd, numpy as np
+from sklearn.metrics import confusion_matrix
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+from scipy import signal
+import time
+import gc
+
+np.random.seed(SEED)
+os.environ["PYTHONHASHSEED"] = str(SEED)
+
+df = pd.read_csv(os.path.join(LOAD_DATA_FROM, "train.csv"))
+TARGETS = df.columns[-6:]
+print("Train shape:", df.shape)
+print("Targets", list(TARGETS))
+
+TF_AVAILABLE = True
+tf_import_error = None
+try:
+    import tensorflow as tf
+    from tensorflow.keras import optimizers
+    from tensorflow.keras.models import clone_model
+except Exception as e:
+    TF_AVAILABLE = False
+    tf_import_error = e
+    tf = None
+    optimizers = None
+    clone_model = None
+    print(
+        "WARNING: TensorFlow import failed; will use prior-based submission fallback."
+    )
+    print("TensorFlow import error:", repr(e))
+
+
+
+## === cell 1
+if NEEDTRAIN:
+    TARGETS_RAW = [c + "_raw" for c in TARGETS]
+
+    if READ_EEG_FILES:
+        train = df.drop_duplicates(
+            [
+                "eeg_id",
+                "seizure_vote",
+                "lpd_vote",
+                "gpd_vote",
+                "lrda_vote",
+                "grda_vote",
+                "other_vote",
+            ]
+        ).reset_index(drop=True)
+        train["sign_id"] = train.index.values
+        df["sign_id"] = df.index.values
+
+        y_data = train[TARGETS].values
+        train[TARGETS_RAW] = y_data
+        y_data = y_data / y_data.sum(axis=1, keepdims=True)
+        train[TARGETS] = y_data
+
+        train.to_csv("train.csv", index=False)
+    else:
+        train = pd.read_csv("train.csv")
+
+
+
+## === cell 2
+if NEEDTRAIN:
+    PATH = os.path.join(LOAD_DATA_FROM, "train_eegs") + "/"
+    if READ_EEG_FILES:
+        b, a = signal.butter(3, np.float32(filter_range) * 2 / RSFREQ, "bandpass")
+        if ("stft" in DATATYPE) or ("img" in DATATYPE):
+            b2, a2 = signal.butter(
+                3, np.float32(filter_range2) * 2 / RSFREQ, "bandpass"
+            )
+        time_start_time = time.time()
+
+        for i, eeg_id in enumerate(train.eeg_id.unique()):
+
+            if i % 200 == 0:
+                gc.collect()
+                xx = time.time() - time_start_time
+                yy = xx / (i + 1) * len(train.eeg_id.unique())
+                print(i, f"time: {round(xx / 60, 2)} min / {round(yy / 60, 2)} min")
+            eeg_default = pd.read_parquet(
+                os.path.join(PATH, (str(eeg_id) + ".parquet"))
+            )
+
+            eeg = []
+            for channel in BRAIN:
+                eeg_temp = (
+                    eeg_default.loc[:, channel.split("-")[0]]
+                    - eeg_default.loc[:, channel.split("-")[1]]
+                ).values
+                eeg_temp[np.isnan(eeg_temp)] = 0
+                eeg.append(np.reshape(eeg_temp, (1, -1)))
+            eeg = np.concatenate(eeg, axis=0)
+
+            if SFREQ != RSFREQ:
+                eeg = signal.resample_poly(eeg, RSFREQ, SFREQ, axis=1)
+
+            if "stft" in DATATYPE:
+                eeg2 = signal.filtfilt(b2, a2, eeg, axis=1)
+                ff, tt, ss = signal.spectrogram(
+                    eeg2, axis=1, fs=RSFREQ, nperseg=RSFREQ, noverlap=60, nfft=160
+                )
+                ss[np.isnan(ss)] = 0
+                ss = ss[:, (ff > 0) * (ff <= 20), :]
+
+            if "img" in DATATYPE:
+                if not TF_AVAILABLE:
+                    raise RuntimeError("TensorFlow is required for img preprocessing.")
+                eeg2 = signal.filtfilt(b2, a2, eeg, axis=1)
+                eeg2 = np.clip(eeg2, a_min=-1024, a_max=1024)
+
+                train_plot = train[train.eeg_id == eeg_id].reset_index(drop=True)
+                for j in range(len(train_plot)):
+                    row = train_plot.iloc[j]
+                    rows = df.loc[
+                        (df.eeg_id == row.eeg_id)
+                        * (df.seizure_vote == row.seizure_vote_raw)
+                        * (df.lpd_vote == row.lpd_vote_raw)
+                        * (df.gpd_vote == row.gpd_vote_raw)
+                        * (df.lrda_vote == row.lrda_vote_raw)
+                        * (df.grda_vote == row.grda_vote_raw),
+                        :,
+                    ].reset_index(drop=True)
+                    row = (
+                        rows.sort_values(by="eeg_sub_id")
+                        .reset_index(drop=True)
+                        .iloc[len(rows) // 2]
+                    )
+
+                    eeg_plot = eeg2[
+                        :,
+                        round(row.eeg_label_offset_seconds * RSFREQ) : round(
+                            (row.eeg_label_offset_seconds + EEG_LENGTH) * RSFREQ
+                        ),
+                    ]
+                    eeg_plot = eeg_plot[
+                        :,
+                        round((EEG_LENGTH - IMG_LENGTH) / 2 * RSFREQ) : round(
+                            (EEG_LENGTH + IMG_LENGTH) / 2 * RSFREQ
+                        ),
+                    ]
+
+                    img_save = np.zeros(
+                        (eeg_plot.shape[0], 36, IMG_WIDE), dtype=np.float32
+                    )
+                    for ii in range(eeg_plot.shape[0]):
+                        fig = plt.figure(clear=True, figsize=(3.93, 2 / 18 * 2))
+                        fig.patch.set_facecolor("black")
+
+                        plt.plot(eeg_plot[ii, :] + 100, color="red", linewidth=0.2)
+
+                        plt.xlim(-5, eeg_plot.shape[1] + 5)
+                        plt.ylim(0, 200)
+                        plt.axis("off")
+
+                        byte_stream = io.BytesIO()
+                        plt.savefig(
+                            byte_stream, format="png", bbox_inches="tight", dpi=100
+                        )
+                        byte_stream.seek(0)
+                        img = Image.open(byte_stream)
+                        img = np.array(img)[:, :, :1]
+                        img = img / 255
+                        img = np.array(img, dtype=np.float32)
+                        byte_stream.truncate()
+                        plt.close("all")
+
+                        if img.shape != (36, IMG_WIDE, 1):
+                            img = np.concatenate((img, img, img), 2)
+                            img = np.array(
+                                tf.image.resize(img, (36, IMG_WIDE)), dtype=np.float32
+                            )
+                        img = img[:, :, 0]
+
+                        img_save[ii, :, :] = img
+
+                    imgs[train_plot.sign_id[j]] = img_save
+
+            eeg = signal.filtfilt(b, a, eeg, axis=1)
+            eeg = np.clip(eeg, a_min=-1024, a_max=1024)
+
+            if "eeg" in DATATYPE:
+                eegs[eeg_id] = eeg
+            if "stft" in DATATYPE:
+                stfts[eeg_id] = ss
+                stfts[-eeg_id] = tt
+
+        if not os.path.exists("./input/preprocess"):
+            os.makedirs("./input/preprocess")
+        if "eeg" in DATATYPE:
+            np.save("./input/preprocess/eegs.npy", eegs, allow_pickle=True)
+        if "stft" in DATATYPE:
+            np.save("./input/preprocess/stfts.npy", stfts, allow_pickle=True)
+        if "img" in DATATYPE:
+            np.save("./input/preprocess/imgs.npy", imgs, allow_pickle=True)
+
+    else:
+        if PLATFORM == "local":
+            datapath = "./" + os.path.join("input", "preprocess")
+        elif PLATFORM == "kaggle":
+            datapath = "/kaggle/" + os.path.join("input", "preprocess")
+
+        if "eeg" in DATATYPE:
+            eegs = np.load(os.path.join(datapath, "eegs.npy"), allow_pickle=True).item()
+        if "stft" in DATATYPE:
+            stfts = np.load(
+                os.path.join(datapath, "stfts.npy"), allow_pickle=True
+            ).item()
+        if "img" in DATATYPE:
+            imgs = np.load(os.path.join(datapath, "imgs.npy"), allow_pickle=True).item()
+
+
+
+## === cell 3
+if NEEDTRAIN:
+    PATH = os.path.join(LOAD_DATA_FROM, "train_spectrograms") + "/"
+    files = os.listdir(PATH)
+    print(f"There are {len(files)} spectrogram parquets")
+    time_start_time = time.time()
+    if READ_SPE_FILES:
+        for i, f in enumerate(files):
+            if i % 200 == 0:
+                gc.collect()
+                xx = time.time() - time_start_time
+                yy = xx / (i + 1) * len(files)
+                print(i, f"time: {round(xx / 60, 2)} min / {round(yy / 60, 2)} min")
+            tmp = pd.read_parquet(f"{PATH}{f}")
+            name = int(f.split(".")[0])
+            spectrograms[name] = tmp.iloc[:, 1:].values
+        if not os.path.exists("./input/preprocess"):
+            os.makedirs("./input/preprocess")
+        np.save("./input/preprocess/spectrograms.npy", spectrograms, allow_pickle=True)
+    else:
+        if "spe" in DATATYPE:
+            if PLATFORM == "local":
+                spectrograms = np.load(
+                    "./input/preprocess/spectrograms.npy", allow_pickle=True
+                ).item()
+            elif PLATFORM == "kaggle":
+                spectrograms = np.load(
+                    "/kaggle/input/preprocess/spectrograms.npy", allow_pickle=True
+                ).item()
+
+
+
+## === cell 4
+if TF_AVAILABLE:
+
+    class DataGenerator(tf.keras.utils.Sequence):
+        def __init__(
+            self,
+            dataframe,
+            batch_size=32,
+            shuffle=False,
+            sample_weights=False,
+            mode="train",
+            eegs=None,
+            stfts=None,
+            specs=None,
+            imgs=None,
+        ):
+
+            self.dataframe = dataframe.reset_index(drop=True)
+            self.batch_size = batch_size
+            self.shuffle = shuffle
+            self.sample_weights = sample_weights
+            self.mode = mode
+            self.eegs = eegs
+            self.stfts = stfts
+            self.specs = specs
+            self.imgs = imgs
+            self.on_epoch_end()
+
+        def __len__(self):
+            return int(np.ceil(len(self.dataframe) / self.batch_size))
+
+        def __getitem__(self, index):
+            indexes = self.indexes[
+                index * self.batch_size : (index + 1) * self.batch_size
+            ]
+            x, y, sample_weights = self.__data_generation(indexes)
+            if self.mode == "test":
+                return x
+            return x, y, sample_weights
+
+        def on_epoch_end(self):
+            self.indexes = np.arange(len(self.dataframe))
+            if self.shuffle:
+                np.random.shuffle(self.indexes)
+
+        def __data_generation(self, indexes):
+            if "spe" in DATATYPE:
+                x_spe = np.zeros((len(indexes), 4, SPE_HIGH, SPE_WIDE), dtype="float32")
+            if "eeg" in DATATYPE:
+                x_eeg = np.zeros(
+                    (
+                        len(indexes),
+                        (4 * 4) * EEG_MULTIPLY,
+                        round(EEG_LENGTH_USED * RSFREQ / EEG_MULTIPLY),
+                    ),
+                    dtype="float32",
+                )
+            if "stft" in DATATYPE:
+                x_stft = np.zeros(
+                    (len(indexes), STFT_HIGH * 9, STFT_WIDE * 2), dtype="float32"
+                )
+            if "img" in DATATYPE:
+                x_img = np.zeros((len(indexes), IMG_HIGH, IMG_WIDE, 3), dtype="float32")
+
+            y = np.zeros((len(indexes), len(TARGETS)), dtype="float32")
+            sample_weights = np.zeros((len(indexes), 1), dtype="float32")
+
+            for j, i in enumerate(indexes):
+                row = self.dataframe.iloc[i]
+
+                if self.mode == "test":
+                    r_spe = 0
+                    r_eeg = 0
+                    r_stft = 0
+                else:
+                    sample_weight = (
+                        float(sum(row[[c + "_raw" for c in TARGETS]].values)) / 20
+                        if all((c + "_raw") in row.index for c in TARGETS)
+                        else 1.0
+                    )
+                    rows = df.loc[
+                        (df.eeg_id == row.eeg_id)
+                        * (df.seizure_vote == row.seizure_vote_raw)
+                        * (df.lpd_vote == row.lpd_vote_raw)
+                        * (df.gpd_vote == row.gpd_vote_raw)
+                        * (df.lrda_vote == row.lrda_vote_raw)
+                        * (df.grda_vote == row.grda_vote_raw),
+                        :,
+                    ].reset_index(drop=True)
+                    if self.mode == "train":
+                        rows = rows.iloc[np.random.permutation(len(rows))].reset_index(
+                            drop=True
+                        )
+                        row = rows.loc[0, :]
+                    elif self.mode == "valid":
+                        row = (
+                            rows.sort_values(by="eeg_sub_id")
+                            .reset_index(drop=True)
+                            .iloc[len(rows) // 2]
+                        )
+                    r_spe = round(row.spectrogram_label_offset_seconds / 2)
+                    r_eeg = row.eeg_label_offset_seconds
+
+                if "spe" in DATATYPE:
+                    spe = []
+                    for k in range(4):
+                        spe.append(
+                            np.reshape(
+                                self.specs[row.spectrogram_id][
+                                    r_spe : (r_spe + 300), k * 100 : (k + 1) * 100
+                                ].T,
+                                (1, 100, 300),
+                            )
+                        )
+                    spe = np.concatenate(spe, axis=0)
+
+                if "eeg" in DATATYPE:
+                    eeg = self.eegs[row.eeg_id][
+                        :, round(r_eeg * RSFREQ) : round((r_eeg + 50) * RSFREQ)
+                    ]
+
+                if "stft" in DATATYPE:
+                    stft_t = self.stfts[-row.eeg_id]
+                    r_stft = (np.where(stft_t >= (r_eeg - min(stft_t))))[0][0]
+                    stft = self.stfts[row.eeg_id][:, :, r_stft : (r_stft + STFT_WIDE)]
+                    if stft.shape[2] < STFT_WIDE:
+                        stft = np.concatenate((stft, stft[:, :, ::-1]), 2)
+                        stft = stft[:, :, :STFT_WIDE]
+
+                if "img" in DATATYPE:
+                    sign_id = row["sign_id"] if "sign_id" in row.index else None
+                    img = self.imgs[sign_id]
+
+                if "spe" in DATATYPE:
+                    spe[np.isnan(spe)] = 0
+                    spe = np.clip(spe, a_min=1e-6, a_max=1e6)
+                    spe = np.log2(spe)
+                    spe = spe[
+                        :,
+                        :,
+                        round((spe.shape[2] - SPE_WIDE) / 2) : -round(
+                            (spe.shape[2] - SPE_WIDE) / 2
+                        ),
+                    ]
+                    spe = spe[[0, 2, 3, 1], :, :]
+                    if self.mode == "train":
+                        spe[0:2, :] = spe[0:2, :][np.random.permutation(2), :]
+                        spe[2:4, :] = spe[2:4, :][np.random.permutation(2), :]
+                        if np.random.rand() > 0.5:
+                            spe = spe[::-1, :, :]
+                        if np.random.rand() > 0.5:
+                            for ii in range(spe.shape[0]):
+                                m1 = round(np.random.rand() * spe.shape[2] / 2)
+                                m2 = round(np.random.rand() * spe.shape[2] / 2)
+                                if np.random.rand() > 0.5:
+                                    m1 = spe.shape[2] - m1
+                                    m2 = spe.shape[2] - m2
+                                m_min = min(m1, m2)
+                                m_max = min(
+                                    max(m1, m2), m_min + round(spe.shape[2] * 0.1)
+                                )
+                                spe[ii, :, m_min:m_max] = 0
+                    spe = (spe - np.mean(spe, keepdims=True)) / (
+                        np.std(spe, keepdims=True) + 1e-6
+                    )
+                    x_spe[j] = spe
+
+                if "eeg" in DATATYPE:
+                    eeg = eeg[
+                        :,
+                        round((EEG_LENGTH - EEG_LENGTH_USED) * RSFREQ / 2) : round(
+                            (EEG_LENGTH + EEG_LENGTH_USED) * RSFREQ / 2
+                        ),
+                    ]
+                    eeg_save = np.zeros(
+                        (x_eeg.shape[1], x_eeg.shape[2]), dtype=np.float32
+                    )
+                    eeg = np.concatenate((eeg[0:8, :], eeg[10:18, :]), axis=0)
+
+                    if self.mode == "train":
+                        eeg[0:8, :] = eeg[0:8, :][np.random.permutation(8), :]
+                        eeg[8:16, :] = eeg[8:16, :][np.random.permutation(8), :]
+                        if np.random.rand() > 0.5:
+                            eeg = eeg[::-1, :]
+
+                    for ii in range(eeg_save.shape[0]):
+                        eeg_save[ii, :] = eeg[
+                            ii // EEG_MULTIPLY, ii % EEG_MULTIPLY :: EEG_MULTIPLY
+                        ]
+
+                    eeg = (eeg_save - np.mean(eeg_save, keepdims=True)) / (
+                        np.std(eeg_save, keepdims=True) + 1e-6
+                    )
+                    x_eeg[j] = eeg
+
+                if "stft" in DATATYPE:
+                    stft = np.clip(stft, a_min=1e-6, a_max=1e6)
+                    stft = np.log2(stft)
+                    if self.mode == "train":
+                        stft[0:8, :, :] = stft[0:8, :, :][
+                            np.random.permutation(8), :, :
+                        ]
+                        stft[10:18, :, :] = stft[10:18, :, :][
+                            np.random.permutation(8), :, :
+                        ]
+                        if np.random.rand() > 0.5:
+                            stft = stft[::-1, :, :]
+                    stft_save = np.zeros(
+                        (round(stft.shape[0] / 2 * stft.shape[1]), stft.shape[2] * 2),
+                        dtype=np.float32,
+                    )
+                    for ii in range(stft.shape[0]):
+                        stft_save[
+                            ii // 2 * stft.shape[1] : (ii // 2 + 1) * stft.shape[1],
+                            (ii % 2) * stft.shape[2] : (ii % 2 + 1) * stft.shape[2],
+                        ] = stft[ii, :, :]
+                    stft = (stft_save - np.mean(stft_save, keepdims=True)) / (
+                        np.std(stft_save, keepdims=True) + 1e-6
+                    )
+                    x_stft[j] = stft
+
+                if "img" in DATATYPE:
+                    img_save = np.zeros((IMG_HIGH, IMG_WIDE), dtype=np.float32)
+                    if self.mode == "train":
+                        img[0:8, :, :] = img[0:8, :, :][np.random.permutation(8), :, :]
+                        img[10:18, :, :] = img[10:18, :, :][
+                            np.random.permutation(8), :, :
+                        ]
+                        if np.random.rand() > 0.5:
+                            img = img[::-1, :, :]
+                    for ii in range(img.shape[0]):
+                        axis_temp = img_save.shape[1] / img.shape[0] / 2 * (2 * ii + 1)
+                        start_temp = round(
+                            max(axis_temp - img_save.shape[1] / img.shape[0], 0)
+                        )
+                        end_temp = round(
+                            min(
+                                img_save.shape[0],
+                                axis_temp + img_save.shape[1] / img.shape[0],
+                            )
+                        )
+                        temp_temp = round(img.shape[1] / 2 - (axis_temp - start_temp))
+                        img_save[start_temp:end_temp, :] = (
+                            img_save[start_temp:end_temp, :]
+                            + img[
+                                ii,
+                                temp_temp : round(temp_temp + end_temp - start_temp),
+                                :,
+                            ]
+                        )
+                    img_save = np.clip(img_save, a_min=0, a_max=1)
+                    img = np.reshape(
+                        img_save, (img_save.shape[0], img_save.shape[1], 1)
+                    )
+                    img = np.concatenate((img, img, img), -1)
+                    img = (img - np.mean(img)) / (np.std(img) + 1e-6)
+                    x_img[j] = img
+
+                if self.mode != "test":
+                    y[j] = row[TARGETS].values / sum(row[TARGETS].values)
+                    sample_weights[j] = sample_weight if self.sample_weights else 1.0
+
+            x = []
+            if "spe" in DATATYPE:
+                x.append(x_spe)
+            if "eeg" in DATATYPE:
+                x.append(x_eeg)
+            if "stft" in DATATYPE:
+                x.append(x_stft)
+            if "img" in DATATYPE:
+                x.append(x_img)
+
+            return x, y, sample_weights
+
+
+
+
+## === cell 5
+if TF_AVAILABLE:
+
+    class CosineAnnealingLRScheduler(optimizers.schedules.LearningRateSchedule):
+        def __init__(self, total_step, lr_max, lr_min=0, warmth_rate=0):
+            super(CosineAnnealingLRScheduler, self).__init__()
+            self.total_step = total_step
+            self.warm_step = 1 if warmth_rate == 0 else int(warmth_rate)
+            self.lr_max = lr_max
+            self.lr_min = lr_min
+
+        @tf.function
+        def __call__(self, step):
+            step = step + 1
+            if step < self.warm_step:
+                lr = self.lr_max / self.warm_step * step
+            else:
+                lr = self.lr_min + 0.5 * (self.lr_max - self.lr_min) * (
+                    1.0
+                    + tf.cos(
+                        (step - self.warm_step)
+                        / (self.total_step - self.warm_step)
+                        * np.pi
+                    )
+                )
+            return lr
+
+
+
+
+## === cell 6
+if TF_AVAILABLE:
+
+    def build_model():
+        inp = []
+        y = None
+
+        if "spe" in DATATYPE:
+            inp_spe = tf.keras.Input(shape=(4, SPE_HIGH, SPE_WIDE))
+            x_spe = tf.keras.layers.Concatenate(axis=1)(
+                [
+                    inp_spe[:, 0, :, :],
+                    inp_spe[:, 1, :, :],
+                    inp_spe[:, 2, :, :],
+                    inp_spe[:, 3, :, :],
+                ]
+            )
+            x_spe = tf.keras.layers.Reshape((x_spe.shape[1], x_spe.shape[2], 1))(x_spe)
+            x_spe = tf.keras.layers.Concatenate(axis=-1)([x_spe, x_spe, x_spe])
+
+            base_model_spe = tf.keras.applications.EfficientNetB0(
+                include_top=False, weights="imagenet"
+            )
+            base_model_spe._name = "spe_extractor"
+            x_spe = base_model_spe(x_spe)
+            x_spe = tf.keras.layers.GlobalAveragePooling2D()(x_spe)
+
+            inp.append(inp_spe)
+            y = x_spe
+
+        if "eeg" in DATATYPE:
+            inp_eeg = tf.keras.Input(
+                shape=(
+                    (4 * 4) * EEG_MULTIPLY,
+                    round(EEG_LENGTH_USED * RSFREQ / EEG_MULTIPLY),
+                )
+            )
+            x_eeg = tf.keras.layers.Reshape((inp_eeg.shape[1], inp_eeg.shape[2], 1))(
+                inp_eeg
+            )
+            x_eeg = tf.keras.layers.Concatenate(axis=-1)([x_eeg, x_eeg, x_eeg])
+
+            base_model_eeg = tf.keras.applications.EfficientNetB0(
+                include_top=False, weights="imagenet"
+            )
+            base_model_eeg._name = "eeg_extractor"
+            x_eeg = base_model_eeg(x_eeg)
+            x_eeg = tf.keras.layers.GlobalAveragePooling2D()(x_eeg)
+            x_eeg = tf.keras.layers.Dropout(0.2)(x_eeg)
+
+            inp.append(inp_eeg)
+            y = (
+                tf.keras.layers.Concatenate(axis=1)([y, x_eeg])
+                if y is not None
+                else x_eeg
+            )
+
+        if "stft" in DATATYPE:
+            inp_stft = tf.keras.Input(shape=(STFT_HIGH * 9, STFT_WIDE * 2))
+            x_stft = tf.keras.layers.Reshape((inp_stft.shape[1], inp_stft.shape[2], 1))(
+                inp_stft
+            )
+            x_stft = tf.keras.layers.Concatenate(axis=-1)([x_stft, x_stft, x_stft])
+
+            base_model_stft = tf.keras.applications.EfficientNetB0(
+                include_top=False, weights="imagenet"
+            )
+            base_model_stft._name = "stft_extractor"
+            x_stft = base_model_stft(x_stft)
+            x_stft = tf.keras.layers.GlobalAveragePooling2D()(x_stft)
+
+            inp.append(inp_stft)
+            y = (
+                tf.keras.layers.Concatenate(axis=1)([y, x_stft])
+                if y is not None
+                else x_stft
+            )
+
+        if "img" in DATATYPE:
+            inp_img = tf.keras.Input(shape=(IMG_HIGH, IMG_WIDE, 3))
+            base_model_img = tf.keras.applications.EfficientNetB0(
+                include_top=False, weights="imagenet"
+            )
+            base_model_img._name = "img_extractor"
+            x_img = base_model_img(inp_img)
+            x_img = tf.keras.layers.GlobalAveragePooling2D()(x_img)
+
+            inp.append(inp_img)
+            y = (
+                tf.keras.layers.Concatenate(axis=1)([y, x_img])
+                if y is not None
+                else x_img
+            )
+
+        y = tf.keras.layers.Dense(len(TARGETS), activation="softmax", dtype="float32")(
+            y
+        )
+        model = tf.keras.Model(inputs=inp, outputs=y)
+        return model
+
+
+
+
+## === cell 7
+if NEEDTRAIN:
+    if not TF_AVAILABLE:
+        raise RuntimeError("TensorFlow is required for training.")
+    gpus = tf.config.list_physical_devices("GPU")
+    if len(gpus) <= 1:
+        strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
+        print(f"Using {len(gpus)} GPU")
+    else:
+        strategy = tf.distribute.MirroredStrategy()
+        print(f"Using {len(gpus)} GPUs")
+
+    os.environ["TF_DETERMINISTIC_OPS"] = "1"
+    tf.random.set_seed(SEED)
+    tf.keras.utils.set_random_seed(SEED)
+    try:
+        tf.config.experimental.enable_op_determinism()
+    except Exception:
+        pass
+
+    MIX = True
+    if MIX:
+        try:
+            tf.config.optimizer.set_experimental_options({"auto_mixed_precision": True})
+            print("Mixed precision enabled")
+        except Exception:
+            print("Mixed precision not available; continuing")
+    else:
+        print("Using full precision")
+
+    if not os.path.exists("models"):
+        os.makedirs("models")
+
+    from sklearn.model_selection import GroupKFold
+    import tensorflow.keras.backend as K
+    import itertools
+
+    TARGETS_RAW = [c + "_raw" for c in TARGETS]
+
+    gkf = GroupKFold(n_splits=SPLITS)
+
+    for i, (train_index, valid_index) in enumerate(
+        gkf.split(train, train.expert_consensus, train.patient_id)
+    ):
+        print("#" * 25)
+        print(f"### Fold {i + 1}")
+
+        df_train_stage1 = train.iloc[train_index].reset_index(drop=True)
+        df_valid_stage1 = train.iloc[valid_index].reset_index(drop=True)
+
+        df_train_stage2 = df_train_stage1[
+            np.sum(df_train_stage1[TARGETS_RAW].values, 1) >= 6
+        ].reset_index(drop=True)
+        df_valid_stage2 = df_valid_stage1[
+            np.sum(df_valid_stage1[TARGETS_RAW].values, 1) >= 6
+        ].reset_index(drop=True)
+
+        train_gen = DataGenerator(
+            df_train_stage1,
+            shuffle=True,
+            sample_weights=True,
+            batch_size=BATCHSIZE,
+            specs=spectrograms,
+            eegs=eegs,
+            stfts=stfts,
+            imgs=imgs,
+        )
+        valid_gen = DataGenerator(
+            df_valid_stage1,
+            shuffle=False,
+            sample_weights=True,
+            batch_size=BATCHSIZE * 2,
+            mode="valid",
+            specs=spectrograms,
+            eegs=eegs,
+            stfts=stfts,
+            imgs=imgs,
+        )
+
+        callbacks_list = [
+            tf.keras.callbacks.LearningRateScheduler(
+                CosineAnnealingLRScheduler(EPOCHS, LEARN_RATE, 1e-5, 5)
+            ),
+            tf.keras.callbacks.ModelCheckpoint(
+                filepath=os.path.join("models", f"fold{i}_stage{1}.h5"),
+                monitor="val_loss",
+                mode="min",
+                save_weights_only=True,
+                save_best_only=True,
+            ),
+        ]
+
+        with strategy.scope():
+            model = build_model()
+            opt = tf.keras.optimizers.AdamW(learning_rate=LEARN_RATE)
+            loss = tf.keras.losses.KLDivergence()
+            model.compile(loss=loss, optimizer=opt)
+
+        history = model.fit(
+            train_gen,
+            verbose=1,
+            validation_data=valid_gen,
+            epochs=EPOCHS,
+            callbacks=callbacks_list,
+        )
+
+        model.load_weights(os.path.join("models", f"fold{i}_stage1.h5"))
+
+        loss_hist = history.history["loss"]
+        val_loss_hist = history.history["val_loss"]
+        epochs_rng = range(1, len(loss_hist) + 1)
+        plt.plot(epochs_rng, loss_hist, "bo", label="loss")
+        plt.plot(epochs_rng, val_loss_hist, "b", label="val_loss")
+        plt.title(
+            f"loss: {round(min(loss_hist), 4)}, val loss: {round(min(val_loss_hist), 4)}",
+            fontsize=12,
+        )
+        plt.legend()
+        plt.savefig(os.path.join("models", f"fold{i}_stage1.pdf"))
+        plt.close()
+
+        valid_stage1 = df_valid_stage1[TARGETS].values
+        predict_stage1 = model.predict(valid_gen)
+        cm = confusion_matrix(np.argmax(valid_stage1, 1), np.argmax(predict_stage1, 1))
+        cm = cm / np.sum(cm, 1, keepdims=True)
+
+        plt.figure()
+        plt.imshow(cm, interpolation="nearest", cmap=plt.cm.Blues)
+        plt.title("Confusion Matrix")
+        plt.colorbar()
+        tick_marks = np.arange(6)
+        plt.xticks(
+            tick_marks, [f"{TARGETS[i][:-5]}" for i in [0, 1, 2, 3, 4, 5]], fontsize=10
+        )
+        plt.yticks(
+            tick_marks, [f"{TARGETS[i][:-5]}" for i in [0, 1, 2, 3, 4, 5]], fontsize=10
+        )
+        thresh = cm.max() / 2.0
+        for ii, jj in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+            plt.text(
+                jj,
+                ii,
+                str(round(cm[ii, jj] * 1e4) * 1e-2)[:5],
+                horizontalalignment="center",
+                color="white" if cm[ii, jj] > thresh else "black",
+                fontsize=10,
+            )
+        plt.xlabel("Predicted label")
+        plt.ylabel("True label")
+        plt.tight_layout()
+        plt.savefig(os.path.join("models", f"fold{i}_stage1_cm.pdf"))
+        plt.close()
+
+        del model, history, train_gen, valid_gen
+        K.clear_session()
+        gc.collect()
+
+        train_gen = DataGenerator(
+            df_train_stage2,
+            shuffle=True,
+            sample_weights=False,
+            batch_size=BATCHSIZE,
+            specs=spectrograms,
+            eegs=eegs,
+            stfts=stfts,
+            imgs=imgs,
+        )
+        valid_gen = DataGenerator(
+            df_valid_stage2,
+            shuffle=False,
+            sample_weights=False,
+            batch_size=BATCHSIZE * 2,
+            mode="valid",
+            specs=spectrograms,
+            eegs=eegs,
+            stfts=stfts,
+            imgs=imgs,
+        )
+
+        callbacks_list = [
+            tf.keras.callbacks.LearningRateScheduler(
+                CosineAnnealingLRScheduler(round(EPOCHS / 3), LEARN_RATE * 0.1, 1e-5, 0)
+            ),
+            tf.keras.callbacks.ModelCheckpoint(
+                filepath=os.path.join("models", f"fold{i}_stage{2}.h5"),
+                monitor="val_loss",
+                mode="min",
+                save_weights_only=True,
+                save_best_only=True,
+            ),
+        ]
+
+        with strategy.scope():
+            model = build_model()
+            opt = tf.keras.optimizers.AdamW(learning_rate=LEARN_RATE * 0.1)
+            loss = tf.keras.losses.KLDivergence()
+            model.compile(loss=loss, optimizer=opt)
+            model.load_weights(os.path.join("models", f"fold{i}_stage1.h5"))
+
+        history = model.fit(
+            train_gen,
+            verbose=1,
+            validation_data=valid_gen,
+            epochs=round(EPOCHS / 3),
+            callbacks=callbacks_list,
+        )
+
+        model.load_weights(os.path.join("models", f"fold{i}_stage2.h5"))
+
+        del model, history, train_gen, valid_gen
+        K.clear_session()
+        gc.collect()
+
+
+
+## === cell 8
+if not NEEDTRAIN:
+
+    def _write_prior_submission(test_df, targets, train_df, out_path="submission.csv"):
+        y = train_df[targets].values.astype(np.float64)
+        y = y / (y.sum(axis=1, keepdims=True) + 1e-12)
+        prior = y.mean(axis=0)
+        prior = np.clip(prior, 1e-8, 1.0)
+        prior = prior / prior.sum()
+
+        preds_all = np.tile(prior.astype(np.float32), (len(test_df), 1))
+        sub = pd.DataFrame({"eeg_id": test_df.eeg_id.values})
+        sub[targets] = preds_all
+        sub[targets] = np.clip(sub[targets].values, 1e-8, 1.0)
+        sub[targets] = sub[targets].values / sub[targets].values.sum(
+            axis=1, keepdims=True
+        )
+        sub.to_csv(out_path, index=False)
+        print("Wrote prior-based submission:", out_path, "shape:", sub.shape)
+        print(sub.head())
+        return sub
+
+    def _compute_train_prior(train_df, targets):
+        y = train_df[targets].values.astype(np.float64)
+        y = y / (y.sum(axis=1, keepdims=True) + 1e-12)
+        prior = y.mean(axis=0)
+        prior = np.clip(prior, 1e-8, 1.0)
+        prior = prior / prior.sum()
+        return prior.astype(np.float32)
+
+    def _discover_fold_files_any(root: str, splits: int):
+        """
+        Search root (and nested dirs) for fold weight files in common patterns.
+        Returns dict: fold_index -> weight_path.
+        """
+        if not root or not os.path.isdir(root):
+            return {}
+
+        patterns = [
+            "fold{fold}_stage2.h5",
+            "fold{fold}_stage1.h5",
+            "fold{fold}.h5",
+            "fold{fold}.weights.h5",
+            "fold{fold}_stage2.keras",
+            "fold{fold}_stage1.keras",
+            "fold{fold}.keras",
+        ]
+
+        found = {}
+        for fold in range(splits):
+            for pat in patterns:
+                p = os.path.join(root, pat.format(fold=fold))
+                if os.path.exists(p):
+                    found[fold] = p
+                    break
+
+        if len(found) > 0:
+            return found
+
+        root_depth = root.rstrip(os.sep).count(os.sep)
+        for dirpath, dirnames, filenames in os.walk(root):
+            if dirpath.rstrip(os.sep).count(os.sep) - root_depth > 7:
+                dirnames[:] = []
+                continue
+            fnset = set(filenames)
+            for fold in range(splits):
+                if fold in found:
+                    continue
+                for pat in patterns:
+                    fn = os.path.basename(pat.format(fold=fold))
+                    if fn in fnset:
+                        found[fold] = os.path.join(dirpath, fn)
+                        break
+        return found
+
+    def _load_available_folds_from_paths(model_template, fold_to_path: dict):
+        loaded = []
+        loaded_paths = []
+        loaded_folds = []
+        for fold in sorted(fold_to_path.keys()):
+            fpath = fold_to_path[fold]
+            try:
+                model = clone_model(model_template)
+                model.compile(
+                    loss=tf.keras.losses.KLDivergence(),
+                    optimizer=tf.keras.optimizers.AdamW(learning_rate=LEARN_RATE),
+                )
+                model.load_weights(fpath)
+                loaded.append(model)
+                loaded_paths.append(fpath)
+                loaded_folds.append(fold)
+            except Exception as e:
+                print("WARNING: failed loading weights:", fpath, "error:", repr(e))
+        return loaded, loaded_paths, loaded_folds
+
+    def _predict_inference_mode(model, generator):
+        @tf.function
+        def _call(x):
+            return model(x, training=False)
+
+        preds = []
+        for bi in range(len(generator)):
+            x = generator[bi]
+            y = _call(x)
+            preds.append(y.numpy())
+        return np.concatenate(preds, axis=0)
+
+    test = pd.read_csv(os.path.join(LOAD_DATA_FROM, "test.csv"))
+    test["sign_id"] = test.index.values
+    print("Test shape", test.shape)
+
+    sample_sub_path = os.path.join(LOAD_DATA_FROM, "sample_submission.csv")
+    sample_submission = pd.read_csv(sample_sub_path)
+    TARGETS = [c for c in sample_submission.columns if c != "eeg_id"]
+
+    if not TF_AVAILABLE:
+        _write_prior_submission(test, TARGETS, df, out_path="submission.csv")
+    else:
+        gpus = tf.config.list_physical_devices("GPU")
+        if len(gpus) <= 1:
+            strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
+            print(f"Using {len(gpus)} GPU")
+        else:
+            strategy = tf.distribute.MirroredStrategy()
+            print(f"Using {len(gpus)} GPUs")
+
+        os.environ["TF_DETERMINISTIC_OPS"] = "1"
+        tf.random.set_seed(SEED)
+        tf.keras.utils.set_random_seed(SEED)
+        try:
+            tf.config.experimental.enable_op_determinism()
+        except Exception:
+            pass
+
+        MIX = True
+        if MIX:
+            try:
+                tf.config.optimizer.set_experimental_options(
+                    {"auto_mixed_precision": True}
+                )
+                print("Mixed precision enabled")
+            except Exception:
+                print("Mixed precision not available; continuing")
+        else:
+            print("Using full precision")
+
+        candidate_model_roots = [LOAD_MODELS_FROM]
+        if PLATFORM == "kaggle":
+            candidate_model_roots.extend(
+                [
+                    f"/kaggle/data/{os.path.basename(LOAD_MODELS_FROM)}",
+                    f"/kaggle/data/{LOAD_MODELS_FROM.strip('/').split('/')[-1]}",
+                    "/kaggle/input",
+                    "/kaggle/data",
+                    "/kaggle/working",
+                ]
+            )
+
+        fold_to_path = {}
+        chosen_root = None
+        for root in candidate_model_roots:
+            found = _discover_fold_files_any(root, SPLITS)
+            if len(found) > len(fold_to_path):
+                fold_to_path = found
+                chosen_root = root
+            if len(fold_to_path) == SPLITS:
+                break
+
+        if len(fold_to_path) == 0:
+            print(
+                "WARNING: No fold weights found. Writing prior-based submission fallback."
+            )
+            _write_prior_submission(test, TARGETS, df, out_path="submission.csv")
+        else:
+            print("Using model weights discovered under root:", chosen_root)
+            print("Found folds:", sorted(fold_to_path.keys()))
+            for k in sorted(fold_to_path.keys())[:5]:
+                print(f"fold{k}:", fold_to_path[k])
+
+            with strategy.scope():
+                model_template = build_model()
+                model_template.compile(
+                    loss=tf.keras.losses.KLDivergence(),
+                    optimizer=tf.keras.optimizers.AdamW(learning_rate=LEARN_RATE),
+                )
+
+            models, loaded_paths, loaded_folds = _load_available_folds_from_paths(
+                model_template, fold_to_path
+            )
+            print(f"Loaded {len(models)}/{SPLITS} fold models:", loaded_folds)
+            for p in loaded_paths[:5]:
+                print("Loaded:", p)
+
+            if len(models) == 0:
+                print(
+                    "WARNING: Found weight paths but could not load any. Writing prior-based submission fallback."
+                )
+                _write_prior_submission(test, TARGETS, df, out_path="submission.csv")
+            else:
+                if "spe" in DATATYPE:
+                    PATH_test = os.path.join(LOAD_DATA_FROM, "test_spectrograms") + "/"
+                    files_test = os.listdir(PATH_test)
+                    print(f"There are {len(files_test)} test spectrogram parquets")
+
+                    for i, f in enumerate(files_test):
+                        if i % 100 == 0:
+                            print(i, ", ", end="")
+                        tmp = pd.read_parquet(f"{PATH_test}{f}")
+                        name = int(f.split(".")[0])
+                        spectrograms_test[name] = tmp.iloc[:, 1:].values
+                    print()
+
+                PATH_test = os.path.join(LOAD_DATA_FROM, "test_eegs") + "/"
+                if ("eeg" in DATATYPE) or ("stft" in DATATYPE) or ("img" in DATATYPE):
+                    b, a = signal.butter(
+                        3, np.float32(filter_range) * 2 / RSFREQ, "bandpass"
+                    )
+                    b2, a2 = signal.butter(
+                        3, np.float32(filter_range2) * 2 / RSFREQ, "bandpass"
+                    )
+
+                    preds_all = np.zeros((len(test), len(TARGETS)), dtype=np.float32)
+
+                    start_idx_batch = 0
+                    for i, eeg_id in enumerate(test.eeg_id.values):
+                        if i % 100 == 0:
+                            print(i, ", ", end="")
+
+                        eeg_default = pd.read_parquet(
+                            os.path.join(PATH_test, (str(eeg_id) + ".parquet"))
+                        )
+
+                        eeg = []
+                        for channel in BRAIN:
+                            eeg_temp = (
+                                eeg_default.loc[:, channel.split("-")[0]]
+                                - eeg_default.loc[:, channel.split("-")[1]]
+                            ).values
+                            eeg_temp[np.isnan(eeg_temp)] = 0
+                            eeg.append(np.reshape(eeg_temp, (1, -1)))
+                        eeg = np.concatenate(eeg, axis=0)
+
+                        if SFREQ != RSFREQ:
+                            eeg = signal.resample_poly(eeg, RSFREQ, SFREQ, axis=1)
+
+                        if "stft" in DATATYPE:
+                            eeg2 = signal.filtfilt(b2, a2, eeg, axis=1)
+                            ff, tt, ss = signal.spectrogram(
+                                eeg2,
+                                axis=1,
+                                fs=RSFREQ,
+                                nperseg=RSFREQ,
+                                noverlap=60,
+                                nfft=160,
+                            )
+                            ss[np.isnan(ss)] = 0
+                            ss = ss[:, (ff > 0) * (ff <= 20), :]
+
+                        if "img" in DATATYPE:
+                            eeg2 = signal.filtfilt(b2, a2, eeg, axis=1)
+                            eeg2 = np.clip(eeg2, a_min=-1024, a_max=1024)
+
+                            train_plot = test[test.eeg_id == eeg_id].reset_index(
+                                drop=True
+                            )
+                            for j in range(len(train_plot)):
+                                eeg_plot = eeg2[:, 0 : EEG_LENGTH * RSFREQ]
+                                eeg_plot = eeg_plot[
+                                    :,
+                                    round(
+                                        (EEG_LENGTH - IMG_LENGTH) / 2 * RSFREQ
+                                    ) : round((EEG_LENGTH + IMG_LENGTH) / 2 * RSFREQ),
+                                ]
+
+                                img_save = np.zeros(
+                                    (eeg_plot.shape[0], 36, IMG_WIDE), dtype=np.float32
+                                )
+                                for ii in range(eeg_plot.shape[0]):
+                                    fig = plt.figure(
+                                        clear=True, figsize=(3.93, 2 / 18 * 2)
+                                    )
+                                    fig.patch.set_facecolor("black")
+
+                                    plt.plot(
+                                        eeg_plot[ii, :] + 100,
+                                        color="red",
+                                        linewidth=0.2,
+                                    )
+                                    plt.xlim(-5, eeg_plot.shape[1] + 5)
+                                    plt.ylim(0, 200)
+                                    plt.axis("off")
+
+                                    byte_stream = io.BytesIO()
+                                    plt.savefig(
+                                        byte_stream,
+                                        format="png",
+                                        bbox_inches="tight",
+                                        dpi=100,
+                                    )
+                                    byte_stream.seek(0)
+                                    img = Image.open(byte_stream)
+                                    img = np.array(img)[:, :, :1]
+                                    img = img / 255
+                                    img = np.array(img, dtype=np.float32)
+                                    byte_stream.truncate()
+                                    plt.close("all")
+
+                                    if img.shape != (36, IMG_WIDE, 1):
+                                        img = np.concatenate((img, img, img), 2)
+                                        img = np.array(
+                                            tf.image.resize(img, (36, IMG_WIDE)),
+                                            dtype=np.float32,
+                                        )
+                                    img = img[:, :, 0]
+
+                                    img_save[ii, :, :] = img
+
+                                imgs_test[int(train_plot.sign_id[j])] = img_save
+
+                        eeg = signal.filtfilt(b, a, eeg, axis=1)
+                        eeg = np.clip(eeg, a_min=-1024, a_max=1024)
+
+                        if "eeg" in DATATYPE:
+                            eegs_test[int(eeg_id)] = eeg
+                        if "stft" in DATATYPE:
+                            stfts_test[int(eeg_id)] = ss
+                            stfts_test[-int(eeg_id)] = tt
+
+                        is_last_in_batch = ((i + 1) % TEST_BATCHSIZE == 0) or (
+                            (i + 1) == len(test.eeg_id)
+                        )
+                        if is_last_in_batch:
+                            end_idx_batch = i + 1
+                            batch_df = test.iloc[
+                                start_idx_batch:end_idx_batch
+                            ].reset_index(drop=True)
+
+                            test_gen = DataGenerator(
+                                batch_df,
+                                shuffle=False,
+                                sample_weights=False,
+                                batch_size=TEST_BATCHSIZE,
+                                mode="test",
+                                specs=spectrograms_test,
+                                eegs=eegs_test,
+                                stfts=stfts_test,
+                                imgs=imgs_test,
+                            )
+
+                            preds = []
+                            for m in models:
+                                pred = _predict_inference_mode(m, test_gen)
+                                preds.append(pred)
+                            pred = np.mean(preds, axis=0).astype(np.float32)
+
+                            preds_all[start_idx_batch:end_idx_batch, :] = pred
+
+                            eegs_test = {}
+                            stfts_test = {}
+                            imgs_test = {}
+                            gc.collect()
+
+                            start_idx_batch = end_idx_batch
+
+                    print()
+
+                if preds_all.shape[0] != len(test):
+                    raise RuntimeError(
+                        f"Prediction rows mismatch: got {preds_all.shape[0]}, expected {len(test)}"
+                    )
+
+                preds_all = np.nan_to_num(
+                    preds_all,
+                    nan=1.0 / len(TARGETS),
+                    posinf=1.0 / len(TARGETS),
+                    neginf=1.0 / len(TARGETS),
+                )
+
+                train_prior = _compute_train_prior(df, TARGETS)
+                eps = 0.005
+                preds_all = (1.0 - eps) * preds_all + eps * train_prior[None, :]
+
+                prob_floor = 2e-5
+                preds_all = np.clip(preds_all, prob_floor, 1.0)
+                preds_all = preds_all / preds_all.sum(axis=1, keepdims=True)
+
+                sub = pd.DataFrame({"eeg_id": test.eeg_id.values})
+                sub[TARGETS] = preds_all
+
+                sub = sample_submission[["eeg_id"]].merge(sub, on="eeg_id", how="left")
+                for c in TARGETS:
+                    if c not in sub.columns:
+                        sub[c] = 1.0 / len(TARGETS)
+
+                sub[TARGETS] = sub[TARGETS].astype(np.float32)
+                sub[TARGETS] = np.clip(sub[TARGETS].values, prob_floor, 1.0)
+                sub[TARGETS] = sub[TARGETS].values / sub[TARGETS].values.sum(
+                    axis=1, keepdims=True
+                )
+
+                sub.to_csv("submission.csv", index=False)
+                print("Submission shape", sub.shape)
+                print(sub.head())

@@ -1,0 +1,602 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+3.33144
+
+# 6. Current score
+
+746.80884
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 281.39519) has done: 'I fix the TensorFlow import crash by pinning protobuf’s Python implementation via an environment variable before TensorFlow loads, which resolves the `MessageFactory.GetPrototype` error in this Kaggle environment. Then I fix two logic bugs that are causing the massive RMSE: the feature list is currently wrong (`train_df.columns[2:]`) and the neural net input dimension is incorrect (`features.shape[0]` on an Index), both of which lead to mis-scaled/misaligned inputs. Finally, I ensure test features are built from the same explicit feature list used for training, and keep the overall model/training approach the same so the pipeline runs end-to-end and writes a valid `taxi_fare_submission.csv`.'
+- What this solution (achieved 292.78572) has done: 'I fix the TensorFlow/protobuf crash by setting the environment variables before *any* TensorFlow import happens (it currently happens too late, after cell 0 already executed). Then I keep your exact feature set and neural net architecture/training loop, but make the pipeline robust by ensuring all feature columns are numeric and aligned between train/test before scaling. Finally, I keep the same submission format and guarantee the `.csv` is written end-to-end. These changes are directly aimed at eliminating the crash and the severe RMSE caused by broken execution, without altering the core modeling approach.'
+- What this solution (achieved 597.10448) has done: 'I fix the TensorFlow/protobuf crash by setting the protobuf implementation environment variables *before any TensorFlow-related import happens*, and by importing TensorFlow only after that point. I also remove an unintended performance/score-killing change: EarlyStopping is currently enabled (contrary to the original “no early stopping” intent), so I keep the same model and training loop but train for the full 50 epochs without that callback. Finally, I make the numeric coercion in the train/valid/test feature frames safe (avoid chained assignment pitfalls) while keeping the exact same feature set and scaling approach, and ensure the submission CSV is written in the required format.'
+- What this solution (achieved 282.46894) has done: 'I fix the TensorFlow/protobuf crash by setting `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` in the process environment before any TensorFlow-related import occurs (this is currently done, but we also need to ensure TF never gets imported earlier indirectly and clear any conflicting protobuf C-extension usage). Then I keep your exact feature set, scaler usage, model architecture, and 50-epoch training loop unchanged, only adding a small safety step to force TensorFlow to import after the env vars and to avoid any stale module state in notebook execution. Finally, I ensure the submission is always written as `taxi_fare_submission.csv` with the required `key` and `fare_amount` columns.'
+- What this solution (achieved 828.77211) has done: 'I fix the TensorFlow/protobuf import crash by removing the unsafe module-popping logic and ensuring the protobuf “python” implementation env var is set before TensorFlow is imported, plus forcing protobuf to use the pure-Python backend at runtime. This change is directly targeted at the current execution failure in cell 35 so the pipeline can run end-to-end and write a valid `taxi_fare_submission.csv`. I keep your feature set, scaling, model architecture, optimizer, and 50-epoch training loop unchanged so evaluation semantics remain the same. No score-tuning changes are introduced beyond making the model actually train and predict correctly (which should dramatically reduce RMSE versus the current broken run).'
+- What this solution (achieved 427.4214) has done: 'I fix the TensorFlow/protobuf crash by avoiding the internal protobuf API hack that triggers the `MessageFactory.GetPrototype` attribute error in this environment, while keeping your existing environment-variable workaround that forces the pure-Python protobuf implementation. Then I ensure TensorFlow is imported only after those env vars are set, and keep the scaler, feature set, model architecture, and 50-epoch training loop exactly the same. Finally, I keep the submission generation unchanged but make sure it always runs end-to-end and writes `taxi_fare_submission.csv` with the required `key` and `fare_amount` columns.'
+- What this solution (achieved 612.88255) has done: 'I fix the TensorFlow/protobuf crash by forcing the pure-Python protobuf implementation *before any TensorFlow import* and by importing `google.protobuf` first to ensure the backend is selected, which resolves the `MessageFactory.GetPrototype` error in this Kaggle environment. I keep your exact feature engineering, scaling, model architecture, optimizer, and 50-epoch training loop unchanged, only adjusting import order/environment so the pipeline runs end-to-end. I also add a small safety fallback to continue without TFDF/XLA side-effects by disabling XLA devices if present (score-neutral, stability-only). The script then reliably train, predict, and write a valid `taxi_fare_submission.csv` with the required `key,fare_amount` columns.'
+- What this solution (achieved 694.84626) has done: 'I fix the TensorFlow/protobuf import crash by forcing protobuf to use the pure-Python runtime *before* anything TensorFlow-related loads, and by avoiding the `google.protobuf` import pattern that can trigger the `MessageFactory.GetPrototype` mismatch in this environment. This is a correctness/stability fix so the notebook runs end-to-end and writes a valid `taxi_fare_submission.csv`. I keep your feature list, scaling, model architecture, optimizer, and 50-epoch training loop unchanged so evaluation semantics remain the same, but the model actually train and predict (which should drastically reduce RMSE from the current broken run). I also add a small sanity check to ensure the submission aligns `key` and predictions 1:1 and contains no NaN/inf fares.'
+- What this solution (achieved 271.33257) has done: 'I fix the TensorFlow/protobuf runtime crash by forcing protobuf to use the pure-Python backend *before* TensorFlow is imported and by preventing any protobuf C++ backend from being selected in this process. This is an execution-blocking bug (currently failing in the TensorFlow import path) and is the main reason you can’t reliably train/predict end-to-end. I keep your exact feature set, scaler usage, model architecture, optimizer, and 50-epoch training loop unchanged, so the modeling semantics stay the same while the run becomes stable. Once TensorFlow loads correctly, the pipeline train, generate predictions, and write a valid `taxi_fare_submission.csv` with the required `key,fare_amount` columns, which should move RMSE dramatically down toward the target.'
+- What this solution (achieved 321.68723) has done: 'I remove the internal protobuf API monkey-patch that is triggering the `MessageFactory.GetPrototype` crash and instead force the pure-Python protobuf implementation only via environment variables set before any TensorFlow import. I also add a safe TensorFlow import fallback that retries once with `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` if the first import fails, without changing your model, features, scaler, or training loop. This should unblock end-to-end execution and greatly reduce RMSE versus the current broken run because the model actually train and predict correctly. The submission writing stays the same and always produce `taxi_fare_submission.csv` with the required columns.'
+- What this solution (achieved 329.03877) has done: 'I fix the TensorFlow/protobuf crash by forcing the pure-Python protobuf backend *before any protobuf/TensorFlow import* and by importing `google.protobuf` first to lock that choice in, then importing TensorFlow once (no internal monkey-patching). This is an execution blocker right now, so it must be resolved to train/predict and generate a valid CSV. I keep your feature set, scaler, model architecture, optimizer, and 50-epoch training loop unchanged, only adjusting the import order and removing the fragile retry logic that still triggers `MessageFactory.GetPrototype` in this environment. The rest of the pipeline (cleaning, feature engineering, scaling, prediction, submission writing) remain the same and produce `taxi_fare_submission.csv`.'
+- What this solution (achieved 746.80884) has done: 'We fix the execution-blocking TensorFlow/protobuf incompatibility by setting the protobuf runtime to the pure-Python implementation before any protobuf/TensorFlow import, and by avoiding the `import google.protobuf` line that can lock in the wrong backend and trigger `MessageFactory.GetPrototype`. This change is stability-focused and keeps your feature engineering, scaler, model architecture, optimizer, and 50-epoch training loop unchanged. To ensure the pipeline always reaches submission writing, we also add a small TensorFlow import fallback that retries once with the pure-Python protobuf env vars if the first import fails. This should allow the model to train/predict normally and substantially reduce RMSE toward the target versus the current crash/invalid run.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "2"
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+## === cell 1
+train_df = pd.read_csv(
+    "../input/new-york-city-taxi-fare-prediction/train.csv", nrows=1000000
+)
+test_df = pd.read_csv("../input/new-york-city-taxi-fare-prediction/test.csv")
+
+
+
+## === cell 2
+train_df.isnull().sum()
+
+
+
+## === cell 3
+train_df.dropna(axis=0, subset=["dropoff_longitude", "dropoff_latitude"], inplace=True)
+train_df = train_df.reset_index(drop=True)
+
+
+
+## === cell 4
+pd.set_option("display.float_format", lambda x: "%.5f" % x)
+train_df.describe()
+
+
+
+## === cell 5
+print("Number of observations out of valid range in coordinate columns:", end="\n")
+
+print("pickup_longitude", end=": ")
+print(
+    (train_df.pickup_longitude < -180).sum() + (train_df.pickup_longitude > 180).sum()
+)
+
+print("pickup_latitude", end=": ")
+print((train_df.pickup_latitude < -90).sum() + (train_df.pickup_latitude > 90).sum())
+
+print("dropoff_longitude", end=": ")
+print(
+    (train_df.dropoff_longitude < -180).sum() + (train_df.dropoff_longitude > 180).sum()
+)
+
+print("dropoff_latitude", end=": ")
+print((train_df.dropoff_latitude < -90).sum() + (train_df.dropoff_latitude > 90).sum())
+
+
+
+## === cell 6
+train_df = train_df.drop(
+    train_df[
+        (train_df.pickup_longitude < -180) | (train_df.pickup_longitude > 180)
+    ].index,
+    axis=0,
+)
+train_df = train_df.drop(
+    train_df[(train_df.pickup_latitude < -90) | (train_df.pickup_latitude > 90)].index,
+    axis=0,
+)
+train_df = train_df.drop(
+    train_df[
+        (train_df.dropoff_longitude < -180) | (train_df.dropoff_longitude > 180)
+    ].index,
+    axis=0,
+)
+train_df = train_df.drop(
+    train_df[
+        (train_df.dropoff_latitude < -90) | (train_df.dropoff_latitude > 90)
+    ].index,
+    axis=0,
+)
+
+
+
+## === cell 7
+train_df.describe()
+
+
+
+## === cell 8
+train_df[(train_df.pickup_longitude >= 40)]
+
+
+
+## === cell 9
+indx = train_df[(train_df.pickup_longitude >= 40)].index
+train_df.loc[indx, ["dropoff_longitude", "dropoff_latitude"]] = train_df.loc[
+    indx, ["dropoff_latitude", "dropoff_longitude"]
+].values
+train_df.loc[indx, ["pickup_longitude", "pickup_latitude"]] = train_df.loc[
+    indx, ["pickup_latitude", "pickup_longitude"]
+].values
+
+
+
+## === cell 10
+train_df = train_df.drop(
+    train_df[
+        (train_df.pickup_longitude < -75) | (train_df.pickup_longitude > -72)
+    ].index,
+    axis=0,
+)
+train_df = train_df.drop(
+    train_df[
+        (train_df.dropoff_longitude < -75) | (train_df.dropoff_longitude > -72)
+    ].index,
+    axis=0,
+)
+train_df = train_df.drop(
+    train_df[(train_df.pickup_latitude < 40) | (train_df.pickup_latitude > 42)].index,
+    axis=0,
+)
+train_df = train_df.drop(
+    train_df[(train_df.dropoff_latitude < 40) | (train_df.dropoff_latitude > 42)].index,
+    axis=0,
+)
+
+
+
+## === cell 11
+train_df.describe()
+
+
+
+## === cell 12
+train_df.passenger_count.value_counts()
+
+
+
+## === cell 13
+train_df = train_df.drop(train_df[train_df.passenger_count == 0].index, axis=0)
+
+
+
+## === cell 14
+train_df.fare_amount.sort_values(ascending=False)
+
+
+
+## === cell 15
+train_df = train_df.drop(train_df[train_df.fare_amount <= 0].index, axis=0)
+train_df["fare_amount"].sort_values(ascending=False)
+
+
+
+## === cell 16
+test_df.isna().sum()
+
+
+
+## === cell 17
+test_df.describe()
+
+
+
+## === cell 18
+train_df.dtypes
+
+
+
+## === cell 19
+train_df["pickup_datetime"] = pd.to_datetime(train_df["pickup_datetime"])
+test_df["pickup_datetime"] = pd.to_datetime(test_df["pickup_datetime"])
+
+
+
+
+## === cell 20
+def date_splitter(df):
+    df["Year"] = df["pickup_datetime"].dt.year
+    df["Month"] = df["pickup_datetime"].dt.month
+    df["Day"] = df["pickup_datetime"].dt.day
+    df["Weekday"] = df["pickup_datetime"].dt.dayofweek
+    df["Hour"] = df["pickup_datetime"].dt.hour
+
+
+date_splitter(train_df)
+date_splitter(test_df)
+
+train_df.drop(["pickup_datetime"], axis=1, inplace=True)
+test_df.drop(["pickup_datetime"], axis=1, inplace=True)
+
+
+
+## === cell 21
+import math
+
+
+def haversine_distance(df):
+    coord = [
+        "pickup_latitude",
+        "pickup_longitude",
+        "dropoff_latitude",
+        "dropoff_longitude",
+    ]
+    phi1, lambda1, phi2, lambda2 = [df[i] * math.pi / 180.0 for i in coord]
+    R = 6371
+    dPhi = phi2 - phi1
+    dLambda = lambda2 - lambda1
+    a = (
+        np.sin(dPhi / 2.0) ** 2
+        + np.cos(phi1) * np.cos(phi2) * np.sin(dLambda / 2.0) ** 2
+    )
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+    d = R * c
+    df["Distance"] = d
+
+
+haversine_distance(train_df)
+haversine_distance(test_df)
+
+
+
+## === cell 22
+train_df.Distance.sort_values()
+
+
+
+## === cell 23
+train_df = train_df.drop(train_df[train_df.Distance < 0.5].index, axis=0)
+
+
+
+## === cell 24
+sns.scatterplot(x="passenger_count", y="fare_amount", data=train_df)
+
+
+
+## === cell 25
+sns.scatterplot(x="Year", y="fare_amount", data=train_df)
+
+
+
+## === cell 26
+sns.scatterplot(x="Month", y="fare_amount", data=train_df)
+
+
+
+## === cell 27
+sns.scatterplot(x="Day", y="fare_amount", data=train_df)
+
+
+
+## === cell 28
+sns.scatterplot(x="Weekday", y="fare_amount", data=train_df)
+
+
+
+## === cell 29
+sns.scatterplot(x="Hour", y="fare_amount", data=train_df)
+
+
+
+## === cell 30
+sns.scatterplot(x="Distance", y="fare_amount", data=train_df)
+
+
+
+## === cell 31
+feature_cols = [
+    "pickup_longitude",
+    "pickup_latitude",
+    "dropoff_longitude",
+    "dropoff_latitude",
+    "passenger_count",
+    "Year",
+    "Month",
+    "Day",
+    "Weekday",
+    "Hour",
+    "Distance",
+]
+target_col = "fare_amount"
+
+
+
+## === cell 32
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from xgboost import XGBRegressor
+
+
+
+## === cell 33
+X_train, X_test, y_train, y_test = train_test_split(
+    train_df[feature_cols], train_df[target_col], test_size=0.30, random_state=42
+)
+
+
+
+## === cell 34
+X_train = X_train.copy()
+X_test = X_test.copy()
+
+for c in feature_cols:
+    X_train[c] = pd.to_numeric(X_train[c], errors="coerce")
+    X_test[c] = pd.to_numeric(X_test[c], errors="coerce")
+    test_df[c] = pd.to_numeric(test_df[c], errors="coerce")
+
+train_mask = X_train.notna().all(axis=1) & y_train.notna()
+valid_mask = X_test.notna().all(axis=1) & y_test.notna()
+X_train = X_train.loc[train_mask].reset_index(drop=True)
+y_train = y_train.loc[train_mask].reset_index(drop=True)
+X_test = X_test.loc[valid_mask].reset_index(drop=True)
+y_test = y_test.loc[valid_mask].reset_index(drop=True)
+
+test_df[feature_cols] = test_df[feature_cols].fillna(X_train.median(numeric_only=True))
+
+
+
+## === cell 35
+import importlib
+import sys
+
+try:
+    import tensorflow as tf
+except Exception:
+    os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+    os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "2"
+    for m in list(sys.modules.keys()):
+        if m.startswith("tensorflow") or m.startswith("google.protobuf"):
+            sys.modules.pop(m, None)
+    import tensorflow as tf  # retry
+
+from tensorflow import keras
+from tensorflow.keras import layers
+from sklearn.preprocessing import StandardScaler
+
+try:
+    tf.config.optimizer.set_jit(False)
+except Exception:
+    pass
+
+scaler = StandardScaler()
+
+scaled_train = scaler.fit_transform(X_train[feature_cols])
+scaled_valid = scaler.transform(X_test[feature_cols])
+scaled_test = scaler.transform(test_df[feature_cols])
+
+
+
+## --- ERROR in cell 35, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 36
+model = keras.Sequential(
+    [
+        layers.Dense(512, activation="relu", input_dim=len(feature_cols)),
+        layers.BatchNormalization(),
+        layers.Dense(128, activation="relu"),
+        layers.BatchNormalization(),
+        layers.Dense(64, activation="relu"),
+        layers.BatchNormalization(),
+        layers.Dense(32, activation="relu"),
+        layers.BatchNormalization(),
+        layers.Dense(1),
+    ]
+)
+
+model.compile(
+    optimizer="sgd",
+    loss="mse",
+    metrics=[tf.keras.metrics.RootMeanSquaredError()],
+)
+
+
+
+## === cell 37
+history = model.fit(
+    scaled_train,
+    y_train,
+    validation_data=(scaled_valid, y_test),
+    batch_size=256,
+    epochs=50,
+)
+
+
+
+## === cell 38
+prediction = model.predict(scaled_test, batch_size=256, verbose=1)
+
+
+
+## === cell 39
+prediction = prediction.ravel()
+
+prediction = np.where(np.isfinite(prediction), prediction, np.nan)
+if np.isnan(prediction).any():
+    prediction = np.nan_to_num(prediction, nan=float(np.nanmedian(prediction)))
+
+submission = pd.DataFrame({"key": test_df["key"].values, "fare_amount": prediction})
+submission.to_csv("taxi_fare_submission.csv", index=False)
+print(submission.head())
+print("Wrote taxi_fare_submission.csv with shape:", submission.shape)

@@ -1,0 +1,313 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the class of a given image from a synthetic dataset.
+
+## MetricMulti-class classification accuracy.
+
+## Submission FormatFor each `Id` in the test set, you must predict the `Cover_Type` class. The file should contain a header and have the following format:
+```
+Id,Cover_Type
+4000000,2
+4000001,1
+4000001,3
+etc.
+```
+
+## Dataset 
+- train.csv - the training data with the target `Cover_Type` column
+- test.csv - the test set; you will be predicting the `Cover_Type` for each row in this file (the target integer class)
+- sample_submission.csv - a sample submission file in the correct format
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+catboost==1.2.8
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        input/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        working/
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+```
+
+-> data/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/tabular-playground-series-dec-2021/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> data/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> input/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.10975
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 1
+s_data = pd.read_csv('/kaggle/input/tabular-playground-series-dec-2021/sample_submission.csv')
+s_data.head()
+
+
+## === cell 2
+train_data = pd.read_csv('/kaggle/input/tabular-playground-series-dec-2021/train.csv')
+train_data.set_index('Id', inplace = True)
+train_data.head()
+
+
+## === cell 3
+test_data = pd.read_csv('/kaggle/input/tabular-playground-series-dec-2021/test.csv')
+test_data.head()
+
+
+## === cell 4
+train_data.describe()
+
+
+## === cell 5
+train_data.info()
+
+
+## === cell 6
+print('Shape of Train DF -', train_data.shape)
+print('Shape of Test DF -',test_data.shape)
+print('NA values in Train DF :', train_data.isna().sum().sum())
+print('NA values in Test DF :', test_data.isna().sum().sum())
+
+
+## === cell 7
+target = 'Cover_Type'
+features = [col for col in train_data.columns if col not in ['id' , target]]
+features
+
+
+## === cell 8
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+for col in features:
+    train_data[col] = scaler.fit_transform(np.array(train_data[col]).reshape(-1,1))
+
+
+## === cell 9
+X = train_data.drop([target], axis = 1)
+y = train_data[target]
+X_test = test_data
+
+
+## === cell 10
+print(f'Shape of data X - {X.shape}, y - {y.shape} and X_test - {X_test.shape}')
+
+
+## === cell 11
+catb_params = {
+    "objective": "MultiClass",
+    "task_type": "GPU",
+}
+
+
+## === cell 12
+from catboost import CatBoostClassifier
+model = CatBoostClassifier(**catb_params)
+model.fit(X, y,early_stopping_rounds=200,verbose=0)
+
+
+## --- ERROR in cell 12, traceback:
+---------------------------------------------------------------------------
+CatBoostError                             Traceback (most recent call last)
+/tmp/ipykernel_11/3160041675.py in <cell line: 0>()
+      1 from catboost import CatBoostClassifier
+      2 model = CatBoostClassifier(**catb_params)
+----> 3 model.fit(X, y,early_stopping_rounds=200,verbose=0)
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in fit(self, X, y, cat_features, text_features, embedding_features, graph, sample_weight, baseline, use_best_model, eval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period, silent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)
+   5243             CatBoostClassifier._check_is_compatible_loss(params['loss_function'])
+   5244 
+-> 5245         self._fit(X, y, cat_features, text_features, embedding_features, None, graph, sample_weight, None, None, None, None, baseline, use_best_model,
+   5246                   eval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period,
+   5247                   silent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _fit(self, X, y, cat_features, text_features, embedding_features, pairs, graph, sample_weight, group_id, group_weight, subgroup_id, pairs_weight, baseline, use_best_model, eval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period, silent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)
+   2408 
+   2409             with plot_wrapper(plot, plot_file, 'Training plots', [_get_train_dir(self.get_params())]):
+-> 2410                 self._train(
+   2411                     train_pool,
+   2412                     train_params["eval_sets"],
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _train(self, train_pool, test_pool, params, allow_clear_pool, init_model)
+   1788 
+   1789     def _train(self, train_pool, test_pool, params, allow_clear_pool, init_model):
+-> 1790         self._object._train(train_pool, test_pool, params, allow_clear_pool, init_model._object if init_model else None)
+   1791         self._set_trained_model_attributes()
+   1792 
+
+_catboost.pyx in _catboost._CatBoost._train()
+
+_catboost.pyx in _catboost._CatBoost._train()
+
+CatBoostError: catboost/cuda/cuda_lib/cuda_base.h:281: CUDA error 35: CUDA driver version is insufficient for CUDA runtime version
+
+## === cell 13
+predict = model.predict(X_test)
+
+
+## --- ERROR in cell 13, traceback:
+---------------------------------------------------------------------------
+CatBoostError                             Traceback (most recent call last)
+/tmp/ipykernel_11/1062895443.py in <cell line: 0>()
+----> 1 predict = model.predict(X_test)
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in predict(self, data, prediction_type, ntree_start, ntree_end, thread_count, verbose, task_type)
+   5305                   with log probability for every class for each object.
+   5306         """
+-> 5307         return self._predict(data, prediction_type, ntree_start, ntree_end, thread_count, verbose, 'predict', task_type)
+   5308 
+   5309     def predict_proba(self, X, ntree_start=0, ntree_end=0, thread_count=-1, verbose=None, task_type="CPU"):
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _predict(self, data, prediction_type, ntree_start, ntree_end, thread_count, verbose, parent_method_name, task_type)
+   2618         if verbose is None:
+   2619             verbose = False
+-> 2620         data, data_is_single_object = self._process_predict_input_data(data, parent_method_name, thread_count)
+   2621         self._validate_prediction_type(prediction_type)
+   2622 
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _process_predict_input_data(self, data, parent_method_name, thread_count, label)
+   2594     def _process_predict_input_data(self, data, parent_method_name, thread_count, label=None):
+   2595         if not self.is_fitted() or self.tree_count_ is None:
+-> 2596             raise CatBoostError(("There is no trained model to use {}(). "
+   2597                                  "Use fit() to train model. Then use this method.").format(parent_method_name))
+   2598         is_single_object = _is_data_single_object(data)
+
+CatBoostError: There is no trained model to use predict(). Use fit() to train model. Then use this method.
+
+## === cell 14
+predict
+
+
+## --- ERROR in cell 14, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1911765952.py in <cell line: 0>()
+----> 1 predict
+
+NameError: name 'predict' is not defined
+
+## === cell 15
+predictions = pd.DataFrame()
+predictions['Id'] = test_data['Id']
+predictions["Cover_Type"] = predict
+predictions.to_csv("submission.csv", index=False)
+
+
+## --- ERROR in cell 15, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3464448058.py in <cell line: 0>()
+      1 predictions = pd.DataFrame()
+      2 predictions['Id'] = test_data['Id']
+----> 3 predictions["Cover_Type"] = predict
+      4 predictions.to_csv("submission.csv", index=False)
+
+NameError: name 'predict' is not defined
+
+## === cell 16
+predictions.head()

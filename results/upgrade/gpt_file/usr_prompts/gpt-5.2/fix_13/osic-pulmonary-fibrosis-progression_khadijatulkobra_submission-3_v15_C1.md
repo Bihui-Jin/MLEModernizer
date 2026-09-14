@@ -1,0 +1,1103 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+
+import pydicom
+import scipy.ndimage
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset
+
+
+
+## === cell 1
+DATA_ROOT = "../input/osic-pulmonary-fibrosis-progression"
+TRAIN_FOLDER = os.path.join(DATA_ROOT, "train")
+TEST_FOLDER = os.path.join(DATA_ROOT, "test")
+
+try:
+    from pydicom.pixel_data_handlers import pylibjpeg_handler  # noqa: F401
+
+    _HAS_PYLIBJPEG = True
+except Exception:
+    _HAS_PYLIBJPEG = False
+
+CACHE_DIR = os.path.join("/kaggle/working", "osic_ct_cache_v1")
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+
+def _cache_key(dir_name, patientid, Z, Y, X):
+    dtag = os.path.basename(os.path.normpath(dir_name))
+    return f"{dtag}_{patientid}_Z{int(Z)}_Y{int(Y)}_X{int(X)}.npy"
+
+
+def load_scan(path):  # kept for compatibility; not used after optimizations
+    files = os.listdir(path)
+    files.sort()
+    slices = []
+    meta = []
+    for f in files:
+        fp = os.path.join(path, f)
+        try:
+            ds = pydicom.dcmread(fp, stop_before_pixels=True, force=True)
+        except Exception:
+            ds = None
+        meta.append((fp, ds))
+    try:
+        meta.sort(
+            key=lambda t: (
+                float(t[1].ImagePositionPatient[2])
+                if (t[1] is not None and hasattr(t[1], "ImagePositionPatient"))
+                else 0.0
+            )
+        )
+    except Exception:
+        pass
+    for fp, _ in meta:
+        try:
+            slices.append(pydicom.dcmread(fp, force=True))
+        except Exception:
+            continue
+    return slices
+
+
+def get_pixels_hu(slices):
+    """
+    If pixel decoding fails, return None and let caller fall back.
+    Vectorized intercept/slope application to avoid Python loops.
+    """
+    try:
+        image = np.stack([s.pixel_array for s in slices]).astype(np.int16, copy=False)
+    except Exception:
+        return None
+
+    try:
+        image[image <= -2000] = 0
+
+        slopes = np.array(
+            [getattr(s, "RescaleSlope", 1.0) for s in slices], dtype=np.float32
+        )
+        intercepts = np.array(
+            [getattr(s, "RescaleIntercept", 0.0) for s in slices], dtype=np.float32
+        )
+
+        if not np.all(slopes == 1.0):
+            image = (image.astype(np.float32) * slopes[:, None, None]).astype(
+                np.int16, copy=False
+            )
+
+        if not np.all(intercepts == 0.0):
+            image = (
+                image.astype(np.int32) + intercepts[:, None, None].astype(np.int32)
+            ).astype(np.int16, copy=False)
+    except Exception:
+        pass
+
+    return np.asarray(image, dtype=np.int16)
+
+
+def resize_along_allaxis(
+    slices, target_dimensionZ=30, target_dimensionY=100, target_dimensionX=100
+):
+    present_dimensionZ, present_dimensionY, present_dimensionX = (
+        slices.shape[0],
+        slices.shape[1],
+        slices.shape[2],
+    )
+    if (
+        target_dimensionZ == present_dimensionZ
+        and target_dimensionY == present_dimensionY
+        and target_dimensionX == present_dimensionX
+    ):
+        return slices
+    zoom_factorZ = float(target_dimensionZ) / float(present_dimensionZ)
+    zoom_factorY = float(target_dimensionY) / float(present_dimensionY)
+    zoom_factorX = float(target_dimensionX) / float(present_dimensionX)
+    resize_image = scipy.ndimage.zoom(
+        slices, [zoom_factorZ, zoom_factorY, zoom_factorX], mode="nearest"
+    )
+    return resize_image
+
+
+MIN_BOUND = -1000.0
+MAX_BOUND = 400.0
+
+
+def image_normalize(image):
+    image = (image - MIN_BOUND) / (MAX_BOUND - MIN_BOUND)
+    image[image > 1] = 1.0
+    image[image < 0] = 0.0
+    return image
+
+
+_READ_IMAGE_CACHE = {}
+
+
+def _read_dicom_volume_with_fallback(path):
+    files = os.listdir(path)
+    files = [f for f in files if not f.startswith(".")]
+    files.sort()
+    if len(files) == 0:
+        return None
+
+    fps = [os.path.join(path, f) for f in files]
+
+    meta = []
+    for fp in fps:
+        try:
+            ds = pydicom.dcmread(
+                fp,
+                stop_before_pixels=True,
+                force=True,
+                specific_tags=["ImagePositionPatient", "InstanceNumber"],
+            )
+        except Exception:
+            ds = None
+
+        key = 0.0
+        if ds is not None:
+            if hasattr(ds, "InstanceNumber"):
+                try:
+                    key = float(ds.InstanceNumber)
+                except Exception:
+                    key = 0.0
+            elif hasattr(ds, "ImagePositionPatient"):
+                try:
+                    key = float(ds.ImagePositionPatient[2])
+                except Exception:
+                    key = 0.0
+        meta.append((key, fp))
+
+    meta.sort(key=lambda t: t[0])
+    fps_sorted = [fp for _, fp in meta]
+
+    def _decode_list(fp_list):
+        slices = []
+        for fp in fp_list:
+            try:
+                ds = pydicom.dcmread(fp, force=True)
+                slices.append(ds)
+            except Exception:
+                continue
+        if len(slices) == 0:
+            return None
+        return get_pixels_hu(slices)
+
+    vol = _decode_list(fps_sorted)
+    if vol is not None:
+        return vol
+
+    mid = len(fps_sorted) // 2
+    half = max(8, len(fps_sorted) // 4)
+    subset = fps_sorted[max(0, mid - half) : min(len(fps_sorted), mid + half)]
+    vol = _decode_list(subset)
+    if vol is not None:
+        return vol
+
+    return None
+
+
+def read_image(dir_name, patientid, Z=100, Y=200, X=200):
+    """
+    If DICOM decode can't be done, fall back to a zero-volume image.
+    Uses in-memory + on-disk cache for speed.
+    """
+    key = (dir_name, patientid, int(Z), int(Y), int(X))
+    if key in _READ_IMAGE_CACHE:
+        return _READ_IMAGE_CACHE[key]
+
+    cache_fp = os.path.join(CACHE_DIR, _cache_key(dir_name, patientid, Z, Y, X))
+    if os.path.exists(cache_fp):
+        try:
+            img = np.load(cache_fp, mmap_mode="r")
+            img = np.asarray(img)
+            _READ_IMAGE_CACHE[key] = img
+            return img
+        except Exception:
+            pass
+
+    path = dir_name + os.sep + patientid
+    try:
+        image_array = _read_dicom_volume_with_fallback(path)
+        if image_array is None:
+            raise RuntimeError("DICOM pixel decode failed")
+        ctimage_resizedAll = resize_along_allaxis(
+            image_array, target_dimensionX=X, target_dimensionY=Y, target_dimensionZ=Z
+        )
+        image = (image_normalize(ctimage_resizedAll) * 255.0).astype("uint8")
+    except Exception:
+        image = np.zeros((Z, Y, X), dtype="uint8")
+
+    try:
+        np.save(cache_fp, image, allow_pickle=False)
+    except Exception:
+        pass
+
+    _READ_IMAGE_CACHE[key] = image
+    return image
+
+
+def prewarm_image_cache(patients, folder, Z=100, Y=200, X=200):
+    patients = list(
+        dict.fromkeys([p for p in patients if isinstance(p, str) and len(p) > 0])
+    )
+    for pid in patients:
+        _ = read_image(folder, pid, Z=Z, Y=Y, X=X)
+
+
+
+
+## === cell 2
+def csv_preprocess(data):
+    data = data.copy()
+
+    data["Healthy-FVC"] = round((data["FVC"] * 100) / data["Percent"])
+    FE = ["Healthy-FVC"]
+
+    d_sex = pd.get_dummies(data["Sex"], prefix="Sex")
+    d_smoke = pd.get_dummies(data["SmokingStatus"], prefix="SmokingStatus")
+
+    data = pd.concat([data, d_sex, d_smoke], axis=1)
+
+    rename_map = {
+        "Sex_Male": "Male",
+        "Sex_Female": "Female",
+        "SmokingStatus_Ex-smoker": "Ex-smoker",
+        "SmokingStatus_Never smoked": "Never smoked",
+        "SmokingStatus_Currently smokes": "Currently smokes",
+    }
+    data = data.rename(columns=rename_map)
+
+    FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+    for c in FE1:
+        if c not in data.columns:
+            data[c] = 0
+        FE.append(c)
+
+    data = data[["Patient", "Weeks", "FVC", "Age"] + FE]
+    data = data.sort_values(["Patient", "Weeks"], ascending=True).reset_index(drop=True)
+
+    rename_col = {"Weeks": "base_Weeks", "FVC": "base_FVC"}
+    data = data.rename(columns=rename_col)
+
+    base = data.groupby("Patient", as_index=False).first()
+
+    visits = data[["Patient", "base_Weeks", "base_FVC"]].rename(
+        columns={"base_Weeks": "Week", "base_FVC": "actual_FVC"}
+    )
+
+    npData = visits.merge(
+        base[["Patient", "base_Weeks", "base_FVC", "Age", "Healthy-FVC"] + FE1],
+        on="Patient",
+        how="left",
+        sort=False,
+        validate="many_to_one",
+    )
+
+    npData = npData[
+        ["Patient", "base_Weeks", "base_FVC", "Age"]
+        + FE1
+        + ["Week", "Healthy-FVC", "actual_FVC"]
+    ]
+    npData = npData.reset_index(drop=True).fillna(0)
+    return npData
+
+
+
+
+## === cell 3
+class Flatten(nn.Module):
+    def forward(self, input):
+        return input.view(input.size(0), -1)
+
+
+class ds_3d_conv(nn.Module):
+    def __init__(self, nin, nout, kernel_size, padding, kernels_per_layer):
+        super(ds_3d_conv, self).__init__()
+        self.depthwise = nn.Conv3d(
+            nin,
+            nin * kernels_per_layer,
+            kernel_size=kernel_size,
+            padding=padding,
+            groups=nin,
+        )
+        self.pointwise = nn.Conv3d(nin * kernels_per_layer, nout, kernel_size=1)
+
+    def forward(self, x):
+        out = self.depthwise(x)
+        out = self.pointwise(out)
+        return out
+
+
+class SIGMA(nn.Module):
+    def __init__(self):
+        super(SIGMA, self).__init__()
+        self.data_net1 = nn.Sequential(
+            nn.Linear(42, 64),
+            nn.ReLU(),
+            nn.Linear(64, 118),
+            nn.ReLU(),
+        )
+        self.data_net2 = nn.Sequential(
+            nn.Linear(128, 256),
+            nn.ReLU(),
+            nn.Linear(256, 502),
+            nn.ReLU(),
+        )
+        self.data_net3 = nn.Sequential(
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 118),
+            nn.ReLU(),
+        )
+        self.data_net4 = nn.Sequential(
+            nn.Linear(780, 256),
+            nn.ReLU(),
+            nn.Linear(256, 64),
+            nn.ReLU(),
+            nn.Linear(64, 3),
+            nn.ReLU(),
+        )
+
+    def forward(self, data_i, image_o):
+        x = torch.cat((data_i, image_o), dim=-1)
+        out1 = self.data_net1(x)
+        out2 = torch.cat((data_i, out1), dim=-1)
+        out2 = self.data_net2(out2)
+        out3 = torch.cat((data_i, out2), dim=-1)
+        out3 = self.data_net3(out3)
+        out4 = torch.cat((x, out1, out2, out3), dim=-1)
+        out = self.data_net4(out4)
+        return out
+
+
+class IMAGE(nn.Module):
+    def __init__(
+        self, channel_number=[32, 64, 128, 256, 256, 64], output_dim=16, dropout=True
+    ):
+        super(IMAGE, self).__init__()
+        n_layer = len(channel_number)
+        self.feature_extractor = nn.Sequential()
+        for i in range(n_layer):
+            in_channel = 1 if i == 0 else channel_number[i - 1]
+            out_channel = channel_number[i]
+            if i < n_layer - 1:
+                self.feature_extractor.add_module(
+                    "conv_%d" % i,
+                    self.conv_layer(
+                        in_channel,
+                        out_channel,
+                        maxpool=True,
+                        kernel_size=3,
+                        padding=1,
+                        kernels_per_layer=1,
+                    ),
+                )
+            else:
+                self.feature_extractor.add_module(
+                    "conv_%d" % i,
+                    self.conv_layer(
+                        in_channel,
+                        out_channel,
+                        maxpool=False,
+                        kernel_size=1,
+                        padding=0,
+                        kernels_per_layer=1,
+                    ),
+                )
+
+        self.classifier = nn.Sequential()
+        if dropout is True:
+            self.classifier.add_module("dropout", nn.Dropout(0.5))
+        i = n_layer
+        in_channel = channel_number[-1]
+        out_channel = output_dim
+        self.classifier.add_module(
+            "conv_%d" % i, nn.Conv3d(in_channel, out_channel, padding=0, kernel_size=1)
+        )
+
+        self.flat = nn.Sequential(
+            Flatten(),
+            nn.Linear(1728, 512),
+            nn.ReLU(),
+            nn.Linear(512, 128),
+            nn.ReLU(),
+            nn.Linear(128, 32),
+            nn.ReLU(),
+        )
+
+    @staticmethod
+    def conv_layer(
+        in_channel,
+        out_channel,
+        maxpool=True,
+        kernel_size=3,
+        padding=1,
+        kernels_per_layer=1,
+        maxpool_stride=2,
+    ):
+        if maxpool is True:
+            layer = nn.Sequential(
+                ds_3d_conv(
+                    in_channel, out_channel, kernel_size, padding, kernels_per_layer
+                ),
+                nn.BatchNorm3d(out_channel),
+                nn.MaxPool3d(2, stride=maxpool_stride),
+                nn.ReLU(),
+            )
+        else:
+            layer = nn.Sequential(
+                ds_3d_conv(
+                    in_channel, out_channel, kernel_size, padding, kernels_per_layer
+                ),
+                nn.BatchNorm3d(out_channel),
+                nn.ReLU(),
+            )
+        return layer
+
+    def forward(self, image_i):
+        image_o = self.feature_extractor(image_i)
+        image_o = self.classifier(image_o)
+        image_o = self.flat(image_o)
+        return image_o
+
+
+class Combined_NET(nn.Module):
+    def __init__(self):
+        super(Combined_NET, self).__init__()
+        self.image = IMAGE()
+        self.data = SIGMA()
+
+    def forward(self, image_i, data_i):
+        image_o = self.image(image_i)
+        data_o = self.data(data_i, image_o)
+        return data_o
+
+
+
+
+## === cell 4
+C1, C2 = torch.tensor(70, dtype=torch.float32), torch.tensor(1000, dtype=torch.float32)
+
+
+def score(y_true, y_pred):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    fvc_pred = y_pred[:, 1]
+
+    sigma_clip = torch.clamp(sigma, min=70.0)
+    delta = (y_true[:, 0] - fvc_pred).abs()
+    delta = torch.clamp(delta, max=1000.0)
+
+    sq2 = torch.sqrt(torch.tensor(2.0, device=y_pred.device))
+    metric = (delta / sigma_clip) * sq2 + (sigma_clip * sq2).log()
+    return metric.mean()
+
+
+def qloss(y_true, y_pred):
+    qs = [0.25, 0.50, 0.75]
+    q = torch.tensor(np.array([qs]), device=y_pred.device, dtype=torch.float32)
+    e = y_true - y_pred
+    v = torch.max(q * e, (q - 1) * e)
+    return v.mean()
+
+
+def quartile_loss(y_true, y_pred, _lambda=0.65):
+    loss = _lambda * qloss(y_true, y_pred) - (1 - _lambda) * score(y_true, y_pred)
+    return loss
+
+
+
+
+## === cell 5
+data_train = pd.read_csv(os.path.join(DATA_ROOT, "train.csv"))
+data_test_base = pd.read_csv(os.path.join(DATA_ROOT, "test.csv"))
+sample_sub = pd.read_csv(os.path.join(DATA_ROOT, "sample_submission.csv"))
+
+sub_work = sample_sub.copy()
+pw = sub_work["Patient_Week"].str.split("_", n=1, expand=True)
+sub_work["Patient"] = pw[0]
+sub_work["Week"] = pw[1].astype(int)
+sub_work = sub_work.sort_values(["Patient", "Week"]).reset_index(drop=True)
+
+base_feat = data_test_base[
+    ["Patient", "FVC", "Percent", "Age", "Sex", "SmokingStatus"]
+].copy()
+base_feat = base_feat.rename(
+    columns={
+        "FVC": "BaseFVC",
+        "Percent": "BasePercent",
+        "Age": "BaseAge",
+        "Sex": "BaseSex",
+        "SmokingStatus": "BaseSmokingStatus",
+    }
+)
+
+test_rows = sub_work.merge(base_feat, on="Patient", how="left", validate="many_to_one")
+
+test_rows = test_rows.rename(
+    columns={
+        "Week": "Weeks",
+        "BaseFVC": "FVC",
+        "BasePercent": "Percent",
+        "BaseAge": "Age",
+        "BaseSex": "Sex",
+        "BaseSmokingStatus": "SmokingStatus",
+    }
+)
+
+for c in ["FVC", "Percent", "Age"]:
+    test_rows[c] = test_rows[c].astype(float)
+
+base_cols = ["Patient", "Weeks", "FVC", "Percent", "Age", "Sex", "SmokingStatus"]
+train_part = data_train[base_cols].copy()
+test_part = test_rows[base_cols].copy()
+
+train_part = train_part.loc[:, ~train_part.columns.duplicated()].copy()
+test_part = test_part.loc[:, ~test_part.columns.duplicated()].copy()
+
+train_part = train_part.reindex(columns=base_cols)
+test_part = test_part.reindex(columns=base_cols)
+
+combined = pd.concat([train_part, test_part], ignore_index=True, axis=0)
+
+combined_proc = csv_preprocess(combined)
+
+sub_keys = sub_work[["Patient", "Week", "Patient_Week"]].copy()
+sub_keys["Week"] = sub_keys["Week"].astype(int)
+combined_proc["Week"] = combined_proc["Week"].astype(int)
+
+test_proc = (
+    combined_proc.merge(
+        sub_keys, on=["Patient", "Week"], how="inner", validate="many_to_one"
+    )
+    .sort_values(["Patient", "Week"])
+    .reset_index(drop=True)
+)
+
+data_test = test_proc.copy()
+
+if data_test["Patient_Week"].nunique() != sample_sub["Patient_Week"].nunique():
+    missing = set(sample_sub["Patient_Week"]) - set(data_test["Patient_Week"])
+    raise RuntimeError(
+        f"Test preprocessing did not cover all Patient_Week rows. Missing: {len(missing)}"
+    )
+
+
+
+
+## === cell 6
+def make_eval_data(npEval, model, device="cuda", batch_patients=2):
+    feature_cols = [
+        "base_Weeks",
+        "base_FVC",
+        "Age",
+        "Male",
+        "Female",
+        "Ex-smoker",
+        "Never smoked",
+        "Currently smokes",
+        "Week",
+        "Healthy-FVC",
+    ]
+
+    use_cuda = torch.cuda.is_available() and device == "cuda"
+    device_t = torch.device("cuda" if use_cuda else "cpu")
+    model = model.to(device_t)
+    model.eval()
+
+    npEval = npEval.copy()
+    unique_patients = npEval.Patient.unique().tolist()
+
+    images_u8 = {
+        pid: read_image(TEST_FOLDER, pid, Z=100, Y=200, X=200)
+        for pid in unique_patients
+    }
+
+    patient_arr = npEval["Patient"].to_numpy()
+    patient_to_indices = {
+        pid: np.flatnonzero(patient_arr == pid) for pid in unique_patients
+    }
+
+    feats_all = npEval[feature_cols].to_numpy(dtype=np.float32, copy=False)
+
+    preds_out = np.empty((len(npEval), 3), dtype=np.float32)
+
+    with torch.no_grad():
+        for start in range(0, len(unique_patients), batch_patients):
+            pids = unique_patients[start : start + batch_patients]
+
+            img_batch = np.stack(
+                [images_u8[pid].astype(np.float32, copy=False) for pid in pids], axis=0
+            )  # [P,Z,Y,X]
+            img_t = (
+                torch.from_numpy(img_batch).unsqueeze(1).to(device_t, non_blocking=True)
+            )  # [P,1,Z,Y,X]
+
+            image_embed = model.image(img_t)  # [P,32]
+
+            for j, pid in enumerate(pids):
+                idx = patient_to_indices[pid]
+                feat_t = torch.from_numpy(feats_all[idx]).to(
+                    device_t, non_blocking=True
+                )
+                img_rep = image_embed[j : j + 1].expand(feat_t.size(0), -1)
+                pred_t = model.data(feat_t, img_rep)
+                preds_out[idx] = pred_t.detach().cpu().numpy()
+
+    npEval["FVC"] = preds_out[:, 1]
+    sigma = (preds_out[:, 2] - preds_out[:, 0]).astype(np.float32)
+    sigma = np.maximum(sigma, 1e-3)
+    npEval["Confidence"] = sigma
+    return npEval
+
+
+
+
+## === cell 7
+def seed_everything(seed=42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+seed_everything(42)
+
+
+class OSICTrainDataset(Dataset):
+    def __init__(self, df, image_dir, Z=100, Y=200, X=200):
+        self.df = df.reset_index(drop=True)
+        self.image_dir = image_dir
+        self.Z, self.Y, self.X = Z, Y, X
+        self.feature_cols = [
+            "base_Weeks",
+            "base_FVC",
+            "Age",
+            "Male",
+            "Female",
+            "Ex-smoker",
+            "Never smoked",
+            "Currently smokes",
+            "Week",
+            "Healthy-FVC",
+        ]
+        self._img_cache = {}
+
+    def __len__(self):
+        return len(self.df)
+
+    def _get_img(self, patient):
+        if patient not in self._img_cache:
+            self._img_cache[patient] = read_image(
+                self.image_dir, patient, Z=self.Z, Y=self.Y, X=self.X
+            )
+        return self._img_cache[patient]
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        patient = row["Patient"]
+        img = self._get_img(patient).astype(np.float32, copy=False)
+        feat = row[self.feature_cols].values.astype(np.float32, copy=False)
+        y = np.array([row["actual_FVC"]], dtype=np.float32)
+        img = torch.from_numpy(img).unsqueeze(0)  # [1, Z, Y, X]
+        feat = torch.from_numpy(feat)
+        y = torch.from_numpy(y)
+        return img, feat, y
+
+
+def build_train_dataframe(train_csv: pd.DataFrame) -> pd.DataFrame:
+    df = csv_preprocess(train_csv)
+    needed = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+    for c in needed:
+        if c not in df.columns:
+            df[c] = 0
+    return df
+
+
+train_df = build_train_dataframe(data_train)
+
+train_patients = train_df["Patient"].unique().tolist()
+test_patients = data_test["Patient"].unique().tolist()
+prewarm_image_cache(train_patients, TRAIN_FOLDER, Z=100, Y=200, X=200)
+prewarm_image_cache(test_patients, TEST_FOLDER, Z=100, Y=200, X=200)
+
+
+
+## === cell 8
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+model = Combined_NET().to(device)
+
+weights_path = (
+    "../input/other683/Epoch0_Score6.839056349116445_Acc0.9296939376174219.pth"
+)
+loaded = False
+if os.path.exists(weights_path):
+    state = torch.load(weights_path, map_location=device)
+    model.load_state_dict(state)
+    loaded = True
+
+if not loaded:
+    train_dataset = OSICTrainDataset(train_df, TRAIN_FOLDER, Z=100, Y=200, X=200)
+
+    use_cuda = torch.cuda.is_available() and device == "cuda"
+    nw = min(4, (os.cpu_count() or 2))
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=1,
+        shuffle=True,
+        num_workers=nw,
+        pin_memory=use_cuda,
+        persistent_workers=(nw > 0),
+        prefetch_factor=2 if nw > 0 else None,
+    )
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    model.train()
+
+    max_steps = 420  # unchanged
+    step = 0
+    for epoch in range(1):  # single epoch
+        for x_img, x_feat, y in train_loader:
+            x_img = x_img.to(device, non_blocking=True)
+            x_feat = x_feat.to(device, non_blocking=True)
+            y = y.to(device, non_blocking=True)
+
+            pred = model(x_img, x_feat)  # [B,3]
+            y3 = y.repeat(1, 3)
+
+            loss = quartile_loss(y3, pred)
+
+            optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            optimizer.step()
+
+            step += 1
+            if step >= max_steps:
+                break
+        if step >= max_steps:
+            break
+
+
+
+## === cell 9
+if "data_test" not in globals() or data_test is None or len(data_test) == 0:
+    sub_work_fallback = sample_sub.copy()
+    pw = sub_work_fallback["Patient_Week"].str.split("_", n=1, expand=True)
+    sub_work_fallback["Patient"] = pw[0]
+    sub_work_fallback["Week"] = pw[1].astype(int)
+
+    tmp = sub_work_fallback.merge(
+        data_test_base[["Patient", "FVC", "Percent", "Age", "Sex", "SmokingStatus"]],
+        on="Patient",
+        how="left",
+        validate="many_to_one",
+    )
+    tmp = tmp.rename(columns={"Week": "Weeks"})
+    combined_fallback = pd.concat(
+        [
+            data_train[
+                ["Patient", "Weeks", "FVC", "Percent", "Age", "Sex", "SmokingStatus"]
+            ],
+            tmp[["Patient", "Weeks", "FVC", "Percent", "Age", "Sex", "SmokingStatus"]],
+        ],
+        ignore_index=True,
+        axis=0,
+    )
+    combined_proc_fallback = csv_preprocess(combined_fallback)
+    data_test = (
+        combined_proc_fallback.merge(
+            sub_work_fallback[["Patient", "Week", "Patient_Week"]],
+            on=["Patient", "Week"],
+            how="inner",
+            validate="many_to_one",
+        )
+        .sort_values(["Patient", "Week"])
+        .reset_index(drop=True)
+    )
+
+prewarm_image_cache(
+    data_test["Patient"].unique().tolist(), TEST_FOLDER, Z=100, Y=200, X=200
+)
+
+test_pred_df = make_eval_data(
+    data_test.copy(), model, device=("cuda" if torch.cuda.is_available() else "cpu")
+)
+
+test_pred_df["Confidence"] = test_pred_df["Confidence"].astype(float).clip(lower=70.0)
+
+pred_map = test_pred_df.set_index("Patient_Week")[["FVC", "Confidence"]]
+if pred_map.index.has_duplicates:
+    pred_map = pred_map[~pred_map.index.duplicated(keep="first")]
+
+submission = sample_sub.copy()
+submission = submission.join(pred_map, on="Patient_Week")
+
+if submission["FVC"].isna().any():
+    base_map = data_test_base.set_index("Patient")["FVC"].to_dict()
+    tmp_patient = submission["Patient_Week"].str.split("_", n=1, expand=True)[0]
+    mask = submission["FVC"].isna()
+    submission.loc[mask, "FVC"] = tmp_patient[mask].map(base_map).fillna(2000.0)
+    submission.loc[mask, "Confidence"] = submission.loc[mask, "Confidence"].fillna(70.0)
+
+submission = submission[["Patient_Week", "FVC", "Confidence"]]
+submission["FVC"] = submission["FVC"].astype(float)
+submission["Confidence"] = submission["Confidence"].astype(float).clip(lower=70.0)
+
+submission.to_csv("submission.csv", index=False)
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)

@@ -1,0 +1,731 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect breast cancer in mammograms.
+
+## Metric
+[Probabilistic F1 score](https://aclanthology.org/2020.eval4nlp-1.9.pdf) (pF1). This extension of the traditional F score accepts probabilities instead of binary classifications. 
+
+With pX as the probabilistic version of X:
+
+$$
+pF_1 = 2 \frac{pPrecision \cdot pRecall}{pPrecision + pRecall}
+$$
+
+where:
+
+$$
+pPrecision = \frac{pTP}{pTP + pFP}
+$$
+
+$$
+pRecall = \frac{pTP}{TP + FN}
+$$
+
+## Submission Format
+For each `prediction_id`, you should predict the likelihood of cancer in the corresponding `cancer` column. The submission file should have the following format:
+
+```
+prediction_id,cancer
+0-L,0
+0-R,0.5
+0-R,0.5
+1-L,1
+...
+# Dataset
+
+**[train/test]_images/[patient_id]/[image_id].dcm** The mammograms, in dicom format. You can expect roughly 8,000 patients in the hidden test set. There are usually but not always 4 images per patient. Note that many of the images use the jpeg 2000 format which may you may need special libraries to load.
+
+**sample_submission.csv** A valid sample submission.
+
+**[train/test].csv** Metadata for each patient and image. Only the first few rows of the test set are available for download.
+
+- `site_id` - ID code for the source hospital.
+- `patient_id` - ID code for the patient.
+- `image_id` - ID code for the image.
+- `laterality` - Whether the image is of the left or right breast.
+- `view` - The orientation of the image. The default for a screening exam is to capture two views per breast.
+- `age` - The patient's age in years.
+- `implant` - Whether or not the patient had breast implants. Site 1 only provides breast implant information at the patient level, not at the breast level.
+- `density` - A rating for how dense the breast tissue is, with A being the least dense and D being the most dense. Extremely dense tissue can make diagnosis more difficult. Only provided for train.
+- `machine_id` - An ID code for the imaging device.
+- `cancer` - Whether or not the breast was positive for malignant cancer. The target value. Only provided for train.
+- `biopsy` - Whether or not a follow-up biopsy was performed on the breast. Only provided for train.
+- `invasive` - If the breast is positive for cancer, whether or not the cancer proved to be invasive. Only provided for train.
+- `BIRADS` - 0 if the breast required follow-up, 1 if the breast was rated as negative for cancer, and 2 if the breast was rated as normal. Only provided for train.
+- `prediction_id` - The ID for the matching submission row. Multiple images will share the same prediction ID. Test only.
+- `difficult_negative_case` - True if the case was unusually difficult. Only provided for train.
+
+# 2. Python version
+
+3.11
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (190 lines)
+            sample_submission.csv (2385 lines)
+            sample_submission.csv.zip (6.5 kB)
+            test.csv (5475 lines)
+            test.csv.zip (60.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (29.1 GB)
+            train.csv (49233 lines)
+            train.csv.zip (513.7 kB)
+            train.zip (162 Bytes)
+            train_images.zip (260.7 GB)
+            rsna-breast-cancer-detection/
+                description.md (190 lines)
+                sample_submission.csv (2385 lines)
+                ... and 9 other files
+                rsna-breast-cancer-detection/
+                test_images/
+                    10116/
+                        1470873094.dcm (8.5 MB)
+                        472095321.dcm (5.6 MB)
+                        ... and 2 other files
+                    10130/
+                        1013166704.dcm (9.7 MB)
+                        1165309236.dcm (8.7 MB)
+                        ... and 5 other files
+                    ... and 1191 other folders
+                train_images/
+                    10006/
+                        1459541791.dcm (4.4 MB)
+                        1864590858.dcm (4.0 MB)
+                        ... and 2 other files
+                    10011/
+                        1031443799.dcm (2.1 MB)
+                        220375232.dcm (1.7 MB)
+                        ... and 2 other files
+                    ... and 10720 other folders
+            test_images/
+                10116/
+                    1470873094.dcm (8.5 MB)
+                    472095321.dcm (5.6 MB)
+                    ... and 2 other files
+                10130/
+                    1013166704.dcm (9.7 MB)
+                    1165309236.dcm (8.7 MB)
+                    ... and 5 other files
+                ... and 1191 other folders
+            train_images/
+                10006/
+                    1459541791.dcm (4.4 MB)
+                    1864590858.dcm (4.0 MB)
+                    ... and 2 other files
+                10011/
+                    1031443799.dcm (2.1 MB)
+                    220375232.dcm (1.7 MB)
+                    ... and 2 other files
+                ... and 10720 other folders
+        input/
+            description.md (190 lines)
+            sample_submission.csv (2385 lines)
+            sample_submission.csv.zip (6.5 kB)
+            test.csv (5475 lines)
+            test.csv.zip (60.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (29.1 GB)
+            train.csv (49233 lines)
+            train.csv.zip (513.7 kB)
+            train.zip (162 Bytes)
+            train_images.zip (260.7 GB)
+            rsna-breast-cancer-detection/
+                description.md (190 lines)
+                sample_submission.csv (2385 lines)
+                ... and 9 other files
+                rsna-breast-cancer-detection/
+                test_images/
+                    10116/
+                        1470873094.dcm (8.5 MB)
+                        472095321.dcm (5.6 MB)
+                        ... and 2 other files
+                    10130/
+                        1013166704.dcm (9.7 MB)
+                        1165309236.dcm (8.7 MB)
+                        ... and 5 other files
+                    ... and 1191 other folders
+                train_images/
+                    10006/
+                        1459541791.dcm (4.4 MB)
+                        1864590858.dcm (4.0 MB)
+                        ... and 2 other files
+                    10011/
+                        1031443799.dcm (2.1 MB)
+                        220375232.dcm (1.7 MB)
+                        ... and 2 other files
+                    ... and 10720 other folders
+            test_images/
+                10116/
+                    1470873094.dcm (8.5 MB)
+                    472095321.dcm (5.6 MB)
+                    ... and 2 other files
+                10130/
+                    1013166704.dcm (9.7 MB)
+                    1165309236.dcm (8.7 MB)
+                    ... and 5 other files
+                ... and 1191 other folders
+            train_images/
+                10006/
+                    1459541791.dcm (4.4 MB)
+                    1864590858.dcm (4.0 MB)
+                    ... and 2 other files
+                10011/
+                    1031443799.dcm (2.1 MB)
+                    220375232.dcm (1.7 MB)
+                    ... and 2 other files
+                ... and 10720 other folders
+        working/
+            rsna-breast-cancer-detection/
+                description.md (190 lines)
+                sample_submission.csv (2385 lines)
+                ... and 9 other files
+                rsna-breast-cancer-detection/
+                test_images/
+                    10116/
+                        1470873094.dcm (8.5 MB)
+                        472095321.dcm (5.6 MB)
+                        ... and 2 other files
+                    10130/
+                        1013166704.dcm (9.7 MB)
+                        1165309236.dcm (8.7 MB)
+                        ... and 5 other files
+                    ... and 1191 other folders
+                train_images/
+                    10006/
+                        1459541791.dcm (4.4 MB)
+                        1864590858.dcm (4.0 MB)
+                        ... and 2 other files
+                    10011/
+                        1031443799.dcm (2.1 MB)
+                        220375232.dcm (1.7 MB)
+                        ... and 2 other files
+                    ... and 10720 other folders
+```
+
+-> data/rsna-breast-cancer-detection/sample_submission.csv has 2384 rows and 2 columns.
+The columns are: prediction_id, cancer
+
+-> data/rsna-breast-cancer-detection/test.csv has 5474 rows and 9 columns.
+The columns are: site_id, patient_id, image_id, laterality, view, age, implant, machine_id, prediction_id
+
+-> data/rsna-breast-cancer-detection/train.csv has 49232 rows and 14 columns.
+The columns are: site_id, patient_id, image_id, laterality, view, age, cancer, biopsy, invasive, BIRADS, implant, density, machine_id, difficult_negative_case
+
+-> data/sample_submission.csv has 2384 rows and 2 columns.
+The columns are: prediction_id, cancer
+
+-> data/test.csv has 5474 rows and 9 columns.
+The columns are: site_id, patient_id, image_id, laterality, view, age, implant, machine_id, prediction_id
+
+-> data/train.csv has 49232 rows and 14 columns.
+The columns are: site_id, patient_id, image_id, laterality, view, age, cancer, biopsy, invasive, BIRADS, implant, density, machine_id, difficult_negative_case
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.2375478927203065
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os, sys, platform, warnings
+
+warnings.filterwarnings("ignore")
+
+print("Python  :", sys.version)
+print("Platform:", platform.platform())
+
+DATA_DIR = "/kaggle/input/rsna-breast-cancer-detection"
+MODEL_DATA_DIR = "/kaggle/input/rsna-breast-cancer-class-convnextv2-model-weights/rsna_cancer_convnext_v2_tiny_model_weights.h5"
+
+print("DATA_DIR      :", DATA_DIR)
+print("MODEL_DATA_DIR:", MODEL_DATA_DIR)
+print("Exists weights:", os.path.exists(MODEL_DATA_DIR))
+
+
+
+
+## === cell 1
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+
+import random
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
+SEED = 1337
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+print("Tensorflow:", tf.__version__)
+
+tf.compat.v1.enable_v2_behavior()
+
+try:
+    tf.config.optimizer.set_jit(False)
+except Exception:
+    pass
+
+tf.config.threading.set_inter_op_parallelism_threads(1)
+
+import cv2
+
+cv2.setNumThreads(1)
+print("cv2:", cv2.__version__)
+
+import pydicom
+from pydicom.pixel_data_handlers.util import apply_voi_lut
+
+print("pydicom:", pydicom.__version__)
+
+tfio = None
+print("tensorflow_io: disabled for compatibility")
+
+from tqdm.auto import tqdm
+
+import re, gc
+import matplotlib
+
+matplotlib.use("Agg")  # no GUI / no rendering overhead
+import matplotlib.pyplot as plt
+
+import multiprocessing
+import concurrent.futures
+
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 2
+try:
+    tpu = tf.distribute.cluster_resolver.TPUClusterResolver.connect()
+    strategy = tf.distribute.TPUStrategy(tpu)
+    print("Running on TPU", tpu.master(), len(tf.config.list_logical_devices("TPU")))
+    gpus = None
+except Exception:
+    gpus = tf.config.list_logical_devices("GPU")
+    if len(gpus) > 1:
+        strategy = tf.distribute.MirroredStrategy(
+            devices=[f"/gpu:{gpu.name.split(':')[-1]}" for gpu in gpus]
+        )
+        print("Running on multiple GPUs", [gpu.name for gpu in gpus])
+    elif len(gpus) == 1:
+        strategy = tf.distribute.get_strategy()
+        print("Running on single GPU", gpus[0].name)
+    else:
+        strategy = tf.distribute.get_strategy()
+        print("Running on CPU")
+
+print("Number of accelerators:", strategy.num_replicas_in_sync)
+
+
+
+
+## === cell 3
+IMAGE_FORMAT = "JPG"
+IMAGE_QUALITY = 95
+TARGET_HEIGHT, TARGET_WIDTH, N_CHANNELS = (1024, 768, 1)
+INPUT_SHAPE = (TARGET_HEIGHT, TARGET_WIDTH, N_CHANNELS)
+
+THRESHOLD_BEST = 0.849352
+
+print("INPUT_SHAPE:", INPUT_SHAPE)
+
+
+
+
+## === cell 4
+test_df = pd.read_csv(f"{DATA_DIR}/test.csv")
+sample_submission_df = pd.read_csv(f"{DATA_DIR}/sample_submission.csv")
+
+print("test_df:", test_df.shape, "sample_submission_df:", sample_submission_df.shape)
+print("sample_submission columns:", list(sample_submission_df.columns))
+print(test_df.head())
+print(sample_submission_df.head())
+
+test_df = test_df.copy()
+test_df["dicom_path"] = (
+    DATA_DIR
+    + "/test_images/"
+    + test_df["patient_id"].astype(str)
+    + "/"
+    + test_df["image_id"].astype(str)
+    + ".dcm"
+)
+
+
+
+
+## === cell 5
+def _opencv_decode_encapsulated(ds) -> np.ndarray | None:
+    """Try decoding encapsulated/compressed DICOM PixelData with OpenCV (JPEG/JPEG2000)."""
+    try:
+        from pydicom.encaps import generate_pixel_data_frame
+
+        frame_bytes = next(generate_pixel_data_frame(ds.PixelData, nr_frames=1), None)
+        if frame_bytes is None:
+            return None
+
+        buf = np.frombuffer(frame_bytes, dtype=np.uint8)
+        img = cv2.imdecode(buf, cv2.IMREAD_UNCHANGED)
+        if img is None:
+            return None
+
+        if img.ndim == 3:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        return img.astype(np.float32)
+    except Exception:
+        return None
+
+
+def dicom_to_uint8(path: str) -> np.ndarray:
+    try:
+        ds = pydicom.dcmread(
+            path,
+            force=True,
+            stop_before_pixels=False,
+            defer_size="1 KB",
+            specific_tags=[
+                "PixelData",
+                "PhotometricInterpretation",
+                "VOILUTSequence",
+                "WindowCenter",
+                "WindowWidth",
+            ],
+        )
+    except Exception:
+        return np.zeros((TARGET_HEIGHT, TARGET_WIDTH), dtype=np.uint8)
+
+    arr = None
+    try:
+        arr = ds.pixel_array.astype(np.float32)
+    except Exception:
+        try:
+            arr = _opencv_decode_encapsulated(ds)
+        except Exception:
+            arr = None
+
+    if arr is None:
+        return np.zeros((TARGET_HEIGHT, TARGET_WIDTH), dtype=np.uint8)
+
+    try:
+        arr = apply_voi_lut(arr, ds).astype(np.float32)
+    except Exception:
+        pass
+
+    if getattr(ds, "PhotometricInterpretation", None) == "MONOCHROME1":
+        arr = np.max(arr) - arr
+
+    arr = arr - np.min(arr)
+    mx = np.max(arr)
+    if mx > 0:
+        arr = arr / mx
+    arr = (arr * 255.0).clip(0, 255).astype(np.uint8)
+    return arr
+
+
+def image_findNonZero(img_data_uint8: np.ndarray) -> np.ndarray:
+    coords = cv2.findNonZero(img_data_uint8)
+    if coords is None:
+        return img_data_uint8  # fallback: blank image
+    x1, y1, w, h = cv2.boundingRect(coords)
+    return img_data_uint8[y1 : y1 + h, x1 : x1 + w]
+
+
+def load_and_preprocess_image(
+    file_path: str, save_image: bool = False, debug: bool = False
+) -> np.ndarray:
+    img_data_uint8 = dicom_to_uint8(file_path)
+    img_data_cropped = image_findNonZero(img_data_uint8)
+    img_resized = cv2.resize(
+        img_data_cropped,
+        dsize=INPUT_SHAPE[:2][::-1],
+        interpolation=cv2.INTER_LANCZOS4,
+    )
+    img_resized = np.expand_dims(img_resized, 2)  # (H, W, 1)
+
+    if save_image:
+        patient_id, image_id = re.split(r"[\./]", file_path)[-3:-1]
+        os.makedirs(str(patient_id), exist_ok=True)
+        out_path = f"{patient_id}/{image_id}.{IMAGE_FORMAT.lower()}"
+        if IMAGE_FORMAT.upper() == "PNG":
+            cv2.imwrite(out_path, img_resized)
+        else:
+            cv2.imwrite(
+                out_path, img_resized, [cv2.IMWRITE_JPEG_QUALITY, IMAGE_QUALITY]
+            )
+
+    if debug:
+        plt.figure(figsize=(4, 4))
+        plt.imshow(img_resized.squeeze(), cmap="bone")
+        plt.axis("off")
+        plt.show()
+
+    return img_resized
+
+
+if len(test_df) > 0:
+    fp0 = test_df["dicom_path"].iloc[0]
+    if os.path.exists(fp0):
+        _ = load_and_preprocess_image(fp0, save_image=False, debug=False)
+        print("DICOM load OK:", fp0)
+    else:
+        print("WARNING: First DICOM path not found:", fp0)
+
+
+
+
+## === cell 6
+print("Model Defined Shape:", INPUT_SHAPE)
+
+
+def build_classifier_model(
+    input_shape=INPUT_SHAPE, model_weights=MODEL_DATA_DIR
+) -> tf.keras.models.Model:
+    input_image = tf.keras.layers.Input(shape=input_shape, name="image", dtype=tf.uint8)
+    input_patient_id = tf.keras.layers.Input(shape=(1,), name="patient_id")
+    input_image_id = tf.keras.layers.Input(shape=(1,), name="image_id")
+
+    x = tf.keras.layers.Lambda(lambda t: tf.image.grayscale_to_rgb(t))(input_image)
+    x = tf.keras.layers.Lambda(lambda t: tf.cast(t, tf.float32))(x)
+    x = tf.keras.layers.Lambda(
+        lambda t: tf.keras.applications.imagenet_utils.preprocess_input(t, mode="tf")
+    )(x)
+
+    backbone = tf.keras.applications.ConvNeXtTiny(
+        include_top=False,
+        weights=None,
+        input_shape=(input_shape[:-1] + (3,)),
+    )
+    x = backbone(x)
+    x = tf.keras.layers.SpatialDropout2D(0.3)(x)
+
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)
+    x = tf.keras.layers.Dense(
+        512,
+        activation=tf.keras.layers.LeakyReLU(negative_slope=0.3),
+        kernel_regularizer=tf.keras.regularizers.l1_l2(l2=0.005),
+    )(x)
+    x = tf.keras.layers.Dropout(0.3)(x)
+    x = tf.keras.layers.Dense(
+        256, activation="gelu", kernel_regularizer=tf.keras.regularizers.l1(0.005)
+    )(x)
+    x = tf.keras.layers.Dropout(0.3)(x)
+    x = tf.keras.layers.Dense(
+        128, activation="gelu", kernel_regularizer=tf.keras.regularizers.l1(0.005)
+    )(x)
+    x = tf.keras.layers.Dropout(0.3)(x)
+
+    output = tf.keras.layers.Dense(1, activation="sigmoid")(x)
+
+    model = tf.keras.models.Model(
+        inputs=[input_image, input_patient_id, input_image_id], outputs=output
+    )
+
+    if model_weights and os.path.exists(model_weights):
+        model.load_weights(model_weights)
+        print("Loaded model weights:", model_weights)
+    else:
+        print(
+            "WARNING: Model weights not found, using randomly initialized weights:",
+            model_weights,
+        )
+
+    model.trainable = False
+    model.compile()
+    return model
+
+
+tf.keras.backend.clear_session()
+with strategy.scope():
+    model = build_classifier_model()
+model.summary()
+
+
+
+
+## === cell 7
+BATCH_SIZE = 8  # keep identical batch size as provided
+
+paths = test_df["dicom_path"].to_numpy()
+patient_ids = (
+    test_df["patient_id"].to_numpy().reshape(-1, 1).astype(np.int64, copy=False)
+)
+image_ids = test_df["image_id"].to_numpy().reshape(-1, 1).astype(np.int64, copy=False)
+pred_ids = test_df["prediction_id"].to_numpy()
+n_total = len(paths)
+
+cpu_cnt = os.cpu_count() or 4
+n_workers = max(2, min(8, cpu_cnt))
+
+
+def _py_load_uint8(path_bytes):
+    p = path_bytes.decode("utf-8")
+    img = load_and_preprocess_image(p, save_image=False, debug=False)
+    return img.astype(np.uint8, copy=False)
+
+
+def _tf_map(path, pid, iid, prid):
+    img = tf.py_function(func=_py_load_uint8, inp=[path], Tout=tf.uint8)
+    img.set_shape((TARGET_HEIGHT, TARGET_WIDTH, 1))
+    return {"image": img, "patient_id": pid, "image_id": iid}, prid
+
+
+ds = tf.data.Dataset.from_tensor_slices(
+    (paths.astype("S"), patient_ids, image_ids, pred_ids.astype("S"))
+)
+
+opts = tf.data.Options()
+opts.experimental_deterministic = True
+ds = ds.with_options(opts)
+
+ds = ds.map(_tf_map, num_parallel_calls=n_workers)
+ds = ds.batch(BATCH_SIZE, drop_remainder=False)
+ds = ds.prefetch(tf.data.AUTOTUNE)
+
+all_probs = model.predict(ds, verbose=1).astype(np.float32).reshape(-1)
+
+tmp = pd.DataFrame({"prediction_id": pred_ids, "prob": all_probs})
+submission_pred_df = (
+    tmp.groupby("prediction_id", sort=False, observed=True)["prob"].mean().reset_index()
+)
+submission_pred_df = submission_pred_df.rename(columns={"prob": "cancer"})
+
+print("Raw submission preds:", submission_pred_df.shape)
+print(submission_pred_df.head())
+submission_pred_df.info()
+
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+UnknownError                              Traceback (most recent call last)
+/tmp/ipykernel_55/2878925767.py in <cell line: 0>()
+     43 
+     44 # Use model.predict on dataset to reduce Python overhead; output ordering matches dataset order.
+---> 45 all_probs = model.predict(ds, verbose=1).astype(np.float32).reshape(-1)
+     46 
+     47 # Recover prediction_id order from dataset (same as original pred_ids) without extra passes.
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+--> 122             raise e.with_traceback(filtered_tb) from None
+    123         finally:
+    124             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/framework/ops.py in raise_from_not_ok_status(e, name)
+   6000 def raise_from_not_ok_status(e, name) -> NoReturn:
+   6001   e.message += (" name: " + str(name if name is not None else ""))
+-> 6002   raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+   6003 
+   6004 
+
+UnknownError: {{function_node __wrapped__IteratorGetNext_output_types_4_device_/job:localhost/replica:0/task:0/device:CPU:0}} Error in user-defined function passed to MapDataset:5 transformation with iterator: Iterator::Root::Prefetch::BatchV2::Map: AttributeError: 'tensorflow.python.framework.ops.EagerTensor' object has no attribute 'decode'
+Traceback (most recent call last):
+
+  File "/usr/local/lib/python3.11/dist-packages/tensorflow/python/ops/script_ops.py", line 267, in __call__
+    return func(device, token, args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "/usr/local/lib/python3.11/dist-packages/tensorflow/python/ops/script_ops.py", line 145, in __call__
+    outputs = self._call(device, args)
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+
+  File "/usr/local/lib/python3.11/dist-packages/tensorflow/python/ops/script_ops.py", line 152, in _call
+    ret = self._func(*args)
+          ^^^^^^^^^^^^^^^^^
+
+  File "/usr/local/lib/python3.11/dist-packages/tensorflow/python/autograph/impl/api.py", line 643, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+
+  File "/tmp/ipykernel_55/2878925767.py", line 21, in _py_load_uint8
+    p = path_bytes.decode("utf-8")
+        ^^^^^^^^^^^^^^^^^
+
+  File "/usr/local/lib/python3.11/dist-packages/tensorflow/python/framework/tensor.py", line 260, in __getattr__
+    self.__getattribute__(name)
+
+AttributeError: 'tensorflow.python.framework.ops.EagerTensor' object has no attribute 'decode'
+
+
+	 [[{{node EagerPyFunc}}]] [Op:IteratorGetNext] name: 
+
+## === cell 8
+submission_df = sample_submission_df[["prediction_id"]].merge(
+    submission_pred_df, on="prediction_id", how="left", validate="one_to_one"
+)
+
+submission_df["cancer"] = (
+    submission_df["cancer"].fillna(0.0).astype(float).clip(0.0, 1.0)
+)
+
+print("Aligned submission:", submission_df.shape)
+assert list(submission_df.columns) == ["prediction_id", "cancer"]
+assert submission_df["prediction_id"].isna().sum() == 0
+assert submission_df["cancer"].isna().sum() == 0
+print(submission_df.head())
+
+submission_path = "submission.csv"
+submission_df.to_csv(submission_path, index=False)
+print("Wrote:", submission_path, "size:", os.path.getsize(submission_path))
+print("Done.")
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2659477228.py in <cell line: 0>()
+      1 submission_df = sample_submission_df[["prediction_id"]].merge(
+----> 2     submission_pred_df, on="prediction_id", how="left", validate="one_to_one"
+      3 )
+      4 
+      5 submission_df["cancer"] = (
+
+NameError: name 'submission_pred_df' is not defined

@@ -1,0 +1,736 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7137396121883658
+
+# 6. Current score
+
+0.63413
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.45226) has done: 'I fix the crash by ensuring the test image list contains only actual image files (the provided directory includes a nested `test_images/` folder that was being globbed and passed to PIL). I also make the train/valid label-index mapping consistent by building it once from the full `train.csv` (instead of separately per split), which avoids label mismatch and improves correctness without changing the model or training loop. Finally, I generate predictions in the exact order of `sample_submission.csv` to guarantee alignment and produce a valid `submission.csv` with the required columns.'
+- What this solution (achieved 0.47107) has done: 'Your current pipeline is training a single-label classifier (CrossEntropy + one class per image), but this competition’s metric/format is multi-label (space-delimited set of diseases). Without changing your model/training core, the smallest legitimate move toward the target is to (1) map each unique space-delimited label *set* to a class (what you already effectively do), then (2) at inference time output the *top-K* most likely label-sets instead of only top-1, joining them with spaces to match the submission semantics and improve mean F1. I’m also fixing a subtle but important label parsing issue: `labels` strings can contain spaces, so splitting CSV lines by comma is unsafe; we parse train/valid via pandas and keep the rest identical. Finally, I keep ordering aligned to `sample_submission.csv` exactly as you already do to avoid accidental score loss from misalignment.'
+- What this solution (achieved 0.47585) has done: 'Your score gap to the target is large (0.47107 vs 0.71374), so we need a legitimate improvement while keeping your core single-label EfficientNet+CE training unchanged. The biggest low-risk gain here is to start from pretrained EfficientNet-B4 ImageNet weights (same architecture/training loop, just better initialization), which typically boosts performance substantially for leaf-disease images. I also fix your seeding setup to be truly deterministic (you currently set `deterministic=True` but also `benchmark=True`, which conflicts) to avoid score regressions, and I add a tiny, metric-aligned inference tweak: use sigmoid over logits with an absolute probability threshold per label-set plus a safe fallback to top-1 (still predicting label-sets, but avoids forcing 3 label-sets when uncertain). The submission ordering/format remain aligned to `sample_submission.csv` exactly, and it still write `/kaggle/working/submission.csv`.'
+- What this solution (achieved 0.62982) has done: 'Your current inference is using `sigmoid` + independent thresholding, but the model was trained with `CrossEntropyLoss` on mutually exclusive “label-set classes”, so probabilities should come from `softmax`; this mismatch can significantly depress F1. I switch inference to `softmax` and keep your existing top‑K/threshold idea, interpreting `PROB_THRESH` as a softmax confidence threshold, with the same safe fallback to top‑1. I also make the train/valid split stratified by the label-set class to reduce validation noise and improve the learned decision boundaries without changing the model, loss, or training loop. Everything else (paths, architecture, training procedure, and submission ordering/format) stays the same and still writes `/kaggle/working/submission.csv`.'
+- What this solution (achieved 0.44788) has done: 'To move your 0.62982 score closer to the 0.71374 target with minimal risk, I keep the same EfficientNet-B4 + CrossEntropy training and only adjust inference to better match the metric’s “set of labels” semantics. Specifically, I (1) stop concatenating multiple *label-sets* (which creates invalid composite strings and hurts F1) and instead predict exactly one label-set per image, and (2) apply a small, validation-calibrated confidence fallback: if the top-1 softmax is below a threshold, use a safer default (the most frequent class in training) rather than forcing a wrong rare label-set. This keeps evaluation semantics intact (still choosing among the same mutually-exclusive label-set classes) while improving macro F1 stability. The submission is still aligned to `sample_submission.csv` order and written to `/kaggle/working/submission.csv`.'
+- What this solution (achieved 0.62569) has done: 'Your current score dropped because the confidence-threshold fallback to the most frequent class is too aggressive and overrides correct predictions, which hurts mean F1. To move back up toward the target with minimal change and without altering the model/training loop, I keep predicting exactly one label-set per image but calibrate the fallback threshold on the validation set (using softmax top‑1 confidence) to maximize mean per-class F1 over label-set classes. This keeps evaluation semantics identical (still a single class among label-set classes) while choosing a threshold that empirically improves F1. I also compute the fallback class from the training split (not full data) to avoid slight split bleed and make the calibration consistent.'
+- What this solution (achieved 0.34841) has done: 'We keep your EfficientNet-B4 + CrossEntropy “label-set as class” setup unchanged, and only adjust the confidence fallback logic that currently overrides too many predictions and is likely depressing the mean F1. Concretely, we calibrate the fallback threshold using the *competition-style sample-level F1* computed on the validation set from predicted/true label strings (instead of macro-F1 over label-set classes), and we restrict the search to a conservative, high-confidence range so the fallback only triggers when the model is genuinely unsure. We also compute the fallback label-set using class priors from the training split (same as you already do) and keep submission ordering/format identical to `sample_submission.csv`. This should nudge your 0.62569 score upward toward the 0.71374 target with minimal, metric-aligned changes and no architecture/training changes.'
+- What this solution (achieved 0.6339) has done: 'Your current score (0.34841) is far below the target (0.71374), so we should make a small, metric-aligned change that can legitimately increase mean F1 without changing your model, loss, or training loop. The biggest issue is that treating each full label-set string as a single class prevents partial credit (e.g., predicting one correct disease out of two), which mean sample-F1 rewards; we can fix this only in post-processing by converting class probabilities into per-disease probabilities. Concretely: build a disease vocabulary from `train.csv`, convert softmax over label-set classes into disease probabilities by summing class probabilities that contain each disease, then predict diseases using a calibrated threshold (and keep your `healthy` fallback for empty predictions). This preserves your training semantics entirely and only changes inference/threshold calibration to better match the competition metric and submission format.'
+- What this solution (achieved 0.63413) has done: 'I keep your EfficientNet-B4 + CrossEntropy “label-set class” training exactly as-is and only make small, metric-aligned inference/calibration adjustments to push the mean F1 upward toward 0.7137. The main change is to calibrate the disease-threshold using a broader and slightly finer grid and to add one extra calibrated parameter: a “top-1 class confidence override” that outputs the predicted label-set string directly when the model is very confident (this preserves semantics and helps recover multi-disease combinations that can get diluted when converting to per-disease probabilities). I also compute the disease-probability aggregation on CPU once (precomputing a numpy/torch matrix) to avoid device transfers inside `_predict_str_from_softmax`, keeping behavior the same but more stable. Submission ordering/format and output path remain unchanged, and the script still writes `/kaggle/working/submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+from PIL import Image
+from tqdm import tqdm
+import copy
+import pandas as pd
+from torchvision import transforms, models
+from torch import optim
+import torch
+import os
+import random
+from glob import glob
+
+DATA_ROOT = "/kaggle/input/plant-pathology-2021-fgvc8"
+TRAIN_CSV_PATH = os.path.join(DATA_ROOT, "train.csv")
+SAMPLE_SUB_PATH = os.path.join(DATA_ROOT, "sample_submission.csv")
+TEST_IMG_DIR = os.path.join(DATA_ROOT, "test_images")
+TRAIN_IMG_DIR = os.path.join(DATA_ROOT, "train_images")
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
+
+def seed_everything(seed: int = 42):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+seed_everything(42)
+
+
+
+## === cell 1
+transform_train = transforms.Compose(
+    [
+        transforms.RandomResizedCrop(640),
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ]
+)
+
+transform_valid = transforms.Compose(
+    [
+        transforms.Resize(640),
+        transforms.CenterCrop(640),
+        transforms.ToTensor(),
+        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+    ]
+)
+
+
+
+## === cell 2
+train_df_full = pd.read_csv(TRAIN_CSV_PATH)
+
+all_labels = sorted(train_df_full["labels"].astype(str).unique().tolist())
+label2idx = {lab: i for i, lab in enumerate(all_labels)}
+idx2label = {i: lab for lab, i in label2idx.items()}
+NUM_CLASSES = len(label2idx)
+print("NUM_CLASSES:", NUM_CLASSES)
+
+df_tmp = train_df_full.copy()
+df_tmp["y"] = df_tmp["labels"].astype(str).map(label2idx)
+
+parts = []
+for y, g in df_tmp.groupby("y", sort=False):
+    parts.append(g.sample(frac=1.0, random_state=42))
+df_shuf = (
+    pd.concat(parts, axis=0).sample(frac=1.0, random_state=42).reset_index(drop=True)
+)
+
+valid_frac = 0.1
+train_idx = []
+valid_idx = []
+for y, g in df_shuf.groupby("y", sort=False):
+    n = len(g)
+    n_valid = max(1, int(round(n * valid_frac))) if n > 1 else 0
+    valid_idx.extend(g.index[:n_valid].tolist())
+    train_idx.extend(g.index[n_valid:].tolist())
+
+train_df = df_shuf.loc[train_idx, ["image", "labels"]].reset_index(drop=True)
+valid_df = df_shuf.loc[valid_idx, ["image", "labels"]].reset_index(drop=True)
+
+MOST_FREQ_LABEL = train_df["labels"].astype(str).value_counts().idxmax()
+MOST_FREQ_IDX = label2idx[MOST_FREQ_LABEL]
+print(
+    "Most frequent label-set (train split):", MOST_FREQ_LABEL, "-> idx", MOST_FREQ_IDX
+)
+
+print("train/valid sizes:", len(train_df), len(valid_df))
+
+
+
+
+## === cell 3
+class torchvision_Dataset(torch.utils.data.Dataset):
+    def __init__(self, image_root, df, label2idx, transforms=None):
+        self.df = df.reset_index(drop=True)
+        self.image_root = image_root
+        self.label2idx = label2idx
+        self.transform = transforms
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        image_name = self.df.loc[idx, "image"]
+        label_name = str(self.df.loc[idx, "labels"]).strip()
+
+        img = Image.open(os.path.join(self.image_root, image_name)).convert("RGB")
+        x = self.transform(img) if self.transform else img
+        return x, self.label2idx[label_name]
+
+
+
+
+## === cell 4
+train_dataset = torchvision_Dataset(TRAIN_IMG_DIR, train_df, label2idx, transform_train)
+valid_dataset = torchvision_Dataset(TRAIN_IMG_DIR, valid_df, label2idx, transform_valid)
+
+
+
+
+## === cell 5
+def _default_num_workers():
+    return min(4, os.cpu_count() or 2)
+
+
+NUM_WORKERS = _default_num_workers()
+PIN_MEMORY = torch.cuda.is_available()
+
+train_dataloaders = torch.utils.data.DataLoader(
+    train_dataset,
+    batch_size=16,
+    shuffle=True,
+    num_workers=NUM_WORKERS,
+    pin_memory=PIN_MEMORY,
+    persistent_workers=(NUM_WORKERS > 0),
+    prefetch_factor=2 if NUM_WORKERS > 0 else None,
+)
+valid_dataloaders = torch.utils.data.DataLoader(
+    valid_dataset,
+    batch_size=16,
+    shuffle=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=PIN_MEMORY,
+    persistent_workers=(NUM_WORKERS > 0),
+    prefetch_factor=2 if NUM_WORKERS > 0 else None,
+)
+
+
+
+## === cell 6
+pass
+
+
+
+## === cell 7
+model_ft = models.efficientnet_b4(weights=models.EfficientNet_B4_Weights.IMAGENET1K_V1)
+in_features = model_ft.classifier[1].in_features
+model_ft.classifier[1] = torch.nn.Linear(in_features, NUM_CLASSES)
+model_ft.to(device)
+
+
+
+## === cell 8
+from torch.optim.lr_scheduler import _LRScheduler
+
+
+class GradualWarmupScheduler(_LRScheduler):
+    def __init__(self, optimizer, multiplier, total_epoch, after_scheduler=None):
+        self.multiplier = multiplier
+        self.total_epoch = total_epoch
+        self.after_scheduler = after_scheduler
+        self.finished = False
+        super().__init__(optimizer)
+
+    def get_lr(self):
+        if self.last_epoch > self.total_epoch:
+            if self.after_scheduler:
+                if not self.finished:
+                    self.after_scheduler.base_lrs = [
+                        base_lr * self.multiplier for base_lr in self.base_lrs
+                    ]
+                    self.finished = True
+                return self.after_scheduler.get_lr()
+            return [base_lr * self.multiplier for base_lr in self.base_lrs]
+
+        return [
+            base_lr
+            * ((self.multiplier - 1.0) * self.last_epoch / self.total_epoch + 1.0)
+            for base_lr in self.base_lrs
+        ]
+
+    def step(self, epoch=None, metrics=None):
+        if self.finished and self.after_scheduler:
+            if epoch is None:
+                self.after_scheduler.step(None)
+            else:
+                self.after_scheduler.step(epoch - self.total_epoch)
+        else:
+            return super(GradualWarmupScheduler, self).step(epoch)
+
+
+
+
+## === cell 9
+criterion = torch.nn.CrossEntropyLoss()
+optimizer_ft = optim.SGD(model_ft.parameters(), lr=0.001, momentum=0.9)
+cosine_scheduler = optim.lr_scheduler.CosineAnnealingLR(
+    optimizer_ft, 30, eta_min=0, last_epoch=-1
+)
+exp_lr_scheduler = GradualWarmupScheduler(
+    optimizer_ft, multiplier=100, total_epoch=3, after_scheduler=cosine_scheduler
+)
+
+
+
+
+## === cell 10
+def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
+    best_model_wts = copy.deepcopy(model.state_dict())
+    best_acc = 0.0
+
+    os.makedirs("outputs", exist_ok=True)
+
+    for epoch in range(num_epochs):
+        running_loss = 0.0
+        train_corrects = 0
+        train_data_cnt = 0
+
+        model.train()
+        train_progress_bar = tqdm(train_dataloaders)
+        for inputs, labels in train_progress_bar:
+            inputs = inputs.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+
+            optimizer.zero_grad(set_to_none=True)
+
+            outputs = model(inputs)
+            _, preds = torch.max(outputs, 1)
+            loss = criterion(outputs, labels)
+
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item() * inputs.size(0)
+            train_corrects += torch.sum(preds == labels.data).item()
+            train_data_cnt += inputs.size(0)
+            train_progress_bar.set_description(
+                f" Epoch[{epoch+1}/{num_epochs}] train : runing_Loss {running_loss / train_data_cnt:.5f}, "
+                f"train_acc {train_corrects / train_data_cnt:.5f}"
+            )
+
+        scheduler.step()
+
+        valid_corrects = 0
+        valid_data_cnt = 0
+
+        model.eval()
+        valid_progress_bar = tqdm(valid_dataloaders)
+        for inputs, labels in valid_progress_bar:
+            inputs = inputs.to(device, non_blocking=True)
+            labels = labels.to(device, non_blocking=True)
+
+            with torch.no_grad():
+                outputs = model(inputs)
+                _, preds = torch.max(outputs, 1)
+
+            valid_corrects += torch.sum(preds == labels.data).item()
+            valid_data_cnt += inputs.size(0)
+            valid_progress_bar.set_description(
+                f" Epoch[{epoch+1}/{num_epochs}] valid : valid_acc {valid_corrects / valid_data_cnt:.5f}"
+            )
+
+        epoch_acc = valid_corrects / len(valid_dataset)
+        if epoch_acc > best_acc:
+            best_acc = epoch_acc
+            best_epoch = epoch
+            best_model_wts = copy.deepcopy(model.state_dict())
+            torch.save(model.state_dict(), f"outputs/{best_epoch}.pth")
+            print(f"best epoch : {best_epoch} (acc={best_acc:.5f})")
+
+    return best_model_wts
+
+
+
+
+## === cell 11
+pass
+
+
+
+## === cell 12
+ckpt_path = "/kaggle/input/best-model/28.pth"
+if os.path.exists(ckpt_path):
+    state = torch.load(ckpt_path, map_location="cpu")
+    model_ft.load_state_dict(state)
+    model_ft.to(device)
+else:
+    best_wts = train_model(
+        model_ft, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=1
+    )
+    model_ft.load_state_dict(best_wts)
+    model_ft.to(device)
+
+
+
+
+## === cell 13
+def _parse_label_str(s: str):
+    s = str(s).strip()
+    if s == "" or s.lower() == "nan":
+        return set()
+    return set(s.split())
+
+
+def _sample_f1(y_true_set, y_pred_set):
+    inter = len(y_true_set & y_pred_set)
+    denom = len(y_true_set) + len(y_pred_set)
+    if denom == 0:
+        return 1.0
+    return (2.0 * inter) / denom
+
+
+def _mean_sample_f1(true_labels_str, pred_labels_str):
+    total = 0.0
+    n = len(true_labels_str)
+    for t, p in zip(true_labels_str, pred_labels_str):
+        total += _sample_f1(_parse_label_str(t), _parse_label_str(p))
+    return total / max(1, n)
+
+
+diseases = sorted(
+    {
+        d
+        for s in train_df_full["labels"].astype(str).tolist()
+        for d in _parse_label_str(s)
+    }
+)
+disease2idx = {d: i for i, d in enumerate(diseases)}
+idx2disease = {i: d for d, i in disease2idx.items()}
+NUM_DISEASES = len(diseases)
+print("NUM_DISEASES:", NUM_DISEASES)
+print("Diseases:", diseases)
+
+class_to_disease = torch.zeros((NUM_CLASSES, NUM_DISEASES), dtype=torch.float32)
+for c in range(NUM_CLASSES):
+    labs = _parse_label_str(idx2label[c])
+    for d in labs:
+        class_to_disease[c, disease2idx[d]] = 1.0
+
+CLASS_TO_DISEASE_CPU = class_to_disease.contiguous()  # (C, D) float32 on CPU
+
+DEFAULT_EMPTY_PRED = (
+    "healthy" if "healthy" in disease2idx else idx2label[int(MOST_FREQ_IDX)]
+)
+
+
+def _predict_str_from_softmax(
+    probs_1d: torch.Tensor, disease_thresh: float, class_override_thresh: float
+) -> str:
+    """
+    probs_1d: (C,) softmax over label-set classes (CPU tensor here)
+    Returns: space-delimited disease labels.
+    """
+    top1_prob, top1_idx = torch.max(probs_1d, dim=0)
+    if float(top1_prob) >= float(class_override_thresh):
+        s = str(idx2label[int(top1_idx)]).strip()
+        return s if s != "" else DEFAULT_EMPTY_PRED
+
+    disease_probs = torch.matmul(probs_1d, CLASS_TO_DISEASE_CPU)  # (D,)
+    chosen = [
+        idx2disease[i]
+        for i, v in enumerate(disease_probs.tolist())
+        if v >= disease_thresh
+    ]
+
+    if len(chosen) == 0:
+        return DEFAULT_EMPTY_PRED
+
+    if "healthy" in chosen and len(chosen) > 1:
+        chosen = [c for c in chosen if c != "healthy"]
+
+    chosen = sorted(set(chosen))
+    return " ".join(chosen)
+
+
+def calibrate_postproc_params_comp_f1(model, loader):
+    model.eval()
+    all_true_str = []
+    all_probs = []
+
+    with torch.no_grad():
+        for inputs, labels in tqdm(
+            loader, desc="Calibrating post-proc on valid", leave=False
+        ):
+            inputs = inputs.to(device, non_blocking=True)
+            logits = model(inputs)
+            probs = torch.softmax(logits, dim=1)  # (B, C)
+
+            all_probs.append(probs.detach().cpu())
+            all_true_str.extend([idx2label[int(i)] for i in labels.cpu().tolist()])
+
+    all_probs = torch.cat(all_probs, dim=0)  # (N, C) on CPU
+
+    disease_grid = [0.02 + 0.01 * i for i in range(49)]  # 0.02..0.50
+    override_grid = [0.60 + 0.02 * i for i in range(20)]  # 0.60..0.98
+
+    best = (disease_grid[0], override_grid[0])
+    best_f1 = -1.0
+
+    for d_t in disease_grid:
+        for o_t in override_grid:
+            pred_str = []
+            for i in range(all_probs.shape[0]):
+                pred_str.append(
+                    _predict_str_from_softmax(all_probs[i], float(d_t), float(o_t))
+                )
+            f1 = _mean_sample_f1(all_true_str, pred_str)
+            if f1 > best_f1:
+                best_f1 = f1
+                best = (d_t, o_t)
+
+    print(
+        f"Calibrated DISEASE_THRESH={best[0]:.2f}, CLASS_OVERRIDE_THRESH={best[1]:.2f} "
+        f"(valid mean sample-F1={best_f1:.5f})"
+    )
+    return float(best[0]), float(best[1])
+
+
+DISEASE_THRESH, CLASS_OVERRIDE_THRESH = calibrate_postproc_params_comp_f1(
+    model_ft, valid_dataloaders
+)
+
+
+
+
+## === cell 14
+class TestDataset(torch.utils.data.Dataset):
+    def __init__(self, img_paths, transform=None):
+        self.img_paths = img_paths
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.img_paths)
+
+    def __getitem__(self, idx):
+        p = self.img_paths[idx]
+        img = Image.open(p).convert("RGB")
+        x = self.transform(img) if self.transform else img
+        return x, os.path.basename(p)
+
+
+valid_ext = {".jpg", ".jpeg", ".png", ".bmp"}
+all_paths = sorted(glob(os.path.join(TEST_IMG_DIR, "*")))
+img_paths = [
+    p
+    for p in all_paths
+    if os.path.isfile(p) and os.path.splitext(p.lower())[1] in valid_ext
+]
+
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+needed = sample_sub["image"].tolist()
+path_map = {os.path.basename(p): p for p in img_paths}
+missing = [n for n in needed if n not in path_map]
+if len(missing) > 0:
+    print(
+        f"Warning: {len(missing)} images from sample_submission not found in TEST_IMG_DIR. Example:",
+        missing[:3],
+    )
+
+img_paths_ordered = [path_map[n] for n in needed if n in path_map]
+
+test_dataset = TestDataset(img_paths_ordered, transform_valid)
+test_loader = torch.utils.data.DataLoader(
+    test_dataset,
+    batch_size=32,
+    shuffle=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=PIN_MEMORY,
+    persistent_workers=(NUM_WORKERS > 0),
+    prefetch_factor=2 if NUM_WORKERS > 0 else None,
+)
+
+submit = []
+model_ft.eval()
+
+with torch.no_grad():
+    for inputs, names in tqdm(test_loader, desc="Infer test"):
+        inputs = inputs.to(device, non_blocking=True)
+        logits = model_ft(inputs)
+        probs = torch.softmax(logits, dim=1)  # (B, C)
+
+        probs_cpu = probs.detach().cpu()
+        for j, n in enumerate(names):
+            chosen = _predict_str_from_softmax(
+                probs_cpu[j], DISEASE_THRESH, CLASS_OVERRIDE_THRESH
+            )
+            submit.append([n, chosen])
+
+submission = pd.DataFrame(submit, columns=["image", "labels"])
+submission = sample_sub[["image"]].merge(submission, on="image", how="left")
+submission["labels"] = submission["labels"].fillna(DEFAULT_EMPTY_PRED)
+
+submission.to_csv("/kaggle/working/submission.csv", index=False)
+print("Wrote /kaggle/working/submission.csv with shape:", submission.shape)
+print(submission.head())

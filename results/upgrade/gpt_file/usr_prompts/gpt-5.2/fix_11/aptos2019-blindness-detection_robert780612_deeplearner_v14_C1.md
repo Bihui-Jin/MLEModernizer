@@ -1,0 +1,1147 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8916564458990466
+
+# 6. Current score
+
+0.0
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I make the notebook run end-to-end by removing the hard dependency on an external `.pth` checkpoint (which isn’t present in your environment) and instead using the same SE-ResNet50+GeM architecture initialized from torchvision’s built-in ImageNet weights. This preserves the core model design and inference pipeline, while ensuring the code can execute in Kaggle without internet or extra datasets. I also make the submission writing robust (correct columns, integer casting, `.csv` suffix) and keep your existing regression-to-5-class thresholding logic unchanged to maintain evaluation semantics. This should yield a valid submission and a reasonable baseline score (better than failing to submit).'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 score is consistent with producing essentially random/untrained predictions (no valid fine-tuned checkpoint found), so the smallest meaningful improvement is to ensure we load a real fine-tuned model rather than falling back to partial ImageNet weights. I keep your exact SE-ResNet50+GeM regression model and the same inference + flip-TTA + thresholding, but make checkpoint discovery prefer APTOS-related `.pth` files inside the provided dataset folders and allow `strict=False` loading to handle common training wrappers without breaking execution. This should move the score upward toward the target by using a likely competition-trained checkpoint if present, while still writing a valid `submission.csv`. If no checkpoint exists, the code still runs end-to-end and produces a valid submission.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with the model effectively not using a meaningful fine-tuned checkpoint (falling back to partial ImageNet weights for a regression head), so the smallest change to move score upward is to more reliably locate and load a real APTOS-trained `.pth` if one exists. I keep your exact SE-ResNet50+GeM regression model and the same flip-TTA + fixed thresholds, but improve checkpoint discovery (also checking common `/kaggle/input/*/` datasets) and loading (handle `model_state_dict`, nested dicts, and common key prefixes like `model.`/`net.`) while still using `strict=False`. This preserves core logic and only affects whether we actually load the intended trained weights. The script still always writes a valid `submission.csv` with correct columns and row alignment.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score strongly suggests the submission is essentially uncorrelated with the labels (most likely because the regression head is random when no fine-tuned checkpoint is found). To move the score upward with minimal semantic change, I keep your exact SE-ResNet50+GeM regression model and flip-TTA, but make the “no-checkpoint” fallback initialize the backbone from torchvision ImageNet weights and initialize the regression head in a stable, near-zero way (so predictions aren’t wild). Additionally, I add a minimal, metric-aligned post-processing step: fit optimal thresholds on a small internal validation split using quadratic weighted kappa (still using your same “regression→5-class thresholds” idea), and then apply those learned thresholds to test predictions. This preserves the core approach (regression + thresholds) while making thresholds data-driven instead of fixed, which typically improves QWK substantially without changing the model/training loop. The code still runs end-to-end and always writes a valid `submission.csv` with correct columns and row alignment.'
+- What this solution (achieved 0.0) has done: 'Your current 0.0 score is almost certainly coming from uninformative predictions (either a random/untrained regression head or thresholds calibrated on near-constant outputs), so the smallest safe move toward the target is to make the fallback predictions non-degenerate without changing your model/inference semantics. I keep your exact SE-ResNet50+GeM regression model, flip-TTA, and “regression→4 thresholds→5 classes” pipeline, but (1) properly initialize the SE-ResNet50 backbone from torchvision ResNet50 ImageNet weights by mapping layer names (so it’s not mostly-random), and (2) make threshold calibration deterministic and robust by using an out-of-fold style calibration: predict all train images once, then optimize thresholds on those predictions. This keeps the same idea (threshold optimization for QWK) but removes the instability from using a small random split with a weak model. The script still runs end-to-end under Kaggle constraints and always writes a valid `submission.csv` with the required columns and row alignment.'
+- What this solution (achieved 0.0) has done: 'I keep your exact SE-ResNet50+GeM regression model, flip-TTA inference, and “regression→4 thresholds→5 classes” pipeline, but fix the main reason you’re stuck at 0.0: the current checkpoint loading path likely doesn’t exist, so you’re effectively running an untrained head and calibrating thresholds on noisy outputs. The smallest score-improving change is to (1) stop relying on downloading Cadene weights via `model_zoo` (no internet), and instead use torchvision’s local ImageNet weights as a strong backbone initialization every time, and (2) make checkpoint loading more robust by also supporting common key patterns (including `last_linear.*` vs `fc.*` mismatches) while still using `strict=False`. Finally, to avoid overfitting your thresholds on the same data you use to choose them (which can hurt public LB), I keep your threshold-optimization logic but calibrate thresholds on out-of-fold predictions (same model, same inference; just avoids leakage in calibration). This should move the score upward toward your 0.8916 target without changing the core approach.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is consistent with a valid CSV that contains essentially uncorrelated predictions, which in this pipeline most likely comes from the SE-ResNet weights never being meaningfully initialized (your mapping currently ignores the `layer0` 7x7 conv/BN path and most downsample keys). I keep your exact SE-ResNet50+GeM regression model and the same inference + flip-TTA + thresholding, but strengthen the *initialization* by mapping torchvision ResNet50 weights into *both* possible SENet “layer0” variants (7x7 or 3x3 stem) and by mapping each block’s downsample weights, so the backbone is no longer mostly-random when no fine-tuned checkpoint exists. I also make the OOF threshold calibration use a deterministic StratifiedKFold split (same core “OOF then optimize thresholds” approach) to reduce fold label imbalance, which typically stabilizes QWK without changing the model or loss. These are minimal, execution-safe changes that should move the score upward toward your target while preserving your core semantics.'
+
+# 9. Code solution
+
+## === cell 0
+from __future__ import print_function, division, absolute_import
+
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+
+
+
+## === cell 1
+"""
+ResNet code gently borrowed from
+https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
+"""
+from collections import OrderedDict
+import math
+
+import torch.nn as nn
+from torch.utils import model_zoo
+
+__all__ = [
+    "SENet",
+    "senet154",
+    "se_resnet50",
+    "se_resnet101",
+    "se_resnet152",
+    "se_resnext50_32x4d",
+    "se_resnext101_32x4d",
+]
+
+pretrained_settings = {
+    "senet154": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/senet154-c7b49a05.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "se_resnet50": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnet50-ce0d4300.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "se_resnet101": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnet101-7e38fcc6.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "se_resnet152": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnet152-d17c99b7.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "se_resnext50_32x4d": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnext50_32x4d-a260b3a4.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+    "se_resnext101_32x4d": {
+        "imagenet": {
+            "url": "http://data.lip6.fr/cadene/pretrainedmodels/se_resnext101_32x4d-3b2fe3d8.pth",
+            "input_space": "RGB",
+            "input_size": [3, 224, 224],
+            "input_range": [0, 1],
+            "mean": [0.485, 0.456, 0.406],
+            "std": [0.229, 0.224, 0.225],
+            "num_classes": 1000,
+        }
+    },
+}
+
+
+class SEModule(nn.Module):
+
+    def __init__(self, channels, reduction):
+        super(SEModule, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc1 = nn.Conv2d(channels, channels // reduction, kernel_size=1, padding=0)
+        self.relu = nn.ReLU(inplace=True)
+        self.fc2 = nn.Conv2d(channels // reduction, channels, kernel_size=1, padding=0)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        module_input = x
+        x = self.avg_pool(x)
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        x = self.sigmoid(x)
+        return module_input * x
+
+
+class Bottleneck(nn.Module):
+    """
+    Base class for bottlenecks that implements `forward()` method.
+    """
+
+    def forward(self, x):
+        residual = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.relu(out)
+
+        out = self.conv3(out)
+        out = self.bn3(out)
+
+        if self.downsample is not None:
+            residual = self.downsample(x)
+
+        out = self.se_module(out) + residual
+        out = self.relu(out)
+
+        return out
+
+
+class SEBottleneck(Bottleneck):
+    """
+    Bottleneck for SENet154.
+    """
+
+    expansion = 4
+
+    def __init__(self, inplanes, planes, groups, reduction, stride=1, downsample=None):
+        super(SEBottleneck, self).__init__()
+        self.conv1 = nn.Conv2d(inplanes, planes * 2, kernel_size=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes * 2)
+        self.conv2 = nn.Conv2d(
+            planes * 2,
+            planes * 4,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            groups=groups,
+            bias=False,
+        )
+        self.bn2 = nn.BatchNorm2d(planes * 4)
+        self.conv3 = nn.Conv2d(planes * 4, planes * 4, kernel_size=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(planes * 4)
+        self.relu = nn.ReLU(inplace=True)
+        self.se_module = SEModule(planes * 4, reduction=reduction)
+        self.downsample = downsample
+        self.stride = stride
+
+
+class SEResNetBottleneck(Bottleneck):
+    """
+    ResNet bottleneck with a Squeeze-and-Excitation module. It follows Caffe
+    implementation and uses `stride=stride` in `conv1` and not in `conv2`
+    (the latter is used in the torchvision implementation of ResNet).
+    """
+
+    expansion = 4
+
+    def __init__(self, inplanes, planes, groups, reduction, stride=1, downsample=None):
+        super(SEResNetBottleneck, self).__init__()
+        self.conv1 = nn.Conv2d(
+            inplanes, planes, kernel_size=1, bias=False, stride=stride
+        )
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(
+            planes, planes, kernel_size=3, padding=1, groups=groups, bias=False
+        )
+        self.bn2 = nn.BatchNorm2d(planes)
+        self.conv3 = nn.Conv2d(planes, planes * 4, kernel_size=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(planes * 4)
+        self.relu = nn.ReLU(inplace=True)
+        self.se_module = SEModule(planes * 4, reduction=reduction)
+        self.downsample = downsample
+        self.stride = stride
+
+
+class SEResNeXtBottleneck(Bottleneck):
+    """
+    ResNeXt bottleneck type C with a Squeeze-and-Excitation module.
+    """
+
+    expansion = 4
+
+    def __init__(
+        self,
+        inplanes,
+        planes,
+        groups,
+        reduction,
+        stride=1,
+        downsample=None,
+        base_width=4,
+    ):
+        super(SEResNeXtBottleneck, self).__init__()
+        width = math.floor(planes * (base_width / 64)) * groups
+        self.conv1 = nn.Conv2d(inplanes, width, kernel_size=1, bias=False, stride=1)
+        self.bn1 = nn.BatchNorm2d(width)
+        self.conv2 = nn.Conv2d(
+            width,
+            width,
+            kernel_size=3,
+            stride=stride,
+            padding=1,
+            groups=groups,
+            bias=False,
+        )
+        self.bn2 = nn.BatchNorm2d(width)
+        self.conv3 = nn.Conv2d(width, planes * 4, kernel_size=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(planes * 4)
+        self.relu = nn.ReLU(inplace=True)
+        self.se_module = SEModule(planes * 4, reduction=reduction)
+        self.downsample = downsample
+        self.stride = stride
+
+
+class SENet(nn.Module):
+
+    def __init__(
+        self,
+        block,
+        layers,
+        groups,
+        reduction,
+        dropout_p=0.2,
+        inplanes=128,
+        input_3x3=True,
+        downsample_kernel_size=3,
+        downsample_padding=1,
+        num_classes=1000,
+    ):
+        super(SENet, self).__init__()
+        self.inplanes = inplanes
+        if input_3x3:
+            layer0_modules = [
+                ("conv1", nn.Conv2d(3, 64, 3, stride=2, padding=1, bias=False)),
+                ("bn1", nn.BatchNorm2d(64)),
+                ("relu1", nn.ReLU(inplace=True)),
+                ("conv2", nn.Conv2d(64, 64, 3, stride=1, padding=1, bias=False)),
+                ("bn2", nn.BatchNorm2d(64)),
+                ("relu2", nn.ReLU(inplace=True)),
+                ("conv3", nn.Conv2d(64, inplanes, 3, stride=1, padding=1, bias=False)),
+                ("bn3", nn.BatchNorm2d(inplanes)),
+                ("relu3", nn.ReLU(inplace=True)),
+            ]
+        else:
+            layer0_modules = [
+                (
+                    "conv1",
+                    nn.Conv2d(
+                        3, inplanes, kernel_size=7, stride=2, padding=3, bias=False
+                    ),
+                ),
+                ("bn1", nn.BatchNorm2d(inplanes)),
+                ("relu1", nn.ReLU(inplace=True)),
+            ]
+        layer0_modules.append(("pool", nn.MaxPool2d(3, stride=2, ceil_mode=True)))
+        self.layer0 = nn.Sequential(OrderedDict(layer0_modules))
+        self.layer1 = self._make_layer(
+            block,
+            planes=64,
+            blocks=layers[0],
+            groups=groups,
+            reduction=reduction,
+            downsample_kernel_size=1,
+            downsample_padding=0,
+        )
+        self.layer2 = self._make_layer(
+            block,
+            planes=128,
+            blocks=layers[1],
+            stride=2,
+            groups=groups,
+            reduction=reduction,
+            downsample_kernel_size=downsample_kernel_size,
+            downsample_padding=downsample_padding,
+        )
+        self.layer3 = self._make_layer(
+            block,
+            planes=256,
+            blocks=layers[2],
+            stride=2,
+            groups=groups,
+            reduction=reduction,
+            downsample_kernel_size=downsample_kernel_size,
+            downsample_padding=downsample_padding,
+        )
+        self.layer4 = self._make_layer(
+            block,
+            planes=512,
+            blocks=layers[3],
+            stride=2,
+            groups=groups,
+            reduction=reduction,
+            downsample_kernel_size=downsample_kernel_size,
+            downsample_padding=downsample_padding,
+        )
+        self.avg_pool = nn.AvgPool2d(7, stride=1)
+        self.dropout = nn.Dropout(dropout_p) if dropout_p is not None else None
+        self.last_linear = nn.Linear(512 * block.expansion, num_classes)
+
+    def _make_layer(
+        self,
+        block,
+        planes,
+        blocks,
+        groups,
+        reduction,
+        stride=1,
+        downsample_kernel_size=1,
+        downsample_padding=0,
+    ):
+        downsample = None
+        if stride != 1 or self.inplanes != planes * block.expansion:
+            downsample = nn.Sequential(
+                nn.Conv2d(
+                    self.inplanes,
+                    planes * block.expansion,
+                    kernel_size=downsample_kernel_size,
+                    stride=stride,
+                    padding=downsample_padding,
+                    bias=False,
+                ),
+                nn.BatchNorm2d(planes * block.expansion),
+            )
+
+        layers = []
+        layers.append(
+            block(self.inplanes, planes, groups, reduction, stride, downsample)
+        )
+        self.inplanes = planes * block.expansion
+        for _ in range(1, blocks):
+            layers.append(block(self.inplanes, planes, groups, reduction))
+
+        return nn.Sequential(*layers)
+
+    def features(self, x):
+        x = self.layer0(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        return x
+
+    def logits(self, x):
+        x = self.avg_pool(x)
+        if self.dropout is not None:
+            x = self.dropout(x)
+        x = x.view(x.size(0), -1)
+        x = self.last_linear(x)
+        return x
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.logits(x)
+        return x
+
+
+def initialize_pretrained_model(model, num_classes, settings):
+    assert (
+        num_classes == settings["num_classes"]
+    ), "num_classes should be {}, but is {}".format(
+        settings["num_classes"], num_classes
+    )
+    model.load_state_dict(model_zoo.load_url(settings["url"]))
+    model.input_space = settings["input_space"]
+    model.input_size = settings["input_size"]
+    model.input_range = settings["input_range"]
+    model.mean = settings["mean"]
+    model.std = settings["std"]
+
+
+def senet154(num_classes=1000, pretrained="imagenet"):
+    model = SENet(
+        SEBottleneck,
+        [3, 8, 36, 3],
+        groups=64,
+        reduction=16,
+        dropout_p=0.2,
+        num_classes=num_classes,
+    )
+    if pretrained is not None:
+        settings = pretrained_settings["senet154"][pretrained]
+        initialize_pretrained_model(model, num_classes, settings)
+    return model
+
+
+def se_resnet50(num_classes=1000, pretrained="imagenet"):
+    model = SENet(
+        SEResNetBottleneck,
+        [3, 4, 6, 3],
+        groups=1,
+        reduction=16,
+        dropout_p=None,
+        inplanes=64,
+        input_3x3=False,
+        downsample_kernel_size=1,
+        downsample_padding=0,
+        num_classes=num_classes,
+    )
+    if pretrained is not None:
+        settings = pretrained_settings["se_resnet50"][pretrained]
+        initialize_pretrained_model(model, num_classes, settings)
+    return model
+
+
+def se_resnet101(num_classes=1000, pretrained="imagenet"):
+    model = SENet(
+        SEResNetBottleneck,
+        [3, 4, 23, 3],
+        groups=1,
+        reduction=16,
+        dropout_p=None,
+        inplanes=64,
+        input_3x3=False,
+        downsample_kernel_size=1,
+        downsample_padding=0,
+        num_classes=num_classes,
+    )
+    if pretrained is not None:
+        settings = pretrained_settings["se_resnet101"][pretrained]
+        initialize_pretrained_model(model, num_classes, settings)
+    return model
+
+
+def se_resnet152(num_classes=1000, pretrained="imagenet"):
+    model = SENet(
+        SEResNetBottleneck,
+        [3, 8, 36, 3],
+        groups=1,
+        reduction=16,
+        dropout_p=None,
+        inplanes=64,
+        input_3x3=False,
+        downsample_kernel_size=1,
+        downsample_padding=0,
+        num_classes=num_classes,
+    )
+    if pretrained is not None:
+        settings = pretrained_settings["se_resnet152"][pretrained]
+        initialize_pretrained_model(model, num_classes, settings)
+    return model
+
+
+def se_resnext50_32x4d(num_classes=1000, pretrained="imagenet"):
+    model = SENet(
+        SEResNeXtBottleneck,
+        [3, 4, 6, 3],
+        groups=32,
+        reduction=16,
+        dropout_p=None,
+        inplanes=64,
+        input_3x3=False,
+        downsample_kernel_size=1,
+        downsample_padding=0,
+        num_classes=num_classes,
+    )
+    if pretrained is not None:
+        settings = pretrained_settings["se_resnext50_32x4d"][pretrained]
+        initialize_pretrained_model(model, num_classes, settings)
+    return model
+
+
+def se_resnext101_32x4d(num_classes=1000, pretrained="imagenet"):
+    model = SENet(
+        SEResNeXtBottleneck,
+        [3, 4, 23, 3],
+        groups=32,
+        reduction=16,
+        dropout_p=None,
+        inplanes=64,
+        input_3x3=False,
+        downsample_kernel_size=1,
+        downsample_padding=0,
+        num_classes=num_classes,
+    )
+    if pretrained is not None:
+        settings = pretrained_settings["se_resnext101_32x4d"][pretrained]
+        initialize_pretrained_model(model, num_classes, settings)
+    return model
+
+
+
+
+## === cell 2
+import sys
+
+sys.path.append("/kaggle/working/")
+
+import torch
+import torch.nn.functional as F
+from torch.nn.parameter import Parameter
+
+
+class GeM(nn.Module):
+    def __init__(self, p=3, eps=1e-6):
+        super(GeM, self).__init__()
+        self.p = Parameter(torch.ones(1) * p)
+        self.eps = eps
+
+    def forward(self, x):
+        return gem(x, p=self.p, eps=self.eps)
+
+    def __repr__(self):
+        return (
+            self.__class__.__name__
+            + "("
+            + "p="
+            + "{:.4f}".format(self.p.data.tolist()[0])
+            + ", "
+            + "eps="
+            + str(self.eps)
+            + ")"
+        )
+
+
+def gem(x, p=3, eps=1e-6):
+    return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1.0 / p)
+
+
+def get_se_resnet50_gem(pretrain):
+    model = se_resnet50(num_classes=1000, pretrained=None)
+    model.avg_pool = GeM()
+    model.last_linear = torch.nn.Linear(2048, 1)
+    return model
+
+
+
+
+## === cell 3
+import os
+import glob
+import time
+
+import pandas as pd
+from PIL import Image, ImageFile
+from torchvision import transforms, models
+
+from sklearn.model_selection import StratifiedKFold
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+_CANDIDATE_BASES = [
+    "/kaggle/input/aptos2019-blindness-detection",
+    "/kaggle/data/aptos2019-blindness-detection",
+    "/kaggle/input",
+    "/kaggle/data",
+]
+
+
+def _first_existing(*paths):
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
+def _find_checkpoint():
+    explicit_preferred = [
+        "/kaggle/input/seresnet50-2/model90.pth",
+        "/kaggle/input/seresnet50/model.pth",
+    ]
+    for p in explicit_preferred:
+        if os.path.exists(p):
+            return p
+
+    patterns = [
+        "/kaggle/input/**/*.pth",
+        "/kaggle/data/**/*.pth",
+        "/kaggle/working/**/*.pth",
+    ]
+    hits = []
+    for pat in patterns:
+        hits.extend(glob.glob(pat, recursive=True))
+    hits = [h for h in hits if os.path.isfile(h)]
+
+    def _rank(p):
+        name = os.path.basename(p).lower()
+        full = p.lower()
+        score = 0
+        if (
+            "aptos" in full
+            or "blindness" in full
+            or "retina" in full
+            or "diabet" in full
+            or "dr" in name
+        ):
+            score -= 100
+        if "seresnet" in name or "se_resnet" in name or "senet" in name:
+            score -= 30
+        if "resnet50" in name:
+            score -= 15
+        if "gem" in name:
+            score -= 5
+        if "best" in name:
+            score -= 5
+        if "final" in name:
+            score -= 3
+        if "fold" in name:
+            score -= 1
+        return (score, len(p))
+
+    hits.sort(key=_rank)
+    return hits[0] if hits else None
+
+
+def _extract_state_dict(state):
+    if isinstance(state, dict):
+        for key in ["state_dict", "model_state_dict", "model", "net", "weights"]:
+            if key in state and isinstance(state[key], dict):
+                return state[key]
+        if all(isinstance(k, str) for k in state.keys()):
+            return state
+    raise ValueError("Unsupported checkpoint format (cannot extract state_dict)")
+
+
+def _strip_common_prefixes(state_dict):
+    prefixes = ["module.", "model.", "net.", "encoder.", "backbone."]
+    out = dict(state_dict)
+    changed = True
+    while changed:
+        changed = False
+        for pref in prefixes:
+            if any(k.startswith(pref) for k in out.keys()):
+                out = {
+                    k[len(pref) :] if k.startswith(pref) else k: v
+                    for k, v in out.items()
+                }
+                changed = True
+    return out
+
+
+def _normalize_head_keys_for_senet(state_dict):
+    sd = dict(state_dict)
+    remap = {}
+    for k, v in sd.items():
+        if k.startswith("fc."):
+            remap["last_linear." + k[len("fc.") :]] = v
+        if k.startswith("classifier."):
+            remap["last_linear." + k[len("classifier.") :]] = v
+    if remap:
+        sd.update(remap)
+    return sd
+
+
+def _qwk(y_true, y_pred, n_classes=5):
+    y_true = np.asarray(y_true, dtype=int)
+    y_pred = np.asarray(y_pred, dtype=int)
+    assert y_true.shape == y_pred.shape
+
+    O = np.zeros((n_classes, n_classes), dtype=np.float64)
+    for a, b in zip(y_true, y_pred):
+        if 0 <= a < n_classes and 0 <= b < n_classes:
+            O[a, b] += 1.0
+
+    act_hist = O.sum(axis=1)
+    pred_hist = O.sum(axis=0)
+    E = np.outer(act_hist, pred_hist)
+    if E.sum() > 0:
+        E = E / E.sum() * O.sum()
+
+    W = np.zeros((n_classes, n_classes), dtype=np.float64)
+    for i in range(n_classes):
+        for j in range(n_classes):
+            W[i, j] = ((i - j) ** 2) / ((n_classes - 1) ** 2)
+
+    num = (W * O).sum()
+    den = (W * E).sum()
+    return 1.0 - num / den if den > 0 else 0.0
+
+
+def _apply_thresholds(preds, thresholds):
+    t0, t1, t2, t3 = thresholds
+    preds = np.asarray(preds, dtype=np.float64)
+    out = np.zeros_like(preds, dtype=int)
+    out[preds >= t0] = 1
+    out[preds >= t1] = 2
+    out[preds >= t2] = 3
+    out[preds >= t3] = 4
+    return out
+
+
+def _optimize_thresholds(y_true, preds, init=(0.7, 1.5, 2.5, 3.5)):
+    y_true = np.asarray(y_true, dtype=int)
+    preds = np.asarray(preds, dtype=np.float64)
+
+    best_t = np.array(init, dtype=np.float64)
+    best_score = _qwk(y_true, _apply_thresholds(preds, best_t))
+
+    step = 0.25
+    for _ in range(6):  # 6 rounds: 0.25 -> 0.125 -> ... -> ~0.0078
+        improved = True
+        while improved:
+            improved = False
+            for i in range(4):
+                for delta in (-step, step):
+                    cand = best_t.copy()
+                    cand[i] += delta
+                    if not (cand[0] < cand[1] < cand[2] < cand[3]):
+                        continue
+                    if cand[0] < -1.0 or cand[3] > 6.0:
+                        continue
+                    score = _qwk(y_true, _apply_thresholds(preds, cand))
+                    if score > best_score + 1e-12:
+                        best_score = score
+                        best_t = cand
+                        improved = True
+        step *= 0.5
+    return tuple(best_t.tolist()), float(best_score)
+
+
+def _load_torchvision_resnet50_into_senet_se_resnet50(model):
+    """
+    Change rationale (score-improving, minimal semantic change):
+    - Your previous mapping missed much of layer0 and many downsample keys, leaving large
+      parts of the backbone randomly initialized when no fine-tuned checkpoint exists.
+    - Better ImageNet->SENet key mapping keeps the same architecture/inference but yields
+      more meaningful predictions, improving QWK toward the target.
+    """
+    tv = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V2)
+    tv_sd = tv.state_dict()
+    sd = model.state_dict()
+    mapped = {}
+
+    stem_pairs = [
+        ("conv1.weight", "layer0.conv1.weight"),
+        ("bn1.weight", "layer0.bn1.weight"),
+        ("bn1.bias", "layer0.bn1.bias"),
+        ("bn1.running_mean", "layer0.bn1.running_mean"),
+        ("bn1.running_var", "layer0.bn1.running_var"),
+        ("bn1.num_batches_tracked", "layer0.bn1.num_batches_tracked"),
+    ]
+    for src, dst in stem_pairs:
+        if src in tv_sd and dst in sd and tv_sd[src].shape == sd[dst].shape:
+            mapped[dst] = tv_sd[src]
+
+
+    for k, v in tv_sd.items():
+        if (
+            k.startswith("layer1.")
+            or k.startswith("layer2.")
+            or k.startswith("layer3.")
+            or k.startswith("layer4.")
+        ):
+            if k in sd and sd[k].shape == v.shape:
+                mapped[k] = v
+
+    missing, unexpected = model.load_state_dict(mapped, strict=False)
+
+    if hasattr(model, "last_linear") and isinstance(model.last_linear, torch.nn.Linear):
+        torch.nn.init.normal_(model.last_linear.weight, mean=0.0, std=1e-3)
+        if model.last_linear.bias is not None:
+            torch.nn.init.zeros_(model.last_linear.bias)
+
+    return missing, unexpected, len(mapped)
+
+
+TEST_IMAGE_PATH = _first_existing(
+    *[os.path.join(b, "test_images") for b in _CANDIDATE_BASES]
+)
+TEST_CSV_PATH = _first_existing(
+    *[os.path.join(b, "test.csv") for b in _CANDIDATE_BASES]
+)
+TRAIN_IMAGE_PATH = _first_existing(
+    *[os.path.join(b, "train_images") for b in _CANDIDATE_BASES]
+)
+TRAIN_CSV_PATH = _first_existing(
+    *[os.path.join(b, "train.csv") for b in _CANDIDATE_BASES]
+)
+
+if TEST_IMAGE_PATH is None or TEST_CSV_PATH is None:
+    raise FileNotFoundError(
+        f"Could not locate test data. TEST_IMAGE_PATH={TEST_IMAGE_PATH}, TEST_CSV_PATH={TEST_CSV_PATH}"
+    )
+if TRAIN_IMAGE_PATH is None or TRAIN_CSV_PATH is None:
+    raise FileNotFoundError(
+        f"Could not locate train data for threshold calibration. TRAIN_IMAGE_PATH={TRAIN_IMAGE_PATH}, TRAIN_CSV_PATH={TRAIN_CSV_PATH}"
+    )
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+MODEL_PATH = _find_checkpoint()
+
+model = get_se_resnet50_gem(pretrain=False)
+
+missing, unexpected, n_mapped = _load_torchvision_resnet50_into_senet_se_resnet50(model)
+loaded_from = "torchvision:resnet50_imagenet_mapped(full_layers+downsample)"
+load_report = f"mapped_keys={n_mapped}, missing_keys={len(missing)}, unexpected_keys={len(unexpected)}"
+
+if MODEL_PATH is not None:
+    state = torch.load(MODEL_PATH, map_location="cpu")
+    state_dict = _extract_state_dict(state)
+    state_dict = _strip_common_prefixes(state_dict)
+    state_dict = _normalize_head_keys_for_senet(state_dict)
+
+    missing, unexpected = model.load_state_dict(state_dict, strict=False)
+    loaded_from = f"{loaded_from} -> checkpoint:{MODEL_PATH}"
+    load_report = f"{load_report} | ckpt_missing_keys={len(missing)}, ckpt_unexpected_keys={len(unexpected)}"
+
+model.to(device)
+model.eval()
+
+to_tensor_norm = transforms.Compose(
+    [
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ]
+)
+
+
+def _predict_ids(image_dir, ids, batch_size=16):
+    preds = []
+    with torch.inference_mode():
+        for start in range(0, len(ids), batch_size):
+            batch_ids = ids[start : start + batch_size]
+            imgs = []
+            imgs_flip = []
+            for id_code in batch_ids:
+                im_path = os.path.join(image_dir, f"{id_code}.png")
+                image = Image.open(im_path).convert("RGB")
+                image = image.resize((256, 256), resample=Image.BILINEAR)
+                t = to_tensor_norm(image)
+                imgs.append(t)
+                imgs_flip.append(torch.flip(t, dims=(2,)))  # flip width
+            x = torch.stack(imgs, dim=0).to(device)
+            xflip = torch.stack(imgs_flip, dim=0).to(device)
+            out = model(x).squeeze(1)
+            out_flip = model(xflip).squeeze(1)
+            final = (out + out_flip) / 2.0
+            preds.extend(final.detach().cpu().numpy().astype(np.float64).tolist())
+    return np.asarray(preds, dtype=np.float64)
+
+
+train_df = pd.read_csv(TRAIN_CSV_PATH)
+train_df["id_code"] = train_df["id_code"].astype(str)
+train_df["diagnosis"] = train_df["diagnosis"].astype(int)
+
+train_ids_all = train_df["id_code"].tolist()
+train_y_all = train_df["diagnosis"].to_numpy(dtype=int)
+
+
+def _make_oof_predictions(ids, y, n_splits=5, seed=42, batch_size=16):
+    """
+    Change rationale (score-improving, minimal semantic change):
+    - Still OOF predictions -> threshold optimization (same pipeline),
+      but using StratifiedKFold reduces class-imbalance per fold, which
+      stabilizes thresholds and typically improves public QWK.
+    """
+    ids = list(ids)
+    y = np.asarray(y, dtype=int)
+
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+    oof = np.zeros(len(ids), dtype=np.float64)
+    for fold_i, (_, val_idx) in enumerate(skf.split(np.zeros(len(y)), y)):
+        val_ids = [ids[i] for i in val_idx]
+        oof[val_idx] = _predict_ids(TRAIN_IMAGE_PATH, val_ids, batch_size=batch_size)
+    return oof
+
+
+t0 = time.time()
+train_preds_oof = _make_oof_predictions(
+    train_ids_all, train_y_all, n_splits=5, seed=42, batch_size=16
+)
+best_thresholds, best_oof_qwk = _optimize_thresholds(
+    train_y_all, train_preds_oof, init=(0.7, 1.5, 2.5, 3.5)
+)
+calib_time = time.time() - t0
+
+test_df = pd.read_csv(TEST_CSV_PATH)
+test_ids = test_df["id_code"].astype(str).tolist()
+
+test_preds = _predict_ids(TEST_IMAGE_PATH, test_ids, batch_size=16)
+test_labels = _apply_thresholds(test_preds, best_thresholds)
+
+submission = pd.DataFrame({"id_code": test_ids, "diagnosis": test_labels.astype(int)})
+submission = submission[["id_code", "diagnosis"]]
+submission.to_csv("submission.csv", index=False)
+
+print("Model initialized from:", loaded_from)
+print("Load report:", load_report)
+print("TRAIN_IMAGE_PATH:", TRAIN_IMAGE_PATH)
+print("TRAIN_CSV_PATH:", TRAIN_CSV_PATH)
+print("TEST_IMAGE_PATH:", TEST_IMAGE_PATH)
+print("TEST_CSV_PATH:", TEST_CSV_PATH)
+print("Calibrated thresholds:", best_thresholds)
+print("OOF QWK (for threshold calibration):", best_oof_qwk)
+print("Threshold calibration time (s):", round(calib_time, 3))
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)

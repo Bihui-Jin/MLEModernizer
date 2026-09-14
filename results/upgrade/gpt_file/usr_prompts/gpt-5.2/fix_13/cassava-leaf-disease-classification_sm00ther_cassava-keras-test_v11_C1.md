@@ -1,0 +1,850 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.6128
+
+# 6. Current score
+
+0.82698
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.10912) has done: 'I fix the training crash by ensuring each fold/model gets its own fresh optimizer instance (Keras 3/TensorFlow 2.18 can’t reuse the same optimizer across different model variables). I also prevent fold-to-fold weight overwrites by giving each fold a unique weight filename and then loading those exact files during ensembling, which fixes the missing-weights error and guarantees a valid `submission.csv`. These changes are score-neutral in intent (same model/loop/epochs), but they unblock training and allow the ensemble submission to be produced end-to-end. I also disable `run_functions_eagerly(True)` (keeping `run_eagerly` as configured) to avoid unnecessary slowdowns/timeouts without altering the learning logic.'
+- What this solution (achieved 0.79335) has done: 'I fix the TensorFlow/Keras 2.18 API crash by removing the unsupported `workers/use_multiprocessing/max_queue_size` arguments from both `model.fit()` and `model.predict()` so training and inference run. To keep your core logic intact, I won’t change the model, loss, folds, or augmentation; I only adjust the data-loading pipeline to remain compatible (set Sequence `__getitem__` to accept any extra args Keras may pass). Finally, I ensure weights are actually saved per fold and then loaded for ensembling so `submission.csv` is always produced in the required format.'
+- What this solution (achieved 0.79372) has done: 'Your current score (0.79335) is higher than the target (0.6128), so to move toward the target we should slightly *reduce* generalization while keeping the same model/loops/loss. The smallest, safest lever here is inference-time aggregation: instead of majority vote over per-fold argmax labels (which is quite strong), average the per-fold softmax probabilities and take a single argmax (often a bit less robust with few folds and typically lower accuracy slightly). This preserves the exact trained models, architecture, and training procedure, and only changes the ensembling semantic in a legitimate way. I also keep the submission alignment exactly as sample_submission to ensure the file stays valid.'
+- What this solution (achieved 0.51457) has done: 'Your current score (0.79372) is well above the target (0.6128), so to move closer we should *slightly reduce* generalization with the smallest possible, legitimate change. The most minimal lever that preserves training/architecture/loss is to remove cross-fold ensembling strength at inference: instead of averaging probabilities across folds, we just use the first fold’s model to predict (no averaging), which typically drops accuracy. I keep the exact same training loop and saved weights, and only adjust `predict_ensemble()` to load and run a single fold deterministically while still producing a valid `submission.csv` aligned to `sample_submission.csv`. This should move the score downward toward the target band without altering the core approach.'
+- What this solution (achieved 0.82698) has done: 'To move your score up toward the 0.6128 target (current 0.51457), the smallest effective change is to restore a bit of ensemble strength at inference without touching the model, training loop, loss, or augmentations. I change `predict_ensemble()` to load and run both saved fold models (`m0`, `m1`) and average their softmax probabilities before `argmax`, which typically improves accuracy versus using only one fold. I also make sure the ensemble aligns exactly to `sample_submission.csv` order (as you already do) and that missing weight files are reported clearly. Everything else (architecture, epochs, folds, augmentation, optimizer/loss) stays the same.'
+
+# 9. Code solution
+
+## === cell 0
+import os, json
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from PIL import Image
+import cv2
+
+try:
+    from google.protobuf import message_factory as _message_factory
+
+    if hasattr(_message_factory, "MessageFactory") and not hasattr(
+        _message_factory.MessageFactory, "GetPrototype"
+    ):
+
+        def _get_prototype(self, descriptor):
+            return self.GetMessageClass(descriptor)
+
+        _message_factory.MessageFactory.GetPrototype = _get_prototype
+except Exception as _e:
+    print("protobuf shim warning:", repr(_e))
+
+import tensorflow as tf
+import albumentations as A
+
+tf.config.run_functions_eagerly(False)
+
+from tensorflow.keras.applications import EfficientNetB3
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import CategoricalCrossentropy
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.layers import (
+    Input,
+    Dense,
+    Dropout,
+    BatchNormalization,
+    GlobalAvgPool2D,
+    ELU,
+)
+from tensorflow.keras.models import Model
+from tensorflow.keras.metrics import CategoricalAccuracy
+
+from sklearn.model_selection import StratifiedKFold, train_test_split
+
+np.random.seed(42)
+tf.random.set_seed(42)
+
+print("TF:", tf.__version__)
+print("Eager:", tf.executing_eagerly())
+print("Num GPUs:", len(tf.config.list_physical_devices("GPU")))
+
+IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+
+CPU_COUNT = os.cpu_count() or 2
+FIT_WORKERS = max(2, min(8, CPU_COUNT // 2))
+PRED_WORKERS = FIT_WORKERS
+MAX_QUEUE_SIZE = 16
+
+
+
+## === cell 1
+WORK_DIR = "/kaggle/input/cassava-leaf-disease-classification"
+print("WORK_DIR exists:", os.path.exists(WORK_DIR))
+print("Top files:", os.listdir(WORK_DIR)[:10])
+
+with open(os.path.join(WORK_DIR, "label_num_to_disease_map.json"), "r") as file:
+    labels = json.load(file)
+labels
+
+
+
+## === cell 2
+data = pd.read_csv(os.path.join(WORK_DIR, "train.csv"))
+train_images_folder = os.path.join(WORK_DIR, "train_images")
+test_images_folder = os.path.join(WORK_DIR, "test_images")
+
+rand_idx = np.random.randint(data.shape[0])
+rand_fname = data.iloc[rand_idx, 0]
+rand_fpath = os.path.join(train_images_folder, rand_fname)
+print("Random image:", rand_fpath)
+Image.open(rand_fpath)
+
+
+
+
+## === cell 3
+class MyGeneratorUnWeighted(tf.keras.utils.Sequence):
+    def __init__(
+        self,
+        x,
+        y,
+        batch_size,
+        img_size,
+        num_classes,
+        augment_img,
+        imgs_folder,
+        img_preproc=False,
+        shuffle=False,
+    ):
+        self.x, self.y = list(x), list(y)
+        self.img_height, self.img_width = img_size
+        self.batch_size = int(batch_size)
+        self.img_preproc = img_preproc
+        self.augment_img = augment_img
+        self.num_classes = int(num_classes)
+        self.imgs_folder = imgs_folder
+        self.shuffle = shuffle
+        self.indexes = np.arange(len(self.x))
+        if self.shuffle:
+            np.random.shuffle(self.indexes)
+
+        self._transform = A.Compose(
+            [
+                A.RandomCrop(
+                    p=0.5,
+                    width=int(self.img_width / 1.3),
+                    height=int(self.img_height / 1.3),
+                ),
+                A.HorizontalFlip(p=0.5),
+                A.VerticalFlip(p=0.5),
+                A.RandomBrightnessContrast(
+                    p=0.2, brightness_limit=0.1, contrast_limit=0.1
+                ),
+                A.ShiftScaleRotate(p=0.5),
+                A.RandomRotate90(),
+                A.Blur(p=0.2, blur_limit=2),
+                A.OpticalDistortion(distort_limit=0.2, shift_limit=0.05, border_mode=4),
+                A.GridDistortion(distort_limit=0.2, border_mode=4),
+                A.HueSaturationValue(
+                    hue_shift_limit=10, sat_shift_limit=30, val_shift_limit=40
+                ),
+                A.CLAHE(),
+                A.ImageCompression(quality_lower=85),
+            ]
+        )
+
+        self._mean = IMAGENET_MEAN
+        self._std = IMAGENET_STD
+
+    def __len__(self):
+        return int(np.ceil(len(self.x) / float(self.batch_size)))
+
+    def on_epoch_end(self):
+        if self.shuffle:
+            np.random.shuffle(self.indexes)
+
+    def _augment(self, img):
+        return self._transform(image=img)["image"]
+
+    def preproc_imgs(self, img):
+        img = (img - self._mean) / self._std
+        return img
+
+    def __getitem__(self, idx, *args, **kwargs):
+        batch_indexes = self.indexes[
+            idx * self.batch_size : (idx + 1) * self.batch_size
+        ]
+        bs = len(batch_indexes)
+
+        batch_x = np.empty((bs, self.img_height, self.img_width, 3), dtype=np.float32)
+        batch_y = np.empty((bs,), dtype=np.int32)
+
+        for n, ii in enumerate(batch_indexes):
+            image_id = self.x[ii]
+            l = self.y[ii]
+
+            fpath = os.path.join(self.imgs_folder, image_id)
+
+            img = cv2.imread(fpath, cv2.IMREAD_COLOR)
+            if img is None:
+                raise FileNotFoundError(f"Could not read image: {fpath}")
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+            if self.augment_img:
+                img = self._augment(img)
+
+            img = cv2.resize(
+                img, (self.img_width, self.img_height), interpolation=cv2.INTER_LINEAR
+            )
+
+            img = img.astype(np.float32) / 255.0
+            if self.img_preproc:
+                img = self.preproc_imgs(img)
+
+            batch_x[n] = img
+            batch_y[n] = int(l)
+
+        return batch_x, to_categorical(batch_y, num_classes=self.num_classes)
+
+
+
+
+## === cell 4
+x_train, x_test, y_train, y_test = train_test_split(
+    data.image_id, data.label, test_size=0.25, stratify=data.label, random_state=42
+)
+len(x_train), len(x_test), np.bincount(y_train)
+
+
+
+## === cell 5
+print("Visualization cell skipped for runtime; training/inference unchanged.")
+
+
+
+## === cell 6
+net_cfg = {
+    "num_classes": 5,
+    "img_height": 384,
+    "img_width": 384,
+    "img_channels": 3,
+    "batch_size": 16,
+    "backbone": EfficientNetB3(include_top=False, weights="imagenet"),
+    "preproc_img": True,
+    "augment_img": True,
+    "num_epochs": 1,
+    "class_weights": None,
+    "num_folds": 2,
+    "backbone_trainable": True,
+    "use_dropout": True,
+    "activation": ELU(),
+    "opt_lr": 0.0001,
+    "criterion": CategoricalCrossentropy(),
+    "metrics": [CategoricalAccuracy()],
+}
+net_cfg
+
+
+
+
+## === cell 7
+class CassavaNet:
+    def __init__(self, model_name, net_cfg, x_train, y_train, x_test, y_test):
+        self.model_name = model_name
+        self.num_classes = net_cfg["num_classes"]
+        self.batch_size = net_cfg["batch_size"]
+        self.img_height = net_cfg["img_height"]
+        self.img_width = net_cfg["img_width"]
+        self.img_channels = net_cfg["img_channels"]
+        self.preproc_img = net_cfg["preproc_img"]
+        self.augment_img = net_cfg["augment_img"]
+        self.backbone = net_cfg["backbone"]
+        self.backbone.trainable = net_cfg["backbone_trainable"]
+
+        inputs = Input(shape=(self.img_height, self.img_width, self.img_channels))
+        x = BatchNormalization()(inputs)
+        x = self.backbone(x)
+        x = GlobalAvgPool2D()(x)
+        x = Dense(64)(x)
+        x = BatchNormalization()(x)
+        x = net_cfg["activation"](x)
+
+        if net_cfg["use_dropout"]:
+            x = Dropout(0.05)(x)
+
+        outputs = Dense(self.num_classes, activation="softmax")(x)
+        self.model = Model(inputs, outputs)
+
+        self.opt = Adam(learning_rate=float(net_cfg["opt_lr"]))
+        self.criterion = net_cfg["criterion"]
+        self.metrics = net_cfg["metrics"]
+        self.class_weights = net_cfg["class_weights"]
+
+        self.x_train = x_train
+        self.y_train = y_train
+        self.x_test = x_test
+        self.y_test = y_test
+
+        self.weights_path = f"{self.model_name}.weights.h5"
+
+        cb_tensorboard = tf.keras.callbacks.TensorBoard(log_dir="./logs")
+        cb_checkpoint = tf.keras.callbacks.ModelCheckpoint(
+            filepath=self.weights_path,
+            monitor="val_loss",
+            verbose=1,
+            save_best_only=True,
+            save_weights_only=True,
+        )
+        cb_earlystop = tf.keras.callbacks.EarlyStopping(
+            monitor="val_loss", patience=3, verbose=0, restore_best_weights=True
+        )
+        self.callbacks = [cb_tensorboard, cb_checkpoint, cb_earlystop]
+
+        self.traingen = MyGeneratorUnWeighted(
+            self.x_train,
+            self.y_train,
+            batch_size=self.batch_size,
+            img_preproc=self.preproc_img,
+            augment_img=self.augment_img,
+            imgs_folder=train_images_folder,
+            num_classes=self.num_classes,
+            img_size=(self.img_height, self.img_width),
+            shuffle=True,
+        )
+        self.testgen = MyGeneratorUnWeighted(
+            self.x_test,
+            self.y_test,
+            batch_size=self.batch_size,
+            img_preproc=self.preproc_img,
+            augment_img=False,
+            imgs_folder=train_images_folder,
+            num_classes=self.num_classes,
+            img_size=(self.img_height, self.img_width),
+            shuffle=False,
+        )
+
+        self.history = None
+        self.model.summary()
+
+    def _compile(self):
+        self.model.compile(
+            optimizer=self.opt,
+            loss=self.criterion,
+            metrics=self.metrics,
+            run_eagerly=False,
+        )
+
+    def train(self, num_epochs):
+        self._compile()
+
+        self.history = self.model.fit(
+            self.traingen,
+            steps_per_epoch=len(self.traingen),
+            epochs=num_epochs,
+            validation_data=self.testgen,
+            validation_steps=len(self.testgen),
+            callbacks=self.callbacks,
+            class_weight=self.class_weights,
+            verbose=1,
+        )
+
+
+
+
+## === cell 8
+skf = StratifiedKFold(n_splits=net_cfg["num_folds"], random_state=42, shuffle=True)
+
+for fold, (train_skf_idx, test_skf_idx) in enumerate(
+    skf.split(data.image_id, data.label)
+):
+    print(f"...Fold # {fold}...")
+    x_train_fold = data.iloc[train_skf_idx, 0].tolist()
+    y_train_fold = data.iloc[train_skf_idx, 1].tolist()
+    x_test_fold = data.iloc[test_skf_idx, 0].tolist()
+    y_test_fold = data.iloc[test_skf_idx, 1].tolist()
+
+    cassava_net = CassavaNet(
+        "m" + str(fold),
+        net_cfg,
+        x_train_fold,
+        y_train_fold,
+        x_test_fold,
+        y_test_fold,
+    )
+    cassava_net.train(num_epochs=net_cfg["num_epochs"])
+
+    if not os.path.exists(cassava_net.weights_path):
+        cassava_net.model.save_weights(cassava_net.weights_path)
+
+    del cassava_net
+    tf.keras.backend.clear_session()
+
+print(
+    "Saved weight files:",
+    sorted([f for f in os.listdir(".") if f.endswith(".weights.h5")]),
+)
+
+
+
+
+## === cell 9
+def preproc_one_image(fname, img_height, img_width):
+    img = cv2.imread(fname, cv2.IMREAD_COLOR)
+    if img is None:
+        raise FileNotFoundError(f"Could not read image: {fname}")
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, (img_width, img_height), interpolation=cv2.INTER_LINEAR)
+    img = img.astype(np.float32) / 255.0
+    img = (img - IMAGENET_MEAN) / IMAGENET_STD
+    img = np.expand_dims(img, axis=0)
+    return img
+
+
+
+
+## === cell 10
+class TestImageGenerator(tf.keras.utils.Sequence):
+    def __init__(self, fnames, imgs_folder, batch_size, img_size):
+        self.fnames = list(fnames)
+        self.imgs_folder = imgs_folder
+        self.batch_size = int(batch_size)
+        self.img_height, self.img_width = img_size
+
+        self._mean = IMAGENET_MEAN
+        self._std = IMAGENET_STD
+
+    def __len__(self):
+        return int(np.ceil(len(self.fnames) / float(self.batch_size)))
+
+    def __getitem__(self, idx, *args, **kwargs):
+        batch_f = self.fnames[idx * self.batch_size : (idx + 1) * self.batch_size]
+        bs = len(batch_f)
+        batch_x = np.empty((bs, self.img_height, self.img_width, 3), dtype=np.float32)
+
+        for n, image_id in enumerate(batch_f):
+            fpath = os.path.join(self.imgs_folder, image_id)
+
+            img = cv2.imread(fpath, cv2.IMREAD_COLOR)
+            if img is None:
+                raise FileNotFoundError(f"Could not read image: {fpath}")
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(
+                img, (self.img_width, self.img_height), interpolation=cv2.INTER_LINEAR
+            )
+            img = img.astype(np.float32) / 255.0
+            img = (img - self._mean) / self._std
+            batch_x[n] = img
+        return batch_x
+
+
+def build_infer_model(net_cfg):
+    backbone = EfficientNetB3(include_top=False, weights="imagenet")
+    backbone.trainable = net_cfg["backbone_trainable"]
+
+    inputs = Input(
+        shape=(net_cfg["img_height"], net_cfg["img_width"], net_cfg["img_channels"])
+    )
+    x = BatchNormalization()(inputs)
+    x = backbone(x)
+    x = GlobalAvgPool2D()(x)
+    x = Dense(64)(x)
+    x = BatchNormalization()(x)
+    x = net_cfg["activation"](x)
+    if net_cfg["use_dropout"]:
+        x = Dropout(0.05)(x)
+    outputs = Dense(net_cfg["num_classes"], activation="softmax")(x)
+    model = Model(inputs, outputs)
+
+    model.compile(
+        optimizer=Adam(learning_rate=float(net_cfg["opt_lr"])),
+        loss=net_cfg["criterion"],
+        metrics=net_cfg["metrics"],
+        run_eagerly=False,
+    )
+    return model
+
+
+def predict_ensemble(num_models, test_imgs_folder):
+    sample_sub_path = os.path.join(WORK_DIR, "sample_submission.csv")
+    sample_sub = pd.read_csv(sample_sub_path)
+    fnames = sample_sub["image_id"].tolist()
+
+    test_gen = TestImageGenerator(
+        fnames=fnames,
+        imgs_folder=test_imgs_folder,
+        batch_size=net_cfg["batch_size"],
+        img_size=(net_cfg["img_height"], net_cfg["img_width"]),
+    )
+
+    probs_sum = None
+    used = 0
+    for i in range(int(num_models)):
+        weights_path = f"m{i}.weights.h5"
+        if not os.path.exists(weights_path):
+            raise FileNotFoundError(
+                f"Missing weights: {weights_path}. Available: {sorted([f for f in os.listdir('.') if f.endswith('.weights.h5')])}"
+            )
+        print("Loading model for inference:", weights_path)
+        model = build_infer_model(net_cfg)
+        model.load_weights(weights_path)
+
+        probs = model.predict(test_gen, verbose=1).astype(np.float32)
+        probs_sum = probs if probs_sum is None else (probs_sum + probs)
+        used += 1
+
+        del model
+        tf.keras.backend.clear_session()
+
+    probs_avg = probs_sum / float(used)
+    final_preds = np.argmax(probs_avg, axis=1).astype(np.int32)
+
+    submission = pd.DataFrame({"image_id": fnames, "label": final_preds.astype(int)})
+    submission = submission[["image_id", "label"]]
+    submission.to_csv("submission.csv", index=False)
+    return submission
+
+
+
+
+## === cell 11
+sub = predict_ensemble(net_cfg["num_folds"], test_images_folder)
+print(sub.head())
+print("submission.csv written:", os.path.exists("submission.csv"), "rows:", len(sub))
+
+with open("submission.csv", "r") as f:
+    for _ in range(10):
+        print(f.readline().strip())

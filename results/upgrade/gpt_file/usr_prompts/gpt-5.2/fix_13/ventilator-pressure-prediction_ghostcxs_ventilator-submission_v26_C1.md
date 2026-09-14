@@ -1,0 +1,626 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "2")
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault("TF_DETERMINISTIC_OPS", "1")
+os.environ.setdefault("TF_ENABLE_ONEDNN_OPTS", "1")  # faster CPU kernels
+
+import numpy as np
+import pandas as pd
+
+INPUT_DIR = "/kaggle/input"
+WORKING_DIR = "/kaggle/working"
+
+COMP_DIR = os.path.join(INPUT_DIR, "ventilator-pressure-prediction")
+if not os.path.exists(os.path.join(COMP_DIR, "test.csv")):  # keep path logic unchanged
+    COMP_DIR = INPUT_DIR
+
+train_path = os.path.join(COMP_DIR, "train.csv")
+test_path = os.path.join(COMP_DIR, "test.csv")
+sample_sub_path = os.path.join(COMP_DIR, "sample_submission.csv")
+
+assert os.path.exists(train_path), f"Missing train.csv at: {train_path}"
+assert os.path.exists(test_path), f"Missing test.csv at: {test_path}"
+assert os.path.exists(
+    sample_sub_path
+), f"Missing sample_submission.csv at: {sample_sub_path}"
+
+
+def _read_csv_fast(path, usecols, dtype):
+    try:
+        return pd.read_csv(path, usecols=usecols, dtype=dtype, engine="pyarrow")
+    except Exception:
+        return pd.read_csv(path, usecols=usecols, dtype=dtype)
+
+
+test_dtypes = {
+    "id": "int32",
+    "breath_id": "int32",
+    "R": "int16",
+    "C": "int16",
+    "time_step": "float32",
+    "u_in": "float32",
+    "u_out": "int8",
+}
+test_df = _read_csv_fast(test_path, usecols=list(test_dtypes.keys()), dtype=test_dtypes)
+
+sample_sub = _read_csv_fast(
+    sample_sub_path,
+    usecols=["id", "pressure"],
+    dtype={"id": "int32", "pressure": "int16"},
+)
+
+print("test_df shape:", test_df.shape)
+print("sample_sub shape:", sample_sub.shape)
+
+
+
+
+## === cell 1
+def _ensure_sorted_by_breath_time(df):
+    bid = df["breath_id"].to_numpy(copy=False)
+    ts = df["time_step"].to_numpy(copy=False)
+
+    if (bid[1:] < bid[:-1]).any():
+        ok = False
+    else:
+        same = bid[1:] == bid[:-1]
+        ok = not (same & (ts[1:] < ts[:-1])).any()
+
+    if not ok:
+        return (
+            df.sort_values(["breath_id", "time_step"], kind="mergesort").reset_index(
+                drop=True
+            ),
+            True,
+        )
+    return df.reset_index(drop=True), False
+
+
+test_df, test_sorted = _ensure_sorted_by_breath_time(test_df)
+print("test_df sorted performed:", test_sorted)
+
+num_rows = len(test_df)
+assert num_rows % 80 == 0, "Unexpected total rows; expected multiple of 80."
+num_breaths = num_rows // 80
+
+breath_ids = test_df["breath_id"].to_numpy(np.int32, copy=False)
+breath_ids_2d = breath_ids.reshape(num_breaths, 80)
+assert np.all(
+    breath_ids_2d[:, 0:1] == breath_ids_2d
+), "Non-contiguous breath_id blocks detected."
+
+R = (
+    test_df["R"]
+    .to_numpy(np.int16, copy=False)
+    .reshape(num_breaths, 80)[:, 0]
+    .astype(np.int32, copy=False)
+)
+C = (
+    test_df["C"]
+    .to_numpy(np.int16, copy=False)
+    .reshape(num_breaths, 80)[:, 0]
+    .astype(np.int32, copy=False)
+)
+
+rc_input = np.empty((num_breaths, 15), dtype=np.int32)
+rc_input[:, 0] = R
+rc_input[:, 1] = C
+rc_input[:, 2] = R * C
+rc_input[:, 3] = R + C
+rc_input[:, 4] = R - C
+rc_input[:, 5] = C - R
+rc_input[:, 6] = R * R
+rc_input[:, 7] = C * C
+rc_input[:, 8] = (R == 5).astype(np.int32)
+rc_input[:, 9] = (R == 20).astype(np.int32)
+rc_input[:, 10] = (R == 50).astype(np.int32)
+rc_input[:, 11] = (C == 10).astype(np.int32)
+rc_input[:, 12] = (C == 20).astype(np.int32)
+rc_input[:, 13] = (C == 50).astype(np.int32)
+rc_input[:, 14] = 1
+
+time_step = (
+    test_df["time_step"].to_numpy(np.float32, copy=False).reshape(num_breaths, 80)
+)
+u_in = test_df["u_in"].to_numpy(np.float32, copy=False).reshape(num_breaths, 80)
+u_out = test_df["u_out"].to_numpy(np.float32, copy=False).reshape(num_breaths, 80)
+
+_u_in_cumsum = np.cumsum(u_in, axis=1, dtype=np.float32)
+
+_u_in_lag1 = np.empty((num_breaths, 80), dtype=np.float32)
+_u_in_lag1[:, 0] = 0.0
+_u_in_lag1[:, 1:] = u_in[:, :-1]
+
+_u_out_lag1 = np.empty((num_breaths, 80), dtype=np.float32)
+_u_out_lag1[:, 0] = 0.0
+_u_out_lag1[:, 1:] = u_out[:, :-1]
+
+_u_in_diff1 = (u_in - _u_in_lag1).astype(np.float32, copy=False)
+
+other_x_input = np.empty((num_breaths, 80, 7), dtype=np.float32)
+other_x_input[:, :, 0] = time_step
+other_x_input[:, :, 1] = u_in
+other_x_input[:, :, 2] = u_out
+other_x_input[:, :, 3] = _u_in_cumsum
+other_x_input[:, :, 4] = _u_in_lag1
+other_x_input[:, :, 5] = _u_out_lag1
+other_x_input[:, :, 6] = _u_in_diff1
+
+rc_input = np.ascontiguousarray(rc_input)
+other_x_input = np.ascontiguousarray(other_x_input)
+
+print("rc_input shape:", rc_input.shape, rc_input.dtype)
+print("other_x_input shape:", other_x_input.shape, other_x_input.dtype)
+
+
+
+## === cell 2
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import (
+    layers,
+    models,
+    losses,
+    optimizers,
+    activations,
+    initializers,
+    backend,
+)
+
+tf.random.set_seed(42)
+np.random.seed(42)
+
+print("TensorFlow:", tf.__version__)
+
+try:
+    cpu_cnt = os.cpu_count() or 2
+    intra = min(32, cpu_cnt)
+    inter = 1
+    tf.config.threading.set_intra_op_parallelism_threads(intra)
+    tf.config.threading.set_inter_op_parallelism_threads(inter)
+    print(f"TF threads set: intra={intra}, inter={inter}")
+except Exception:
+    pass
+
+try:
+    resolver = tf.distribute.cluster_resolver.TPUClusterResolver()
+    tf.config.experimental_connect_to_cluster(resolver)
+    tf.tpu.experimental.initialize_tpu_system(resolver)
+    strategy = tf.distribute.TPUStrategy(resolver)
+    print("Using TPU strategy")
+except Exception as e:
+    strategy = tf.distribute.get_strategy()
+    print("Using default strategy (CPU/GPU). TPU not available:", repr(e))
+
+
+class ExpandTileLayer(layers.Layer):
+    def __init__(self):
+        super(ExpandTileLayer, self).__init__()
+
+    def call(self, inputs, *args, **kwargs):
+        return backend.tile(backend.expand_dims(inputs, axis=-2), (1, 80, 1))
+
+
+
+
+## === cell 3
+with strategy.scope():
+    rc_input_layer = keras.Input(shape=(15,), dtype="int32", name="rc_input_layer")
+    other_x_input_layer = keras.Input(
+        shape=(80, other_x_input.shape[-1]), dtype="float32", name="other_x_input"
+    )
+
+    rc_embedding_layer = layers.Dense(
+        units=10, use_bias=False, activation=activations.selu, name="rc_embed_layer"
+    )
+    rc_embedding = rc_embedding_layer(rc_input_layer)
+    rc_embedding = ExpandTileLayer()(rc_embedding)
+
+    x_input = layers.Concatenate(axis=-1)([other_x_input_layer, rc_embedding])
+
+    conv1d_1 = layers.Conv1D(filters=256, kernel_size=5, padding="same")(x_input)
+    conv1d_1 = layers.Activation(activations.relu)(conv1d_1)
+    conv1d_1 = layers.BatchNormalization()(conv1d_1)
+
+    conv1d_2 = layers.Conv1D(filters=192, kernel_size=5, padding="same")(conv1d_1)
+    conv1d_output = layers.Activation(activations.relu)(conv1d_2)
+    conv1d_output = layers.BatchNormalization()(conv1d_output)
+
+    the_feature = layers.Concatenate()([conv1d_output, x_input])
+
+    ox_1 = layers.Bidirectional(
+        layers.LSTM(
+            units=672,
+            return_sequences=True,
+            kernel_initializer=initializers.GlorotUniform(),
+        ),
+        merge_mode="concat",
+    )(the_feature)
+
+    ox_2 = layers.Bidirectional(
+        layers.LSTM(
+            units=512,
+            return_sequences=True,
+            kernel_initializer=initializers.GlorotUniform(),
+        ),
+        merge_mode="concat",
+    )(ox_1)
+
+    ox = layers.Bidirectional(
+        layers.LSTM(
+            units=384,
+            return_sequences=True,
+            kernel_initializer=initializers.GlorotUniform(),
+        ),
+        merge_mode="concat",
+    )(ox_2)
+
+    ox = layers.Bidirectional(layers.GRU(units=192, return_sequences=True))(ox)
+
+    output = layers.Concatenate(axis=-1)([ox, conv1d_output])
+    output = layers.Dense(
+        units=128,
+        activation=activations.selu,
+        kernel_initializer=initializers.GlorotUniform(),
+    )(output)
+    output = layers.Dense(units=1, kernel_initializer=initializers.GlorotUniform())(
+        output
+    )
+
+    my_model = models.Model(
+        inputs=[rc_input_layer, other_x_input_layer], outputs=[output]
+    )
+
+print(my_model.summary())
+
+
+
+## === cell 4
+train_dtypes = {
+    "id": "int32",
+    "breath_id": "int32",
+    "R": "int16",
+    "C": "int16",
+    "time_step": "float32",
+    "u_in": "float32",
+    "u_out": "int8",
+    "pressure": "float32",
+}
+
+train_df = _read_csv_fast(
+    train_path, usecols=list(train_dtypes.keys()), dtype=train_dtypes
+)
+print("train_df shape:", train_df.shape)
+
+train_df, train_sorted = _ensure_sorted_by_breath_time(train_df)
+print("train_df sorted performed:", train_sorted)
+
+num_rows_tr = len(train_df)
+assert num_rows_tr % 80 == 0, "Unexpected total train rows; expected multiple of 80."
+num_breaths_tr = num_rows_tr // 80
+
+breath_ids_tr = train_df["breath_id"].to_numpy(np.int32, copy=False)
+breath_ids_tr_2d = breath_ids_tr.reshape(num_breaths_tr, 80)
+assert np.all(
+    breath_ids_tr_2d[:, 0:1] == breath_ids_tr_2d
+), "Non-contiguous breath_id blocks detected in train."
+
+Rtr = (
+    train_df["R"]
+    .to_numpy(np.int16, copy=False)
+    .reshape(num_breaths_tr, 80)[:, 0]
+    .astype(np.int32, copy=False)
+)
+Ctr = (
+    train_df["C"]
+    .to_numpy(np.int16, copy=False)
+    .reshape(num_breaths_tr, 80)[:, 0]
+    .astype(np.int32, copy=False)
+)
+
+rc_input_tr = np.empty((num_breaths_tr, 15), dtype=np.int32)
+rc_input_tr[:, 0] = Rtr
+rc_input_tr[:, 1] = Ctr
+rc_input_tr[:, 2] = Rtr * Ctr
+rc_input_tr[:, 3] = Rtr + Ctr
+rc_input_tr[:, 4] = Rtr - Ctr
+rc_input_tr[:, 5] = Ctr - Rtr
+rc_input_tr[:, 6] = Rtr * Rtr
+rc_input_tr[:, 7] = Ctr * Ctr
+rc_input_tr[:, 8] = (Rtr == 5).astype(np.int32)
+rc_input_tr[:, 9] = (Rtr == 20).astype(np.int32)
+rc_input_tr[:, 10] = (Rtr == 50).astype(np.int32)
+rc_input_tr[:, 11] = (Ctr == 10).astype(np.int32)
+rc_input_tr[:, 12] = (Ctr == 20).astype(np.int32)
+rc_input_tr[:, 13] = (Ctr == 50).astype(np.int32)
+rc_input_tr[:, 14] = 1
+
+time_step_tr = (
+    train_df["time_step"].to_numpy(np.float32, copy=False).reshape(num_breaths_tr, 80)
+)
+u_in_tr = train_df["u_in"].to_numpy(np.float32, copy=False).reshape(num_breaths_tr, 80)
+u_out_tr = (
+    train_df["u_out"].to_numpy(np.float32, copy=False).reshape(num_breaths_tr, 80)
+)
+
+_u_in_cumsum_tr = np.cumsum(u_in_tr, axis=1, dtype=np.float32)
+
+_u_in_lag1_tr = np.empty((num_breaths_tr, 80), dtype=np.float32)
+_u_in_lag1_tr[:, 0] = 0.0
+_u_in_lag1_tr[:, 1:] = u_in_tr[:, :-1]
+
+_u_out_lag1_tr = np.empty((num_breaths_tr, 80), dtype=np.float32)
+_u_out_lag1_tr[:, 0] = 0.0
+_u_out_lag1_tr[:, 1:] = u_out_tr[:, :-1]
+
+_u_in_diff1_tr = (u_in_tr - _u_in_lag1_tr).astype(np.float32, copy=False)
+
+other_x_input_tr = np.empty((num_breaths_tr, 80, 7), dtype=np.float32)
+other_x_input_tr[:, :, 0] = time_step_tr
+other_x_input_tr[:, :, 1] = u_in_tr
+other_x_input_tr[:, :, 2] = u_out_tr
+other_x_input_tr[:, :, 3] = _u_in_cumsum_tr
+other_x_input_tr[:, :, 4] = _u_in_lag1_tr
+other_x_input_tr[:, :, 5] = _u_out_lag1_tr
+other_x_input_tr[:, :, 6] = _u_in_diff1_tr
+
+y_flat = (
+    train_df["pressure"].to_numpy(np.float32, copy=False).reshape(num_breaths_tr, 80, 1)
+)
+u_out_flat = u_out_tr.astype(np.int32, copy=False)
+sample_weight = (u_out_flat == 0).astype(np.float32, copy=False)
+
+rc_input_tr = np.ascontiguousarray(rc_input_tr)
+other_x_input_tr = np.ascontiguousarray(other_x_input_tr)
+y_flat = np.ascontiguousarray(y_flat)
+sample_weight = np.ascontiguousarray(sample_weight)
+
+print(
+    "Train tensors:",
+    "rc_input_tr",
+    rc_input_tr.shape,
+    "other_x_input_tr",
+    other_x_input_tr.shape,
+    "y",
+    y_flat.shape,
+    "sample_weight",
+    sample_weight.shape,
+)
+
+BATCH_SIZE_TRAIN = 256
+options = tf.data.Options()
+options.deterministic = True  # preserve deterministic ordering/behavior
+options.experimental_slack = True
+
+train_ds = tf.data.Dataset.from_tensor_slices(
+    ((rc_input_tr, other_x_input_tr), y_flat, sample_weight)
+)
+train_ds = train_ds.batch(BATCH_SIZE_TRAIN, drop_remainder=False)
+train_ds = train_ds.with_options(options)
+train_ds = train_ds.cache()
+train_ds = train_ds.prefetch(tf.data.AUTOTUNE)
+
+with strategy.scope():
+    my_model.compile(
+        optimizer=optimizers.Adam(learning_rate=1e-3),
+        loss=losses.MeanAbsoluteError(),
+        jit_compile=True,
+    )
+
+history = my_model.fit(
+    train_ds,
+    epochs=2,
+    verbose=2,
+)
+print("Finished training.")
+
+
+
+## === cell 5
+BATCH_SIZE_TEST = 1024
+options_pred = tf.data.Options()
+options_pred.deterministic = True
+options_pred.experimental_slack = True
+
+test_ds = tf.data.Dataset.from_tensor_slices((rc_input, other_x_input))
+test_ds = test_ds.batch(BATCH_SIZE_TEST, drop_remainder=False)
+test_ds = test_ds.with_options(options_pred)
+test_ds = test_ds.prefetch(tf.data.AUTOTUNE)
+
+pre_y_ = my_model.predict(
+    test_ds,
+    verbose=1,
+)
+pre_y = np.asarray(pre_y_).reshape(-1)
+print("Pred vector shape:", pre_y.shape)
+
+pressure_step = 0.07030248641967773
+p_min = -1.7551400036622216
+p_max = 64.82099173863328
+
+sub_medclip = pre_y
+sub_medclip = np.round((sub_medclip - p_min) / pressure_step) * pressure_step + p_min
+sub_medclip = np.clip(sub_medclip, p_min, p_max)
+
+ids = test_df["id"].values.astype(np.int32, copy=False)
+assert (
+    ids.shape[0] == sub_medclip.shape[0]
+), "Mismatch between predicted length and test ids."
+
+submission = pd.DataFrame(
+    {"id": ids, "pressure": sub_medclip.astype(np.float32, copy=False)}
+)
+submission_path = os.path.join(WORKING_DIR, "submission.csv")
+submission.to_csv(submission_path, index=False)
+
+print("Wrote:", submission_path)
+print(submission.head())
+print(submission.tail())
+print("submission rows:", len(submission))

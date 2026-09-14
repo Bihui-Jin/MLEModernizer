@@ -1,0 +1,906 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the `scalar_coupling_constant` between atom pairs in molecules, given the two atom types (e.g., C and H), the coupling type (e.g., `2JHC`), and any features you are able to create from the molecule structure (`xyz`) files.
+
+## Metric
+Log of the Mean Absolute Error, calculated for each scalar coupling type, and then averaged across types.
+
+## Submission Format
+```
+id,scalar_coupling_constant
+2324604,0.0
+2324605,0.0
+2324606,0.0
+etc.
+```
+
+## Dataset
+The training and test splits are by *molecule*, so that no molecule in the training data is found in the test data.
+
+- **train.csv** - the training set, where the first column (`molecule_name`) is the name of the molecule where the coupling constant originates (the corresponding XYZ file is located at ./structures/.xyz), the second (`atom_index_0`) and third column (`atom_index_1`) is the atom indices of the atom-pair creating the coupling and the fourth column (`scalar_coupling_constant`) is the scalar coupling constant that we want to be able to predict
+- **test.csv** - the test set; same info as train, without the target variable
+- **sample_submission.csv** - a sample submission file in the correct format
+- **structures.zip** - folder containing molecular structure (xyz) files, where the first line is the number of atoms in the molecule, followed by a blank line, and then a line for every atom, where the first column contains the atomic element (H for hydrogen, C for carbon etc.) and the remaining columns contain the X, Y and Z cartesian coordinates (a standard format for chemists and molecular visualization programs)
+- **structures.csv** - this file contains the **same** information as the individual xyz structure files, but in a single file
+- **dipole_moments.csv** - contains the molecular electric dipole moments. These are three dimensional vectors that indicate the charge distribution in the molecule. The first column (`molecule_name`) are the names of the molecule, the second to fourth column are the `X`, `Y` and `Z` components respectively of the dipole moment.
+- **magnetic_shielding_tensors.csv** - contains the magnetic shielding tensors for all atoms in the molecules. The first column (`molecule_name`) contains the molecule name, the second column (`atom_index`) contains the index of the atom in the molecule, the third to eleventh columns contain the `XX`, `YX`, `ZX`, `XY`, `YY`, `ZY`, `XZ`, `YZ` and `ZZ` elements of the tensor/matrix respectively.
+- **mulliken_charges.csv** - contains the mulliken charges for all atoms in the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`atom_index`) contains the index of the atom in the molecule, the third column (`mulliken_charge`) contains the mulliken charge of the atom.
+- **potential_energy.csv** - contains the potential energy of the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`potential_energy`) contains the potential energy of the molecule.
+- **scalar_coupling_contributions.csv** - The scalar coupling constants in `train.csv` (or corresponding files) are a sum of four terms. `scalar_coupling_contributions.csv` contain all these terms. The first column (`molecule_name`) are the name of the molecule, the second (`atom_index_0`) and third column (`atom_index_1`) are the atom indices of the atom-pair, the fourth column indicates the type of coupling, the fifth column (`fc`) is the Fermi Contact contribution, the sixth column (`sd`) is the Spin-dipolar contribution, the seventh column (`pso`) is the Paramagnetic spin-orbit contribution and the eighth column (`dso`) is the Diamagnetic spin-orbit contribution.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+category_encoders==2.7.0
+geopandas==0.14.4
+lightgbm==4.6.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        input/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        working/
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+```
+
+-> data/champs-scalar-coupling/dipole_moments.csv has 76510 rows and 4 columns.
+The columns are: molecule_name, X, Y, Z
+
+-> data/champs-scalar-coupling/magnetic_shielding_tensors.csv has 1379964 rows and 11 columns.
+The columns are: molecule_name, atom_index, XX, YX, ZX, XY, YY, ZY, XZ, YZ, ZZ
+
+-> data/champs-scalar-coupling/mulliken_charges.csv has 1379964 rows and 3 columns.
+The columns are: molecule_name, atom_index, mulliken_charge
+
+-> data/champs-scalar-coupling/potential_energy.csv has 76510 rows and 2 columns.
+The columns are: molecule_name, potential_energy
+
+-> data/champs-scalar-coupling/sample_submission.csv has 467813 rows and 2 columns.
+The columns are: id, scalar_coupling_constant
+
+-> data/champs-scalar-coupling/scalar_coupling_contributions.csv has 4191263 rows and 8 columns.
+The columns are: molecule_name, atom_index_0, atom_index_1, type, fc, sd, pso, dso
+
+-> data/champs-scalar-coupling/structures.csv has 1379964 rows and 6 columns.
+The columns are: molecule_name, atom_index, atom, x, y, z
+
+-> data/champs-scalar-coupling/test.csv has 467813 rows and 5 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type
+
+-> data/champs-scalar-coupling/train.csv has 4191263 rows and 6 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type, scalar_coupling_constant
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7869
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 2.42039) has done: 'The test row mismatch is caused by the merges with `structures` using `sort=True`, which reorders rows and can also silently drop rows if any merge keys don’t match, so `X_test_new` no longer aligns 1:1 with `test`. I make the merges stable and non-dropping by using `how="left"` and removing `sort=True`, and I restore alignment by carrying `id` through feature engineering and reindexing back to the original `row_id` order before training/predicting. This fixes the runtime assertions and ensures `y_predict` is defined so a valid `submission.csv` is always written. The modeling logic (LightGBM regressor + same feature set) is preserved; changes are strictly to fix row alignment/stability.'
+- What this solution (achieved 1.68) has done: 'Your current score (2.42039, lower is better) is far from the target (0.7869), so we should improve performance while keeping the same core approach (LightGBM regressor on engineered features). The biggest gain with minimal logic change is to avoid the “single global model” mismatch across coupling `type`: train one LightGBM model per `type` (same model class, same fit/predict loop concept) and predict test rows for that type, which aligns with the metric being averaged per type and typically drops error substantially. I also switch to LightGBM’s native categorical handling (keep your category dtypes and do not one-hot), and I add a safe median fallback per type for any rare edge case where a type might be missing in training. The rest of your feature engineering, row alignment, and submission writing stays intact.'
+- What this solution (achieved 1.68285) has done: 'You’re still far from the target (lower is better), so we should improve accuracy while keeping the same core LightGBM-per-`type` approach and the same engineered features. The largest remaining avoidable error source is that your training/validation logic ignores the molecule-wise split requirement, which can make generalization worse and destabilize performance; we switch CV (and training fit behavior) to be molecule-group aware without changing the model class or feature set. We also add a minimal, metric-aligned log-MAE monitoring via a GroupKFold CV printout per type to sanity-check that we’re moving toward the target, and we slightly regularize LightGBM (still the same model) to reduce overfit that hurts the molecule-split test. Everything still writes a valid `submission.csv` with correct row alignment and schema.'
+- What this solution (achieved 1.71436) has done: 'Your current score is much worse than the target (lower is better), so we should improve generalization without changing the overall approach (same LightGBM per `type`, same engineered features). The largest avoidable issue is that `num_atoms` is currently computed from only `atom_index_0` inside train/test separately, which is noisy and inconsistent across splits; we instead compute `num_atoms` from `structures.csv` once per molecule and merge it into both train/test. Next, we ensure categorical columns are aligned between train/test by making test categories match train categories, which reduces unpredictable handling of unseen categories and improves stability. Finally, we add a minimal, metric-aligned per-type target transform: fit on `scalar_coupling_constant - median(type)` and add the median back at prediction time, which often reduces per-type MAE without changing the model class or training loop structure.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np  # linear algebra
+import pandas as pd  # data processing
+import gc
+import lightgbm as lgbm
+from sklearn.model_selection import GroupKFold
+import os
+
+print(os.listdir("../input"))
+
+
+
+## === cell 1
+gc.collect()
+
+
+
+## === cell 2
+BASE_PATH = "../input"
+if os.path.exists(os.path.join(BASE_PATH, "champs-scalar-coupling", "train.csv")):
+    DATA_PATH = os.path.join(BASE_PATH, "champs-scalar-coupling")
+else:
+    DATA_PATH = BASE_PATH
+
+train_dtypes = {
+    "id": np.int32,
+    "molecule_name": "category",
+    "atom_index_0": np.int16,
+    "atom_index_1": np.int16,
+    "type": "category",
+    "scalar_coupling_constant": np.float32,
+}
+test_dtypes = {
+    "id": np.int32,
+    "molecule_name": "category",
+    "atom_index_0": np.int16,
+    "atom_index_1": np.int16,
+    "type": "category",
+}
+structures_dtypes = {
+    "molecule_name": "category",
+    "atom_index": np.int16,
+    "atom": "category",
+    "x": np.float32,
+    "y": np.float32,
+    "z": np.float32,
+}
+mulliken_dtypes = {
+    "molecule_name": "category",
+    "atom_index": np.int16,
+    "mulliken_charge": np.float32,
+}
+shield_dtypes = {
+    "molecule_name": "category",
+    "atom_index": np.int16,
+    "XX": np.float32,
+    "YX": np.float32,
+    "ZX": np.float32,
+    "XY": np.float32,
+    "YY": np.float32,
+    "ZY": np.float32,
+    "XZ": np.float32,
+    "YZ": np.float32,
+    "ZZ": np.float32,
+}
+
+train = pd.read_csv(os.path.join(DATA_PATH, "train.csv"), dtype=train_dtypes)
+test = pd.read_csv(os.path.join(DATA_PATH, "test.csv"), dtype=test_dtypes)
+
+sample_sub = pd.read_csv(
+    os.path.join(DATA_PATH, "sample_submission.csv"),
+    usecols=["id", "scalar_coupling_constant"],
+)
+
+structures = pd.read_csv(
+    os.path.join(DATA_PATH, "structures.csv"),
+    dtype=structures_dtypes,
+    usecols=["molecule_name", "atom_index", "atom", "x", "y", "z"],
+)
+mulliken = pd.read_csv(
+    os.path.join(DATA_PATH, "mulliken_charges.csv"),
+    dtype=mulliken_dtypes,
+    usecols=["molecule_name", "atom_index", "mulliken_charge"],
+)
+shield = pd.read_csv(
+    os.path.join(DATA_PATH, "magnetic_shielding_tensors.csv"), dtype=shield_dtypes
+)
+
+print(f"train.shape: {train.shape}")
+print(f"test.shape: {test.shape}")
+print(f"structures.shape: {structures.shape}")
+print(f"mulliken.shape: {mulliken.shape}")
+print(f"shield.shape: {shield.shape}")
+
+
+
+## === cell 3
+X_train = train.drop(columns=["scalar_coupling_constant"]).copy()
+y_train = train["scalar_coupling_constant"].copy()
+X_test = test.copy()
+
+print(f"X_train.shape: {X_train.shape}")
+print(f"X_test.shape: {X_test.shape}")
+
+
+
+## === cell 4
+train_id = X_train["id"].copy()
+test_id = X_test["id"].copy()
+
+
+
+## === cell 5
+X_train = X_train.copy()
+X_test = X_test.copy()
+X_train["row_id"] = np.arange(len(X_train), dtype=np.int32)
+X_test["row_id"] = np.arange(len(X_test), dtype=np.int32)
+
+
+
+
+## === cell 6
+def convert_object_to_categories(X_train, X_test):
+    for col in X_train.columns:
+        if X_train[col].dtype == "O":
+            X_train[col] = X_train[col].astype("category")
+            if col in X_test.columns:
+                X_test[col] = X_test[col].astype("category")
+    for col in X_test.columns:
+        if X_test[col].dtype == "O":
+            X_test[col] = X_test[col].astype("category")
+    return X_train, X_test
+
+
+X_train, X_test = convert_object_to_categories(X_train, X_test)
+
+
+
+
+## === cell 7
+def calc_score_by_type(df_type, y_true, y_pred):
+    err = np.mean(np.abs(y_true - y_pred))
+    return float(np.log(err + 1e-12))
+
+
+def calc_overall_score(types, y_true, y_pred):
+    tmp = pd.DataFrame({"type": types.astype(str).values, "y": y_true, "p": y_pred})
+    per_type = tmp.groupby("type").apply(
+        lambda g: calc_score_by_type(g["type"], g["y"].values, g["p"].values)
+    )
+    return float(per_type.mean())
+
+
+print(f"{X_train['type'].unique()}")
+print(f"{X_test['type'].unique()}")
+
+
+
+
+## === cell 8
+def cross_val_grouped_by_molecule(X, y, groups, cat_cols, n_splits=3, lgb_params=None):
+    if lgb_params is None:
+        lgb_params = {}
+    gkf = GroupKFold(n_splits=n_splits)
+
+    fold_scores = []
+    for fold, (tr_idx, va_idx) in enumerate(gkf.split(X, y, groups=groups), start=1):
+        Xtr = X.iloc[tr_idx]
+        ytr = y.iloc[tr_idx]
+        Xva = X.iloc[va_idx]
+        yva = y.iloc[va_idx]
+
+        model = lgbm.LGBMRegressor(**lgb_params)
+        model.fit(Xtr, ytr, categorical_feature=cat_cols)
+        pva = model.predict(Xva)
+
+        score = calc_overall_score(Xva["type"], yva.values, pva)
+        fold_scores.append(score)
+        print(f"GroupKFold fold {fold} logMAE-by-type score: {score:.5f}")
+
+    print(f"Mean CV score (GroupKFold): {np.mean(fold_scores):.5f}")
+    return float(np.mean(fold_scores))
+
+
+
+
+## === cell 9
+def _pack_key(mol_cat_codes: np.ndarray, atom_index: np.ndarray) -> np.ndarray:
+    return (mol_cat_codes.astype(np.int64) << 20) | atom_index.astype(np.int64)
+
+
+all_mols = pd.Categorical(
+    pd.concat(
+        [train["molecule_name"], test["molecule_name"], structures["molecule_name"]],
+        axis=0,
+    ),
+    ordered=False,
+)
+mol_categories = all_mols.categories
+
+for df in (train, test, structures, mulliken, shield, X_train, X_test):
+    if "molecule_name" in df.columns:
+        df["molecule_name"] = df["molecule_name"].cat.set_categories(mol_categories)
+
+mol_codes_struct = structures["molecule_name"].cat.codes.to_numpy(np.int32, copy=False)
+atom_idx_struct = structures["atom_index"].to_numpy(np.int16, copy=False)
+k_struct = _pack_key(mol_codes_struct, atom_idx_struct)
+order_struct = np.argsort(k_struct, kind="mergesort")
+k_struct_sorted = k_struct[order_struct]
+
+x_s = structures["x"].to_numpy(np.float32, copy=False)[order_struct]
+y_s = structures["y"].to_numpy(np.float32, copy=False)[order_struct]
+z_s = structures["z"].to_numpy(np.float32, copy=False)[order_struct]
+atom_s = structures["atom"].to_numpy(copy=False)[order_struct]
+
+
+def _lookup_struct_features(mol_codes: np.ndarray, atom_idx: np.ndarray):
+    keys = _pack_key(mol_codes, atom_idx)
+    pos = np.searchsorted(k_struct_sorted, keys)
+    found = (pos < k_struct_sorted.size) & (k_struct_sorted[pos] == keys)
+    x = np.full(keys.shape[0], np.nan, dtype=np.float32)
+    y = np.full(keys.shape[0], np.nan, dtype=np.float32)
+    z = np.full(keys.shape[0], np.nan, dtype=np.float32)
+    a = np.empty(keys.shape[0], dtype=object)
+    a[:] = None
+    if found.any():
+        pf = pos[found]
+        x[found] = x_s[pf]
+        y[found] = y_s[pf]
+        z[found] = z_s[pf]
+        a[found] = atom_s[pf]
+    return x, y, z, a
+
+
+mol_codes_train = X_train["molecule_name"].cat.codes.to_numpy(np.int32, copy=False)
+mol_codes_test = X_test["molecule_name"].cat.codes.to_numpy(np.int32, copy=False)
+
+a0_train = X_train["atom_index_0"].to_numpy(np.int16, copy=False)
+a0_test = X_test["atom_index_0"].to_numpy(np.int16, copy=False)
+x0, y0, z0, atom0 = _lookup_struct_features(mol_codes_train, a0_train)
+X_train["atom_index_0_x"] = x0
+X_train["atom_index_0_y"] = y0
+X_train["atom_index_0_z"] = z0
+X_train["atom_0"] = pd.Categorical(atom0)
+
+x0, y0, z0, atom0 = _lookup_struct_features(mol_codes_test, a0_test)
+X_test["atom_index_0_x"] = x0
+X_test["atom_index_0_y"] = y0
+X_test["atom_index_0_z"] = z0
+X_test["atom_0"] = pd.Categorical(atom0)
+
+a1_train = X_train["atom_index_1"].to_numpy(np.int16, copy=False)
+a1_test = X_test["atom_index_1"].to_numpy(np.int16, copy=False)
+x1, y1, z1, atom1 = _lookup_struct_features(mol_codes_train, a1_train)
+X_train["atom_index_1_x"] = x1
+X_train["atom_index_1_y"] = y1
+X_train["atom_index_1_z"] = z1
+X_train["atom_1"] = pd.Categorical(atom1)
+
+x1, y1, z1, atom1 = _lookup_struct_features(mol_codes_test, a1_test)
+X_test["atom_index_1_x"] = x1
+X_test["atom_index_1_y"] = y1
+X_test["atom_index_1_z"] = z1
+X_test["atom_1"] = pd.Categorical(atom1)
+
+
+
+## === cell 10
+pass
+
+
+
+## === cell 11
+X_train.head()
+
+
+
+## === cell 12
+dx = X_train["atom_index_0_x"].to_numpy() - X_train["atom_index_1_x"].to_numpy()
+dy = X_train["atom_index_0_y"].to_numpy() - X_train["atom_index_1_y"].to_numpy()
+dz = X_train["atom_index_0_z"].to_numpy() - X_train["atom_index_1_z"].to_numpy()
+X_train["distance"] = np.sqrt(dx * dx + dy * dy + dz * dz)
+
+dx = X_test["atom_index_0_x"].to_numpy() - X_test["atom_index_1_x"].to_numpy()
+dy = X_test["atom_index_0_y"].to_numpy() - X_test["atom_index_1_y"].to_numpy()
+dz = X_test["atom_index_0_z"].to_numpy() - X_test["atom_index_1_z"].to_numpy()
+X_test["distance"] = np.sqrt(dx * dx + dy * dy + dz * dz)
+
+
+
+## === cell 13
+X_train["join_type"] = X_train["type"].astype(str).str.slice(0, 2)
+X_test["join_type"] = X_test["type"].astype(str).str.slice(0, 2)
+
+
+
+## === cell 14
+print(X_train["atom_0"].unique())
+print(X_test["atom_0"].unique())
+
+
+
+## === cell 15
+structures_atom_index_i32 = structures["atom_index"].astype(np.int32, copy=False)
+mol_num_atoms = (
+    structures.assign(atom_index_i32=structures_atom_index_i32)
+    .query("atom_index_i32 >= 0")
+    .groupby("molecule_name", sort=False)["atom_index_i32"]
+    .max()
+    .add(1)
+    .astype(np.int32)
+    .rename("num_atoms")
+    .reset_index()
+)
+
+X_train = X_train.merge(mol_num_atoms, on="molecule_name", how="left")
+X_test = X_test.merge(mol_num_atoms, on="molecule_name", how="left")
+
+
+
+## --- ERROR in cell 15, traceback:
+---------------------------------------------------------------------------
+IntCastingNaNError                        Traceback (most recent call last)
+/tmp/ipykernel_11/4120029722.py in <cell line: 0>()
+      8     .max()
+      9     .add(1)
+---> 10     .astype(np.int32)
+     11     .rename("num_atoms")
+     12     .reset_index()
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/generic.py in astype(self, dtype, copy, errors)
+   6641         else:
+   6642             # else, only a single dtype is given
+-> 6643             new_data = self._mgr.astype(dtype=dtype, copy=copy, errors=errors)
+   6644             res = self._constructor_from_mgr(new_data, axes=new_data.axes)
+   6645             return res.__finalize__(self, method="astype")
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/internals/managers.py in astype(self, dtype, copy, errors)
+    428             copy = False
+    429 
+--> 430         return self.apply(
+    431             "astype",
+    432             dtype=dtype,
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/internals/managers.py in apply(self, f, align_keys, **kwargs)
+    361                 applied = b.apply(f, **kwargs)
+    362             else:
+--> 363                 applied = getattr(b, f)(**kwargs)
+    364             result_blocks = extend_blocks(applied, result_blocks)
+    365 
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/internals/blocks.py in astype(self, dtype, copy, errors, using_cow, squeeze)
+    756             values = values[0, :]  # type: ignore[call-overload]
+    757 
+--> 758         new_values = astype_array_safe(values, dtype, copy=copy, errors=errors)
+    759 
+    760         new_values = maybe_coerce_values(new_values)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in astype_array_safe(values, dtype, copy, errors)
+    235 
+    236     try:
+--> 237         new_values = astype_array(values, dtype, copy=copy)
+    238     except (ValueError, TypeError):
+    239         # e.g. _astype_nansafe can fail on object-dtype of strings
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in astype_array(values, dtype, copy)
+    180 
+    181     else:
+--> 182         values = _astype_nansafe(values, dtype, copy=copy)
+    183 
+    184     # in pandas we don't store numpy str dtypes, so convert to object
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in _astype_nansafe(arr, dtype, copy, skipna)
+     99 
+    100     elif np.issubdtype(arr.dtype, np.floating) and dtype.kind in "iu":
+--> 101         return _astype_float_to_int_nansafe(arr, dtype, copy)
+    102 
+    103     elif arr.dtype == object:
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in _astype_float_to_int_nansafe(values, dtype, copy)
+    143     """
+    144     if not np.isfinite(values).all():
+--> 145         raise IntCastingNaNError(
+    146             "Cannot convert non-finite values (NA or inf) to integer"
+    147         )
+
+IntCastingNaNError: Cannot convert non-finite values (NA or inf) to integer
+
+## === cell 16
+mol_codes_mul = mulliken["molecule_name"].cat.codes.to_numpy(np.int32, copy=False)
+atom_idx_mul = mulliken["atom_index"].to_numpy(np.int16, copy=False)
+k_mul = _pack_key(mol_codes_mul, atom_idx_mul)
+order_mul = np.argsort(k_mul, kind="mergesort")
+k_mul_sorted = k_mul[order_mul]
+mul_charge_sorted = mulliken["mulliken_charge"].to_numpy(np.float32, copy=False)[
+    order_mul
+]
+
+
+def _lookup_mulliken(mol_codes: np.ndarray, atom_idx: np.ndarray) -> np.ndarray:
+    keys = _pack_key(mol_codes, atom_idx)
+    pos = np.searchsorted(k_mul_sorted, keys)
+    found = (pos < k_mul_sorted.size) & (k_mul_sorted[pos] == keys)
+    out = np.full(keys.shape[0], np.nan, dtype=np.float32)
+    if found.any():
+        out[found] = mul_charge_sorted[pos[found]]
+    return out
+
+
+X_train["mulliken_charge_0"] = _lookup_mulliken(mol_codes_train, a0_train)
+X_train["mulliken_charge_1"] = _lookup_mulliken(mol_codes_train, a1_train)
+X_test["mulliken_charge_0"] = _lookup_mulliken(mol_codes_test, a0_test)
+X_test["mulliken_charge_1"] = _lookup_mulliken(mol_codes_test, a1_test)
+
+
+
+## === cell 17
+shield_cols = ["XX", "YX", "ZX", "XY", "YY", "ZY", "XZ", "YZ", "ZZ"]
+mol_codes_sh = shield["molecule_name"].cat.codes.to_numpy(np.int32, copy=False)
+atom_idx_sh = shield["atom_index"].to_numpy(np.int16, copy=False)
+k_sh = _pack_key(mol_codes_sh, atom_idx_sh)
+order_sh = np.argsort(k_sh, kind="mergesort")
+k_sh_sorted = k_sh[order_sh]
+shield_mat_sorted = shield[shield_cols].to_numpy(np.float32, copy=False)[order_sh]
+
+
+def _lookup_shield(mol_codes: np.ndarray, atom_idx: np.ndarray) -> np.ndarray:
+    keys = _pack_key(mol_codes, atom_idx)
+    pos = np.searchsorted(k_sh_sorted, keys)
+    found = (pos < k_sh_sorted.size) & (k_sh_sorted[pos] == keys)
+    out = np.full((keys.shape[0], len(shield_cols)), np.nan, dtype=np.float32)
+    if found.any():
+        out[found, :] = shield_mat_sorted[pos[found], :]
+    return out
+
+
+sh0 = _lookup_shield(mol_codes_train, a0_train)
+sh1 = _lookup_shield(mol_codes_train, a1_train)
+for i, c in enumerate(shield_cols):
+    X_train[f"{c}_0"] = sh0[:, i]
+    X_train[f"{c}_1"] = sh1[:, i]
+
+sh0 = _lookup_shield(mol_codes_test, a0_test)
+sh1 = _lookup_shield(mol_codes_test, a1_test)
+for i, c in enumerate(shield_cols):
+    X_test[f"{c}_0"] = sh0[:, i]
+    X_test[f"{c}_1"] = sh1[:, i]
+
+
+
+## === cell 18
+X_train, X_test = convert_object_to_categories(X_train, X_test)
+
+
+
+## === cell 19
+for c in X_train.columns:
+    if (
+        str(X_train[c].dtype) == "category"
+        and c in X_test.columns
+        and str(X_test[c].dtype) == "category"
+    ):
+        X_test[c] = X_test[c].cat.set_categories(X_train[c].cat.categories)
+
+
+
+## === cell 20
+X_train_new = X_train.set_index("row_id", drop=True)
+X_test_new = X_test.set_index("row_id", drop=True)
+
+
+
+## === cell 21
+num_cols_train = X_train_new.select_dtypes(include=[np.number]).columns
+num_cols_test = X_test_new.select_dtypes(include=[np.number]).columns
+X_train_new[num_cols_train] = X_train_new[num_cols_train].fillna(0.0)
+X_test_new[num_cols_test] = X_test_new[num_cols_test].fillna(0.0)
+
+if "scalar_coupling_constant" in X_train_new.columns:
+    X_train_new = X_train_new.drop(columns=["scalar_coupling_constant"])
+if "scalar_coupling_constant" in X_test_new.columns:
+    X_test_new = X_test_new.drop(columns=["scalar_coupling_constant"])
+
+if "id" in X_train_new.columns:
+    X_train_new = X_train_new.drop(columns=["id"])
+if "id" in X_test_new.columns:
+    X_test_new = X_test_new.drop(columns=["id"])
+
+X_test_new = X_test_new.reindex(columns=X_train_new.columns)
+
+assert X_train_new.shape[0] == y_train.shape[0], "Train features/target row mismatch."
+assert X_test_new.shape[0] == test.shape[0], "Test row mismatch after processing."
+assert X_test_new.shape[1] > 0, "No feature columns available after alignment."
+
+
+
+## === cell 22
+cat_cols = [c for c in X_train_new.columns if str(X_train_new[c].dtype) == "category"]
+
+lgb_params = dict(
+    objective="regression_l1",
+    n_estimators=1200,
+    learning_rate=0.05,
+    num_leaves=128,
+    max_depth=-1,
+    min_child_samples=30,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    reg_alpha=0.1,
+    reg_lambda=0.1,
+    random_state=42,
+    n_jobs=-1,
+)
+
+print("Skipping CV to fit 600s runtime budget (does not affect final predictions).")
+
+
+
+## === cell 23
+y_pred = np.zeros(X_test_new.shape[0], dtype=np.float64)
+
+type_medians = train.groupby("type")["scalar_coupling_constant"].median().to_dict()
+global_median = float(train["scalar_coupling_constant"].median())
+
+train_types = X_train_new["type"].astype(str).to_numpy()
+test_types = X_test_new["type"].astype(str).to_numpy()
+
+feature_cols_no_type = [c for c in X_train_new.columns if c != "type"]
+cat_cols_no_type = [c for c in cat_cols if c != "type"]
+
+cat_idx_no_type = [
+    i for i, c in enumerate(feature_cols_no_type) if c in cat_cols_no_type
+]
+
+train_order = np.argsort(train_types, kind="mergesort")
+train_types_sorted = train_types[train_order]
+train_unique, train_start = np.unique(train_types_sorted, return_index=True)
+train_end = np.r_[train_start[1:], train_types_sorted.size]
+
+test_order = np.argsort(test_types, kind="mergesort")
+test_types_sorted = test_types[test_order]
+test_unique, test_start = np.unique(test_types_sorted, return_index=True)
+test_end = np.r_[test_start[1:], test_types_sorted.size]
+
+train_type_to_slice = {
+    t: (train_start[i], train_end[i]) for i, t in enumerate(train_unique)
+}
+
+base_params = dict(lgb_params)
+n_estimators = int(base_params.pop("n_estimators"))
+base_params.setdefault("verbosity", -1)
+
+base_params.setdefault("seed", 42)
+base_params.setdefault("feature_fraction_seed", 42)
+base_params.setdefault("bagging_seed", 42)
+base_params.setdefault("data_random_seed", 42)
+base_params.setdefault("deterministic", True)
+base_params.setdefault("force_row_wise", True)
+
+X_train_base = X_train_new[feature_cols_no_type]
+X_test_base = X_test_new[feature_cols_no_type]
+
+X_train_mat = X_train_base.to_numpy(copy=False)
+X_test_mat = X_test_base.to_numpy(copy=False)
+y_train_arr = y_train.to_numpy(copy=False).astype(np.float64, copy=False)
+
+ref_train = lgbm.Dataset(
+    X_train_mat[:1, :],
+    label=y_train_arr[:1],
+    categorical_feature=cat_idx_no_type,
+    free_raw_data=False,
+)
+
+for i, t in enumerate(test_unique):
+    s0, s1 = test_start[i], test_end[i]
+    test_idx = test_order[s0:s1]
+
+    median_t = float(type_medians.get(t, global_median))
+    sl = train_type_to_slice.get(t, None)
+    if sl is None:
+        y_pred[test_idx] = median_t
+        continue
+
+    tr_s0, tr_s1 = sl
+    train_idx = train_order[tr_s0:tr_s1]
+
+    Xtr = X_train_mat[train_idx]
+    ytr = y_train_arr[train_idx] - median_t
+    Xte = X_test_mat[test_idx]
+
+    dtrain = lgbm.Dataset(
+        Xtr,
+        label=ytr,
+        categorical_feature=cat_idx_no_type,
+        free_raw_data=False,
+    )
+    dtrain.set_reference(ref_train)
+
+    booster = lgbm.train(
+        params=base_params,
+        train_set=dtrain,
+        num_boost_round=n_estimators,
+    )
+    y_pred[test_idx] = booster.predict(Xte, num_iteration=n_estimators) + median_t
+
+y_predict = y_pred
+
+
+
+## --- ERROR in cell 23, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/58674467.py in <cell line: 0>()
+     81     dtrain.set_reference(ref_train)
+     82 
+---> 83     booster = lgbm.train(
+     84         params=base_params,
+     85         train_set=dtrain,
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/engine.py in train(params, train_set, num_boost_round, valid_sets, valid_names, feval, init_model, keep_training_booster, callbacks)
+    295     # construct booster
+    296     try:
+--> 297         booster = Booster(params=params, train_set=train_set)
+    298         if is_valid_contain_train:
+    299             booster.set_train_data_name(train_data_name)
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/basic.py in __init__(self, params, train_set, model_file, model_str)
+   3654                 )
+   3655             # construct booster object
+-> 3656             train_set.construct()
+   3657             # copy the parameters from train_set
+   3658             params.update(train_set.get_params())
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/basic.py in construct(self)
+   2537                 if self.used_indices is None:
+   2538                     # create valid
+-> 2539                     self._lazy_init(
+   2540                         data=self.data,
+   2541                         label=self.label,
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/basic.py in _lazy_init(self, data, label, reference, weight, group, init_score, predictor, feature_name, categorical_feature, params, position)
+   2166         ref_dataset = None
+   2167         if isinstance(reference, Dataset):
+-> 2168             ref_dataset = reference.construct()._handle
+   2169         elif reference is not None:
+   2170             raise TypeError("Reference dataset should be None or dataset instance")
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/basic.py in construct(self)
+   2588             else:
+   2589                 # create train
+-> 2590                 self._lazy_init(
+   2591                     data=self.data,
+   2592                     label=self.label,
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/basic.py in _lazy_init(self, data, label, reference, weight, group, init_score, predictor, feature_name, categorical_feature, params, position)
+   2185             self.__init_from_csc(data, params_str, ref_dataset)
+   2186         elif isinstance(data, np.ndarray):
+-> 2187             self.__init_from_np2d(data, params_str, ref_dataset)
+   2188         elif _is_pyarrow_table(data):
+   2189             self.__init_from_pyarrow_table(data, params_str, ref_dataset)
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/basic.py in __init_from_np2d(self, mat, params_str, ref_dataset)
+   2314 
+   2315         self._handle = ctypes.c_void_p()
+-> 2316         data, layout = _np2d_to_np1d(mat)
+   2317         ptr_data, type_ptr_data, _ = _c_float_array(data)
+   2318         _safe_call(
+
+/usr/local/lib/python3.11/dist-packages/lightgbm/basic.py in _np2d_to_np1d(mat)
+    202         layout = _C_API_IS_ROW_MAJOR
+    203     # ensure dtype and order, copies if either do not match
+--> 204     data = np.asarray(mat, dtype=dtype, order=order)
+    205     # flatten array without copying
+    206     return data.ravel(order=order), layout
+
+ValueError: could not convert string to float: 'dsgdb9nsd_109986'
+
+## === cell 24
+sub = pd.DataFrame({"id": test_id.values, "scalar_coupling_constant": y_predict})
+sub.to_csv("submission.csv", index=False)
+print(sub.head())
+print("Wrote submission.csv with shape:", sub.shape)
+print("submission.csv exists:", os.path.exists("submission.csv"))
+print("NaNs in predictions:", np.isnan(sub["scalar_coupling_constant"]).sum())
+assert (
+    sub.shape[0] == sample_sub.shape[0]
+), "Submission row count mismatch vs sample_submission."
+assert list(sub.columns) == [
+    "id",
+    "scalar_coupling_constant",
+], "Submission columns incorrect."
+
+## --- ERROR in cell 24, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3521354735.py in <cell line: 0>()
+----> 1 sub = pd.DataFrame({"id": test_id.values, "scalar_coupling_constant": y_predict})
+      2 sub.to_csv("submission.csv", index=False)
+      3 print(sub.head())
+      4 print("Wrote submission.csv with shape:", sub.shape)
+      5 print("submission.csv exists:", os.path.exists("submission.csv"))
+
+NameError: name 'y_predict' is not defined

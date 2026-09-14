@@ -1,0 +1,610 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+5.68914
+
+# 6. Current score
+
+813.99774
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 752.76803) has done: 'I fix the scikit-learn runtime error by removing the deprecated `normalize` argument from `LinearRegression` so training can proceed. I also make the weekday one-hot encoding robust by aligning train/test dummy columns to avoid any feature mismatch at prediction time. To keep the core logic intact while improving stability and score (RMSE), I standardize `Difference_longitude/latitude` using the training statistics and apply the same transform to test (your current code incorrectly normalizes test using its own mean/var). Finally, I ensure a valid submission CSV with the required `key,fare_amount` header is written to the working directory.'
+- What this solution (achieved 752.76803) has done: 'Your current RMSE is extremely far from the target (752 vs 5.69), which strongly suggests your submission predictions are on the wrong scale rather than the model being “a bit weak.” The smallest core-logic-preserving fix is to correct the standardization bug: you’re dividing by variance instead of standard deviation, which shrinks those features by ~10–100x and can blow up regression coefficients and predictions. I change that single step to use `std` (with the same train-derived stats applied to test), and keep everything else (same features, same LinearRegression, same training split, same rounding) unchanged. This should dramatically reduce RMSE and move you much closer to the target band while staying within the same approach.'
+- What this solution (achieved 974.19618) has done: 'Your current RMSE (752) is far above the target (5.69), which almost always means the model is being trained on many invalid/outlier rows (bad coordinates, impossible passenger counts, and non-positive fares) that distort a linear regression badly. To move the score down toward the target while keeping your exact feature set and LinearRegression approach, I add minimal, standard NYC Taxi Fare cleaning filters (valid lat/lon bounds, passenger_count range, fare_amount range, and distance > 0) before training. I also ensure train/test columns are perfectly aligned after feature engineering (including dummies) so prediction uses the same feature order as training. These changes preserve your core logic but should drastically reduce the RMSE toward the target band and still produce a valid `Submission.csv`.'
+- What this solution (achieved 974.19433) has done: 'Your RMSE is catastrophically high because the engineered `pickuptime` feature is extracted with the wrong string slice (`[11:-7]`), which turns times like `13:08:24` into `"13:"` and then into integers like `1300` (minutes lost), severely corrupting a key signal. I fix `pickuptime` by parsing `pickup_datetime` once with pandas and computing minutes since midnight consistently for both train and test—this keeps the same feature idea but makes it correct. I also compute `Weekday` from the same parsed datetime (same semantics, just more reliable) and leave the rest of your pipeline (filters, haversine distances, LinearRegression, rounding, submission format) unchanged. This is a minimal change that should move RMSE sharply down toward your 5.689 target without changing the core modeling approach.'
+- What this solution (achieved 7.88618) has done: 'Your RMSE is far above the target, so we should make a small, legitimate change that usually yields a large RMSE drop without changing your model: remove a handful of extreme outlier targets that distort ordinary least squares. Concretely, we keep your exact feature engineering and LinearRegression, but clip the training target to a reasonable upper bound (e.g., 100) and also clip predictions to a reasonable non-negative range; this preserves the same learning approach while preventing a few huge fares from dominating coefficients. We also ensure the train/test feature columns are aligned in the safe direction (outer) after all engineering so the model sees exactly the same columns at predict time. These are minimal, stable changes that should move RMSE sharply down toward your 5.689 target while still producing a valid `Submission.csv`.'
+- What this solution (achieved 802.02787) has done: 'Your current RMSE (7.886) is still notably above the target (5.689), so we should make a small change that typically reduces RMSE for this exact competition without changing your model or feature set: tighten the fare/outlier handling to avoid distorting ordinary least squares. Concretely, we keep your same LinearRegression and same engineered features, but (1) stop clipping the training target (which biases the regression) and instead remove extreme fares using a modest upper bound, and (2) only clip predictions to be non-negative (no upper cap), which avoids artificially flattening high-fare trips in the test set. These are minimal, metric-aligned adjustments that generally move RMSE down toward the target band while preserving your core pipeline and producing the same submission format.'
+- What this solution (achieved 765.51136) has done: 'I fix the pipeline break in the train/test split cell by ensuring all engineered features are strictly numeric before calling `np.isfinite`, since your current dummy/weekday processing can leave `object` dtypes that make `isfinite` crash. I keep your exact feature engineering and `LinearRegression` approach, only adding a minimal numeric-coercion + NaN/inf cleanup step so training and prediction run end-to-end. I also keep your existing train/test column alignment and write a valid `Submission.csv` with the required `key,fare_amount` columns. These changes are score-neutral in intent (mostly stability), but they should also prevent silent dtype issues that can severely harm RMSE.'
+- What this solution (achieved 813.99774) has done: 'Your current RMSE is far above the target, so we should make the smallest changes that fix likely scale/fit distortion while keeping your exact feature engineering and LinearRegression approach. The biggest issue is the extra `fare_amount <= 100` filter right before training, which throws away legitimate higher-fare trips and biases ordinary least squares; replacing it with the same upper bound you already used earlier (<=500) preserves your existing cleaning intent and typically drops RMSE a lot. I also align train/test engineered columns using `join="inner"` (instead of `outer`) to avoid accidental unseen/constant columns influencing coefficients, while keeping the same dummy logic and model. Everything else (features, model, prediction clipping/rounding, submission format/path) stays the same and still writes `Submission.csv`.'
+- What this solution (achieved 813.99774) has done: 'Your current RMSE is catastrophically worse than the target, which strongly suggests the submission is misaligned (predictions paired with the wrong `key`) rather than the linear model being “a bit off.” The minimal, core-logic-preserving fix is to keep the exact same feature engineering and LinearRegression, but carry the test `key` through the same `align(join="inner")` step so the row order used for `predict()` matches the `key` order written to the submission. I also add a tiny safety check that the aligned test features still have the expected row count and that the produced submission has no missing keys. These changes should dramatically reduce RMSE toward the 5.689 target without changing your model/feature approach.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+import seaborn as sns
+import time
+import os
+
+for dirname, _, filenames in os.walk("/kaggle/input"):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 1
+train_data = pd.read_csv("/kaggle/input/train.csv", nrows=10_000_000)
+train_data.head()
+
+
+
+## === cell 2
+train_data.shape
+
+
+
+## === cell 3
+train_data.info()
+
+
+
+## === cell 4
+test_data = pd.read_csv("/kaggle/input/test.csv")
+test_data.head()
+
+
+
+## === cell 5
+test_data.info()
+
+
+
+## === cell 6
+train_data.isna().sum()
+
+
+
+## === cell 7
+train_data["Difference_longitude"] = np.abs(
+    np.asarray(train_data["pickup_longitude"] - train_data["dropoff_longitude"])
+)
+train_data["Difference_latitude"] = np.abs(
+    np.asarray(train_data["pickup_latitude"] - train_data["dropoff_latitude"])
+)
+
+test_data["Difference_longitude"] = np.abs(
+    np.asarray(test_data["pickup_longitude"] - test_data["dropoff_longitude"])
+)
+test_data["Difference_latitude"] = np.abs(
+    np.asarray(test_data["pickup_latitude"] - test_data["dropoff_latitude"])
+)
+
+
+
+## === cell 8
+print(f"Before Dropping null values: {len(train_data)}")
+train_data.dropna(inplace=True)
+print(f"After Dropping null values: {len(train_data)}")
+
+
+
+## === cell 9
+plot = train_data[:2000].plot.scatter("Difference_longitude", "Difference_latitude")
+
+
+
+## === cell 10
+train_data = train_data[
+    (train_data["Difference_longitude"] < 5.0)
+    & (train_data["Difference_latitude"] < 5.0)
+]
+
+
+
+## === cell 11
+train_data = train_data[
+    (train_data["fare_amount"] > 0) & (train_data["fare_amount"] <= 500)
+]
+train_data = train_data[
+    (train_data["passenger_count"] >= 1) & (train_data["passenger_count"] <= 6)
+]
+
+train_data = train_data[
+    (train_data["pickup_longitude"].between(-75, -72))
+    & (train_data["dropoff_longitude"].between(-75, -72))
+    & (train_data["pickup_latitude"].between(40, 42))
+    & (train_data["dropoff_latitude"].between(40, 42))
+]
+
+train_data = train_data[
+    (train_data["Difference_longitude"] > 0) | (train_data["Difference_latitude"] > 0)
+]
+
+train_data.shape
+
+
+
+## === cell 12
+train_dt = pd.to_datetime(train_data["pickup_datetime"], errors="coerce", utc=True)
+test_dt = pd.to_datetime(test_data["pickup_datetime"], errors="coerce", utc=True)
+
+train_data = train_data.loc[train_dt.notna()].copy()
+train_dt = train_dt.loc[train_dt.notna()]
+
+train_data["pickuptime"] = (train_dt.dt.hour * 60 + train_dt.dt.minute).astype(np.int32)
+test_data["pickuptime"] = (
+    test_dt.dt.hour.fillna(0).astype(int) * 60 + test_dt.dt.minute.fillna(0).astype(int)
+).astype(np.int32)
+
+train_data["Weekday"] = train_dt.dt.weekday.astype(np.int8)
+test_data["Weekday"] = test_dt.dt.weekday.fillna(0).astype(int).astype(np.int8)
+
+
+
+## === cell 13
+train_data.head()
+
+
+
+## === cell 14
+train_data.head()
+
+
+
+## === cell 15
+test_data.head()
+
+
+
+## === cell 16
+train_data.drop("pickup_datetime", inplace=True, axis=1)
+test_data.drop("pickup_datetime", inplace=True, axis=1)
+
+
+
+## === cell 17
+train_data["Weekday"].replace(
+    to_replace=[i for i in range(0, 7)],
+    value=[
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ],
+    inplace=True,
+)
+test_data["Weekday"].replace(
+    to_replace=[i for i in range(0, 7)],
+    value=[
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ],
+    inplace=True,
+)
+
+
+
+## === cell 18
+train_one_hot = pd.get_dummies(train_data["Weekday"])
+test_one_hot = pd.get_dummies(test_data["Weekday"])
+train_one_hot, test_one_hot = train_one_hot.align(
+    test_one_hot, join="outer", axis=1, fill_value=0
+)
+
+train_data = pd.concat([train_data, train_one_hot], axis=1)
+test_data = pd.concat([test_data, test_one_hot], axis=1)
+
+
+
+## === cell 19
+train_data.drop("Weekday", axis=1, inplace=True)
+test_data.drop("Weekday", axis=1, inplace=True)
+
+
+
+## === cell 20
+train_data.head()
+
+
+
+## === cell 21
+R = 6373.0
+lat1 = np.asarray(np.radians(train_data["pickup_latitude"]))
+lon1 = np.asarray(np.radians(train_data["pickup_longitude"]))
+lat2 = np.asarray(np.radians(train_data["dropoff_latitude"]))
+lon2 = np.asarray(np.radians(train_data["dropoff_longitude"]))
+
+dlon = lon2 - lon1
+dlat = lat2 - lat1
+a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+distance = R * c
+train_data["Distance"] = np.asarray(distance) * 0.621
+
+lat1 = np.asarray(np.radians(test_data["pickup_latitude"]))
+lon1 = np.asarray(np.radians(test_data["pickup_longitude"]))
+lat2 = np.asarray(np.radians(test_data["dropoff_latitude"]))
+lon2 = np.asarray(np.radians(test_data["dropoff_longitude"]))
+
+dlon = lon2 - lon1
+dlat = lat2 - lat1
+a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+distance = R * c
+test_data["Distance"] = np.asarray(distance) * 0.621
+
+
+
+## === cell 22
+R = 6373.0
+lat1 = np.asarray(np.radians(train_data["pickup_latitude"]))
+lon1 = np.asarray(np.radians(train_data["pickup_longitude"]))
+lat2 = np.asarray(np.radians(train_data["dropoff_latitude"]))
+lon2 = np.asarray(np.radians(train_data["dropoff_longitude"]))
+
+lat3 = np.zeros(len(train_data)) + np.radians(40.6413111)
+lon3 = np.zeros(len(train_data)) + np.radians(-73.7781391)
+
+dlon_pickup = lon3 - lon1
+dlat_pickup = lat3 - lat1
+d_lon_dropoff = lon3 - lon2
+d_lat_dropoff = lat3 - lat2
+
+a1 = (
+    np.sin(dlat_pickup / 2) ** 2
+    + np.cos(lat1) * np.cos(lat3) * np.sin(dlon_pickup / 2) ** 2
+)
+c1 = 2 * np.arctan2(np.sqrt(a1), np.sqrt(1 - a1))
+distance1 = R * c1
+train_data["Pickup_Distance_airport"] = np.asarray(distance1) * 0.621
+
+a2 = (
+    np.sin(d_lat_dropoff / 2) ** 2
+    + np.cos(lat2) * np.cos(lat3) * np.sin(d_lon_dropoff / 2) ** 2
+)
+c2 = 2 * np.arctan2(np.sqrt(a2), np.sqrt(1 - a2))
+distance2 = R * c2
+train_data["Dropoff_Distance_airport"] = np.asarray(distance2) * 0.621
+
+lat1 = np.asarray(np.radians(test_data["pickup_latitude"]))
+lon1 = np.asarray(np.radians(test_data["pickup_longitude"]))
+lat2 = np.asarray(np.radians(test_data["dropoff_latitude"]))
+lon2 = np.asarray(np.radians(test_data["dropoff_longitude"]))
+
+lat3 = np.zeros(len(test_data)) + np.radians(40.6413111)
+lon3 = np.zeros(len(test_data)) + np.radians(-73.7781391)
+
+dlon_pickup = lon3 - lon1
+dlat_pickup = lat3 - lat1
+d_lon_dropoff = lon3 - lon2
+d_lat_dropoff = lat3 - lat2
+
+a1 = (
+    np.sin(dlat_pickup / 2) ** 2
+    + np.cos(lat1) * np.cos(lat3) * np.sin(dlon_pickup / 2) ** 2
+)
+c1 = 2 * np.arctan2(np.sqrt(a1), np.sqrt(1 - a1))
+distance1 = R * c1
+test_data["Pickup_Distance_airport"] = np.asarray(distance1) * 0.621
+
+a2 = (
+    np.sin(d_lat_dropoff / 2) ** 2
+    + np.cos(lat2) * np.cos(lat3) * np.sin(d_lon_dropoff / 2) ** 2
+)
+c2 = 2 * np.arctan2(np.sqrt(a2), np.sqrt(1 - a2))
+distance2 = R * c2
+test_data["Dropoff_Distance_airport"] = np.asarray(distance2) * 0.621
+
+
+
+## === cell 23
+train_data["Distance"] = np.round(train_data["Distance"], 2)
+train_data["Pickup_Distance_airport"] = np.round(
+    train_data["Pickup_Distance_airport"], 2
+)
+train_data["Dropoff_Distance_airport"] = np.round(
+    train_data["Dropoff_Distance_airport"], 2
+)
+
+test_data["Distance"] = np.round(test_data["Distance"], 2)
+test_data["Pickup_Distance_airport"] = np.round(test_data["Pickup_Distance_airport"], 2)
+test_data["Dropoff_Distance_airport"] = np.round(
+    test_data["Dropoff_Distance_airport"], 2
+)
+
+
+
+## === cell 24
+train_data.drop(
+    ["pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude"],
+    axis=1,
+    inplace=True,
+)
+test_data.drop(
+    ["pickup_longitude", "pickup_latitude", "dropoff_longitude", "dropoff_latitude"],
+    axis=1,
+    inplace=True,
+)
+
+
+
+## === cell 25
+dl_mean = float(np.mean(train_data["Difference_longitude"]))
+dl_std = float(np.std(train_data["Difference_longitude"]))
+dlat_mean = float(np.mean(train_data["Difference_latitude"]))
+dlat_std = float(np.std(train_data["Difference_latitude"]))
+
+if dl_std == 0.0:
+    dl_std = 1.0
+if dlat_std == 0.0:
+    dlat_std = 1.0
+
+train_data["Difference_longitude"] = (
+    np.abs(train_data["Difference_longitude"] - dl_mean) / dl_std
+)
+train_data["Difference_latitude"] = (
+    np.abs(train_data["Difference_latitude"] - dlat_mean) / dlat_std
+)
+
+test_data["Difference_longitude"] = (
+    np.abs(test_data["Difference_longitude"] - dl_mean) / dl_std
+)
+test_data["Difference_latitude"] = (
+    np.abs(test_data["Difference_latitude"] - dlat_mean) / dlat_std
+)
+
+
+
+## === cell 26
+train_data.shape
+
+
+
+## === cell 27
+test_data.shape
+
+
+
+## === cell 28
+from sklearn.model_selection import train_test_split
+
+train_data = train_data[
+    (train_data["fare_amount"] > 0.0) & (train_data["fare_amount"] <= 500.0)
+].copy()
+
+X = train_data.drop(["key", "fare_amount"], axis=1)
+y = train_data["fare_amount"]
+
+test_keys = test_data["key"].copy()
+test_features = test_data.drop("key", axis=1)
+
+X, test_features = X.align(test_features, join="inner", axis=1)
+
+test_keys = test_keys.reindex(test_features.index)
+
+X = X.apply(pd.to_numeric, errors="coerce")
+test_features = test_features.apply(pd.to_numeric, errors="coerce")
+y = pd.to_numeric(y, errors="coerce")
+
+X = X.replace([np.inf, -np.inf], np.nan)
+test_features = test_features.replace([np.inf, -np.inf], np.nan)
+
+finite_mask = np.isfinite(X.to_numpy(dtype=np.float64)).all(axis=1) & np.isfinite(
+    y.to_numpy(dtype=np.float64)
+)
+X = X.loc[finite_mask].copy()
+y = y.loc[finite_mask].copy()
+
+X = X.fillna(0.0)
+test_features = test_features.fillna(0.0)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.01, random_state=80
+)
+
+assert len(test_features) == len(
+    test_keys
+), "Test feature rows and key rows are misaligned."
+assert test_keys.notna().all(), "Found missing keys after alignment."
+
+
+
+## === cell 29
+from sklearn.linear_model import LinearRegression
+
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+print(lr.score(X_test, y_test))
+
+
+
+## === cell 30
+pred = lr.predict(test_features)
+
+pred = np.clip(pred, 0.0, None)
+pred = np.round(pred, 2)
+
+
+
+## === cell 31
+pd.read_csv("/kaggle/input/sample_submission.csv").head()
+
+
+
+## === cell 32
+Submission = pd.DataFrame(data=pred, columns=["fare_amount"])
+Submission["key"] = test_keys.values
+Submission = Submission[["key", "fare_amount"]]
+Submission.head()
+
+
+
+## === cell 33
+Submission.to_csv("Submission.csv", index=False)
+print("Wrote submission file:", os.path.abspath("Submission.csv"))
+print(Submission.shape)
+print(Submission.head())

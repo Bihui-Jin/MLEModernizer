@@ -1,0 +1,833 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the `scalar_coupling_constant` between atom pairs in molecules, given the two atom types (e.g., C and H), the coupling type (e.g., `2JHC`), and any features you are able to create from the molecule structure (`xyz`) files.
+
+## Metric
+Log of the Mean Absolute Error, calculated for each scalar coupling type, and then averaged across types.
+
+## Submission Format
+```
+id,scalar_coupling_constant
+2324604,0.0
+2324605,0.0
+2324606,0.0
+etc.
+```
+
+## Dataset
+The training and test splits are by *molecule*, so that no molecule in the training data is found in the test data.
+
+- **train.csv** - the training set, where the first column (`molecule_name`) is the name of the molecule where the coupling constant originates (the corresponding XYZ file is located at ./structures/.xyz), the second (`atom_index_0`) and third column (`atom_index_1`) is the atom indices of the atom-pair creating the coupling and the fourth column (`scalar_coupling_constant`) is the scalar coupling constant that we want to be able to predict
+- **test.csv** - the test set; same info as train, without the target variable
+- **sample_submission.csv** - a sample submission file in the correct format
+- **structures.zip** - folder containing molecular structure (xyz) files, where the first line is the number of atoms in the molecule, followed by a blank line, and then a line for every atom, where the first column contains the atomic element (H for hydrogen, C for carbon etc.) and the remaining columns contain the X, Y and Z cartesian coordinates (a standard format for chemists and molecular visualization programs)
+- **structures.csv** - this file contains the **same** information as the individual xyz structure files, but in a single file
+- **dipole_moments.csv** - contains the molecular electric dipole moments. These are three dimensional vectors that indicate the charge distribution in the molecule. The first column (`molecule_name`) are the names of the molecule, the second to fourth column are the `X`, `Y` and `Z` components respectively of the dipole moment.
+- **magnetic_shielding_tensors.csv** - contains the magnetic shielding tensors for all atoms in the molecules. The first column (`molecule_name`) contains the molecule name, the second column (`atom_index`) contains the index of the atom in the molecule, the third to eleventh columns contain the `XX`, `YX`, `ZX`, `XY`, `YY`, `ZY`, `XZ`, `YZ` and `ZZ` elements of the tensor/matrix respectively.
+- **mulliken_charges.csv** - contains the mulliken charges for all atoms in the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`atom_index`) contains the index of the atom in the molecule, the third column (`mulliken_charge`) contains the mulliken charge of the atom.
+- **potential_energy.csv** - contains the potential energy of the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`potential_energy`) contains the potential energy of the molecule.
+- **scalar_coupling_contributions.csv** - The scalar coupling constants in `train.csv` (or corresponding files) are a sum of four terms. `scalar_coupling_contributions.csv` contain all these terms. The first column (`molecule_name`) are the name of the molecule, the second (`atom_index_0`) and third column (`atom_index_1`) are the atom indices of the atom-pair, the fourth column indicates the type of coupling, the fifth column (`fc`) is the Fermi Contact contribution, the sixth column (`sd`) is the Spin-dipolar contribution, the seventh column (`pso`) is the Paramagnetic spin-orbit contribution and the eighth column (`dso`) is the Diamagnetic spin-orbit contribution.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+category_encoders==2.7.0
+geopandas==0.14.4
+lightgbm==4.6.0
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        input/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        working/
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+```
+
+-> data/champs-scalar-coupling/dipole_moments.csv has 76510 rows and 4 columns.
+The columns are: molecule_name, X, Y, Z
+
+-> data/champs-scalar-coupling/magnetic_shielding_tensors.csv has 1379964 rows and 11 columns.
+The columns are: molecule_name, atom_index, XX, YX, ZX, XY, YY, ZY, XZ, YZ, ZZ
+
+-> data/champs-scalar-coupling/mulliken_charges.csv has 1379964 rows and 3 columns.
+The columns are: molecule_name, atom_index, mulliken_charge
+
+-> data/champs-scalar-coupling/potential_energy.csv has 76510 rows and 2 columns.
+The columns are: molecule_name, potential_energy
+
+-> data/champs-scalar-coupling/sample_submission.csv has 467813 rows and 2 columns.
+The columns are: id, scalar_coupling_constant
+
+-> data/champs-scalar-coupling/scalar_coupling_contributions.csv has 4191263 rows and 8 columns.
+The columns are: molecule_name, atom_index_0, atom_index_1, type, fc, sd, pso, dso
+
+-> data/champs-scalar-coupling/structures.csv has 1379964 rows and 6 columns.
+The columns are: molecule_name, atom_index, atom, x, y, z
+
+-> data/champs-scalar-coupling/test.csv has 467813 rows and 5 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type
+
+-> data/champs-scalar-coupling/train.csv has 4191263 rows and 6 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type, scalar_coupling_constant
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7858
+
+# 6. Current score
+
+2.03018
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.88801) has done: 'I fix the categorical conversion bug by ensuring category lists never include null values, which currently causes the `ValueError: Categorical categories cannot be null`. Then I make LightGBM accept the categorical columns by explicitly casting the intended categorical features to pandas `category` dtype (instead of leaving them as `object`), which resolves the “bad pandas dtypes” error during `.fit()`. Finally, I ensure training completes and `y_predict` is defined so the pipeline always writes a valid `submission.csv` with the correct columns and row count.'
+- What this solution (achieved 2.01286) has done: 'Your current model is trained on raw `molecule_name` as a categorical feature, which encourages memorization and hurts generalization because train/test are split by molecule; dropping that single column typically moves the score substantially toward your target without changing the overall approach. I also make the train/valid split in your (optional) CV routine molecule-grouped (to match the competition split) so you can sanity-check improvements locally without leakage. Finally, I keep everything else (LightGBM regressor, features, training flow, submission writing) the same, only adding a couple of stable training parameters so categorical handling is consistent.'
+- What this solution (achieved 1.67647) has done: 'You’re currently far from the target (2.01286 vs 0.7858, lower is better), so we should make a small, legitimate improvement without changing the overall LightGBM approach. The biggest low-risk gain is to train separate regressors per coupling `type`, which better matches the metric (averaged per-type log MAE) while keeping the same model family/training loop style. I also ensure categorical handling remains consistent by keeping `type` as a category and excluding it from per-type feature sets (to avoid a constant/degenerate categorical in each submodel). Finally, the code still write a valid `submission.csv` with the correct row order and columns.'
+- What this solution (achieved 1.82965) has done: 'Your per-type LightGBM setup is a good direction for this metric, but it’s currently leaving a lot of signal on the table by only using raw pair coordinates + a few simple categoricals. I keep the exact same modeling family and per-type training loop, and make a minimal feature upgrade by adding molecule-level and atom-level auxiliary features already provided in the competition (mulliken charges, magnetic shielding tensors, dipole moments, potential energy), joined onto atom_index_0/1 and molecule_name. This typically reduces per-type MAE substantially without changing the core training approach, and it remains leakage-safe because these features are available for both train and test. I also add a couple of conservative LightGBM stability parameters (subsample/colsample/min_child_samples) that usually improve generalization a bit without changing the algorithmic approach.'
+- What this solution (achieved 2.03902) has done: 'We’re still far from the target (1.82965 vs 0.7858, lower is better), so we should add a small set of high-signal, leakage-safe features without changing the overall LightGBM-per-type training approach. The biggest missing signal in your current feature set is local molecular geometry/context: how “crowded” each atom is and how far it is from nearby atoms; adding a few aggregated neighbor-distance statistics per atom (computed from `structures.csv`) usually yields a meaningful MAE drop on this competition. I compute simple per-(molecule, atom_index) distance summaries to all other atoms (mean/min/max/std and counts within a few radii) and merge them for atom_index_0 and atom_index_1, plus symmetric pair features (diff/sum). I also make the per-type training use `metric='mae'` (training-only, same objective) to better align the internal split decisions with the competition loss, keeping everything else intact and still writing a valid `submission.csv`.'
+- What this solution (achieved 2.01825) has done: 'Your current neighbor-stat feature step computes an \(N\times N\) distance matrix per molecule, which is expensive and (given the timeout) likely forces you into incomplete/unstable runs or suboptimal training behavior; we can replace it with an equivalent, much faster per-molecule KDTree query that preserves the same feature semantics (min/mean/max/std distances to “all other atoms”, plus counts under radii). Then we add a single, very small but high-signal geometry feature that doesn’t change the training approach: the inverse distance and squared inverse distance of the atom pair (common in this competition), which typically improves MAE without altering the model family/loop. Finally, we keep your per-type LightGBM training intact, but make the categorical handling deterministic and ensure we don’t accidentally drop/alter feature alignment, so the submission stays valid and stable while moving the score down toward your target.'
+- What this solution (achieved 2.06542) has done: 'Your current pipeline is still leaving a lot of geometry signal unused because the “neighbor stats” are only computed over the k-nearest neighbors (k=24) rather than all atoms in the molecule; we can keep the exact same feature names/semantics but compute them exactly (and efficiently) using KDTree radius counts plus `pdist`-based distance summaries per molecule. This is a minimal change to the feature engineering step (no model/loop changes) and should materially reduce MAE toward your target because CHAMPS is highly geometry-driven. I also fix `num_atoms` so it truly reflects molecule atom counts (currently it’s counting rows per `(molecule_name, atom_1)` in the pair table, which is a leaky/odd proxy), again without changing the training approach. Everything else (per-type LightGBM, categorical handling, submission writing) remains the same.'
+- What this solution (achieved 2.06542) has done: 'We’re far from the target (2.06542 vs 0.7858, lower is better), so we need a small but meaningful, leakage-safe improvement while keeping the same per-type LightGBM setup and the same overall feature approach. The biggest bug-like issue I see is in `build_atom_neighbor_stats_fast()`: `d_mean` and `d_std` currently include the zero self-distance (diagonal) but divide by `(n-1)`, which makes these features systematically too small and inconsistent with their intended semantics; fixing this should improve generalization without changing the modeling approach. I also remove the unused KDTree import and keep everything else intact, ensuring categorical handling and submission writing remain unchanged. This is a minimal, targeted fix to correct geometry-derived features rather than adding new logic.'
+- What this solution (achieved 2.0686) has done: 'Your current score is far above the target (2.06542 vs 0.7858, lower is better), so we need a legitimate improvement that keeps your per-type LightGBM approach intact. The smallest high-impact fix is to correct the neighbor-distance statistics: `nbr_dist_mean`/`nbr_dist_std` are currently biased because they include the self-distance (0) in the sums but still divide by `(n-1)`. I compute these stats from the off-diagonal distances only (i.e., exclude self consistently), keeping the same feature names and downstream merges unchanged. This should move the score down toward the target while preserving your core logic and producing the same submission format.'
+- What this solution (achieved 2.03018) has done: 'I make two minimal, score-relevant fixes while keeping your per-type LightGBM approach and feature set intact. First, your neighbor-stat routine currently still uses the full distance matrix (via `pdist/squareform`), which is both slow and—more importantly here—does not actually exclude self-distances from mean/std (the current “subtract 0” lines are no-ops); I compute mean/std from off-diagonal distances correctly and efficiently using KDTree kNN distances (equivalent “all-other-atoms” stats for our purposes). Second, I add a tiny but high-signal, leakage-safe geometry feature (`cosine` between the bond vector and the molecule dipole vector) using the dipole moments you already merged, which often reduces MAE without changing the training loop or model family. The rest (categoricals, per-type training, submission writing) stays unchanged, and it still write a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import gc
+import lightgbm as lgbm
+from sklearn.model_selection import KFold, GroupKFold
+import os
+
+RANDOM_STATE = 42
+np.random.seed(RANDOM_STATE)
+
+BASE_INPUT = "../input"
+if not os.path.exists(BASE_INPUT):
+    BASE_INPUT = "/kaggle/input/champs-scalar-coupling"
+
+print("Using BASE_INPUT =", BASE_INPUT)
+print(os.listdir(BASE_INPUT)[:20])
+
+
+
+## === cell 1
+gc.collect()
+
+
+
+## === cell 2
+train = pd.read_csv(f"{BASE_INPUT}/train.csv")
+test = pd.read_csv(f"{BASE_INPUT}/test.csv")
+sample_sub = pd.read_csv(f"{BASE_INPUT}/sample_submission.csv")
+structures = pd.read_csv(f"{BASE_INPUT}/structures.csv")
+
+mulliken = pd.read_csv(f"{BASE_INPUT}/mulliken_charges.csv")
+shield = pd.read_csv(f"{BASE_INPUT}/magnetic_shielding_tensors.csv")
+dipole = pd.read_csv(f"{BASE_INPUT}/dipole_moments.csv")
+potential = pd.read_csv(f"{BASE_INPUT}/potential_energy.csv")
+
+print(f"train.shape: {train.shape}")
+print(f"test.shape: {test.shape}")
+print(f"structures.shape: {structures.shape}")
+print(f"mulliken.shape: {mulliken.shape}")
+print(f"shield.shape: {shield.shape}")
+print(f"dipole.shape: {dipole.shape}")
+print(f"potential.shape: {potential.shape}")
+
+
+
+## === cell 3
+train_id = train["id"].copy()
+test_id = test["id"].copy()
+
+X_train = train.drop(columns=["scalar_coupling_constant"]).copy()
+y_train = train["scalar_coupling_constant"].copy()
+X_test = test.copy()
+
+print(f"X_train.shape: {X_train.shape}")
+print(f"X_test.shape: {X_test.shape}")
+
+
+
+## === cell 4
+X_train = X_train.drop(columns=["id"])
+X_test = X_test.drop(columns=["id"])
+
+
+
+## === cell 5
+X_train = X_train.reset_index(drop=True)
+X_test = X_test.reset_index(drop=True)
+X_train["orig_idx"] = np.arange(len(X_train), dtype=np.int64)
+X_test["orig_idx"] = np.arange(len(X_test), dtype=np.int64)
+
+
+
+
+## === cell 6
+def convert_object_to_categories(X_train_df, X_test_df):
+    for col in X_train_df.columns:
+        if X_train_df[col].dtype == "O" or str(X_train_df[col].dtype) == "object":
+            combined = pd.concat(
+                [X_train_df[col], X_test_df[col]], axis=0, ignore_index=True
+            )
+            cats = pd.Index(combined.dropna().unique())
+            X_train_df[col] = pd.Categorical(X_train_df[col], categories=cats)
+            X_test_df[col] = pd.Categorical(X_test_df[col], categories=cats)
+    return X_train_df, X_test_df
+
+
+X_train, X_test = convert_object_to_categories(X_train, X_test)
+
+
+
+## === cell 7
+import math
+
+print(f"{X_train['type'].unique()}")
+print(f"{X_test['type'].unique()}")
+
+
+def calc_score(X_val, y_true, y_pred):
+    tmp = X_val[["type"]].copy()
+    tmp["y_true"] = np.asarray(y_true)
+    tmp["y_pred"] = np.asarray(y_pred)
+    tmp["error"] = (tmp["y_true"] - tmp["y_pred"]).abs()
+
+    g = tmp.groupby("type")["error"].mean()
+    g = np.log(np.maximum(g.values, 1e-12))
+    return float(np.mean(g))
+
+
+
+
+## === cell 8
+def cross_val_grouped_by_molecule(X, y, groups):
+    gkf = GroupKFold(n_splits=5)
+    fold = 0
+    for train_index, val_index in gkf.split(X, y, groups=groups):
+        fold += 1
+        lgbm_model = lgbm.LGBMRegressor(
+            random_state=RANDOM_STATE,
+            n_estimators=200,
+            objective="regression",
+        )
+        lgbm_model.fit(X.iloc[train_index, :], y.iloc[train_index])
+        y_val = lgbm_model.predict(X.iloc[val_index, :])
+        print(
+            f"fold {fold} score: {calc_score(X.iloc[val_index, :], y.iloc[val_index], y_val)}"
+        )
+
+
+
+
+## === cell 9
+assert len(X_train) == len(y_train)
+assert len(X_test) > 0
+assert (
+    "molecule_name" in X_train.columns
+    and "atom_index_0" in X_train.columns
+    and "atom_index_1" in X_train.columns
+)
+
+
+
+
+## === cell 10
+def build_atom_neighbor_stats_fast(structures_df, radii=(2.0, 3.0, 5.0)):
+    """
+    Change (score-improving, minimal, same feature names):
+    - Correct nbr_dist_mean/nbr_dist_std to exclude self-distance (0) consistently.
+      The previous implementation used a full NxN matrix and effectively kept the 0s.
+    - Compute exact off-diagonal mean/std efficiently using KDTree kNN distances,
+      which is equivalent to aggregating distances to all other atoms for each atom.
+    """
+    from sklearn.neighbors import KDTree
+
+    s = structures_df[["molecule_name", "atom_index", "x", "y", "z"]].copy()
+    s[["x", "y", "z"]] = s[["x", "y", "z"]].astype(np.float32)
+
+    out_parts = []
+    for mol, g in s.groupby("molecule_name", sort=False):
+        coords = g[["x", "y", "z"]].to_numpy(dtype=np.float32, copy=True)
+        n = int(coords.shape[0])
+
+        if n <= 1:
+            d_min = np.zeros(n, dtype=np.float32)
+            d_mean = np.zeros(n, dtype=np.float32)
+            d_max = np.zeros(n, dtype=np.float32)
+            d_std = np.zeros(n, dtype=np.float32)
+            cnts = [np.zeros(n, dtype=np.int16) for _ in radii]
+        else:
+            tree = KDTree(coords, leaf_size=32)
+
+            dists, _ = tree.query(coords, k=n, return_distance=True)
+            dists = dists[:, 1:].astype(np.float32, copy=False)  # (n, n-1), no self
+
+            d_min = dists.min(axis=1).astype(np.float32, copy=False)
+            d_max = dists.max(axis=1).astype(np.float32, copy=False)
+            d_mean = dists.mean(axis=1).astype(np.float32, copy=False)
+            d_std = dists.std(axis=1).astype(np.float32, copy=False)
+
+            cnts = []
+            for r in radii:
+                c = tree.query_radius(coords, r=float(r), count_only=True) - 1
+                cnts.append(c.astype(np.int16, copy=False))
+
+        part = pd.DataFrame(
+            {
+                "molecule_name": g["molecule_name"].values,
+                "atom_index": g["atom_index"].values.astype(np.int32, copy=False),
+                "nbr_dist_min": d_min,
+                "nbr_dist_mean": d_mean,
+                "nbr_dist_max": d_max,
+                "nbr_dist_std": d_std,
+                "nbr_cnt_2": cnts[0],
+                "nbr_cnt_3": cnts[1],
+                "nbr_cnt_5": cnts[2],
+            }
+        )
+        out_parts.append(part)
+
+    out = pd.concat(out_parts, axis=0, ignore_index=True)
+    return out
+
+
+atom_stats = build_atom_neighbor_stats_fast(structures, radii=(2.0, 3.0, 5.0))
+print("atom_stats.shape:", atom_stats.shape)
+gc.collect()
+
+
+
+## === cell 11
+X_train = X_train.merge(
+    structures,
+    left_on=["molecule_name", "atom_index_0"],
+    right_on=["molecule_name", "atom_index"],
+    how="left",
+    sort=False,
+)
+X_train = X_train.rename(
+    columns={
+        "atom_index": "atom_index_0_0",
+        "x": "atom_index_0_x",
+        "y": "atom_index_0_y",
+        "z": "atom_index_0_z",
+        "atom": "atom_0",
+    }
+)
+
+X_test = X_test.merge(
+    structures,
+    left_on=["molecule_name", "atom_index_0"],
+    right_on=["molecule_name", "atom_index"],
+    how="left",
+    sort=False,
+)
+X_test = X_test.rename(
+    columns={
+        "atom_index": "atom_index_0_0",
+        "x": "atom_index_0_x",
+        "y": "atom_index_0_y",
+        "z": "atom_index_0_z",
+        "atom": "atom_0",
+    }
+)
+
+
+
+## === cell 12
+X_train = X_train.merge(
+    structures,
+    left_on=["molecule_name", "atom_index_1"],
+    right_on=["molecule_name", "atom_index"],
+    how="left",
+    sort=False,
+)
+X_train = X_train.rename(
+    columns={
+        "atom_index": "atom_index_1_1",
+        "x": "atom_index_1_x",
+        "y": "atom_index_1_y",
+        "z": "atom_index_1_z",
+        "atom": "atom_1",
+    }
+)
+
+X_test = X_test.merge(
+    structures,
+    left_on=["molecule_name", "atom_index_1"],
+    right_on=["molecule_name", "atom_index"],
+    how="left",
+    sort=False,
+)
+X_test = X_test.rename(
+    columns={
+        "atom_index": "atom_index_1_1",
+        "x": "atom_index_1_x",
+        "y": "atom_index_1_y",
+        "z": "atom_index_1_z",
+        "atom": "atom_1",
+    }
+)
+
+
+
+## === cell 13
+X_train = X_train.drop(columns=["atom_index_0_0", "atom_index_1_1"])
+X_test = X_test.drop(columns=["atom_index_0_0", "atom_index_1_1"])
+
+
+
+## === cell 14
+X_train["distance"] = (
+    (X_train["atom_index_0_x"] - X_train["atom_index_1_x"]) ** 2
+    + (X_train["atom_index_0_y"] - X_train["atom_index_1_y"]) ** 2
+    + (X_train["atom_index_0_z"] - X_train["atom_index_1_z"]) ** 2
+) ** 0.5
+
+X_test["distance"] = (
+    (X_test["atom_index_0_x"] - X_test["atom_index_1_x"]) ** 2
+    + (X_test["atom_index_0_y"] - X_test["atom_index_1_y"]) ** 2
+    + (X_test["atom_index_0_z"] - X_test["atom_index_1_z"]) ** 2
+) ** 0.5
+
+eps = 1e-6
+X_train["inv_distance"] = 1.0 / (X_train["distance"] + eps)
+X_test["inv_distance"] = 1.0 / (X_test["distance"] + eps)
+X_train["inv_distance2"] = X_train["inv_distance"] ** 2
+X_test["inv_distance2"] = X_test["inv_distance"] ** 2
+
+
+
+## === cell 15
+X_train["join_type"] = X_train["type"].astype(str).str.slice(0, 2)
+X_test["join_type"] = X_test["type"].astype(str).str.slice(0, 2)
+
+
+
+## === cell 16
+mol_atom_count = (
+    structures.groupby("molecule_name", sort=False)["atom_index"].max().astype(np.int32)
+    + 1
+).rename("num_atoms_mol")
+X_train = X_train.merge(mol_atom_count, on="molecule_name", how="left", sort=False)
+X_test = X_test.merge(mol_atom_count, on="molecule_name", how="left", sort=False)
+
+
+
+## === cell 17
+X_train["num_atoms"] = X_train["num_atoms_mol"].astype("str") + X_train[
+    "atom_1"
+].astype(str)
+X_test["num_atoms"] = X_test["num_atoms_mol"].astype("str") + X_test["atom_1"].astype(
+    str
+)
+
+
+
+## === cell 18
+atom_stats_0 = atom_stats.rename(
+    columns={
+        c: f"atom0_{c}"
+        for c in atom_stats.columns
+        if c not in ["molecule_name", "atom_index"]
+    }
+).rename(columns={"atom_index": "atom_index_0"})
+
+atom_stats_1 = atom_stats.rename(
+    columns={
+        c: f"atom1_{c}"
+        for c in atom_stats.columns
+        if c not in ["molecule_name", "atom_index"]
+    }
+).rename(columns={"atom_index": "atom_index_1"})
+
+X_train = X_train.merge(
+    atom_stats_0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+X_test = X_test.merge(
+    atom_stats_0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+
+X_train = X_train.merge(
+    atom_stats_1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+X_test = X_test.merge(
+    atom_stats_1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+
+for base in [
+    "nbr_dist_min",
+    "nbr_dist_mean",
+    "nbr_dist_max",
+    "nbr_dist_std",
+    "nbr_cnt_2",
+    "nbr_cnt_3",
+    "nbr_cnt_5",
+]:
+    c0 = f"atom0_{base}"
+    c1 = f"atom1_{base}"
+    if c0 in X_train.columns and c1 in X_train.columns:
+        X_train[f"{base}_diff01"] = X_train[c0] - X_train[c1]
+        X_train[f"{base}_sum01"] = X_train[c0] + X_train[c1]
+        X_test[f"{base}_diff01"] = X_test[c0] - X_test[c1]
+        X_test[f"{base}_sum01"] = X_test[c0] + X_test[c1]
+
+gc.collect()
+
+
+
+## === cell 19
+mulliken_0 = mulliken.rename(
+    columns={"atom_index": "atom_index_0", "mulliken_charge": "mulliken_charge_0"}
+)
+mulliken_1 = mulliken.rename(
+    columns={"atom_index": "atom_index_1", "mulliken_charge": "mulliken_charge_1"}
+)
+
+X_train = X_train.merge(
+    mulliken_0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+X_test = X_test.merge(
+    mulliken_0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+
+X_train = X_train.merge(
+    mulliken_1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+X_test = X_test.merge(
+    mulliken_1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+
+shield_0 = shield.rename(
+    columns={
+        c: f"shield_0_{c}"
+        for c in shield.columns
+        if c not in ["molecule_name", "atom_index"]
+    }
+)
+shield_0 = shield_0.rename(columns={"atom_index": "atom_index_0"})
+shield_1 = shield.rename(
+    columns={
+        c: f"shield_1_{c}"
+        for c in shield.columns
+        if c not in ["molecule_name", "atom_index"]
+    }
+)
+shield_1 = shield_1.rename(columns={"atom_index": "atom_index_1"})
+
+X_train = X_train.merge(
+    shield_0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+X_test = X_test.merge(
+    shield_0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+
+X_train = X_train.merge(
+    shield_1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+X_test = X_test.merge(
+    shield_1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+
+X_train = X_train.merge(
+    dipole.rename(columns={"X": "dipole_X", "Y": "dipole_Y", "Z": "dipole_Z"}),
+    on="molecule_name",
+    how="left",
+    sort=False,
+)
+X_test = X_test.merge(
+    dipole.rename(columns={"X": "dipole_X", "Y": "dipole_Y", "Z": "dipole_Z"}),
+    on="molecule_name",
+    how="left",
+    sort=False,
+)
+
+X_train = X_train.merge(potential, on="molecule_name", how="left", sort=False)
+X_test = X_test.merge(potential, on="molecule_name", how="left", sort=False)
+
+X_train["mulliken_charge_diff"] = (
+    X_train["mulliken_charge_0"] - X_train["mulliken_charge_1"]
+)
+X_test["mulliken_charge_diff"] = (
+    X_test["mulliken_charge_0"] - X_test["mulliken_charge_1"]
+)
+X_train["mulliken_charge_sum"] = (
+    X_train["mulliken_charge_0"] + X_train["mulliken_charge_1"]
+)
+X_test["mulliken_charge_sum"] = (
+    X_test["mulliken_charge_0"] + X_test["mulliken_charge_1"]
+)
+
+
+
+## === cell 20
+vx_tr = (X_train["atom_index_1_x"] - X_train["atom_index_0_x"]).astype(np.float32)
+vy_tr = (X_train["atom_index_1_y"] - X_train["atom_index_0_y"]).astype(np.float32)
+vz_tr = (X_train["atom_index_1_z"] - X_train["atom_index_0_z"]).astype(np.float32)
+
+vx_te = (X_test["atom_index_1_x"] - X_test["atom_index_0_x"]).astype(np.float32)
+vy_te = (X_test["atom_index_1_y"] - X_test["atom_index_0_y"]).astype(np.float32)
+vz_te = (X_test["atom_index_1_z"] - X_test["atom_index_0_z"]).astype(np.float32)
+
+dipx_tr = X_train["dipole_X"].astype(np.float32)
+dipy_tr = X_train["dipole_Y"].astype(np.float32)
+dipz_tr = X_train["dipole_Z"].astype(np.float32)
+
+dipx_te = X_test["dipole_X"].astype(np.float32)
+dipy_te = X_test["dipole_Y"].astype(np.float32)
+dipz_te = X_test["dipole_Z"].astype(np.float32)
+
+bond_norm_tr = np.sqrt(vx_tr * vx_tr + vy_tr * vy_tr + vz_tr * vz_tr) + np.float32(1e-6)
+bond_norm_te = np.sqrt(vx_te * vx_te + vy_te * vy_te + vz_te * vz_te) + np.float32(1e-6)
+dip_norm_tr = np.sqrt(
+    dipx_tr * dipx_tr + dipy_tr * dipy_tr + dipz_tr * dipz_tr
+) + np.float32(1e-6)
+dip_norm_te = np.sqrt(
+    dipx_te * dipx_te + dipy_te * dipy_te + dipz_te * dipz_te
+) + np.float32(1e-6)
+
+X_train["bond_dipole_cos"] = (vx_tr * dipx_tr + vy_tr * dipy_tr + vz_tr * dipz_tr) / (
+    bond_norm_tr * dip_norm_tr
+)
+X_test["bond_dipole_cos"] = (vx_te * dipx_te + vy_te * dipy_te + vz_te * dipz_te) / (
+    bond_norm_te * dip_norm_te
+)
+
+
+
+## === cell 21
+X_train, X_test = convert_object_to_categories(X_train, X_test)
+
+for col in X_train.columns:
+    if X_train[col].dtype == "O" or str(X_train[col].dtype) == "object":
+        combined = pd.concat([X_train[col], X_test[col]], axis=0, ignore_index=True)
+        cats = pd.Index(combined.dropna().unique())
+        X_train[col] = pd.Categorical(X_train[col], categories=cats)
+        X_test[col] = pd.Categorical(X_test[col], categories=cats)
+
+
+
+## === cell 22
+df = X_train.merge(
+    pd.DataFrame(
+        {
+            "scalar_coupling_constant": y_train.values,
+            "orig_idx": X_train["orig_idx"].values,
+        }
+    ),
+    on="orig_idx",
+    how="left",
+)
+numeric_corr = df.select_dtypes(include=[np.number]).corr()
+print("numeric_corr computed with shape:", numeric_corr.shape)
+
+
+
+## === cell 23
+X_train_new = X_train.set_index("orig_idx").sort_index()
+X_test_new = X_test.set_index("orig_idx").sort_index()
+
+assert X_train_new.shape[0] == len(y_train)
+assert X_test_new.shape[0] == len(test)
+
+
+
+## === cell 24
+X_train_new = X_train_new.drop(columns=["molecule_name"])
+X_test_new = X_test_new.drop(columns=["molecule_name"])
+
+assert "type" in X_train_new.columns and "type" in X_test_new.columns
+
+types_train = X_train_new["type"]
+types_test = X_test_new["type"]
+
+y_predict = pd.Series(index=X_test_new.index, dtype=np.float64)
+
+unique_types = list(pd.Index(types_train.dropna().unique()))
+print("Training per-type models for", len(unique_types), "types:", unique_types)
+
+base_params = dict(
+    random_state=RANDOM_STATE,
+    n_estimators=400,
+    objective="regression",
+    metric="mae",
+    learning_rate=0.05,
+    num_leaves=128,
+    min_child_samples=50,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    reg_alpha=0.0,
+    reg_lambda=0.0,
+    n_jobs=-1,
+)
+
+for t in unique_types:
+    train_mask = (types_train == t).values
+    test_mask = (types_test == t).values
+
+    X_tr_t = X_train_new.loc[train_mask].copy()
+    y_tr_t = y_train.loc[train_mask].copy()
+    X_te_t = X_test_new.loc[test_mask].copy()
+
+    if "type" in X_tr_t.columns:
+        X_tr_t = X_tr_t.drop(columns=["type"])
+    if "type" in X_te_t.columns:
+        X_te_t = X_te_t.drop(columns=["type"])
+
+    cat_cols_t = [c for c in X_tr_t.columns if str(X_tr_t[c].dtype) == "category"]
+
+    model_t = lgbm.LGBMRegressor(**base_params)
+    model_t.fit(X_tr_t, y_tr_t, categorical_feature=cat_cols_t)
+
+    y_predict.loc[X_te_t.index] = model_t.predict(X_te_t)
+
+missing_pred = y_predict.isna()
+if missing_pred.any():
+    print(
+        "Warning: missing predictions for",
+        int(missing_pred.sum()),
+        "rows; fitting fallback global model.",
+    )
+    X_tr_all = X_train_new.drop(columns=["type"])
+    X_te_all = X_test_new.drop(columns=["type"])
+    cat_cols_all = [c for c in X_tr_all.columns if str(X_tr_all[c].dtype) == "category"]
+    global_model = lgbm.LGBMRegressor(**base_params)
+    global_model.fit(X_tr_all, y_train, categorical_feature=cat_cols_all)
+    y_predict.loc[missing_pred] = global_model.predict(X_te_all.loc[missing_pred])
+
+y_predict = y_predict.sort_index().values
+
+print(
+    "Predictions:",
+    y_predict.shape,
+    "min/max:",
+    float(np.min(y_predict)),
+    float(np.max(y_predict)),
+)
+
+
+
+## === cell 25
+submission = pd.DataFrame({"id": test_id.values, "scalar_coupling_constant": y_predict})
+submission.to_csv("submission.csv", index=False)
+
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)
+assert submission.shape[0] == sample_sub.shape[0]
+assert list(submission.columns) == ["id", "scalar_coupling_constant"]
+assert submission["id"].is_unique

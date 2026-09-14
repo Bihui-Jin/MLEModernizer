@@ -1,0 +1,681 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the `scalar_coupling_constant` between atom pairs in molecules, given the two atom types (e.g., C and H), the coupling type (e.g., `2JHC`), and any features you are able to create from the molecule structure (`xyz`) files.
+
+## Metric
+Log of the Mean Absolute Error, calculated for each scalar coupling type, and then averaged across types.
+
+## Submission Format
+```
+id,scalar_coupling_constant
+2324604,0.0
+2324605,0.0
+2324606,0.0
+etc.
+```
+
+## Dataset
+The training and test splits are by *molecule*, so that no molecule in the training data is found in the test data.
+
+- **train.csv** - the training set, where the first column (`molecule_name`) is the name of the molecule where the coupling constant originates (the corresponding XYZ file is located at ./structures/.xyz), the second (`atom_index_0`) and third column (`atom_index_1`) is the atom indices of the atom-pair creating the coupling and the fourth column (`scalar_coupling_constant`) is the scalar coupling constant that we want to be able to predict
+- **test.csv** - the test set; same info as train, without the target variable
+- **sample_submission.csv** - a sample submission file in the correct format
+- **structures.zip** - folder containing molecular structure (xyz) files, where the first line is the number of atoms in the molecule, followed by a blank line, and then a line for every atom, where the first column contains the atomic element (H for hydrogen, C for carbon etc.) and the remaining columns contain the X, Y and Z cartesian coordinates (a standard format for chemists and molecular visualization programs)
+- **structures.csv** - this file contains the **same** information as the individual xyz structure files, but in a single file
+- **dipole_moments.csv** - contains the molecular electric dipole moments. These are three dimensional vectors that indicate the charge distribution in the molecule. The first column (`molecule_name`) are the names of the molecule, the second to fourth column are the `X`, `Y` and `Z` components respectively of the dipole moment.
+- **magnetic_shielding_tensors.csv** - contains the magnetic shielding tensors for all atoms in the molecules. The first column (`molecule_name`) contains the molecule name, the second column (`atom_index`) contains the index of the atom in the molecule, the third to eleventh columns contain the `XX`, `YX`, `ZX`, `XY`, `YY`, `ZY`, `XZ`, `YZ` and `ZZ` elements of the tensor/matrix respectively.
+- **mulliken_charges.csv** - contains the mulliken charges for all atoms in the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`atom_index`) contains the index of the atom in the molecule, the third column (`mulliken_charge`) contains the mulliken charge of the atom.
+- **potential_energy.csv** - contains the potential energy of the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`potential_energy`) contains the potential energy of the molecule.
+- **scalar_coupling_contributions.csv** - The scalar coupling constants in `train.csv` (or corresponding files) are a sum of four terms. `scalar_coupling_contributions.csv` contain all these terms. The first column (`molecule_name`) are the name of the molecule, the second (`atom_index_0`) and third column (`atom_index_1`) are the atom indices of the atom-pair, the fourth column indicates the type of coupling, the fifth column (`fc`) is the Fermi Contact contribution, the sixth column (`sd`) is the Spin-dipolar contribution, the seventh column (`pso`) is the Paramagnetic spin-orbit contribution and the eighth column (`dso`) is the Diamagnetic spin-orbit contribution.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        input/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        working/
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+```
+
+-> data/champs-scalar-coupling/dipole_moments.csv has 76510 rows and 4 columns.
+The columns are: molecule_name, X, Y, Z
+
+-> data/champs-scalar-coupling/magnetic_shielding_tensors.csv has 1379964 rows and 11 columns.
+The columns are: molecule_name, atom_index, XX, YX, ZX, XY, YY, ZY, XZ, YZ, ZZ
+
+-> data/champs-scalar-coupling/mulliken_charges.csv has 1379964 rows and 3 columns.
+The columns are: molecule_name, atom_index, mulliken_charge
+
+-> data/champs-scalar-coupling/potential_energy.csv has 76510 rows and 2 columns.
+The columns are: molecule_name, potential_energy
+
+-> data/champs-scalar-coupling/sample_submission.csv has 467813 rows and 2 columns.
+The columns are: id, scalar_coupling_constant
+
+-> data/champs-scalar-coupling/scalar_coupling_contributions.csv has 4191263 rows and 8 columns.
+The columns are: molecule_name, atom_index_0, atom_index_1, type, fc, sd, pso, dso
+
+-> data/champs-scalar-coupling/structures.csv has 1379964 rows and 6 columns.
+The columns are: molecule_name, atom_index, atom, x, y, z
+
+-> data/champs-scalar-coupling/test.csv has 467813 rows and 5 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type
+
+-> data/champs-scalar-coupling/train.csv has 4191263 rows and 6 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type, scalar_coupling_constant
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+DATA_DIR = "/kaggle/data/champs-scalar-coupling"
+if not os.path.exists(DATA_DIR):
+    DATA_DIR = "/kaggle/input/champs-scalar-coupling"
+
+print("DATA_DIR:", DATA_DIR)
+print("Files:", sorted([f for f in os.listdir(DATA_DIR) if f.endswith(".csv")])[:10])
+
+os.environ.setdefault("PYTHONHASHSEED", "0")
+np.random.seed(42)
+
+
+
+## === cell 1
+train = pd.read_csv(
+    os.path.join(DATA_DIR, "train.csv"),
+    dtype={
+        "id": np.int32,
+        "molecule_name": "string",
+        "atom_index_0": np.int32,
+        "atom_index_1": np.int32,
+        "type": "category",
+        "scalar_coupling_constant": np.float32,
+    },
+)
+test = pd.read_csv(
+    os.path.join(DATA_DIR, "test.csv"),
+    dtype={
+        "id": np.int32,
+        "molecule_name": "string",
+        "atom_index_0": np.int32,
+        "atom_index_1": np.int32,
+        "type": "category",
+    },
+)
+structures = pd.read_csv(
+    os.path.join(DATA_DIR, "structures.csv"),
+    dtype={
+        "molecule_name": "string",
+        "atom_index": np.int32,
+        "atom": "category",
+        "x": np.float32,
+        "y": np.float32,
+        "z": np.float32,
+    },
+)
+
+print(train.shape, test.shape, structures.shape)
+print(train.columns.tolist())
+print(test.columns.tolist())
+print(structures.columns.tolist())
+
+
+
+## === cell 2
+structures = structures.sort_values(["molecule_name", "atom_index"], kind="mergesort")
+
+s0 = structures.rename(
+    columns={
+        "atom_index": "atom_index_0",
+        "atom": "atom_0",
+        "x": "x0",
+        "y": "y0",
+        "z": "z0",
+    }
+)
+s1 = structures.rename(
+    columns={
+        "atom_index": "atom_index_1",
+        "atom": "atom_1",
+        "x": "x1",
+        "y": "y1",
+        "z": "z1",
+    }
+)
+
+train_feat = train.merge(
+    s0[["molecule_name", "atom_index_0", "atom_0", "x0", "y0", "z0"]],
+    on=["molecule_name", "atom_index_0"],
+    how="left",
+    sort=False,
+)
+test_feat = test.merge(
+    s0[["molecule_name", "atom_index_0", "atom_0", "x0", "y0", "z0"]],
+    on=["molecule_name", "atom_index_0"],
+    how="left",
+    sort=False,
+)
+train_feat = train_feat.merge(
+    s1[["molecule_name", "atom_index_1", "atom_1", "x1", "y1", "z1"]],
+    on=["molecule_name", "atom_index_1"],
+    how="left",
+    sort=False,
+)
+test_feat = test_feat.merge(
+    s1[["molecule_name", "atom_index_1", "atom_1", "x1", "y1", "z1"]],
+    on=["molecule_name", "atom_index_1"],
+    how="left",
+    sort=False,
+)
+
+for col in ["atom_0", "atom_1"]:
+    tr = train_feat[col]
+    te = test_feat[col]
+    if not pd.api.types.is_categorical_dtype(tr):
+        tr = tr.astype("category")
+    if not pd.api.types.is_categorical_dtype(te):
+        te = te.astype("category")
+    cats = tr.cat.categories.union(te.cat.categories)
+    if "UNK" not in cats:
+        cats = cats.insert(len(cats), "UNK")
+    dtype = pd.CategoricalDtype(categories=cats, ordered=False)
+    train_feat[col] = (
+        train_feat[col].cat.add_categories(["UNK"]).fillna("UNK").astype(dtype)
+    )
+    test_feat[col] = (
+        test_feat[col].cat.add_categories(["UNK"]).fillna("UNK").astype(dtype)
+    )
+
+
+def _add_pair_geom_features(df: pd.DataFrame) -> None:
+    x0 = df["x0"].to_numpy(np.float32, copy=False)
+    y0 = df["y0"].to_numpy(np.float32, copy=False)
+    z0 = df["z0"].to_numpy(np.float32, copy=False)
+    x1 = df["x1"].to_numpy(np.float32, copy=False)
+    y1 = df["y1"].to_numpy(np.float32, copy=False)
+    z1 = df["z1"].to_numpy(np.float32, copy=False)
+
+    dx = (x0 - x1).astype(np.float32, copy=False)
+    dy = (y0 - y1).astype(np.float32, copy=False)
+    dz = (z0 - z1).astype(np.float32, copy=False)
+
+    dist2 = (dx * dx + dy * dy + dz * dz).astype(np.float32, copy=False)
+    dist = np.sqrt(dist2).astype(np.float32, copy=False)
+
+    df["dx"] = dx
+    df["dy"] = dy
+    df["dz"] = dz
+    df["adx"] = np.abs(dx).astype(np.float32, copy=False)
+    df["ady"] = np.abs(dy).astype(np.float32, copy=False)
+    df["adz"] = np.abs(dz).astype(np.float32, copy=False)
+
+    df["dist"] = dist
+    df["dist2"] = dist2
+    df["inv_dist"] = (1.0 / (dist + 1e-6)).astype(np.float32, copy=False)
+    df["inv_dist2"] = (1.0 / (dist2 + 1e-6)).astype(np.float32, copy=False)
+
+    df["pos_dot"] = (x0 * x1 + y0 * y1 + z0 * z1).astype(np.float32, copy=False)
+    df["dxdy"] = (dx * dy).astype(np.float32, copy=False)
+    df["dxdz"] = (dx * dz).astype(np.float32, copy=False)
+    df["dydz"] = (dy * dz).astype(np.float32, copy=False)
+
+    dist3 = (dist * dist2).astype(np.float32, copy=False)
+    df["dist3"] = dist3
+    df["inv_dist3"] = (1.0 / (dist3 + 1e-6)).astype(np.float32, copy=False)
+
+    r0 = np.sqrt((x0 * x0 + y0 * y0 + z0 * z0).astype(np.float32, copy=False)).astype(
+        np.float32, copy=False
+    )
+    r1 = np.sqrt((x1 * x1 + y1 * y1 + z1 * z1).astype(np.float32, copy=False)).astype(
+        np.float32, copy=False
+    )
+    df["r0"] = r0
+    df["r1"] = r1
+    df["r_sum"] = (r0 + r1).astype(np.float32, copy=False)
+    df["r_diff"] = (r0 - r1).astype(np.float32, copy=False)
+
+
+_add_pair_geom_features(train_feat)
+_add_pair_geom_features(test_feat)
+
+print(
+    "Feature build done. Nulls in dist train/test:",
+    int(train_feat["dist"].isna().sum()),
+    int(test_feat["dist"].isna().sum()),
+)
+
+K_NEIGH = 8
+RADII = (1.5, 2.0, 3.0)  # Angstrom radii for neighbor counts
+
+ENV_ELEMS = ["H", "C", "N", "O", "F"]
+ENV_STATS = ["mean", "min", "max", "std"]
+ENV_K = 16  # cap neighbors used per element
+
+
+def _mol_env_features_fast(
+    mol_df: pd.DataFrame, k_neigh: int = K_NEIGH
+) -> pd.DataFrame:
+    coords = mol_df[["x", "y", "z"]].to_numpy(np.float32, copy=False)
+    n = coords.shape[0]
+    out = mol_df[["molecule_name", "atom_index"]].copy()
+
+    for j in range(1, k_neigh + 1):
+        out[f"knn_d{j}"] = np.float32(np.nan)
+    out["knn_mean"] = np.float32(np.nan)
+    out["knn_min"] = np.float32(np.nan)
+    out["knn_max"] = np.float32(np.nan)
+    out["knn_std"] = np.float32(np.nan)
+    for r in RADII:
+        out[f"nbr_cnt_r{str(r).replace('.','p')}"] = np.float32(np.nan)
+    for elem in ENV_ELEMS + ["ALL"]:
+        for st in ENV_STATS:
+            out[f"env_{elem}_{st}"] = np.float32(np.nan)
+
+    if n <= 1:
+        return out
+
+    k_eff = min(k_neigh, n - 1)
+    k_all = min(ENV_K, n - 1)
+
+    atom_codes = mol_df["atom"].cat.codes.to_numpy(copy=False)
+    atom_cats = mol_df["atom"].cat.categories
+    elem_code_map = {}
+    for elem in ENV_ELEMS:
+        if elem in atom_cats:
+            elem_code_map[elem] = atom_cats.get_loc(elem)
+
+    knn_d = np.empty((n, k_eff), dtype=np.float32)
+    nbr_cnt = {r: np.zeros(n, dtype=np.int32) for r in RADII}
+
+    env_all = np.empty((n, k_all), dtype=np.float32)
+    env_elem = {}
+    for elem, code in elem_code_map.items():
+        m = int(np.sum(atom_codes == code))
+        if m > 0:
+            k_e = min(ENV_K, m)
+            env_elem[elem] = np.empty((n, k_e), dtype=np.float32)
+
+    x2 = np.sum(coords * coords, axis=1, dtype=np.float32)
+    G = coords @ coords.T  # float32
+    d2 = (x2[:, None] + x2[None, :] - 2.0 * G).astype(np.float32, copy=False)
+    np.fill_diagonal(d2, np.inf)  # exclude self for knn/radii/ALL
+
+    idx = np.argpartition(d2, kth=k_eff - 1, axis=1)[:, :k_eff]
+    knn_d2 = np.take_along_axis(d2, idx, axis=1)
+    knn_d[:, :] = np.sqrt(knn_d2, dtype=np.float32)
+    knn_d.sort(axis=1)
+
+    d = np.sqrt(d2, dtype=np.float32)
+    for r in RADII:
+        nbr_cnt[r] = np.sum(d <= np.float32(r), axis=1).astype(np.int32, copy=False)
+
+    idx_all = np.argpartition(d2, kth=k_all - 1, axis=1)[:, :k_all]
+    env_all[:, :] = np.sqrt(np.take_along_axis(d2, idx_all, axis=1), dtype=np.float32)
+
+    for elem, arr in env_elem.items():
+        code = elem_code_map[elem]
+        mask = atom_codes == code
+        d2_e = d2[:, mask]
+        m = d2_e.shape[1]
+        if m == 0:
+            continue
+        k_e = arr.shape[1]
+        idx_e = np.argpartition(d2_e, kth=k_e - 1, axis=1)[:, :k_e]
+        arr[:, :] = np.sqrt(np.take_along_axis(d2_e, idx_e, axis=1), dtype=np.float32)
+
+    for j in range(1, k_neigh + 1):
+        if j <= k_eff:
+            out[f"knn_d{j}"] = knn_d[:, j - 1].astype(np.float32, copy=False)
+        else:
+            out[f"knn_d{j}"] = np.float32(np.nan)
+
+    out["knn_mean"] = np.mean(knn_d, axis=1).astype(np.float32, copy=False)
+    out["knn_min"] = np.min(knn_d, axis=1).astype(np.float32, copy=False)
+    out["knn_max"] = np.max(knn_d, axis=1).astype(np.float32, copy=False)
+    out["knn_std"] = np.std(knn_d, axis=1).astype(np.float32, copy=False)
+
+    for r in RADII:
+        out[f"nbr_cnt_r{str(r).replace('.','p')}"] = nbr_cnt[r].astype(
+            np.float32, copy=False
+        )
+
+    out["env_ALL_mean"] = np.mean(env_all, axis=1).astype(np.float32, copy=False)
+    out["env_ALL_min"] = np.min(env_all, axis=1).astype(np.float32, copy=False)
+    out["env_ALL_max"] = np.max(env_all, axis=1).astype(np.float32, copy=False)
+    out["env_ALL_std"] = np.std(env_all, axis=1).astype(np.float32, copy=False)
+
+    for elem, arr in env_elem.items():
+        out[f"env_{elem}_mean"] = np.mean(arr, axis=1).astype(np.float32, copy=False)
+        out[f"env_{elem}_min"] = np.min(arr, axis=1).astype(np.float32, copy=False)
+        out[f"env_{elem}_max"] = np.max(arr, axis=1).astype(np.float32, copy=False)
+        out[f"env_{elem}_std"] = np.std(arr, axis=1).astype(np.float32, copy=False)
+
+    return out
+
+
+used_mols = pd.Index(
+    pd.concat(
+        [train_feat["molecule_name"], test_feat["molecule_name"]], axis=0
+    ).unique()
+)
+
+structures_used = (
+    structures[structures["molecule_name"].isin(used_mols)]
+    .sort_values(["molecule_name", "atom_index"], kind="mergesort")
+    .reset_index(drop=True)
+)
+
+mol_names = structures_used["molecule_name"].to_numpy()
+change = np.empty(len(structures_used), dtype=bool)
+change[0] = True
+change[1:] = mol_names[1:] != mol_names[:-1]
+starts = np.flatnonzero(change)
+ends = np.append(starts[1:], len(structures_used))
+
+parts = []
+for s, e in zip(starts, ends):
+    parts.append(_mol_env_features_fast(structures_used.iloc[s:e], k_neigh=K_NEIGH))
+
+mol_env = pd.concat(parts, axis=0, ignore_index=True)
+
+knn_cols_base = (
+    [f"knn_d{j}" for j in range(1, K_NEIGH + 1)]
+    + ["knn_mean", "knn_min", "knn_max", "knn_std"]
+    + [f"nbr_cnt_r{str(r).replace('.','p')}" for r in RADII]
+)
+env_cols_base = [
+    f"env_{elem}_{st}" for elem in (ENV_ELEMS + ["ALL"]) for st in ENV_STATS
+]
+feat_cols_base = knn_cols_base + env_cols_base
+
+mol0 = mol_env.rename(columns={c: c + "_0" for c in feat_cols_base}).rename(
+    columns={"atom_index": "atom_index_0"}
+)
+mol1 = mol_env.rename(columns={c: c + "_1" for c in feat_cols_base}).rename(
+    columns={"atom_index": "atom_index_1"}
+)
+
+train_feat = train_feat.merge(
+    mol0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+train_feat = train_feat.merge(
+    mol1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+test_feat = test_feat.merge(
+    mol0, on=["molecule_name", "atom_index_0"], how="left", sort=False
+)
+test_feat = test_feat.merge(
+    mol1, on=["molecule_name", "atom_index_1"], how="left", sort=False
+)
+
+print(
+    "Added KNN + element env features (single pass). Train/test shapes:",
+    train_feat.shape,
+    test_feat.shape,
+)
+
+_basic_num_cols = [
+    "dist",
+    "dist2",
+    "dist3",
+    "inv_dist",
+    "inv_dist2",
+    "inv_dist3",
+    "dx",
+    "dy",
+    "dz",
+    "adx",
+    "ady",
+    "adz",
+    "pos_dot",
+    "dxdy",
+    "dxdz",
+    "dydz",
+    "r0",
+    "r1",
+    "r_sum",
+    "r_diff",
+]
+_knn_cols_tmp = []
+for side in ["0", "1"]:
+    for j in range(1, K_NEIGH + 1):
+        _knn_cols_tmp.append(f"knn_d{j}_{side}")
+    _knn_cols_tmp += [
+        f"knn_mean_{side}",
+        f"knn_min_{side}",
+        f"knn_max_{side}",
+        f"knn_std_{side}",
+    ]
+    for r in RADII:
+        _knn_cols_tmp.append(f"nbr_cnt_r{str(r).replace('.','p')}_{side}")
+
+_env_cols_tmp = []
+for elem in ENV_ELEMS + ["ALL"]:
+    for st in ENV_STATS:
+        _env_cols_tmp.append(f"env_{elem}_{st}_0")
+        _env_cols_tmp.append(f"env_{elem}_{st}_1")
+
+_all_num_cols_tmp = _basic_num_cols + _knn_cols_tmp + _env_cols_tmp
+
+
+def _sanitize_numeric_features_inplace(df: pd.DataFrame, cols: list) -> None:
+    cols = [c for c in cols if c in df.columns]
+    if not cols:
+        return
+    df[cols] = df[cols].replace([np.inf, -np.inf], np.nan)
+    max_f32 = np.float32(np.finfo(np.float32).max / 1000.0)  # conservative margin
+    df[cols] = df[cols].clip(lower=-max_f32, upper=max_f32)
+
+
+_sanitize_numeric_features_inplace(train_feat, _all_num_cols_tmp)
+_sanitize_numeric_features_inplace(test_feat, _all_num_cols_tmp)
+
+
+def _count_nonfinite(df: pd.DataFrame, cols: list) -> int:
+    cols = [c for c in cols if c in df.columns]
+    arr = df[cols].to_numpy(dtype=np.float64, copy=False)
+    return int((~np.isfinite(arr)).sum())
+
+
+print(
+    "After numeric sanitization:",
+    "nonfinite train count=",
+    _count_nonfinite(train_feat, _all_num_cols_tmp),
+    "nonfinite test count=",
+    _count_nonfinite(test_feat, _all_num_cols_tmp),
+)
+
+
+
+## === cell 3
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.linear_model import Ridge
+from sklearn.impute import SimpleImputer
+
+num_cols = _basic_num_cols + _knn_cols_tmp + _env_cols_tmp
+cat_cols = ["atom_0", "atom_1"]
+
+preprocess = ColumnTransformer(
+    transformers=[
+        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
+        (
+            "num",
+            Pipeline(
+                steps=[
+                    ("imp", SimpleImputer(strategy="median")),
+                    ("scaler", StandardScaler(with_mean=False)),
+                ]
+            ),
+            num_cols,
+        ),
+    ],
+    remainder="drop",
+    sparse_threshold=0.3,
+)
+
+base_model = Ridge(alpha=1.0, random_state=42)
+
+models = {}
+type_means = train_feat.groupby("type")["scalar_coupling_constant"].mean().to_dict()
+
+pred_test = np.zeros(len(test_feat), dtype=np.float32)
+
+types = sorted(train_feat["type"].unique().tolist())
+print("Training types:", types)
+
+for t in types:
+    trn_mask = (train_feat["type"] == t).to_numpy()
+    tst_mask = (test_feat["type"] == t).to_numpy()
+
+    X_tr = train_feat.loc[trn_mask, cat_cols + num_cols]
+    y_tr = train_feat.loc[trn_mask, "scalar_coupling_constant"].to_numpy()
+
+    if X_tr.shape[0] < 100:
+        pred_test[tst_mask] = float(
+            type_means.get(t, float(train_feat["scalar_coupling_constant"].mean()))
+        )
+        continue
+
+    model = Pipeline(steps=[("prep", preprocess), ("model", base_model)])
+    model.fit(X_tr, y_tr)
+    models[t] = model
+
+    X_te = test_feat.loc[tst_mask, cat_cols + num_cols]
+    pred_test[tst_mask] = model.predict(X_te).astype(np.float32)
+
+test_only_types = sorted(set(test_feat["type"].unique()) - set(types))
+if test_only_types:
+    global_mean = float(train_feat["scalar_coupling_constant"].mean())
+    for t in test_only_types:
+        tst_mask = (test_feat["type"] == t).to_numpy()
+        pred_test[tst_mask] = global_mean
+
+print("Pred stats:", pd.Series(pred_test).describe())
+
+
+
+## === cell 4
+submission = pd.DataFrame(
+    {"id": test_feat["id"].to_numpy(copy=False), "scalar_coupling_constant": pred_test}
+)
+assert submission.shape[0] == test.shape[0]
+assert submission["id"].nunique() == test.shape[0]
+
+submission = submission.sort_values("id", kind="mergesort").reset_index(drop=True)
+
+out_path = "submission.csv"
+submission.to_csv(out_path, index=False)
+print("Wrote:", out_path)
+print(submission.head())

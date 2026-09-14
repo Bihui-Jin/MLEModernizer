@@ -1,0 +1,969 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+librosa==0.11.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+PyWavelets==1.8.0
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.5993002550597261
+
+# 6. Current score
+
+1.40995
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.40995) has done: 'I fix the two blockers preventing an end-to-end run: the missing `/kaggle/input/resnet34d2` weights path (by falling back to a valid probability submission when no checkpoints exist), and the dataset bugs that currently make inference unusable (undefined `targets`, missing `min/max` for test, and a `print` inside `__getitem__` that would explode runtime). I also ensure predictions are always shaped `(n_test, 6)` and normalized to sum to 1 per row to satisfy the submission rules and avoid the “Columns must be same length” error. The core model and inference logic are preserved; the only score-related behavior is a safe fallback to the sample submission probabilities when weights are unavailable, which guarantees a valid submission CSV. All paths are kept within the Kaggle filesystem and the final output is `submission.csv`.'
+- What this solution (achieved 1.40995) has done: 'Your current score (1.40995, lower-is-better) is much worse than the target (0.5993), so we should improve predictions without changing the model/training logic. The biggest score drag in your current pipeline is that the spectrogram window index `r` is always 0 for test, which mis-centers the spectrogram slice and hurts accuracy; we can compute a sensible center crop from the spectrogram parquet itself (per sample) to better match the intended labeled window behavior. We keep the architecture and inference identical, but fix the test-time `r` computation and a small bug where `X[:, :, 4:]` is overwritten in a loop (should be assigned once) to preserve the intended data composition. These are minimal, deterministic fixes that should move the score down toward the target while still producing a valid `submission.csv`.'
+- What this solution (achieved 1.40995) has done: 'Your current score (1.40995, lower-is-better) is far worse than the target (0.5993), and the biggest reason in this script is that it usually falls back to `sample_submission` (near-uniform probabilities), which produces a poor KL score. I keep your model/inference exactly the same, but make checkpoint loading robust by also accepting common checkpoint key names (`state_dict`, `model_state_dict`) and stripping `module.` prefixes so the weights actually load when present. I also ensure the test DataLoader doesn’t shuffle and uses `num_workers/pin_memory` for stable, faster inference without changing predictions. Finally, I keep the existing probability normalization/clipping so the submission is always valid.'
+- What this solution (achieved 1.40995) has done: 'I fix the runtime error in the submission normalization by avoiding `keepdims=True` on a pandas `sum()` call (unsupported in your pandas version) and instead normalizing via NumPy arrays, which keeps the same logic but runs. I also align the script with Kaggle’s cell numbering (start at cell 1) and make the final submission normalization robust to any non-numeric dtype after the merge. These changes are score-neutral (they only fix execution and ensure valid probability rows summing to 1) and reliably write `/kaggle/working/submission.csv`.'
+- What this solution (achieved 1.40995) has done: 'Your current score (1.40995, lower-is-better) is far from the target (0.5993), so we should improve inference quality without changing the model architecture or training loop. The biggest blocker is that your script almost certainly falls back to `sample_submission` because `/kaggle/input/resnet34d2` is not available, which yields near-uniform probabilities and a poor KL score; instead, we robustly auto-discover and load any checkpoints that exist anywhere under `/kaggle/input` and `/kaggle/working`. To avoid a silent bad-load (wrong keys/shape), we accept common checkpoint formats, strip prefixes, and use `strict=False` with a compatibility check so partial-mismatch doesn’t crash but still loads usable weights. These are minimal, inference-only changes that keep the core logic intact while making it much more likely you actually use trained weights and thereby move the score down toward the target.'
+- What this solution (achieved 1.40995) has done: 'Your score is much worse than the target (1.40995 vs 0.5993, lower-is-better), so we should improve prediction quality without changing the model architecture or inference semantics. The biggest likely issue is that the model is receiving 24-channel inputs (by concatenation) while the ResNet backbone expects 3 channels, so any loaded weights won’t match well (or load partially) and inference becomes effectively broken; we keep the exact same features but collapse them to 3 channels deterministically (mean over each group of 8) so checkpoints can load cleanly and the model can actually use the spectrogram+EEG information. We also make checkpoint selection prefer the most compatible files by trying to load and scoring “missing/unexpected keys” rather than averaging arbitrary partial loads, which is a minimal inference-only change aimed at reducing KL. All paths and the submission formatting/normalization remain unchanged, and the script still writes `/kaggle/working/submission.csv`.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995, lower-is-better) is far worse than the target (0.5993), so the priority is to stop silently falling back to near-uniform/sample probabilities and instead produce better-calibrated probabilities at inference with the same model. I keep the architecture and inference loop intact, but fix a key data bug: the spectrogram crop index `r` is computed in the wrong coordinate system (row index vs “seconds”), causing mis-centered crops; we compute `r` in the correct row-index space for both train-style metadata (when present) and test energy-crop (bounded). I also make the checkpoint discovery/loading more likely to actually find usable weights by filtering out obvious non-model artifacts and preferring `.pth/.pt` files with matching tensors, without changing how predictions are computed once weights load. Finally, I keep the same normalization/clipping to ensure every submission row sums to 1 and is valid.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995, lower-is-better) is far above the target (0.5993), so we should reduce KL by improving inference quality without changing the model/training core. The biggest likely score drag is that checkpoint discovery is expensive and often still results in falling back to near-uniform/sample probabilities; I instead load the *best-matching* available checkpoint quickly by scoring candidates on state_dict compatibility and using only the top one (or a small fixed number) to avoid noisy averaging and timeouts. I also fix a small spectrogram-crop robustness issue by ensuring the energy crop is computed from numeric spectrogram values only (dropping the first column if it’s a time/index column), which keeps the same crop logic but makes it correct for this dataset format. These changes keep the same architecture, same softmax probabilities, same dataset construction, and still always write a valid `submission.csv`.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995, lower-is-better) is far worse than the target (0.5993), so we should improve inference quality with minimal, inference-only fixes. The main score drag is that your checkpoint auto-discovery likely loads an unrelated or partially-incompatible weight file (or none), making predictions close to uniform; I constrain checkpoint search to likely HMS/model files and require strong key-compatibility so we don’t “successfully” load junk. I also fix the spectrogram crop coordinate conversion: `_offset_seconds_to_row_index()` should map 10 minutes (600s) to the full spectrogram height, so we infer seconds-per-row from the parquet height instead of assuming 2.0s/row. These changes preserve your model, inputs, and softmax inference, but make test crops consistent and make weight loading actually use the right checkpoint when present.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np  # linear algebra
+import pandas as pd  # data processing
+import os
+
+import albumentations as A
+import gc
+import librosa
+import matplotlib.pyplot as plt
+import math
+import multiprocessing
+import pywt
+import random
+import time
+import timm
+import torch
+import torch.nn as nn
+
+from albumentations.pytorch import ToTensorV2
+from glob import glob
+from torch.utils.data import DataLoader, Dataset
+from tqdm import tqdm
+from typing import Dict, List
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print("Using", torch.cuda.device_count(), "GPU(s)")
+
+torch.manual_seed(42)
+np.random.seed(42)
+random.seed(42)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(42)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+
+
+
+## === cell 1
+class config:
+    model = "resnet34d"
+    epoch = 10
+    lr = 1e-3
+    batchsize = 32
+    splits = 5
+    momentum = 0.9
+    MAX_GRAD_NORM = 1e7
+    WEIGHT_DECAY = 0.01
+    device = "cpu"
+    FOLDS = 5
+    AMP = True
+
+
+class paths:
+    preloadedeeg = "/kaggle/input/brain-eeg-spectrograms/eeg_specs.npy"
+    train_eeg_dir = "/kaggle/input/hms-harmful-brain-activity-classification/train_eegs"
+    train_spec_dir = (
+        "/kaggle/input/hms-harmful-brain-activity-classification/train_spectrograms"
+    )
+    train_csv = "/kaggle/input/hms-harmful-brain-activity-classification/train.csv"
+    test_csv = "/kaggle/input/hms-harmful-brain-activity-classification/test.csv"
+    test_eeg = "/kaggle/input/hms-harmful-brain-activity-classification/test_eegs"
+    test_spec = (
+        "/kaggle/input/hms-harmful-brain-activity-classification/test_spectrograms"
+    )
+    out = "/kaggle/working/"
+
+
+
+
+## === cell 2
+USE_WAVELET = None
+
+NAMES = ["LL", "LP", "RP", "RR"]
+
+FEATS = [
+    ["Fp1", "F7", "T3", "T5", "O1"],
+    ["Fp1", "F3", "C3", "P3", "O1"],
+    ["Fp2", "F8", "T4", "T6", "O2"],
+    ["Fp2", "F4", "C4", "P4", "O2"],
+]
+
+
+def maddest(d, axis: int = None):
+    """
+    Denoise function.
+    """
+    return np.mean(np.absolute(d - np.mean(d, axis)), axis)
+
+
+def denoise(x: np.ndarray, wavelet: str = "haar", level: int = 1):
+    coeff = pywt.wavedec(x, wavelet, mode="per")
+    sigma = (1 / 0.6745) * maddest(coeff[-level])
+    uthresh = sigma * np.sqrt(2 * np.log(len(x)))
+    coeff[1:] = (pywt.threshold(i, value=uthresh, mode="hard") for i in coeff[1:])
+    output = pywt.waverec(coeff, wavelet, mode="per")
+    return output
+
+
+def spectrogram_from_eeg(parquet_path, display=False):
+    eeg = pd.read_parquet(parquet_path)
+    middle = (len(eeg) - 10_000) // 2
+    eeg = eeg.iloc[middle : middle + 10_000]
+
+    img = np.zeros((128, 256, 4), dtype="float32")
+
+    if display:
+        plt.figure(figsize=(10, 7))
+    signals = []
+    for k in range(4):
+        COLS = FEATS[k]
+
+        for kk in range(4):
+            x = eeg[COLS[kk]].values - eeg[COLS[kk + 1]].values
+
+            m = np.nanmean(x)
+            if np.isnan(x).mean() < 1:
+                x = np.nan_to_num(x, nan=m)
+            else:
+                x[:] = 0
+
+            if USE_WAVELET:
+                x = denoise(x, wavelet=USE_WAVELET)
+            signals.append(x)
+
+            mel_spec = librosa.feature.melspectrogram(
+                y=x,
+                sr=200,
+                hop_length=len(x) // 256,
+                n_fft=1024,
+                n_mels=128,
+                fmin=0,
+                fmax=20,
+                win_length=128,
+            )
+
+            width = (mel_spec.shape[1] // 32) * 32
+            mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max).astype(np.float32)[
+                :, :width
+            ]
+
+            mel_spec_db = (mel_spec_db + 40) / 40
+            img[:, :, k] += mel_spec_db
+
+        img[:, :, k] /= 4.0
+
+        if display:
+            plt.subplot(2, 2, k + 1)
+            plt.imshow(img[:, :, k], aspect="auto", origin="lower")
+            plt.title(f"Spectrogram {NAMES[k]}")
+
+    if display:
+        plt.show()
+
+    return img
+
+
+
+
+## === cell 3
+test_df = pd.read_csv(paths.test_csv)
+print(f"Test dataframe shape is: {test_df.shape}")
+test_df.head()
+
+
+
+## === cell 4
+all_eegs = {}
+test_eeg_files = sorted(os.listdir(paths.test_eeg))
+for fn in tqdm(
+    test_eeg_files,
+    desc="Loading test EEGs -> mel-spectrogram",
+    total=len(test_eeg_files),
+):
+    sp = spectrogram_from_eeg(os.path.join(paths.test_eeg, fn))
+    name = int(fn.split(".")[0])
+    all_eegs[name] = np.array(sp)
+
+print("Loaded EEG spectrograms:", len(all_eegs))
+
+
+
+## === cell 5
+all_spectrograms = {}
+test_spec_files = sorted(os.listdir(paths.test_spec))
+for fn in tqdm(
+    test_spec_files, desc="Loading test spectrograms", total=len(test_spec_files)
+):
+    sp = pd.read_parquet(os.path.join(paths.test_spec, fn))
+    name = int(fn.split(".")[0])
+    all_spectrograms[name] = np.array(sp)
+
+print("Loaded test spectrogram arrays:", len(all_spectrograms))
+
+
+
+## === cell 6
+targets = [
+    "seizure_vote",
+    "lpd_vote",
+    "gpd_vote",
+    "lrda_vote",
+    "grda_vote",
+    "other_vote",
+]
+
+
+
+
+## === cell 7
+def _numeric_spec_view(spec_arr: np.ndarray) -> np.ndarray:
+    """
+    Ensure the spectrogram array used for cropping/tiling is numeric-only.
+
+    Why this helps score: HMS spectrogram parquets often include a non-signal first column
+    (time/index). Using that column in energy/cropping can misplace the crop and degrade KL.
+    This keeps the same crop logic but applies it to the actual frequency-bin values.
+    """
+    if spec_arr.ndim != 2:
+        return spec_arr
+    if spec_arr.shape[1] == 401:
+        return spec_arr[:, 1:]
+    if spec_arr.shape[1] > 400:
+        return spec_arr[:, -400:]
+    return spec_arr
+
+
+def _best_energy_crop_r(spec_arr: np.ndarray, crop_h: int = 300) -> int:
+    """
+    Choose the highest-energy crop window.
+
+    Why this helps score: avoids the previous implicit behavior of always using a fixed
+    crop location at test-time; better matches the "informative" portion of the 10-min
+    spectrogram and should reduce KL.
+    """
+    spec_arr = _numeric_spec_view(spec_arr)
+    h = int(spec_arr.shape[0])
+    if h <= crop_h:
+        return 0
+    row_energy = np.nan_to_num(np.abs(spec_arr), nan=0.0).sum(axis=1)  # (h,)
+    c = np.concatenate([[0.0], np.cumsum(row_energy, dtype=np.float64)])
+    win = c[crop_h:] - c[:-crop_h]  # (h-crop_h+1,)
+    r = int(np.argmax(win))
+    r = max(0, min(r, h - crop_h))
+    return r
+
+
+def _offset_seconds_to_row_index(offset_seconds: float, spec_h: int) -> int:
+    try:
+        spec_h = int(spec_h)
+        if spec_h <= 1:
+            return 0
+        sec_per_row = 600.0 / float(spec_h)  # 10 minutes coverage
+        return int(round(float(offset_seconds) / sec_per_row))
+    except Exception:
+        return 0
+
+
+
+
+## === cell 8
+class CustomDataset:
+    def __init__(
+        self,
+        traindf: pd.DataFrame,
+        config,
+        mode: str = "train",
+        specs: dict[int, np.ndarray] = None,
+        eegs: dict[int, np.ndarray] = None,
+    ):
+        self.traindf = traindf
+        self.specs = specs if specs is not None else all_spectrograms
+        self.eeg = eegs if eegs is not None else all_eegs
+        self.mode = mode
+
+    def __len__(self):
+        return len(self.traindf)
+
+    def __getitem__(self, idx):
+        X = np.zeros((128, 256, 8), dtype="float32")
+        row = self.traindf.iloc[idx]
+
+        spec_arr_raw = self.specs[int(row.spectrogram_id)]
+        spec_arr = _numeric_spec_view(spec_arr_raw)
+        h = int(spec_arr.shape[0])
+
+        if self.mode == "test":
+            r = _best_energy_crop_r(spec_arr, crop_h=300)
+        else:
+            if ("min" in row.index) and ("max" in row.index):
+                center_sec = 0.5 * (float(row["min"]) + float(row["max"]))
+                r = _offset_seconds_to_row_index(center_sec, spec_h=h) - 150
+            else:
+                r = 0
+            r = max(0, min(int(r), max(0, h - 300)))
+
+        eeg_img = self.eeg[int(row.eeg_id)]
+        X[:, :, 4:] = eeg_img
+
+        for region in range(4):
+            img = spec_arr[r : r + 300, region * 100 : (region + 1) * 100].T
+
+            img = np.clip(img, np.exp(-4), np.exp(8))
+            img = np.log(img)
+
+            ep = 1e-6
+            mu = np.nanmean(img)
+            std = np.nanstd(img)
+            img = (img - mu) / (std + ep)
+            img = np.nan_to_num(img, nan=0.0)
+
+            X[14:-14, :, region] = img[:, 22:-22] / 2.0
+
+        x8 = torch.from_numpy(X).permute(2, 0, 1)  # (8,128,256)
+
+        ch0 = x8[0:4].mean(dim=0, keepdim=True)
+        ch1 = x8[4:8].mean(dim=0, keepdim=True)
+        ch2 = x8.mean(dim=0, keepdim=True)
+        x = torch.cat([ch0, ch1, ch2], dim=0)  # (3,128,256)
+
+        if self.mode != "test":
+            y = row[targets].values.astype(np.float32)
+        else:
+            y = np.zeros(6, dtype=np.float32)
+
+        return {"data": x, "target": y, "eeg_id": int(row.eeg_id)}
+
+
+
+
+## === cell 9
+customdataset = CustomDataset(test_df, config, mode="test")
+
+_num_workers = min(4, max(1, (os.cpu_count() or 2) // 2))
+test_loader = DataLoader(
+    customdataset,
+    batch_size=config.batchsize,
+    shuffle=False,
+    num_workers=_num_workers,
+    pin_memory=torch.cuda.is_available(),
+    drop_last=False,
+)
+
+sample = customdataset[0]
+print(
+    "One sample data shape:",
+    tuple(sample["data"].shape),
+    "target shape:",
+    tuple(np.array(sample["target"]).shape),
+    "eeg_id:",
+    sample["eeg_id"],
+)
+
+
+
+
+## === cell 10
+class Custommodel(nn.Module):
+    def __init__(self, config, numclass: int = 6):
+        super(Custommodel, self).__init__()
+        self.model = timm.create_model(
+            config.model,
+            pretrained=False,
+            drop_rate=0.1,
+            drop_path_rate=0.2,
+        )
+        self.features = nn.Sequential(*list(self.model.children())[:-2])
+        self.customlayer = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Linear(self.model.num_features, numclass),
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.customlayer(x)
+        return x
+
+
+
+
+## === cell 11
+def inference_function(test_loader, model, device):
+    model.eval()
+    softmax = nn.Softmax(dim=1)
+    preds = []
+    eeg_ids = []
+    for batch in tqdm(test_loader, desc="Inference", leave=False):
+        x = batch["data"].to(device, non_blocking=True)
+        with torch.no_grad():
+            ypred = model(x)
+            ypred = softmax(ypred)
+        preds.append(ypred.detach().cpu().numpy())
+        eeg_ids.append(np.asarray(batch["eeg_id"], dtype=np.int64))
+    return {
+        "predictions": np.concatenate(preds, axis=0),
+        "eeg_id": np.concatenate(eeg_ids, axis=0),
+    }
+
+
+
+
+## === cell 12
+def _extract_state_dict(ckpt_obj):
+    if isinstance(ckpt_obj, dict):
+        for k in ["model", "state_dict", "model_state_dict", "net", "weights"]:
+            if k in ckpt_obj and isinstance(ckpt_obj[k], dict):
+                return ckpt_obj[k]
+    if isinstance(ckpt_obj, dict):
+        tensor_vals = [v for v in ckpt_obj.values() if torch.is_tensor(v)]
+        if len(tensor_vals) > 0:
+            return ckpt_obj
+    return ckpt_obj
+
+
+def _strip_module_prefix(state_dict):
+    if not isinstance(state_dict, dict):
+        return state_dict
+    if any(k.startswith("module.") for k in state_dict.keys()):
+        return {k.replace("module.", "", 1): v for k, v in state_dict.items()}
+    return state_dict
+
+
+def _find_checkpoint_files():
+    patterns = [
+        "/kaggle/input/**/*.pth",
+        "/kaggle/input/**/*.pt",
+        "/kaggle/input/**/*.bin",
+        "/kaggle/working/**/*.pth",
+        "/kaggle/working/**/*.pt",
+        "/kaggle/working/**/*.bin",
+    ]
+    files = []
+    for p in patterns:
+        files.extend(glob(p, recursive=True))
+
+    bad_substrings = [
+        "optimizer",
+        "sched",
+        "scheduler",
+        "ema",
+        "scaler",
+        "tokenizer",
+        "vocab",
+        "feature_extractor",
+    ]
+    allow_substrings = [
+        "hms",
+        "harmful",
+        "brain",
+        "eeg",
+        "spect",
+        "spec",
+        "resnet",
+        "timm",
+        "fold",
+        "ckpt",
+        "checkpoint",
+        "best",
+        "model",
+        "weights",
+    ]
+
+    files2 = []
+    for f in files:
+        lf = f.lower()
+        if any(s in lf for s in bad_substrings):
+            continue
+        if not any(s in lf for s in allow_substrings):
+            continue
+        try:
+            if os.path.getsize(f) <= 500_000:  # ignore tiny artifacts
+                continue
+        except Exception:
+            continue
+        files2.append(f)
+
+    return sorted(set(files2))
+
+
+def _load_model_from_ckpt(model, ckpt_path: str):
+    dd = torch.load(ckpt_path, map_location="cpu")
+    state = _strip_module_prefix(_extract_state_dict(dd))
+    if not isinstance(state, dict):
+        raise ValueError("Checkpoint does not contain a state_dict-like mapping")
+    missing, unexpected = model.load_state_dict(state, strict=False)
+
+    total = len(model.state_dict())
+    if total == 0:
+        raise ValueError("Model has empty state_dict")
+    missing_ratio = len(missing) / float(total)
+    if missing_ratio > 0.25:
+        raise ValueError(
+            f"Low-compat checkpoint (missing_ratio={missing_ratio:.2f}): {ckpt_path}"
+        )
+    return {"missing": missing, "unexpected": unexpected}
+
+
+predictions = None
+pred_eeg_ids = None
+
+ckpt_dir = "/kaggle/input/resnet34d2"
+ckpt_files = []
+if os.path.isdir(ckpt_dir):
+    ckpt_files = [os.path.join(ckpt_dir, fn) for fn in sorted(os.listdir(ckpt_dir))]
+    ckpt_files = [f for f in ckpt_files if os.path.isfile(f)]
+
+if len(ckpt_files) == 0:
+    ckpt_files = _find_checkpoint_files()
+
+ckpt_files = ckpt_files[:50]
+print("Checkpoint candidates:", len(ckpt_files))
+if len(ckpt_files) > 0:
+    print("First checkpoint candidate:", ckpt_files[0])
+
+scored = []
+for p in ckpt_files:
+    try:
+        m = Custommodel(config)
+        info = _load_model_from_ckpt(m, p)
+        miss = len(info["missing"])
+        unexp = len(info["unexpected"])
+        scored.append((miss + unexp, miss, unexp, p))
+    except Exception:
+        pass
+    finally:
+        try:
+            del m
+        except Exception:
+            pass
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+scored = sorted(scored, key=lambda x: (x[0], x[1], x[2]))
+
+best_ckpts = [t[-1] for t in scored[:1]]
+print("Usable checkpoints:", len(scored), "| Using best:", len(best_ckpts))
+if len(best_ckpts) > 0:
+    print("Best checkpoint:", best_ckpts[0])
+
+if len(best_ckpts) > 0:
+    fold_preds = []
+    used = 0
+    for ckpt_path in best_ckpts:
+        try:
+            model = Custommodel(config)
+            info = _load_model_from_ckpt(model, ckpt_path)
+            model.to(device)
+
+            testdataset = CustomDataset(test_df, config, mode="test")
+            testloader = DataLoader(
+                testdataset,
+                batch_size=config.batchsize,
+                shuffle=False,
+                num_workers=_num_workers,
+                pin_memory=torch.cuda.is_available(),
+                drop_last=False,
+            )
+
+            pred_dict = inference_function(testloader, model, device)
+            fold_preds.append(pred_dict["predictions"])
+            pred_eeg_ids = pred_dict["eeg_id"]
+
+            used += 1
+            print(
+                f"Loaded ckpt: {os.path.basename(ckpt_path)} | "
+                f"missing={len(info['missing'])} unexpected={len(info['unexpected'])}"
+            )
+
+            del model
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except Exception as e:
+            print("Skipping checkpoint (load/infer failed):", ckpt_path, "|", repr(e))
+            try:
+                del model
+            except Exception:
+                pass
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
+    if used > 0:
+        predictions = np.mean(np.stack(fold_preds, axis=0), axis=0)
+        print(
+            "Predictions from checkpoints:",
+            predictions.shape,
+            "pred_eeg_ids:",
+            pred_eeg_ids.shape,
+            "used:",
+            used,
+        )
+
+if predictions is None:
+    sample_path = (
+        "/kaggle/input/hms-harmful-brain-activity-classification/sample_submission.csv"
+    )
+    sample_sub = pd.read_csv(sample_path)
+    sample_sub = sample_sub.sort_values("eeg_id").reset_index(drop=True)
+    test_sorted = test_df.sort_values("eeg_id").reset_index(drop=True)
+    if not np.array_equal(sample_sub["eeg_id"].values, test_sorted["eeg_id"].values):
+        sample_sub = test_sorted[["eeg_id"]].merge(sample_sub, on="eeg_id", how="left")
+    predictions = sample_sub[targets].values.astype(np.float32)
+    pred_eeg_ids = sample_sub["eeg_id"].values.astype(np.int64)
+    print("Fallback to sample_submission probabilities:", predictions.shape)
+
+
+
+## === cell 13
+TARGETS = targets
+
+predictions = np.asarray(predictions, dtype=np.float32)
+if predictions.ndim != 2 or predictions.shape[1] != 6:
+    raise ValueError(f"predictions must be (n,6). Got {predictions.shape}")
+
+if pred_eeg_ids is None:
+    pred_eeg_ids = test_df["eeg_id"].values.astype(np.int64)
+
+pred_eeg_ids = np.asarray(pred_eeg_ids, dtype=np.int64)
+if len(pred_eeg_ids) != len(predictions):
+    raise ValueError(
+        f"Length mismatch: pred_eeg_ids={len(pred_eeg_ids)} predictions={len(predictions)}"
+    )
+
+predictions = np.clip(predictions, 1e-8, 1.0)
+predictions = predictions / predictions.sum(axis=1, keepdims=True)
+
+pred_df = pd.DataFrame(predictions, columns=TARGETS)
+pred_df.insert(0, "eeg_id", pred_eeg_ids)
+pred_df = pred_df.groupby("eeg_id", as_index=False)[TARGETS].mean()
+
+pred_mat = pred_df[TARGETS].values.astype(np.float32)
+pred_mat = np.clip(pred_mat, 1e-8, 1.0)
+pred_mat = pred_mat / pred_mat.sum(axis=1, keepdims=True)
+pred_df[TARGETS] = pred_mat
+
+sample_path = (
+    "/kaggle/input/hms-harmful-brain-activity-classification/sample_submission.csv"
+)
+sample_sub = pd.read_csv(sample_path)[["eeg_id"]]
+
+sub = sample_sub.merge(pred_df, on="eeg_id", how="left")
+
+missing = sub[TARGETS].isna().any(axis=1)
+if missing.any():
+    sub.loc[missing, TARGETS] = 1.0 / 6.0
+
+sub_vals = sub[TARGETS].to_numpy(dtype=np.float32)
+sub_vals = np.clip(sub_vals, 1e-8, 1.0)
+sub_vals = sub_vals / sub_vals.sum(axis=1, keepdims=True)
+sub.loc[:, TARGETS] = sub_vals
+
+row_sums = sub_vals.sum(axis=1)
+print(
+    "Submission rows:",
+    len(sub),
+    "Row sum min/max:",
+    float(row_sums.min()),
+    float(row_sums.max()),
+)
+assert np.isfinite(sub_vals).all()
+assert np.allclose(row_sums, 1.0, atol=1e-5)
+
+out_path = os.path.join(paths.out, "submission.csv")
+sub.to_csv(out_path, index=False)
+print(f"Submission shape: {sub.shape}")
+print("Wrote:", out_path)
+sub.head()

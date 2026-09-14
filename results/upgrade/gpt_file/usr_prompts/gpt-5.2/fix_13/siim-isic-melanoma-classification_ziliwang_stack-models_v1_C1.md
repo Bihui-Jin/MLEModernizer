@@ -1,0 +1,876 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict whether a lesion is malignant (0 denotes **benign**, and 1 indicates **malignant**).
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each `image_name` in the test set, you must predict the probability (`target`) that the sample is **malignant**. The file should contain a header and have the following format:
+
+```
+image_name,target
+ISIC_0052060,0.7
+ISIC_0052349,0.9
+ISIC_0058510,0.8
+ISIC_0073313,0.5
+ISIC_0073502,0.5
+etc.
+```
+
+## Dataset 
+The images are provided in DICOM format.
+
+Images are also provided in JPEG and TFRecord format (in the `jpeg` and `tfrecords` directories, respectively). Images in TFRecord format have been resized to a uniform 1024x1024.
+
+Metadata is also provided outside of the DICOM format, in CSV files. See the `Columns` section for a description.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `image_name` - unique identifier, points to filename of related DICOM image
+- `patient_id` - unique patient identifier
+- `sex` - the sex of the patient (when unknown, will be blank)
+- `age_approx` - approximate patient age at time of imaging
+- `anatom_site_general_challenge` - location of imaged site
+- `diagnosis` - detailed diagnosis information (train only)
+- `benign_malignant` - indicator of malignancy of imaged lesion
+- `target` - binarized version of the target variable
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (176 lines)
+            jpeg.zip (24.7 GB)
+            sample_submission.csv (4143 lines)
+            sample_submission.csv.zip (16.4 kB)
+            test.csv (4143 lines)
+            test.csv.zip (42.5 kB)
+            test.zip (6.4 GB)
+            tfrecords.zip (9.3 GB)
+            train.csv (28985 lines)
+            train.csv.zip (299.7 kB)
+            train.zip (46.0 GB)
+            jpeg/
+                test/
+                    ISIC_1440063.jpg (1.1 MB)
+                    ISIC_0815802.jpg (853.1 kB)
+                    ... and 4140 other files
+                train/
+                    ISIC_1845271.jpg (1.0 MB)
+                    ISIC_1970027.jpg (138.4 kB)
+                    ... and 28982 other files
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+            test/
+                ISIC_0052212.dcm (1.5 MB)
+                ISIC_0076545.dcm (4.0 MB)
+                ... and 4140 other files
+                test/
+            tfrecords/
+                test00-2071.tfrec (579.6 MB)
+                test01-2071.tfrec (583.5 MB)
+                ... and 14 other files
+            train/
+                ISIC_0015719.dcm (2.4 MB)
+                ISIC_0068279.dcm (1.3 MB)
+                ... and 28982 other files
+                train/
+        input/
+            description.md (176 lines)
+            jpeg.zip (24.7 GB)
+            sample_submission.csv (4143 lines)
+            sample_submission.csv.zip (16.4 kB)
+            test.csv (4143 lines)
+            test.csv.zip (42.5 kB)
+            test.zip (6.4 GB)
+            tfrecords.zip (9.3 GB)
+            train.csv (28985 lines)
+            train.csv.zip (299.7 kB)
+            train.zip (46.0 GB)
+            jpeg/
+                test/
+                    ISIC_1440063.jpg (1.1 MB)
+                    ISIC_0815802.jpg (853.1 kB)
+                    ... and 4140 other files
+                train/
+                    ISIC_1845271.jpg (1.0 MB)
+                    ISIC_1970027.jpg (138.4 kB)
+                    ... and 28982 other files
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+            test/
+                ISIC_0052212.dcm (1.5 MB)
+                ISIC_0076545.dcm (4.0 MB)
+                ... and 4140 other files
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+            tfrecords/
+                test00-2071.tfrec (579.6 MB)
+                test01-2071.tfrec (583.5 MB)
+                ... and 14 other files
+            train/
+                ISIC_0015719.dcm (2.4 MB)
+                ISIC_0068279.dcm (1.3 MB)
+                ... and 28982 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+        working/
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+```
+
+-> data/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> data/siim-isic-melanoma-classification/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> data/siim-isic-melanoma-classification/test.csv has 4142 rows and 5 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge
+
+-> data/siim-isic-melanoma-classification/train.csv has 28984 rows and 8 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge, diagnosis, benign_malignant, target
+
+-> data/test.csv has 4142 rows and 5 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge
+
+-> data/train.csv has 28984 rows and 8 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge, diagnosis, benign_malignant, target
+
+-> input/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+DATA_DIR_CANDIDATES = [
+    "/kaggle/input/siim-isic-melanoma-classification",
+    "/kaggle/data/siim-isic-melanoma-classification",
+    "/kaggle/input",
+    "/kaggle/data",
+]
+
+
+def find_file(filename):
+    for base in DATA_DIR_CANDIDATES:
+        path = os.path.join(base, filename)
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(
+        f"Could not find {filename} in any of: {DATA_DIR_CANDIDATES}"
+    )
+
+
+def find_dir(relpath):
+    for base in DATA_DIR_CANDIDATES:
+        path = os.path.join(base, relpath)
+        if os.path.isdir(path):
+            return path
+    raise FileNotFoundError(
+        f"Could not find directory {relpath} in any of: {DATA_DIR_CANDIDATES}"
+    )
+
+
+test_csv_path = find_file("test.csv")
+train_csv_path = find_file("train.csv")
+sample_sub_path = find_file("sample_submission.csv")
+
+test = pd.read_csv(test_csv_path)
+train = pd.read_csv(train_csv_path)
+sample_sub = pd.read_csv(sample_sub_path)
+
+assert "image_name" in test.columns
+assert "image_name" in train.columns and "target" in train.columns
+assert "image_name" in sample_sub.columns and "target" in sample_sub.columns
+
+test = test.merge(sample_sub[["image_name"]], on="image_name", how="right")
+
+JPEG_TEST_DIR = None
+for candidate in [
+    "jpeg/test",
+    "siim-isic-melanoma-classification/jpeg/test",
+]:
+    try:
+        JPEG_TEST_DIR = find_dir(candidate)
+        break
+    except FileNotFoundError:
+        pass
+if JPEG_TEST_DIR is None:
+    raise FileNotFoundError(
+        "Could not locate jpeg/test directory under known data roots."
+    )
+
+JPEG_TRAIN_DIR = None
+for candidate in [
+    "jpeg/train",
+    "siim-isic-melanoma-classification/jpeg/train",
+]:
+    try:
+        JPEG_TRAIN_DIR = find_dir(candidate)
+        break
+    except FileNotFoundError:
+        pass
+if JPEG_TRAIN_DIR is None:
+    raise FileNotFoundError(
+        "Could not locate jpeg/train directory under known data roots."
+    )
+
+print("Using JPEG_TEST_DIR:", JPEG_TEST_DIR)
+print("Using JPEG_TRAIN_DIR:", JPEG_TRAIN_DIR)
+print(
+    "test rows:",
+    test.shape[0],
+    "train rows:",
+    train.shape[0],
+    "sample_sub rows:",
+    sample_sub.shape[0],
+)
+
+
+
+## === cell 1
+from PIL import Image
+from concurrent.futures import ThreadPoolExecutor
+
+
+def sigmoid(x):
+    x = np.clip(x, -50, 50)
+    return 1.0 / (1.0 + np.exp(-x))
+
+
+def image_features(image_name, jpg_dir, size=128):
+    path = os.path.join(jpg_dir, f"{image_name}.jpg")
+    with Image.open(path) as im:
+        im = im.convert("RGB")
+        if size is not None:
+            im = im.resize((size, size), resample=Image.BICUBIC)
+        arr = np.asarray(im, dtype=np.uint8)
+
+    arr_f = arr.astype(np.float32) * (1.0 / 255.0)  # (H,W,3)
+    r = arr_f[..., 0]
+    g = arr_f[..., 1]
+    b = arr_f[..., 2]
+
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+
+    mean_gray = float(gray.mean())
+    std_gray = float(gray.std())
+
+    mean_r = float(r.mean())
+    mean_g = float(g.mean())
+    mean_b = float(b.mean())
+    mean_rgb = float(arr_f.mean()) + 1e-6
+    redness = float(mean_r / mean_rgb)
+
+    gx = np.abs(np.diff(gray, axis=1)).mean()
+    gy = np.abs(np.diff(gray, axis=0)).mean()
+    grad = float(gx + gy)
+
+    std_r = float(r.std())
+    std_g = float(g.std())
+    std_b = float(b.std())
+
+    sat = (np.maximum(np.maximum(r, g), b) - np.minimum(np.minimum(r, g), b)).astype(
+        np.float32, copy=False
+    )
+    mean_sat = float(sat.mean())
+    std_sat = float(sat.std())
+
+    h, w = gray.shape
+    h0, h1 = h // 4, (3 * h) // 4
+    w0, w1 = w // 4, (3 * w) // 4
+    center_mean = float(gray[h0:h1, w0:w1].mean())
+    border_mean = float(
+        (gray.mean() * (h * w) - gray[h0:h1, w0:w1].sum())
+        / (h * w - (h1 - h0) * (w1 - w0) + 1e-6)
+    )
+    center_delta = float(center_mean - border_mean)
+
+    br_ratio = float((mean_b + 1e-6) / (mean_r + 1e-6))
+    dark_frac = float((gray < 0.20).mean())
+
+    rg_ratio = float((mean_r + 1e-6) / (mean_g + 1e-6))
+    rb_ratio = float((mean_r + 1e-6) / (mean_b + 1e-6))
+    gr_diff = float(mean_g - mean_r)
+    bright_frac = float((gray > 0.85).mean())
+    center_sat = float(sat[h0:h1, w0:w1].mean())
+    border_sat = float(
+        (sat.mean() * (h * w) - sat[h0:h1, w0:w1].sum())
+        / (h * w - (h1 - h0) * (w1 - w0) + 1e-6)
+    )
+    sat_center_delta = float(center_sat - border_sat)
+
+    g0 = gray
+    lap = (
+        -4.0 * g0
+        + np.roll(g0, 1, axis=0)
+        + np.roll(g0, -1, axis=0)
+        + np.roll(g0, 1, axis=1)
+        + np.roll(g0, -1, axis=1)
+    )
+    lap_energy = float((lap * lap).mean())
+
+    k = (
+        g0
+        + np.roll(g0, 1, axis=0)
+        + np.roll(g0, -1, axis=0)
+        + np.roll(g0, 1, axis=1)
+        + np.roll(g0, -1, axis=1)
+        + np.roll(np.roll(g0, 1, axis=0), 1, axis=1)
+        + np.roll(np.roll(g0, 1, axis=0), -1, axis=1)
+        + np.roll(np.roll(g0, -1, axis=0), 1, axis=1)
+        + np.roll(np.roll(g0, -1, axis=0), -1, axis=1)
+    ) * (1.0 / 9.0)
+    local_contrast = float(np.abs(g0 - k).mean())
+
+    return (
+        mean_gray,  # 0
+        std_gray,  # 1
+        redness,  # 2
+        grad,  # 3
+        std_r,  # 4
+        std_g,  # 5
+        std_b,  # 6
+        mean_sat,  # 7
+        std_sat,  # 8
+        center_delta,  # 9
+        br_ratio,  # 10
+        dark_frac,  # 11
+        rg_ratio,  # 12
+        rb_ratio,  # 13
+        gr_diff,  # 14
+        bright_frac,  # 15
+        sat_center_delta,  # 16
+        lap_energy,  # 17 (new)
+        local_contrast,  # 18 (new)
+    )
+
+
+def robust_location_scale(x):
+    x = x.astype(np.float32, copy=False)
+    med = float(np.median(x))
+    mad = float(np.median(np.abs(x - med)) + 1e-6)
+    scale = float(1.4826 * mad + 1e-6)
+    return med, scale
+
+
+def apply_robust_zscore(x, med, scale):
+    x = x.astype(np.float32, copy=False)
+    return (x - med) / scale
+
+
+def calibrate_intercept(base_logit, target_prevalence):
+    lo, hi = -10.0, 10.0
+    for _ in range(40):
+        mid = 0.5 * (lo + hi)
+        m = float(sigmoid(base_logit + mid).mean())
+        if m > target_prevalence:
+            hi = mid
+        else:
+            lo = mid
+    return 0.5 * (lo + hi)
+
+
+train_names_all = train["image_name"].values
+train_y_all = train["target"].astype(np.float32).values
+
+MAX_TRAIN_FIT = 24000
+
+pos_idx = np.flatnonzero(train_y_all >= 0.5).astype(np.int32)
+neg_idx = np.flatnonzero(train_y_all < 0.5).astype(np.int32)
+
+names_bytes = train_names_all.astype("S")
+name_hash = (
+    np.frombuffer(b"".join(names_bytes.tolist()), dtype=np.uint8).sum().astype(np.int64)
+)
+rng = np.random.RandomState(int(name_hash % (2**31 - 1)))
+
+neg_take = max(0, min(len(neg_idx), MAX_TRAIN_FIT - len(pos_idx)))
+if neg_take > 0:
+    neg_sel = rng.choice(neg_idx, size=neg_take, replace=False).astype(np.int32)
+    fit_idx = np.concatenate([pos_idx, neg_sel], axis=0)
+else:
+    fit_idx = pos_idx
+fit_idx = np.sort(fit_idx)
+
+train_fit_df = train.iloc[fit_idx].reset_index(drop=True)
+train_names = train_fit_df["image_name"].tolist()
+train_y = train_fit_df["target"].astype(np.float32).values
+
+print(
+    "Fitting feature scaling/weights on train subset:",
+    len(train_names),
+    "of",
+    len(train_names_all),
+    "| positives included:",
+    int(len(pos_idx)),
+)
+
+test_names = test["image_name"].values.tolist()
+
+
+def _extract_batch(names, jpg_dir, size, max_workers):
+    n = len(names)
+    out = np.empty((n, 19), dtype=np.float32)
+
+    def _one(i_nm):
+        i, nm = i_nm
+        feats = image_features(nm, jpg_dir, size=size)
+        return (i,) + feats
+
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        for k, row in enumerate(ex.map(_one, enumerate(names), chunksize=32), start=1):
+            i = row[0]
+            out[i, :] = np.asarray(row[1:], dtype=np.float32)
+            if k % 2000 == 0 or k == n:
+                print(f"Processed {k}/{n} images from {os.path.basename(jpg_dir)}")
+    return out
+
+
+CPU_CNT = os.cpu_count() or 2
+MAX_WORKERS = min(8, max(2, CPU_CNT))
+
+tr_feats = _extract_batch(
+    train_names, JPEG_TRAIN_DIR, size=128, max_workers=MAX_WORKERS
+)
+te_feats = _extract_batch(test_names, JPEG_TEST_DIR, size=128, max_workers=MAX_WORKERS)
+
+(
+    tr_mg,
+    tr_sg,
+    tr_rd,
+    tr_gr,
+    tr_sr,
+    tr_sgch,
+    tr_sb,
+    tr_msat,
+    tr_ssat,
+    tr_cdelta,
+    tr_brr,
+    tr_dark,
+    tr_rgr,
+    tr_rbr,
+    tr_grdiff,
+    tr_bright,
+    tr_scdelta,
+    tr_lap,
+    tr_lcon,
+) = (tr_feats[:, i] for i in range(19))
+
+(
+    te_mg,
+    te_sg,
+    te_rd,
+    te_gr,
+    te_sr,
+    te_sgch,
+    te_sb,
+    te_msat,
+    te_ssat,
+    te_cdelta,
+    te_brr,
+    te_dark,
+    te_rgr,
+    te_rbr,
+    te_grdiff,
+    te_bright,
+    te_scdelta,
+    te_lap,
+    te_lcon,
+) = (te_feats[:, i] for i in range(19))
+
+scalers = {}
+for name, vec in [
+    ("mg", tr_mg),
+    ("sg", tr_sg),
+    ("rd", tr_rd),
+    ("gr", tr_gr),
+    ("sr", tr_sr),
+    ("sgch", tr_sgch),
+    ("sb", tr_sb),
+    ("msat", tr_msat),
+    ("ssat", tr_ssat),
+    ("cdelta", tr_cdelta),
+    ("brr", tr_brr),
+    ("dark", tr_dark),
+    ("rgr", tr_rgr),
+    ("rbr", tr_rbr),
+    ("grdiff", tr_grdiff),
+    ("bright", tr_bright),
+    ("scdelta", tr_scdelta),
+    ("lap", tr_lap),
+    ("lcon", tr_lcon),
+]:
+    med, scale = robust_location_scale(vec)
+    scalers[name] = (med, scale)
+
+tr_z = {}
+te_z = {}
+for name, trv, tev in [
+    ("mg", tr_mg, te_mg),
+    ("sg", tr_sg, te_sg),
+    ("rd", tr_rd, te_rd),
+    ("gr", tr_gr, te_gr),
+    ("sr", tr_sr, te_sr),
+    ("sgch", tr_sgch, te_sgch),
+    ("sb", tr_sb, te_sb),
+    ("msat", tr_msat, te_msat),
+    ("ssat", tr_ssat, te_ssat),
+    ("cdelta", tr_cdelta, te_cdelta),
+    ("brr", tr_brr, te_brr),
+    ("dark", tr_dark, te_dark),
+    ("rgr", tr_rgr, te_rgr),
+    ("rbr", tr_rbr, te_rbr),
+    ("grdiff", tr_grdiff, te_grdiff),
+    ("bright", tr_bright, te_bright),
+    ("scdelta", tr_scdelta, te_scdelta),
+    ("lap", tr_lap, te_lap),
+    ("lcon", tr_lcon, te_lcon),
+]:
+    med, scale = scalers[name]
+    tr_z[name] = apply_robust_zscore(trv, med, scale)
+    te_z[name] = apply_robust_zscore(tev, med, scale)
+
+
+def _standardize_design_mtx(X_tr, X_te):
+    mu = X_tr.mean(axis=0, dtype=np.float32)
+    sd = X_tr.std(axis=0, dtype=np.float32)
+    sd = np.where(sd < 1e-6, 1.0, sd).astype(np.float32)
+    X_tr2 = ((X_tr - mu) / sd).astype(np.float32, copy=False)
+    X_te2 = ((X_te - mu) / sd).astype(np.float32, copy=False)
+    return X_tr2, X_te2
+
+
+def fit_ridge_weights(X, y, l2=5.0):
+    y = y.astype(np.float32, copy=False)
+    y_soft = np.clip(0.005 + 0.99 * y, 1e-5, 1 - 1e-5).astype(np.float32, copy=False)
+    t = np.log(y_soft / (1.0 - y_soft)).astype(np.float32, copy=False)
+
+    XtX = (X.T @ X).astype(np.float32, copy=False)
+    Xtt = (X.T @ t).astype(np.float32, copy=False)
+    A = XtX + (l2 * np.eye(X.shape[1], dtype=np.float32))
+    w = np.linalg.solve(A, Xtt).astype(np.float32, copy=False)
+    return w
+
+
+def make_group_folds(groups, n_splits=5, seed=13):
+    groups = np.asarray(groups)
+    uniq = pd.unique(groups)
+    rng = np.random.RandomState(seed)
+    perm = rng.permutation(len(uniq))
+    uniq = uniq[perm]
+    fold_id = np.arange(len(uniq)) % n_splits
+    grp2fold = {g: int(f) for g, f in zip(uniq, fold_id)}
+    return np.array([grp2fold[g] for g in groups], dtype=np.int32)
+
+
+ones_tr = np.ones_like(tr_z["sg"], dtype=np.float32)
+ones_te = np.ones_like(te_z["sg"], dtype=np.float32)
+
+X_a_tr = np.stack(
+    [
+        tr_z["sg"],
+        tr_z["gr"],
+        tr_z["mg"],
+        tr_z["rd"],
+        tr_z["msat"],
+        tr_z["cdelta"],
+        tr_z["brr"],
+        tr_z["rgr"],
+        tr_z["scdelta"],
+        tr_z["lap"],
+        tr_z["lcon"],
+        ones_tr,
+    ],
+    axis=1,
+).astype(np.float32, copy=False)
+
+X_b_tr = np.stack(
+    [
+        tr_z["gr"],
+        tr_z["rd"],
+        tr_z["mg"],
+        tr_z["sg"],
+        tr_z["ssat"],
+        tr_z["sr"],
+        tr_z["dark"],
+        tr_z["bright"],
+        tr_z["grdiff"],
+        tr_z["lap"],
+        tr_z["lcon"],
+        ones_tr,
+    ],
+    axis=1,
+).astype(np.float32, copy=False)
+
+X_c_tr = np.stack(
+    [
+        tr_z["sg"],
+        tr_z["rd"],
+        tr_z["mg"],
+        tr_z["gr"],
+        tr_z["sb"],
+        tr_z["sgch"],
+        tr_z["dark"],
+        tr_z["rbr"],
+        tr_z["scdelta"],
+        tr_z["lap"],
+        tr_z["lcon"],
+        ones_tr,
+    ],
+    axis=1,
+).astype(np.float32, copy=False)
+
+X_a_te = np.stack(
+    [
+        te_z["sg"],
+        te_z["gr"],
+        te_z["mg"],
+        te_z["rd"],
+        te_z["msat"],
+        te_z["cdelta"],
+        te_z["brr"],
+        te_z["rgr"],
+        te_z["scdelta"],
+        te_z["lap"],
+        te_z["lcon"],
+        ones_te,
+    ],
+    axis=1,
+).astype(np.float32, copy=False)
+
+X_b_te = np.stack(
+    [
+        te_z["gr"],
+        te_z["rd"],
+        te_z["mg"],
+        te_z["sg"],
+        te_z["ssat"],
+        te_z["sr"],
+        te_z["dark"],
+        te_z["bright"],
+        te_z["grdiff"],
+        te_z["lap"],
+        te_z["lcon"],
+        ones_te,
+    ],
+    axis=1,
+).astype(np.float32, copy=False)
+
+X_c_te = np.stack(
+    [
+        te_z["sg"],
+        te_z["rd"],
+        te_z["mg"],
+        te_z["gr"],
+        te_z["sb"],
+        te_z["sgch"],
+        te_z["dark"],
+        te_z["rbr"],
+        te_z["scdelta"],
+        te_z["lap"],
+        te_z["lcon"],
+        ones_te,
+    ],
+    axis=1,
+).astype(np.float32, copy=False)
+
+X_a_tr, X_a_te = _standardize_design_mtx(X_a_tr, X_a_te)
+X_b_tr, X_b_te = _standardize_design_mtx(X_b_tr, X_b_te)
+X_c_tr, X_c_te = _standardize_design_mtx(X_c_tr, X_c_te)
+
+groups = train_fit_df["patient_id"].fillna("NA").astype(str).values
+folds = make_group_folds(groups, n_splits=5, seed=13)
+
+
+def oof_and_refit_predict(X_tr, y, X_te, folds, l2):
+    oof = np.empty((X_tr.shape[0],), dtype=np.float32)
+    for f in range(int(folds.max()) + 1):
+        tr_idx = np.flatnonzero(folds != f)
+        va_idx = np.flatnonzero(folds == f)
+        w = fit_ridge_weights(X_tr[tr_idx], y[tr_idx], l2=l2)
+        oof[va_idx] = (X_tr[va_idx] @ w).astype(np.float32, copy=False)
+    w_full = fit_ridge_weights(X_tr, y, l2=l2)
+    te_raw = (X_te @ w_full).astype(np.float32, copy=False)
+    return oof, te_raw
+
+
+oof_a, raw_a = oof_and_refit_predict(X_a_tr, train_y, X_a_te, folds, l2=8.0)
+oof_b, raw_b = oof_and_refit_predict(X_b_tr, train_y, X_b_te, folds, l2=8.0)
+oof_c, raw_c = oof_and_refit_predict(X_c_tr, train_y, X_c_te, folds, l2=8.0)
+
+train_prev = float(train["target"].mean())
+
+delta_a = calibrate_intercept(oof_a, target_prevalence=train_prev)
+delta_b = calibrate_intercept(oof_b, target_prevalence=train_prev)
+delta_c = calibrate_intercept(oof_c, target_prevalence=train_prev)
+
+pred_a = sigmoid(raw_a + delta_a).astype(np.float32, copy=False)
+pred_b = sigmoid(raw_b + delta_b).astype(np.float32, copy=False)
+pred_c = sigmoid(raw_c + delta_c).astype(np.float32, copy=False)
+
+a = pd.DataFrame({"image_name": test_names, "target": pred_a})
+b = pd.DataFrame({"image_name": test_names, "target": pred_b})
+c = pd.DataFrame({"image_name": test_names, "target": pred_c})
+
+a.to_csv("b0-b3-b4.csv", index=False)
+b.to_csv("b5.csv", index=False)
+c.to_csv("b7.csv", index=False)
+
+print(a.head())
+print("Train prevalence:", train_prev)
+print("Mean preds:", float(pred_a.mean()), float(pred_b.mean()), float(pred_c.mean()))
+
+
+
+## === cell 2
+a = pd.read_csv("b0-b3-b4.csv")
+b = pd.read_csv("b5.csv")
+c = pd.read_csv("b7.csv")
+
+m = (
+    sample_sub[["image_name"]]
+    .merge(a, on="image_name", how="left", suffixes=("", "_a"))
+    .merge(b, on="image_name", how="left", suffixes=("", "_b"))
+    .merge(c, on="image_name", how="left", suffixes=("", "_c"))
+)
+
+for col in ["target", "target_b", "target_c"]:
+    if col not in m.columns:
+        raise RuntimeError(f"Missing blended column: {col}")
+    m[col] = m[col].fillna(0.02)
+
+pred = (m["target"].values + m["target_b"].values + m["target_c"].values) / 3.0
+pred = np.clip(pred, 0.0, 1.0)
+
+submission = pd.DataFrame(
+    {"image_name": m["image_name"].values, "target": pred.astype(np.float32)}
+)
+submission = submission[sample_sub.columns]  # enforce correct column order
+
+assert submission.shape[0] == sample_sub.shape[0]
+assert list(submission.columns) == ["image_name", "target"]
+assert submission["target"].between(0, 1).all()
+
+submission.to_csv("submission.csv", index=False)
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)
+print("Submission mean target:", float(submission["target"].mean()))

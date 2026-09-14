@@ -1,0 +1,831 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a model to automatically segment the stomach and intestines on MRI scans.
+
+## Metric
+Mean Dice coefficient and 3D Hausdorff distance. 
+
+The Dice coefficient can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:
+
+$$
+\frac{2 \cdot |X \cap Y|}{|X| + |Y|}
+$$
+
+where $X$ is the predicted set of pixels and $Y$ is the ground truth. The Dice coefficient is defined to be 0 when both $X$ and $Y$ are empty. 
+
+Hausdorff distance is a method for calculating the distance between segmentation objects A and B, by calculating the furthest point on object A from the nearest point on object B. For 3D Hausdorff, we construct 3D volumes by combining each 2D segmentation with slice depth as the Z coordinate and then find the Hausdorff distance between them. (Here the slice depth for all scans is set to 1). The expected / predicted pixel locations are normalized by image size to create a bounded 0-1 score.
+
+The two metrics are combined, with a weight of 0.4 for the Dice metric and 0.6 for the Hausdorff distance.
+
+## Submission Format
+Use run-length encoding on the pixel values.  Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+Note that, at the time of encoding, the mask should be binary, meaning the masks for all objects in an image are joined into a single large mask. A value of 0 should indicate pixels that are not masked, and a value of 1 will indicate pixels that are masked.
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. The pixels are numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The file should contain a header and have the following format:
+
+```
+id,class,predicted
+1,large_bowel,1 1 5 1
+1,small_bowel,1 1
+1,stomach,1 1
+2,large_bowel,1 5 2 17
+etc.
+```
+
+## Dataset
+Each case is represented by multiple sets of scan slices (each set is identified by the day the scan took place). Some cases are split by time (early days are in train, later days are in test) while some cases are split by case - the entirety of the case is in train or test. The goal is to be able to generalize to both partially and wholly unseen cases.
+
+### Files
+- train.csv - IDs and masks for all training objects.
+- sample_submission.csv - a sample submission file in the correct format
+- train - a folder of case/day folders, each containing slice images for a particular case on a given day.
+
+Note that the image filenames include 4 numbers (ex. 276_276_1.63_1.63.png). These four numbers are slice width / height (integers in pixels) and width/height pixel spacing (floating points in mm). The first two defines the resolution of the slide. The last two record the physical size of each pixel.
+
+Physical pixel thickness in superior-inferior direction is 3mm.
+
+### Columns
+- `id` - unique identifier for object
+- `class` - the predicted class for the object
+- `segmentation` - RLE-encoded pixels for the identified object
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+nibabel==5.3.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        input/
+            description.md (126 lines)
+            sample_submission.csv (20401 lines)
+            sample_submission.csv.zip (57.4 kB)
+            test.csv (20401 lines)
+            test.csv.zip (55.2 kB)
+            test.zip (432.9 MB)
+            train.csv (95089 lines)
+            train.csv.zip (6.7 MB)
+            train.zip (2.0 GB)
+            test/
+                case110/
+                    case110_day12/
+                        scans/
+                            ... (max depth reached)
+                    case110_day16/
+                        scans/
+                            ... (max depth reached)
+                case113/
+                    case113_day22/
+                        scans/
+                            ... (max depth reached)
+                ... and 27 other folders
+            train/
+                case101/
+                    case101_day20/
+                        scans/
+                            ... (max depth reached)
+                    case101_day22/
+                        scans/
+                            ... (max depth reached)
+                    case101_day26/
+                        scans/
+                            ... (max depth reached)
+                    case101_day32/
+                        scans/
+                            ... (max depth reached)
+                case102/
+                    case102_day0/
+                        scans/
+                            ... (max depth reached)
+                ... and 75 other folders
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+        working/
+            uw-madison-gi-tract-image-segmentation/
+                description.md (126 lines)
+                sample_submission.csv (20401 lines)
+                ... and 7 other files
+                test/
+                    case110/
+                        case110_day12/
+                            ... (max depth reached)
+                        case110_day16/
+                            ... (max depth reached)
+                    case113/
+                        case113_day22/
+                            ... (max depth reached)
+                    ... and 27 other folders
+                train/
+                    case101/
+                        case101_day20/
+                            ... (max depth reached)
+                        case101_day22/
+                            ... (max depth reached)
+                        case101_day26/
+                            ... (max depth reached)
+                        case101_day32/
+                            ... (max depth reached)
+                    case102/
+                        case102_day0/
+                            ... (max depth reached)
+                    ... and 75 other folders
+                uw-madison-gi-tract-image-segmentation/
+```
+
+-> data/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> data/uw-madison-gi-tract-image-segmentation/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> data/uw-madison-gi-tract-image-segmentation/test.csv has 20400 rows and 2 columns.
+The columns are: id, class
+
+-> data/uw-madison-gi-tract-image-segmentation/train.csv has 95088 rows and 3 columns.
+The columns are: id, class, segmentation
+
+-> input/sample_submission.csv has 20400 rows and 3 columns.
+The columns are: id, class, predicted
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8359853040468126
+
+# 6. Current score
+
+0.0
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I fix the root cause of the failure by ensuring MONAI is importable without relying on unavailable pip wheels, and I update the MONAI transform names to the current API (Torch 2.6/Kaggle images often have MONAI preinstalled but with the “d” transforms renamed). I also correct the decathlon JSON writing (it was being double-written incorrectly), fix pandas `DataFrame.append` usage (removed in pandas 2.x), and make the inference-to-RLE mapping robust by iterating classes explicitly and aligning slice indices correctly. Finally, I ensure a valid `submission.csv` with the required columns is always produced (fallback to empty masks if any volume/model issue occurs), so you get a submit-ready file end-to-end.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most likely coming from an invalid/near-empty submission caused by a silent failure to load the external pretrained weights and/or incorrect slice indexing (the test `id` is `case_day_slice` where `slice` is **not** 1..Z), so your current `z=int(slice_str)-1` mapping usually points to the wrong plane. I keep your overall pipeline (NIfTI creation → MONAI UNETR sliding-window inference → sigmoid → per-slice RLE) but make two minimal fixes: (1) robustly locate the pretrained `best_metric_model.pth` under Kaggle inputs (fallback to empty masks only if truly missing), and (2) map each `Slice` to the correct z-index by sorting the slice identifiers within each (Case, Day) volume rather than assuming they are contiguous integers. This should move the score upward toward your target without changing architecture, loss, or inference semantics. The submission writing remains the same and always produces a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is consistent with effectively empty/incorrect masks, and the most likely root cause here is that your NIfTI volume is being saved in `(Z,H,W)` order while MONAI expects spatial dims `(H,W,D)` (or after `EnsureChannelFirstd`, `(1,H,W,D)`), so UNETR inference is operating on mis-ordered axes and the per-slice mapping becomes wrong. I keep your exact pipeline (PNG→NIfTI→MONAI UNETR sliding-window inference→sigmoid→0.5 threshold→RLE) but make two minimal, directly score-relevant fixes: (1) save NIfTI volumes as `(H,W,Z)` and (2) make `segm_to_pred_rows` robust to MONAI output being `(3,H,W,Z)` by transposing to `(3,Z,H,W)` before slice-wise RLE. These changes should move the score up substantially toward the target without altering the model, loss, or inference semantics, and the script still always write a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with a “valid-but-wrong/empty” submission caused by either (a) the UNETR weights not being found/loaded (so you fall back to all-empty masks), or (b) a mismatch between the model’s expected input size and the real volume size (so inference produces misaligned outputs). I keep your exact pipeline (PNG→NIfTI→MONAI UNETR sliding-window inference→sigmoid→0.5 threshold→RLE), but make two minimal score-critical fixes: (1) force volumes to be resampled to the fixed `sz=(80,144,192)` your UNETR was built for (using MONAI `Resized`) so the model sees correctly-shaped data, and (2) tighten weight-file discovery to prefer the intended `best_metric_model.pth` and validate it has compatible keys before inference to avoid silent “loaded but wrong” states. These changes should move you off 0.0 toward the target while preserving architecture and inference semantics, and the script still always write a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with the model never actually running (MONAI missing) and/or a valid-but-misaligned prediction mapping where z-slices don’t correspond to the `id`’s slice token, yielding essentially wrong/empty masks. I keep your exact pipeline (PNG→NIfTI→MONAI UNETR sliding-window inference→sigmoid→0.5 threshold→RLE) but make two minimal score-critical fixes: (1) make slice-to-z mapping use the **actual PNG slice ordering** (from filenames) instead of sorting by the `Slice` token, and (2) ensure MONAI is loaded from the existing Kaggle dataset copy (no pip) by adding the common dataset path to `sys.path` if needed. These changes preserve architecture/inference semantics and should move you off 0.0 toward the target by aligning predictions to the correct slices, while still always producing a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with systematically wrong slice alignment caused by generating a **resized** volume for inference while still mapping predictions back to the **original slice ids** without undoing the resize along the Z axis. I keep your exact pipeline (PNG→NIfTI→MONAI UNETR sliding-window inference→sigmoid→0.5 threshold→RLE), but make one minimal, score-critical fix: record the original `(H,W,Z)` and add a post-inference `Resized` step to bring the predicted probability maps back to the original `(H,W,Z)` before per-slice RLE. This preserves architecture and inference semantics (same model, same threshold), but restores correct per-slice geometry so each `id` gets the right mask. The script still always write a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is almost certainly coming from a geometrically invalid submission: you resize the input volumes to `sz`, run inference, then upsample predictions back to `orig_hwz` but you never undo the *per-slice* resizing to the original (H,W) that Kaggle evaluates against for each `id` (those dimensions are encoded in each PNG filename). I keep your exact pipeline (PNG→NIfTI→MONAI UNETR sliding window→sigmoid→0.5 threshold→RLE), but (1) record the true per-slice `(H,W)` from the first PNG filename per (case,day), and (2) after inference, resize predictions to `(H,W,Z)` using that true shape instead of the raw PNG array shape. I also ensure the `slice_order` tokens are taken from the PNG filenames in the same loop and used consistently for z-alignment (no semantic change, just robustness). These are minimal, score-critical geometry fixes and should move you substantially upward toward the target by making the decoded masks match the expected image grid.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with the model output being geometrically misaligned with Kaggle’s per-slice (H,W) grid and/or slice indices not matching the `id` slice token, resulting in essentially empty/wrong masks despite a valid CSV. I keep your exact pipeline (PNG→NIfTI (H,W,Z)→MONAI UNETR sliding-window→sigmoid→0.5→RLE) but make two minimal score-critical fixes: (1) parse the true (H,W) correctly from the PNG filename (the filename format is `slice_w_h_spacingX_spacingY.png`, so width/height are parts[0]/parts[1], not parts[1]/parts[2]), and (2) resize predictions back to the true (H,W,Z) using a correct channel-aware tensor shape so interpolation doesn’t mix channels or drop dimensions. These changes should move you off 0.0 upward toward your target by restoring correct mask geometry without changing the model or thresholding semantics, and the script still always write a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is consistent with a submission that is valid CSV-wise but geometrically wrong for the eval masks: you’re resizing the whole 3D prediction back to a single “true (H,W,Z)” per volume, but in this dataset each slice can have its own (H,W) (encoded in each PNG filename), so many slices decode to the wrong grid and score collapses. I keep your exact pipeline (PNG→NIfTI (H,W,Z)→MONAI UNETR sliding window→sigmoid→0.5→RLE) and make the smallest score-critical fix: record per-slice (H,W) alongside slice tokens, then after inference resize each 2D slice prediction to that slice’s native (H,W) right before RLE. I also fix `slice_order` token extraction to use the actual slice index token (the third underscore field) rather than the width token, ensuring correct z-alignment to `id`. These changes preserve the model/threshold/inference semantics and should move the score upward toward your target while still always producing a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is most consistent with predictions being mapped onto the wrong slice IDs: in this dataset the test `id` slice token is the **4th** underscore field in the PNG filename, but your `slice_order` currently uses the **3rd** field, so most slices never find a matching z-index and become empty RLEs. I make the minimal change to extract the correct slice token (with a safe fallback), so `slice_order_tokens` aligns with `df_base["Slice"]` and the model’s Z dimension. I also make weight-file discovery look in `/kaggle/input/**` in addition to `../input/**` (common path mismatch), which avoids silently falling back to all-empty masks. These are small, directly score-relevant fixes that preserve your model/inference pipeline and still produce a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is almost certainly coming from systematically misaligned slice indices: the test/train `id` “Slice” token is the **last** token in `caseXXX_dayYY_sliceZZZZ`, but your `slice_order` is extracted from PNG filenames using the wrong underscore field and often falls back to `1..N`, so most predictions get mapped to the wrong `id` rows and evaluate near-zero. I make one minimal, directly score-relevant change: derive `slice_order` tokens directly from the **sorted PNG basenames** in a robust way that matches the dataset’s slice naming (using the leading integer before the first underscore, which is the actual slice index in this dataset), and keep everything else (NIfTI creation, UNETR, transforms, inference, sigmoid, 0.5 threshold, RLE) identical. I also harden the `slice_to_z` mapping by normalizing tokens (strip leading zeros) on both sides so `0001` matches `1` without changing semantics. This should move you off 0.0 toward your target while keeping the core logic unchanged and still always writing a valid `submission.csv`.'
+- What this solution (achieved 0.0) has done: 'Your 0.0 score is consistent with a “valid CSV but effectively wrong masks” issue, and the biggest minimal-risk culprit in your current pipeline is slice-to-z misalignment: your `slice_order` tokens are taken from the first underscore field of PNG filenames (width), not the actual slice index, so most `id` rows never match a predicted z-slice and become empty. I make a single core fix: derive `slice_order` tokens from the **leading integer before the first underscore** in each PNG filename (the real slice index in this dataset) and keep per-slice (H,W) parsing consistent with the same filename. I also make the mapping robust by normalizing tokens as integers (so `0001` and `1` match), without changing your model, transforms, threshold, or RLE logic. This should move the score up substantially from 0.0 toward your target while preserving your overall approach and still writing a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import glob, os, gc, sys, re
+
+DATASET_FOLDER = "../input/uw-madison-gi-tract-image-segmentation"
+WORKDIR = "."
+
+
+
+## === cell 1
+sub_df = pd.read_csv(os.path.join(DATASET_FOLDER, "sample_submission.csv"))
+sub = True if len(sub_df) else False
+sub, sub_df.shape
+
+
+
+## === cell 2
+if sub:
+    path_csv = os.path.join(DATASET_FOLDER, "test.csv")
+    df_base = pd.read_csv(path_csv)  # has id,class only
+    folder = "test"
+else:
+    path_csv = os.path.join(DATASET_FOLDER, "train.csv")
+    df_base = pd.read_csv(path_csv)[:1000]
+    df_base = df_base.rename(columns={"segmentation": "predicted"})
+    folder = "train"
+
+df_base.head()
+
+
+
+
+## === cell 3
+def extract_details(id_):
+    id_fields = id_.split("_")
+    case = id_fields[0].replace("case", "")
+    day = id_fields[1].replace("day", "")
+    slice_id = id_fields[-1]
+    return {"Case": int(case), "Day": int(day), "Slice": slice_id}
+
+
+df_base[["Case", "Day", "Slice"]] = df_base["id"].apply(
+    lambda x: pd.Series(extract_details(x))
+)
+df_base.head()
+
+
+
+## === cell 4
+train_overview = []
+for (case, day), dfg in df_base.groupby(["Case", "Day"]):
+    train_overview.append({"Day": int(day), "Case": int(case), "Slices": len(dfg)})
+
+df_overview = (
+    pd.DataFrame(train_overview).sort_values(["Case", "Day"]).reset_index(drop=True)
+)
+df_overview.head(), len(df_overview)
+
+
+
+## === cell 5
+from PIL import Image
+
+
+def load_image_volume(img_dir, quant=0.01):
+    imgs = sorted(glob.glob(os.path.join(img_dir, "*.png")))
+    if len(imgs) == 0:
+        raise FileNotFoundError(f"No png slices found in {img_dir}")
+    imgs = [np.array(Image.open(p)).tolist() for p in imgs]
+    vol = np.array(imgs)
+    if quant:
+        q_low, q_high = np.percentile(vol, [quant * 100, (1 - quant) * 100])
+        vol = np.clip(vol, q_low, q_high)
+    v_min, v_max = np.min(vol), np.max(vol)
+    if v_max - v_min < 1e-8:
+        vol = np.zeros_like(vol, dtype=np.uint8)
+    else:
+        vol = (vol - v_min) / (v_max - v_min)
+        vol = (vol * 255).astype(np.uint8)
+    del imgs
+    gc.collect()
+    return vol
+
+
+
+
+## === cell 6
+import nibabel as nib
+
+df_overview["vol_path"] = ""
+df_overview["slice_order"] = ""
+df_overview["orig_hwz"] = ""
+df_overview["true_hw"] = ""
+df_overview["slice_hw"] = ""
+
+for i in range(len(df_overview)):
+    CASE = df_overview.loc[i, "Case"]
+    DAY = df_overview.loc[i, "Day"]
+    IMAGE_FOLDER = os.path.join(
+        DATASET_FOLDER, folder, f"case{CASE}", f"case{CASE}_day{DAY}", "scans"
+    )
+
+    pngs = sorted(glob.glob(os.path.join(IMAGE_FOLDER, "*.png")))
+    if len(pngs) == 0:
+        raise FileNotFoundError(f"No png slices found in {IMAGE_FOLDER}")
+
+    first_base = os.path.basename(pngs[0]).replace(".png", "")
+    parts = first_base.split("_")
+    if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
+        true_w, true_h = int(parts[1]), int(parts[2])
+    elif len(parts) >= 2 and parts[0].isdigit() and parts[1].isdigit():
+        true_w, true_h = int(parts[0]), int(parts[1])
+    else:
+        arr0 = np.array(Image.open(pngs[0]))
+        true_h, true_w = int(arr0.shape[0]), int(arr0.shape[1])
+        del arr0
+    df_overview.loc[i, "true_hw"] = f"{true_h} {true_w}"
+
+    slice_ids_in_order = []
+    slice_hw_in_order = []
+    for p in pngs:
+        base = os.path.basename(p).replace(".png", "")
+        pp = base.split("_")
+
+        if len(pp) >= 1 and re.fullmatch(r"\d+", pp[0] or ""):
+            slice_tok = pp[0]
+        else:
+            slice_tok = str(len(slice_ids_in_order) + 1)
+
+        if len(pp) >= 3 and pp[1].isdigit() and pp[2].isdigit():
+            w_i, h_i = int(pp[1]), int(pp[2])
+        elif len(pp) >= 2 and pp[0].isdigit() and pp[1].isdigit():
+            w_i, h_i = int(pp[0]), int(pp[1])
+        else:
+            arr = np.array(Image.open(p))
+            h_i, w_i = int(arr.shape[0]), int(arr.shape[1])
+            del arr
+
+        slice_ids_in_order.append(str(slice_tok))
+        slice_hw_in_order.append((h_i, w_i))
+
+    df_overview.loc[i, "slice_order"] = " ".join(slice_ids_in_order)
+    df_overview.loc[i, "slice_hw"] = " ".join(
+        [f"{h},{w}" for (h, w) in slice_hw_in_order]
+    )
+
+    vol = load_image_volume(
+        img_dir=IMAGE_FOLDER
+    )  # (Z,H,W) as loaded (sorted by filename)
+    vol_hwz = np.transpose(vol, (1, 2, 0))  # (H,W,Z) for MONAI spatial dims consistency
+
+    df_overview.loc[i, "orig_hwz"] = " ".join(map(str, vol_hwz.shape))
+
+    nii = nib.Nifti1Image(vol_hwz, affine=np.eye(4))
+    nii_path = os.path.join(WORKDIR, f"{CASE}_{DAY}_vol.nii.gz")
+    df_overview.loc[i, "vol_path"] = nii_path
+    nib.save(nii, nii_path)
+
+    del vol, vol_hwz, nii, pngs, slice_ids_in_order, slice_hw_in_order
+    gc.collect()
+
+df_overview.head()
+
+
+
+## === cell 7
+test_data = [{"image": p} for p in df_overview["vol_path"].tolist()]
+
+import json
+
+data1 = {
+    "description": "UWM",
+    "labels": {
+        "0": "background",
+        "1": "large_bowel",
+        "2": "small_bowel",
+        "3": "stomach",
+    },
+    "test": test_data,
+}
+
+with open("json_data.json", "w") as f:
+    json.dump(data1, f)
+
+with open("json_data.json", "r") as f:
+    _tmp = json.load(f)
+len(_tmp["test"]), _tmp["test"][0]
+
+
+
+## === cell 8
+monai_available = True
+try:
+    import monai  # noqa: F401
+except Exception:
+    for cand in ["../input", "/kaggle/input"]:
+        if os.path.isdir(cand) and cand not in sys.path:
+            sys.path.insert(0, cand)
+
+try:
+    import monai
+    from monai.inferers import sliding_window_inference
+    from monai.transforms import (
+        Compose,
+        LoadImaged,
+        NormalizeIntensityd,
+        EnsureChannelFirstd,
+        EnsureTyped,
+        Resized,
+    )
+    from monai.networks.nets import UNETR
+    from monai.data import CacheDataset, load_decathlon_datalist
+except Exception as e:
+    monai_available = False
+    monai_import_error = repr(e)
+
+monai_available, (monai_import_error if not monai_available else "ok")
+
+
+
+## === cell 9
+sz = (80, 144, 192)
+
+if monai_available:
+    test_transforms = Compose(
+        [
+            LoadImaged(keys=["image"]),
+            EnsureChannelFirstd(keys=["image"]),
+            NormalizeIntensityd(keys=["image"]),
+            Resized(keys=["image"], spatial_size=sz, mode="area"),
+            EnsureTyped(keys=["image"]),
+        ]
+    )
+
+
+
+## === cell 10
+import torch
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model = None
+model_loaded = False
+
+
+def _find_weight_file():
+    preferred = [
+        "../input/unetr-raw-size/best_metric_model.pth",
+        "/kaggle/input/unetr-raw-size/best_metric_model.pth",
+        os.path.join(DATASET_FOLDER, "best_metric_model.pth"),
+    ]
+    for p in preferred:
+        if os.path.exists(p) and os.path.isfile(p):
+            return p
+    candidates = glob.glob(
+        "../input/**/best_metric_model.pth", recursive=True
+    ) + glob.glob("/kaggle/input/**/best_metric_model.pth", recursive=True)
+    if candidates:
+        return sorted(candidates)[0]
+    candidates = glob.glob("../input/**/*.pth", recursive=True) + glob.glob(
+        "/kaggle/input/**/*.pth", recursive=True
+    )
+    for p in sorted(candidates):
+        if os.path.exists(p) and os.path.isfile(p):
+            return p
+    return None
+
+
+model_path = _find_weight_file()
+
+if monai_available and (model_path is not None):
+    try:
+        model = UNETR(
+            in_channels=1,
+            out_channels=3,
+            img_size=sz,
+            pos_embed="perceptron",
+            dropout_rate=0.2,
+        ).to(device)
+        state = torch.load(model_path, map_location=device)
+
+        if (
+            isinstance(state, dict)
+            and "state_dict" in state
+            and isinstance(state["state_dict"], dict)
+        ):
+            state = state["state_dict"]
+        missing, unexpected = model.load_state_dict(state, strict=False)
+        if len(unexpected) > 0:
+            raise RuntimeError(f"Unexpected keys in checkpoint: {unexpected[:10]}")
+        model.eval()
+        model_loaded = True
+        model_load_error = None
+    except Exception as e:
+        model_loaded = False
+        model_load_error = repr(e)
+else:
+    model_loaded = False
+    model_load_error = (
+        "weights_not_found" if model_path is None else "monai_not_available"
+    )
+
+model_loaded, (model_load_error if (not model_loaded) else f"ok:{model_path}")
+
+
+
+
+## === cell 11
+def rle_encode(img):
+    pixels = img.flatten(order="F")  # column-major: top-to-bottom then left-to-right
+    pixels = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
+    runs[1::2] -= runs[::2]
+    return " ".join(str(x) for x in runs)
+
+
+def rle_decode(mask_rle, shape):
+    s = mask_rle.split()
+    starts, lengths = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
+    starts -= 1
+    ends = starts + lengths
+    img = np.zeros(shape[0] * shape[1], dtype=np.uint8)
+    for lo, hi in zip(starts, ends):
+        img[lo:hi] = 1
+    return img.reshape(shape, order="F")
+
+
+
+
+## === cell 12
+CLASSES = ["large_bowel", "small_bowel", "stomach"]
+
+
+def _norm_slice_token(x):
+    s = str(x)
+    m = re.search(r"\d+", s)
+    if m is None:
+        return s
+    return str(int(m.group(0)))
+
+
+def segm_to_pred_rows(segm, df_vol, slice_order_tokens, slice_hw_list=None):
+    """
+    segm: expected model output after sigmoid, typically (3,H,W,Z).
+    df_vol: rows for a specific (Case,Day), contains id,class,Slice.
+    slice_order_tokens: list of slice identifiers in true z-order taken from PNG filenames.
+    slice_hw_list: optional list of (H,W) per z in same order as slice_order_tokens.
+                   If provided, each 2D mask is resized to that slice's native grid before RLE.
+    """
+    df_vol = df_vol.copy()
+    rows = []
+
+    if segm.ndim != 4:
+        raise ValueError(f"Unexpected segm shape: {segm.shape}")
+    if segm.shape[0] != 3:
+        raise ValueError(f"Unexpected channels: {segm.shape}")
+
+    segm = np.transpose(segm, (0, 3, 1, 2))  # (3,Z,H,W)
+    z_dim = segm.shape[1]
+
+    slice_to_z = {}
+    for i, tok in enumerate(slice_order_tokens):
+        ntok = _norm_slice_token(tok)
+        if ntok not in slice_to_z:
+            slice_to_z[ntok] = i
+
+    for slice_str, dfg in df_vol.groupby("Slice"):
+        z = slice_to_z.get(_norm_slice_token(slice_str), None)
+        if z is None or z < 0 or z >= z_dim:
+            for cls in CLASSES:
+                drow = dfg[dfg["class"] == cls].iloc[0]
+                rows.append({"id": drow["id"], "class": cls, "predicted": ""})
+            continue
+
+        target_hw = None
+        if slice_hw_list is not None and z < len(slice_hw_list):
+            target_hw = slice_hw_list[z]  # (H,W)
+
+        for cls in CLASSES:
+            drow = dfg[dfg["class"] == cls].iloc[0]
+            c = CLASSES.index(cls)
+            prob2d = segm[c, z, :, :]  # (H,W) in current segm space
+
+            if target_hw is not None and (
+                prob2d.shape[0] != target_hw[0] or prob2d.shape[1] != target_hw[1]
+            ):
+                t = torch.from_numpy(prob2d[None, None, ...]).float()  # (1,1,H,W)
+                with torch.no_grad():
+                    t = torch.nn.functional.interpolate(
+                        t,
+                        size=(target_hw[0], target_hw[1]),
+                        mode="bilinear",
+                        align_corners=False,
+                    )
+                prob2d = t.squeeze(0).squeeze(0).cpu().numpy()
+
+            mask2d = (prob2d > 0.5).astype(np.uint8)
+            pred = rle_encode(mask2d) if mask2d.any() else ""
+            rows.append({"id": drow["id"], "class": cls, "predicted": pred})
+
+    return pd.DataFrame(rows, columns=["id", "class", "predicted"])
+
+
+
+
+## === cell 13
+pred_df = None
+
+if monai_available and model_loaded:
+    datasets = "./json_data.json"
+    datalist = load_decathlon_datalist(datasets, True, "test")
+    test_ds = CacheDataset(
+        data=datalist,
+        transform=test_transforms,
+        cache_num=min(16, len(datalist)),
+        cache_rate=1.0,
+        num_workers=0,
+    )
+
+    pred_parts = []
+    for i in range(len(df_overview)):
+        x_data = test_ds[i]
+        vol_path = x_data["image_meta_dict"]["filename_or_obj"]
+
+        x_df = df_overview[
+            df_overview["vol_path"].apply(lambda p: os.path.basename(p))
+            == os.path.basename(vol_path)
+        ]
+        if len(x_df) != 1:
+            x_df = df_overview[df_overview["vol_path"] == vol_path]
+
+        CASE = int(x_df["Case"].iloc[0])
+        DAY = int(x_df["Day"].iloc[0])
+
+        slice_order_tokens = str(x_df["slice_order"].iloc[0]).split()
+
+        slice_hw_strs = str(x_df["slice_hw"].iloc[0]).split()
+        slice_hw_list = []
+        for s in slice_hw_strs:
+            if "," in s:
+                h_s, w_s = s.split(",", 1)
+                if h_s.isdigit() and w_s.isdigit():
+                    slice_hw_list.append((int(h_s), int(w_s)))
+        if len(slice_hw_list) != len(slice_order_tokens):
+            slice_hw_list = None  # fallback safely
+
+        true_hw = tuple(int(x) for x in str(x_df["true_hw"].iloc[0]).split())  # (H,W)
+        true_z = len(slice_order_tokens)
+        true_hwz = (true_hw[0], true_hw[1], true_z)
+
+        inputs = torch.unsqueeze(x_data["image"], 0).to(device)
+        with torch.no_grad():
+            output = sliding_window_inference(inputs, sz, 1, model, overlap=0.8)
+        output = output.float().sigmoid().cpu()
+
+        segm = np.squeeze(output.numpy())  # (3,H,W,Z) in resized space (sz)
+
+        if tuple(segm.shape[1:]) != tuple(true_hwz):
+            segm_t = torch.from_numpy(segm).float()  # (3,H,W,Z)
+            segm_t = segm_t.permute(0, 3, 1, 2).unsqueeze(0)  # (1,3,Z,H,W)
+            with torch.no_grad():
+                segm_t = torch.nn.functional.interpolate(
+                    segm_t,
+                    size=(true_hwz[2], true_hwz[0], true_hwz[1]),  # (Z,H,W)
+                    mode="trilinear",
+                    align_corners=False,
+                )
+            segm = (
+                segm_t.squeeze(0).permute(0, 2, 3, 1).cpu().numpy()
+            )  # back to (3,H,W,Z)
+
+        df_vol = df_base[(df_base["Case"] == CASE) & (df_base["Day"] == DAY)].copy()
+        pred_parts.append(
+            segm_to_pred_rows(
+                segm, df_vol, slice_order_tokens, slice_hw_list=slice_hw_list
+            )
+        )
+
+        del inputs, output, segm, df_vol
+        gc.collect()
+
+    pred_df = pd.concat(pred_parts, ignore_index=True)
+else:
+    pred_df = df_base[["id", "class"]].copy()
+    pred_df["predicted"] = ""
+
+pred_df.head(), pred_df.shape
+
+
+
+## === cell 14
+sub_df = pd.read_csv(os.path.join(DATASET_FOLDER, "sample_submission.csv"))
+sub_df = sub_df.drop(columns=["predicted"])
+sub_df = sub_df.merge(pred_df, on=["id", "class"], how="left")
+sub_df["predicted"] = sub_df["predicted"].fillna("")
+sub_df.to_csv("submission.csv", index=False)
+
+sub_df.head(), sub_df.shape, os.path.exists("submission.csv")

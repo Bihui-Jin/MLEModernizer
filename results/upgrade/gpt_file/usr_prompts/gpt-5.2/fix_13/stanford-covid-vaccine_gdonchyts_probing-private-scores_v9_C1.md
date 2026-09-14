@@ -1,0 +1,673 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Overview
+Predict likely degradation rates at each base of an RNA molecule.
+
+## Metric
+Mean columnwise root mean squared error:
+
+$\textrm{MCRMSE} = \frac{1}{N_{t}}\sum_{j=1}^{N_{t}}\sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_{ij} - \hat{y}_{ij})^2}$
+
+where $N_{t}$ is the number of scored ground truth target columns, and $y$ and $\hat{y}$ are the actual and predicted values, respectively.
+
+There are multiple ground truth values provided in the training data. While the submission format requires all 5 to be predicted, only the following are scored: reactivity, deg_Mg_pH10, and deg_Mg_50C.
+
+## Submission Formats
+For each sample `id` in the test set, you must predict targets for *each* sequence position (`seqpos`), one per row. If the length of the `sequence` of an `id` is, e.g., 107, then you should make 107 predictions. Positions greater than the `seq_scored` value of a sample are not scored, but still need a value in the solution file.
+
+```csv
+id_seqpos,reactivity,deg_Mg_pH10,deg_pH10,deg_Mg_50C,deg_50C
+id_d190610e8_0,0.1,0.3,0.2,0.5,0.4
+id_d190610e8_1,0.3,0.2,0.5,0.4,0.2
+id_d190610e8_2,0.5,0.4,0.2,0.1,0.2
+etc.
+```
+
+## Dataset 
+- **train.json** - the training data
+- **test.json** - the test set, without any columns associated with the ground truth.
+- **sample_submission.csv** - a sample submission file in the correct format
+
+#### Columns
+- `id` - An arbitrary identifier for each sample.
+- `seq_scored` - (68 in Train and Public Test, 68 in Private Test) Integer value denoting the number of positions used in scoring with predicted values. This should match the length of `reactivity`, `deg_*` and `*_error_*` columns.
+- `seq_length` - (107 in Train and Public Test, 107 in Private Test) Integer values, denotes the length of `sequence`.
+- `sequence` - (1x107 string in Train and Public Test, 107 in Private Test) Describes the RNA sequence, a combination of `A`, `G`, `U`, and `C` for each sample. Should be 107 characters long, and the first 68 bases should correspond to the 68 positions specified in `seq_scored` (note: indexed starting at 0).
+- `structure` - (1x107 string in Train and Public Test, 107 in Private Test) An array of `(`, `)`, and `.` characters that describe whether a base is estimated to be paired or unpaired. Paired bases are denoted by opening and closing parentheses e.g. (....) means that base 0 is paired to base 5, and bases 1-4 are unpaired.
+- `reactivity` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likely secondary structure of the RNA sample.
+- `deg_pH10` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating without magnesium at high pH (pH 10).
+- `deg_Mg_pH10` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating with magnesium in high pH (pH 10).
+- `deg_50C` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating without magnesium at high temperature (50 degrees Celsius).
+- `deg_Mg_50C` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating with magnesium at high temperature (50 degrees Celsius).
+- `*_error_*` - An array of floating point numbers, should have the same length as the corresponding `reactivity` or `deg_*` columns, calculated errors in experimental values obtained in `reactivity` and `deg_*` columns.
+- `predicted_loop_type` - (1x107 string) Describes the structural context (also referred to as 'loop type')of each character in `sequence`. Loop types assigned by bpRNA from Vienna RNAfold 2 structure. From the bpRNA_documentation: S: paired "Stem" M: Multiloop I: Internal loop B: Bulge H: Hairpin loop E: dangling End X: eXternal loop
+    - `S/N filter` Indicates if the sample passed filters described below in `Additional Notes`.
+
+#### Additional Notes
+At the beginning of the competition, Stanford scientists have data on 2400 RNA sequences of length 107. For technical reasons, measurements cannot be carried out on the final bases of these RNA sequences, so we have experimental data (ground truth) in 5 conditions for the first 68 bases.
+
+We have split out 240 of these 2400 sequences for a public test set to allow for continuous evaluation through the competition, on the public leaderboard. These sequences, in `test.json`, have been additionally filtered based on three criteria detailed below to ensure that this subset is not dominated by any large cluster of RNA molecules with poor data, which might bias the public leaderboard. The remaining 2160 sequences for which we have data are in `train.json`.
+
+For our final and most important scoring (the Private Leaderbooard), Stanford scientists are carrying out measurements on 240 new RNAs. For these data, we expect to have measurements for the first 68 bases, again missing the ends of the RNA. These sequences constitute the 240 sequences in `test.json`.
+
+For those interested in how the sequences in `test.json` were filtered, here were the steps to ensure a diverse and high quality test set for public leaderboard scoring:
+
+1. Minimum value across all 5 conditions must be greater than -0.5.
+2. Mean signal/noise across all 5 conditions must be greater than 1.0. [Signal/noise is defined as mean( measurement value over 68 nts )/mean( statistical error in measurement value over 68 nts)]
+3. To help ensure sequence diversity, the resulting sequences were clustered into clusters with less than 50% sequence similarity, and the 240 test set sequences were chosen from clusters with 3 or fewer members. That is, any sequence in the test set should be sequence similar to at most 2 other sequences.
+
+Note that these filters have not been applied to the 2160 RNAs in the public training data `train.json` -- some of those measurements have negative values or poor signal-to-noise, or some RNA sequences have near-identical sequences in that set. But we are providing all those data in case competitors can squeeze out more signal.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        input/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        working/
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+```
+
+-> data/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/stanford-covid-vaccine/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> input/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.3518779703353691
+
+# 6. Current score
+
+0.47889
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.63824) has done: 'I remove the dependency on the missing `../input/worst-submission/ensemble52.csv` and instead build a valid submission directly from the provided `sample_submission.csv` and `test.json`. To keep the core intent (produce a “worse” baseline submission) while ensuring it runs end-to-end, I fill predictions with a constant value (0.0) for all targets and preserve the exact required row order/columns from `sample_submission.csv`. I also keep your existing “set a specific id’s reactivity to 0” line, but guard it so it won’t crash if the id isn’t present. The result reliably write `submission.csv` with the correct format.'
+- What this solution (achieved 0.47906) has done: 'I fix the crash by reading `test.json` with the correct JSON-lines mode (`lines=True`), since the file is newline-delimited JSON and `pd.read_json` otherwise raises “Trailing data”. Then, to move the score toward your target (lower is better) while keeping the same “constant prediction” core approach, I set the constant to a more reasonable global mean estimated from the training targets (computed only from `train.json`, no leakage from test labels). Finally, I keep the exact `sample_submission.csv` row order/columns and still write a valid `submission.csv`.'
+- What this solution (achieved 0.47889) has done: 'To move your score down toward the 0.3519 target (lower is better) while preserving the same “constant prediction per column” core logic, I adjust the constants to better match the evaluation: compute means only over the scored region (first `seq_scored` positions) and only from higher-quality training samples (`SN_filter==1`). I also set the two unscored columns (`deg_pH10`, `deg_50C`) to reasonable means as well, but keep the same submission format and row order from `sample_submission.csv`. Finally, I remove the single-id manual override because it injects an arbitrary outlier that is very likely hurting MCRMSE without offering systematic benefit. All changes are minimal, deterministic, and keep the same overall approach (no model/training added).'
+- What this solution (achieved 0.55557) has done: 'You’re already using the best “constant baseline” core logic you described, so the smallest safe improvement toward the lower-is-better target is to make the constants match the evaluation more closely. I compute per-target constants as an error-weighted mean using the provided `*_error_*` arrays (still only on the scored region and only `SN_filter==1`), which typically reduces RMSE versus an unweighted mean without changing the modeling approach. I also clip predictions to be non-negative (a common property of these targets) to avoid unnecessary error from negative constants, while keeping the exact sample submission row order and writing `submission.csv` the same way. No model, feature extraction, or training loop is introduced—this remains a deterministic constant-per-column submission.'
+- What this solution (achieved 0.59231) has done: 'We keep your constant-per-target submission logic intact and make the constants closer to what minimizes RMSE by switching from an error-weighted mean (sensitive to tiny/unstable error values) to an error-weighted median (more robust), still computed only on `SN_filter==1` and only over the scored region. We also remove the hard non-negativity clip (which can bias the constant away from the true optimum under RMSE) and instead apply a very light winsorization on the per-position values used to compute the constants to reduce the influence of extreme outliers without changing the overall approach. Finally, we keep the exact `sample_submission.csv` row order/columns and still write a valid `submission.csv`.'
+- What this solution (achieved 0.55332) has done: 'Your current approach is a constant-per-target submission; the main reason it’s underperforming is that you’re using a (weighted) median, but RMSE is minimized by the (weighted) mean. I keep the exact same pipeline and inputs (no model/training), but switch the constant estimator to a stabilized inverse-variance weighted mean computed only on the scored region and only for `SN_filter==1`, which should move the MCRMSE down toward your target. To avoid the earlier instability from tiny error values, I add a small, deterministic weight cap/floor (still using the provided error arrays) rather than changing the overall logic. Submission formatting, row order, and file writing remain identical to ensure a valid `submission.csv`.'
+- What this solution (achieved 0.54125) has done: 'We keep your constant-per-target submission logic unchanged, but tune the constant estimator to better match the RMSE objective by removing the per-row winsorization step, which can bias the mean away from the true RMSE-minimizing constant. We also compute constants only from the scored region (you already do) and still restrict to `SN_filter==1`, but we stabilize inverse-variance weights using a slightly higher error floor and a tighter weight cap to reduce over-reliance on potentially under-estimated error values. Finally, we keep the exact `sample_submission.csv` row order/columns and write `submission.csv` as before to ensure a valid submission.'
+- What this solution (achieved 0.53342) has done: 'Your current gap to the target is large (0.54125 vs 0.35188; lower is better), so we should improve the constant baseline without changing the overall “one constant per target column” logic. The simplest RMSE-aligned improvement is to estimate the constant as the mean of the **per-sequence means** (over the scored region), rather than pooling all positions across all sequences; this avoids overweighting sequences that happen to have more valid points and tends to be more stable for this dataset. To keep your existing inverse-variance weighting intent while improving robustness, we compute each sequence’s error-weighted mean first, then take an (unweighted) mean across sequences. Submission formatting and row order remain exactly the same, and the script still writes `submission.csv`.'
+- What this solution (achieved 0.54125) has done: 'We keep your “one constant per target column” submission logic, but make the constant estimator more RMSE-aligned by pooling across **all scored positions** (still only `SN_filter==1`) instead of averaging per-sequence means, which can underweight high-quality sequences and usually increases error. We retain your inverse-variance weighting idea, but compute a single stabilized weighted mean over all valid scored positions, with the same `e_floor` and `w_max` guards for numerical stability. This is a minimal change isolated to `weighted_const_for_target`, preserving I/O, columns, row order, and still writing a valid `submission.csv`. The expected effect (lower-is-better) is to decrease MCRMSE from 0.53342 toward your 0.35188 target.'
+- What this solution (achieved 0.55153) has done: 'I keep your “one constant per target column” submission logic exactly the same, but make the constant estimates closer to what minimizes MCRMSE by reducing bias from heavy inverse-variance weighting. Concretely, I estimate each constant using a stabilized Huber-style reweighting around the (weighted) mean, which is still a deterministic constant-per-column approach and uses only training data. This typically improves over pure inverse-variance weighting when the provided error arrays are imperfectly calibrated and when outliers exist, moving your 0.54125 score downward toward the 0.35188 target. All I/O, paths, column order, row count, and `submission.csv` writing remain unchanged.'
+- What this solution (achieved 0.54125) has done: 'Your current score (0.55153; lower is better) is still far from the target (0.35188), so we should improve the constant-baseline while keeping the exact “one constant per target column” semantics. The smallest change likely to reduce MCRMSE is to switch from the current Huber-reweighted mean back to a stabilized inverse-variance weighted mean (RMSE-optimal under Gaussian noise) computed only on the scored region and SN_filter==1, because Huber downweighting can bias the mean away from the RMSE-minimizing constant. To make this stable (and not over-trust tiny/possibly miscalibrated errors), we keep your existing error floor and weight cap, but remove the robust reweighting step. All I/O paths, row order, columns, and submission writing remain identical.'
+- What this solution (achieved 0.47889) has done: 'We keep your “one constant per target column” submission logic intact, but adjust the constant estimator to better match the RMSE objective by using a plain (unweighted) mean over all scored positions from high-quality samples (`SN_filter==1`). This is a minimal change isolated to `weighted_const_for_target` and should reduce error because inverse-variance weighting can be harmful here when the provided error arrays are miscalibrated relative to test noise. We still compute using only the scored region (`seq_scored`) and keep submission formatting/row order identical to `sample_submission.csv`. The rest of the pipeline remains unchanged and still writes a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np  # linear algebra
+import pandas as pd  # data processing
+import os
+
+
+
+## === cell 1
+base_dir_candidates = [
+    "/kaggle/input/stanford-covid-vaccine",
+    "/kaggle/data/stanford-covid-vaccine",
+    "../input/stanford-covid-vaccine",
+    "../kaggle/input/stanford-covid-vaccine",
+    "/kaggle/input",
+    "/kaggle/data",
+    "../input",
+    "../kaggle/data",
+]
+
+
+def find_file(filename: str) -> str:
+    for d in base_dir_candidates:
+        p = os.path.join(d, filename)
+        if os.path.exists(p):
+            return p
+    for p in [
+        f"/kaggle/data/{filename}",
+        f"/kaggle/input/{filename}",
+        f"../input/{filename}",
+        f"../kaggle/data/{filename}",
+    ]:
+        if os.path.exists(p):
+            return p
+    raise FileNotFoundError(f"Could not find {filename} in known Kaggle paths.")
+
+
+sample_path = find_file("sample_submission.csv")
+test_json_path = find_file("test.json")
+train_json_path = find_file("train.json")
+
+sample_sub = pd.read_csv(sample_path)
+
+test_df = pd.read_json(test_json_path, lines=True)
+train_df = pd.read_json(train_json_path, lines=True)
+
+print("Loaded sample_sub:", sample_sub.shape)
+print("Loaded test_df:", test_df.shape)
+print("Loaded train_df:", train_df.shape)
+sample_sub.head()
+
+
+
+## === cell 2
+target_cols = ["reactivity", "deg_Mg_pH10", "deg_pH10", "deg_Mg_50C", "deg_50C"]
+
+train_use = train_df.copy()
+if "SN_filter" in train_use.columns:
+    train_use = train_use[train_use["SN_filter"] == 1].reset_index(drop=True)
+
+error_col_map = {
+    "reactivity": "reactivity_error",
+    "deg_Mg_pH10": "deg_error_Mg_pH10",
+    "deg_pH10": "deg_error_pH10",
+    "deg_Mg_50C": "deg_error_Mg_50C",
+    "deg_50C": "deg_error_50C",
+}
+
+
+def _collect_y_e_for_target(tcol: str):
+    """Collect scored-region y and corresponding error arrays (if present)."""
+    ecol = error_col_map.get(tcol, None)
+
+    ys = []
+    es = []
+    have_e = (ecol is not None) and (ecol in train_use.columns)
+
+    for _, r in train_use.iterrows():
+        y = np.asarray(r[tcol], dtype=np.float64)
+        n = int(r["seq_scored"]) if "seq_scored" in r else len(y)
+        y = y[:n]
+        y = np.nan_to_num(y, nan=np.nan, posinf=np.nan, neginf=np.nan)
+
+        if have_e:
+            e = np.asarray(r[ecol], dtype=np.float64)[:n]
+            e = np.nan_to_num(e, nan=np.nan, posinf=np.nan, neginf=np.nan)
+        else:
+            e = None
+
+        if e is None:
+            m = np.isfinite(y)
+            if np.any(m):
+                ys.append(y[m])
+        else:
+            m = np.isfinite(y) & np.isfinite(e)
+            if np.any(m):
+                ys.append(y[m])
+                es.append(e[m])
+
+    if len(ys) == 0:
+        return np.array([], dtype=np.float64), np.array([], dtype=np.float64), have_e
+
+    y_all = np.concatenate(ys).astype(np.float64, copy=False)
+    if have_e and len(es) > 0:
+        e_all = np.concatenate(es).astype(np.float64, copy=False)
+    else:
+        e_all = np.array([], dtype=np.float64)
+
+    return y_all, e_all, have_e
+
+
+def weighted_const_for_target(tcol: str) -> float:
+    """
+    Minimal score-improving change while keeping identical core logic (one constant per target):
+    - Switch from inverse-variance weighting to the plain mean over all scored positions (SN_filter==1).
+    Why it should move score toward the lower-is-better target:
+    - For constant prediction under RMSE, the optimal constant is the mean of the target distribution.
+    - The provided per-position error arrays are not guaranteed to reflect test-time noise; inverse-variance
+      weighting can therefore bias the constant and worsen MCRMSE. Using the unweighted mean is a safer
+      RMSE-aligned estimator in this baseline setting.
+    """
+    y, _, _ = _collect_y_e_for_target(tcol)
+
+    if y.size == 0:
+        vals_all = np.concatenate(
+            [np.asarray(v, dtype=np.float64) for v in train_df[tcol].values]
+        )
+        return float(np.nanmean(vals_all))
+
+    m = np.isfinite(y)
+    y = y[m]
+    if y.size == 0:
+        return 0.0
+
+    return float(np.mean(y))
+
+
+const_by_col = {}
+for c in target_cols:
+    if c not in train_df.columns:
+        raise ValueError(f"Expected column {c} in train.json but it was missing.")
+    const_by_col[c] = weighted_const_for_target(c)
+
+for c in target_cols:
+    if not np.isfinite(const_by_col[c]):
+        const_by_col[c] = 0.0
+
+print("Constants:", const_by_col)
+
+
+
+## === cell 3
+df = sample_sub.copy()
+
+for c in target_cols:
+    if c not in df.columns:
+        raise ValueError(
+            f"Expected column {c} in sample_submission.csv but it was missing."
+        )
+    df[c] = const_by_col[c]
+
+assert (
+    df.shape[0] == sample_sub.shape[0]
+), "Submission row count mismatch vs sample_submission.csv"
+assert list(df.columns) == list(
+    sample_sub.columns
+), "Submission columns/order must match sample_submission.csv"
+
+df.head()
+
+
+
+## === cell 4
+pass
+
+
+
+## === cell 5
+expected_cols = [
+    "id_seqpos",
+    "reactivity",
+    "deg_Mg_pH10",
+    "deg_pH10",
+    "deg_Mg_50C",
+    "deg_50C",
+]
+if list(df.columns) != expected_cols:
+    df = df[expected_cols]
+
+for c in expected_cols[1:]:
+    df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0.0).astype(np.float32)
+
+print(df.head())
+print(df.dtypes)
+
+
+
+## === cell 6
+df.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with shape:", df.shape)
+print(pd.read_csv("submission.csv").head())

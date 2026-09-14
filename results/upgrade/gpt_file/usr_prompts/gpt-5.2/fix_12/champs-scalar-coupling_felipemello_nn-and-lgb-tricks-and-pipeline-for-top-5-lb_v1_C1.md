@@ -1,0 +1,1352 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the `scalar_coupling_constant` between atom pairs in molecules, given the two atom types (e.g., C and H), the coupling type (e.g., `2JHC`), and any features you are able to create from the molecule structure (`xyz`) files.
+
+## Metric
+Log of the Mean Absolute Error, calculated for each scalar coupling type, and then averaged across types.
+
+## Submission Format
+```
+id,scalar_coupling_constant
+2324604,0.0
+2324605,0.0
+2324606,0.0
+etc.
+```
+
+## Dataset
+The training and test splits are by *molecule*, so that no molecule in the training data is found in the test data.
+
+- **train.csv** - the training set, where the first column (`molecule_name`) is the name of the molecule where the coupling constant originates (the corresponding XYZ file is located at ./structures/.xyz), the second (`atom_index_0`) and third column (`atom_index_1`) is the atom indices of the atom-pair creating the coupling and the fourth column (`scalar_coupling_constant`) is the scalar coupling constant that we want to be able to predict
+- **test.csv** - the test set; same info as train, without the target variable
+- **sample_submission.csv** - a sample submission file in the correct format
+- **structures.zip** - folder containing molecular structure (xyz) files, where the first line is the number of atoms in the molecule, followed by a blank line, and then a line for every atom, where the first column contains the atomic element (H for hydrogen, C for carbon etc.) and the remaining columns contain the X, Y and Z cartesian coordinates (a standard format for chemists and molecular visualization programs)
+- **structures.csv** - this file contains the **same** information as the individual xyz structure files, but in a single file
+- **dipole_moments.csv** - contains the molecular electric dipole moments. These are three dimensional vectors that indicate the charge distribution in the molecule. The first column (`molecule_name`) are the names of the molecule, the second to fourth column are the `X`, `Y` and `Z` components respectively of the dipole moment.
+- **magnetic_shielding_tensors.csv** - contains the magnetic shielding tensors for all atoms in the molecules. The first column (`molecule_name`) contains the molecule name, the second column (`atom_index`) contains the index of the atom in the molecule, the third to eleventh columns contain the `XX`, `YX`, `ZX`, `XY`, `YY`, `ZY`, `XZ`, `YZ` and `ZZ` elements of the tensor/matrix respectively.
+- **mulliken_charges.csv** - contains the mulliken charges for all atoms in the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`atom_index`) contains the index of the atom in the molecule, the third column (`mulliken_charge`) contains the mulliken charge of the atom.
+- **potential_energy.csv** - contains the potential energy of the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`potential_energy`) contains the potential energy of the molecule.
+- **scalar_coupling_contributions.csv** - The scalar coupling constants in `train.csv` (or corresponding files) are a sum of four terms. `scalar_coupling_contributions.csv` contain all these terms. The first column (`molecule_name`) are the name of the molecule, the second (`atom_index_0`) and third column (`atom_index_1`) are the atom indices of the atom-pair, the fourth column indicates the type of coupling, the fifth column (`fc`) is the Fermi Contact contribution, the sixth column (`sd`) is the Spin-dipolar contribution, the seventh column (`pso`) is the Paramagnetic spin-orbit contribution and the eighth column (`dso`) is the Diamagnetic spin-orbit contribution.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        input/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        working/
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+```
+
+-> data/champs-scalar-coupling/dipole_moments.csv has 76510 rows and 4 columns.
+The columns are: molecule_name, X, Y, Z
+
+-> data/champs-scalar-coupling/magnetic_shielding_tensors.csv has 1379964 rows and 11 columns.
+The columns are: molecule_name, atom_index, XX, YX, ZX, XY, YY, ZY, XZ, YZ, ZZ
+
+-> data/champs-scalar-coupling/mulliken_charges.csv has 1379964 rows and 3 columns.
+The columns are: molecule_name, atom_index, mulliken_charge
+
+-> data/champs-scalar-coupling/potential_energy.csv has 76510 rows and 2 columns.
+The columns are: molecule_name, potential_energy
+
+-> data/champs-scalar-coupling/sample_submission.csv has 467813 rows and 2 columns.
+The columns are: id, scalar_coupling_constant
+
+-> data/champs-scalar-coupling/scalar_coupling_contributions.csv has 4191263 rows and 8 columns.
+The columns are: molecule_name, atom_index_0, atom_index_1, type, fc, sd, pso, dso
+
+-> data/champs-scalar-coupling/structures.csv has 1379964 rows and 6 columns.
+The columns are: molecule_name, atom_index, atom, x, y, z
+
+-> data/champs-scalar-coupling/test.csv has 467813 rows and 5 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type
+
+-> data/champs-scalar-coupling/train.csv has 4191263 rows and 6 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type, scalar_coupling_constant
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-2.108374155517372
+
+# 6. Current score
+
+11.64689
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.99777) has done: 'I fix the runtime/import crashes by removing the TensorFlow v1 session configuration and avoiding the protobuf-related Keras/TensorFlow import path that triggers the `MessageFactory.GetPrototype` error in this environment. I also make the notebook robust to missing external Kaggle Dataset inputs (the `preds-on-oof-and-test` and `features-for-top-5-lb-with-nn-or-lgb` folders) by falling back to generating a valid submission directly from the official `sample_submission.csv` when those files are not present, so you always get a `.csv` submission artifact. Finally, I fix several NameErrors and missing imports (e.g., `tqdm`, `mol_type` capture in `load_or_create_nn_model`) so the script runs end-to-end without depending on cells that previously failed. These changes are correctness/stability focused; since no current score exists, the priority is producing a valid submission CSV rather than tuning for the target score.'
+- What this solution (achieved 1.23566) has done: 'I fix the TensorFlow/Keras import crash (`MessageFactory.GetPrototype`) by avoiding TF entirely and using a lightweight, deterministic fallback that still produces a valid submission CSV. Since your current score (1.99777, lower-is-better) is far from the target (-2.108…), the minimal legitimate way to move toward the target without changing the intended pipeline is to replace the zero-prediction fallback with a simple, type-wise mean baseline computed from `train.csv` (no leakage because test has no targets). The rest of the script keep the same I/O paths and still run the full pipeline only if the extra external feature folders exist; otherwise it reliably generate `final_sub.csv`. This should run end-to-end in the Kaggle environment within the time limit and improve score substantially over zeros.'
+- What this solution (achieved 1.23566) has done: 'Your current fallback is a very weak baseline (type-wise mean), which explains why the score is far from the target (lower is better). To move substantially toward the target while keeping changes minimal and preserving the “fallback baseline” core idea, I upgrade the fallback to a strictly out-of-model feature baseline: a per-`type` linear regression on only geometric distance features computed from `structures.csv` (no neural nets, no external datasets, no leakage). This keeps runtime under the limit by computing only the coordinates needed for each pair and training one tiny regression per type, and it generally improve MAE a lot versus type-mean without changing any of your full-pipeline logic. The full pipeline remains untouched and still runs only if all optional inputs + TF are available; otherwise it writes `final_sub.csv` with the improved baseline.'
+- What this solution (achieved 1.23566) has done: 'Your current score (1.23566, lower-is-better) is still very far from the target (-2.108...), so we need a real (but still minimal) improvement in the fallback baseline while keeping your overall structure and submission semantics unchanged. I keep the same “distance-based per-type linear model” idea, but make it more expressive by adding atom identity features (atom_0/atom_1) and a couple of simple interaction terms with distance, which typically reduces MAE a lot for this competition without changing the approach class. I also switch from `Ridge` to `RidgeCV` (still linear regression with L2, same core logic) to pick a better regularization per type deterministically, and I keep the same robust NaN/merge fallbacks and `final_sub.csv` writing. The full TF/LGB/NN pipeline remains untouched and still only run when all optional inputs are present.'
+- What this solution (achieved 6.30415) has done: 'Your current score (1.23566, lower-is-better) is still far from the target (-2.108…), so we need a modest but legitimate accuracy lift in the fallback baseline without changing the overall “distance-based per-type linear model” approach. I keep the same RidgeCV-per-type training, but add a few cheap, chemistry-relevant features already available from the same official files: electronegativity and covalent radius (mapped from atom symbols), plus simple combinations with distance. I also incorporate `mulliken_charges.csv` (per-atom) as additional pairwise features, which typically improves MAE a lot while preserving the same model class and training flow. Finally, I keep the same submission alignment logic using `sample_submission.csv` to guarantee a valid `final_sub.csv`.'
+- What this solution (achieved 6.11597) has done: 'Your current score (6.30415, lower-is-better) is far worse than the target (-2.108...), so we should improve the fallback baseline with minimal, legitimate feature additions while keeping the same per-type RidgeCV training flow. The biggest gain per unit change is to add a few more official per-atom/per-molecule features (magnetic shielding tensors + dipole moments + potential energy) and simple pairwise aggregates, which are cheap joins and usually reduce MAE materially on this competition. I also fix a bug in `calc_logmae` (it currently computes `log(sum(MAE))` instead of `log(MAE)`), which doesn’t affect submissions but prevents correct internal scoring/feature selection if you ever run those parts. All I/O paths and the submission writing logic remain unchanged, and the script still always writes `final_sub.csv`.'
+- What this solution (achieved 5.73515) has done: 'Your current score (6.11597, lower-is-better) is far worse than the target, so we should improve the fallback baseline while keeping the same “per-type RidgeCV on simple engineered features” core logic. The biggest issue is that the current fallback likely produces miscalibrated predictions because the scalar coupling scale differs drastically by `type`; adding a lightweight per-type target standardization (fit on train, invert on predict) typically reduces MAE a lot without changing the model class. I also add a tiny set of safe, interaction-only features (`dist` crossed with per-atom properties and shielding summaries) that are still computed from the same official files and keep the same training flow. Finally, I keep submission alignment via `sample_submission.csv` and ensure the pipeline always writes `final_sub.csv`.'
+- What this solution (achieved 11.64689) has done: 'Your current score is far worse than the target (lower-is-better), so we should make the smallest changes that improve the *fallback baseline* without touching the unavailable TF full pipeline. The biggest likely issue is that the per-type RidgeCV is being fit on unscaled features with very different magnitudes, which can severely hurt linear models; we add a per-type `StandardScaler` fit on train features and applied to test. We also make the per-type CV deterministic by disabling shuffling (leave `cv=3`) and keep the existing per-type target standardization exactly as-is. All I/O paths remain unchanged and the script still always writes a valid `final_sub.csv`.'
+- What this solution (achieved 11.64689) has done: 'Your current score (11.64689, lower-is-better) is far worse than the target, so we should make the smallest change that is most likely to fix a correctness issue rather than “tune” the model. The biggest bug in the fallback baseline is that it trains per-type models, but then writes predictions into `preds` using a boolean mask taken from `test` **after merges**—if row order/indices change during merges, this mask can mis-assign predictions to the wrong `id`, exploding MAE. I fix this by creating predictions keyed by `id` (per-type), and only merging back to `sample_submission` by `id` at the end (same model/features, just correct alignment). This preserves the core RidgeCV-per-type baseline logic and should materially improve score toward the target by eliminating misalignment.'
+- What this solution (achieved 11.64689) has done: 'Your current score is dramatically worse than target, so the most likely cause is still a correctness issue in the fallback baseline rather than lack of model power. I make the smallest change that prevents any accidental row duplication/misalignment during the many merges: keep an explicit `row_id` key through feature building, then always create predictions as a Series aligned by `row_id` and only finally map by `id` into `sample_submission`. Additionally, I add `validate=` to the critical merges (where safe) so the script fails fast if any merge becomes many-to-many (which can silently explode the dataset and destroy accuracy). These changes preserve the same RidgeCV-per-type approach and all existing features, but should bring the score back down by ensuring predictions are assigned to the correct `id`.'
+- What this solution (achieved 11.64689) has done: 'Your current score is far worse than the target (lower is better), so the most likely remaining issue is still in the fallback baseline’s prediction assembly rather than model capacity. I make the smallest change that prevents any row/key mismatch: build predictions keyed **directly by `id`** per type, and then fill the submission by mapping `id -> prediction` (avoids any dependence on `row_id`/row order after merges). I also ensure that `RidgeCV` receives the correct train rows by converting the `tr_idx` index labels into positional indices for `X_train_all`, so the model is trained on the intended subset. All features, per-type modeling, scaling, and target standardization remain the same.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import gc
+import copy
+import random
+import warnings
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.preprocessing import StandardScaler
+
+warnings.filterwarnings("ignore")
+warnings.filterwarnings(action="ignore", category=DeprecationWarning)
+warnings.filterwarnings(action="ignore", category=FutureWarning)
+
+SEED = 2319
+random.seed(SEED)
+np.random.seed(SEED)
+
+
+
+## === cell 1
+TF_AVAILABLE = False
+
+
+
+## === cell 2
+from tqdm.auto import tqdm
+
+
+def calc_logmae(y_val, y_pred):
+    y_val = np.asarray(y_val).reshape(-1)
+    y_pred = np.asarray(y_pred).reshape(-1)
+    mae = np.mean(np.abs(y_val - y_pred))
+    return np.log(mae + 1e-12)
+
+
+def permutation_importance(
+    model, X_val, y_val, calc_logmae, threshold=0.01, minimize=True, verbose=True
+):
+    results = {}
+
+    y_pred = model.predict(X_val)
+    results["base_score"] = calc_logmae(y_val, y_pred)
+    if verbose:
+        print(f'Base score {results["base_score"]:.5}')
+
+    for col in tqdm(X_val.columns):
+        freezed_col = X_val[col].copy()
+        X_val[col] = np.random.permutation(X_val[col])
+        preds = model.predict(X_val)
+        results[col] = calc_logmae(y_val, preds)
+        X_val[col] = freezed_col
+
+        if verbose:
+            print(f"column: {col} - {results[col]:.5}")
+
+    if minimize:
+        bad_features = [
+            k for k in results if results[k] < results["base_score"] + threshold
+        ]
+    else:
+        bad_features = [
+            k for k in results if results[k] > results["base_score"] + threshold
+        ]
+    if "base_score" in bad_features:
+        bad_features.remove("base_score")
+
+    return results, bad_features
+
+
+def load_lgb_params(mol_type, n_estimators=2000):
+    seed = SEED
+    param_1J = {
+        "num_leaves": int(0.7 * (25**2)),
+        "learning_rate": 0.1,
+        "feature_fraction": 1,
+        "save_binary": True,
+        "seed": seed,
+        "feature_fraction_seed": seed,
+        "bagging_seed": seed,
+        "drop_seed": seed,
+        "data_random_seed": seed,
+        "objective": "regression_l2",
+        "boosting_type": "gbdt",
+        "verbosity": -1,
+        "metric": "mae",
+        "is_unbalance": True,
+        "boost_from_average": "false",
+        "bagging_fraction": 1,
+        "bagging_freq": 0,
+        "lambda_l1": 0.5,
+        "lambda_l2": 1.7244553699717466,
+        "max_bin": 238,
+        "max_depth": 25,
+        "n_estimators": n_estimators,
+        "sparse_threshold": 1.0,
+        "n_jobs": 6,
+    }
+
+    param_2J = {
+        "num_leaves": int(1 * (20**2)),
+        "learning_rate": 0.1,
+        "feature_fraction": 1,
+        "save_binary": True,
+        "seed": seed,
+        "feature_fraction_seed": seed,
+        "bagging_seed": seed,
+        "drop_seed": seed,
+        "data_random_seed": seed,
+        "objective": "regression_l2",
+        "boosting_type": "gbdt",
+        "verbosity": -1,
+        "metric": "mae",
+        "is_unbalance": True,
+        "boost_from_average": "false",
+        "bagging_fraction": 1,
+        "bagging_freq": 0,
+        "lambda_l1": 1,
+        "lambda_l2": 1.89,
+        "max_bin": 255,
+        "max_depth": 20,
+        "min_data_in_leaf": 10,
+        "min_gain_to_split": 0,
+        "min_sum_hessian_in_leaf": 1 / 869,
+        "n_estimators": n_estimators,
+        "sparse_threshold": 1.0,
+        "n_jobs": 6,
+    }
+
+    param_3J = {
+        "num_leaves": int(1 * (30**2)),
+        "learning_rate": 0.1,
+        "feature_fraction": 1,
+        "save_binary": True,
+        "seed": seed,
+        "feature_fraction_seed": seed,
+        "bagging_seed": seed,
+        "drop_seed": seed,
+        "data_random_seed": seed,
+        "objective": "regression_l2",
+        "boosting_type": "gbdt",
+        "verbosity": -1,
+        "metric": "mae",
+        "is_unbalance": True,
+        "boost_from_average": "false",
+        "bagging_fraction": 1,
+        "bagging_freq": 0,
+        "lambda_l1": 0.5,
+        "lambda_l2": 1,
+        "max_bin": 50,
+        "max_depth": 20,
+        "min_data_in_leaf": 10,
+        "min_gain_to_split": 0,
+        "min_sum_hessian_in_leaf": 1 / 202,
+        "n_estimators": n_estimators,
+        "sparse_threshold": 1.0,
+        "n_jobs": 6,
+    }
+
+    if mol_type[0] == "1":
+        return param_1J
+    if mol_type[0] == "2":
+        return param_2J
+    if mol_type[0] == "3":
+        return param_3J
+    return param_1J
+
+
+def create_nn_model(input_shape):
+    raise RuntimeError("TensorFlow/Keras is unavailable in this environment.")
+
+
+def plot_history(history, label):
+    plt.plot(history.history["loss"])
+    plt.plot(history.history["val_loss"])
+    plt.title("Loss for %s" % label)
+    plt.ylabel("Loss")
+    plt.xlabel("Epoch")
+    _ = plt.legend(["Train", "Validation"], loc="upper left")
+    plt.show()
+
+
+def change_dists_to_yukawa(df, features):
+    df[features] = np.exp(df[features]) / df[features]
+    df.replace(np.inf, 0, inplace=True)
+    return df
+
+
+def get_folds(train, k_folds=5, val_data_ratio_if_no_kfolds=0.2, verbose=True):
+    molecules_names = train["molecule_name"].unique()
+    random.shuffle(molecules_names)
+    n_molecules = len(molecules_names)
+
+    index_folds = []
+    for k in range(1, k_folds + 1):
+        if k_folds > 1:
+            ratio = 1 / k_folds
+        else:
+            ratio = val_data_ratio_if_no_kfolds
+
+        start_index = int(np.round(n_molecules * ratio * (k - 1)))
+        end_index = int(np.round(n_molecules * ratio * k))
+
+        train_molecules = list(molecules_names[:start_index]) + list(
+            molecules_names[end_index:]
+        )
+        val_molecules = list(molecules_names[start_index:end_index])
+
+        index_folds.append(
+            [
+                train[train["molecule_name"].isin(train_molecules)].index,
+                train[train["molecule_name"].isin(val_molecules)].index,
+            ]
+        )
+
+        if verbose:
+            print("-------------")
+            print(f"fold {k}")
+            print("validation molecules indices go from", start_index, "to", end_index)
+            print(
+                f"{len(train_molecules)} train molecules and {len(val_molecules)} validation molecules"
+            )
+            print(
+                f"{len(index_folds[-1][0])} train samples and {len(index_folds[-1][1])} validation samples"
+            )
+
+    return index_folds
+
+
+def preprocess_train_data(
+    mol_type,
+    train,
+    scalar_coupling_contributions,
+    k_folds=5,
+    val_data_ratio_if_no_kfolds=0.2,
+    verbose=True,
+):
+    train = train.sample(frac=1, random_state=SEED).reset_index(drop=True)
+    index_folds = get_folds(train, k_folds, val_data_ratio_if_no_kfolds, verbose)
+    return train, index_folds
+
+
+def split_train_and_val_data(train, trn_idx, val_idx, mol_features):
+    X_train = train.loc[trn_idx, mol_features]
+    X_val = train.loc[val_idx, mol_features]
+    y_train = train.loc[trn_idx, ["scalar_coupling_constant", "fc", "sd", "pso", "dso"]]
+    y_val = train.loc[val_idx, ["scalar_coupling_constant", "fc", "sd", "pso", "dso"]]
+
+    std_scaler = StandardScaler().fit(train[mol_features])
+    X_t = std_scaler.transform(X_train.values)
+    X_v = std_scaler.transform(X_val.values)
+
+    return X_t, X_v, y_train, y_val
+
+
+def load_or_create_nn_model(
+    X_t, k_fold, k_folds, file_folder, mol_type, load_existing_model=True
+):
+    raise RuntimeError("TensorFlow/Keras is unavailable in this environment.")
+
+
+def select_best_features(file_folder, train, scalar_coupling_contributions, mol_type):
+    import lightgbm as lgb  # local import
+
+    train, index_folds = preprocess_train_data(
+        mol_type,
+        train,
+        scalar_coupling_contributions,
+        k_folds=1,
+        val_data_ratio_if_no_kfolds=0.05,
+        verbose=True,
+    )
+    trn_idx, val_idx = index_folds[0]
+
+    mol_features = [
+        c
+        for c in train.columns
+        if (
+            c
+            not in [
+                "scalar_coupling_constant",
+                "id",
+                "molecule_name",
+                "type",
+                "aromaticity_vec_1",
+                "aromaticity_vec_0",
+                "fc",
+                "sd",
+                "pso",
+                "dso",
+            ]
+        )
+    ]
+
+    X_t, X_v, y_t, y_v = split_train_and_val_data(train, trn_idx, val_idx, mol_features)
+
+    lgb_params = load_lgb_params(mol_type, n_estimators=1000)
+    lgb_model = lgb.LGBMRegressor(**lgb_params)
+    lgb_model.fit(
+        X_t,
+        y_t["scalar_coupling_constant"],
+        eval_set=[
+            (X_t, y_t["scalar_coupling_constant"]),
+            (X_v, y_v["scalar_coupling_constant"]),
+        ],
+        eval_metric="mae",
+        verbose=100,
+        early_stopping_rounds=250,
+    )
+
+    lgb_pred = lgb_model.predict(X_v, num_iteration=lgb_model.best_iteration_)
+    lgb_score = calc_logmae(y_v["scalar_coupling_constant"], lgb_pred)
+    print(f"Inital LGB_score --> logmae for {mol_type} is {lgb_score}")
+
+    results, bad_features = permutation_importance(
+        model=lgb_model,
+        X_val=pd.DataFrame(X_v, columns=mol_features),
+        y_val=y_v["scalar_coupling_constant"],
+        calc_logmae=calc_logmae,
+        threshold=0.01,
+        minimize=True,
+        verbose=True,
+    )
+
+    print(f"{len(bad_features)} were removed from {len(mol_features)} initial features")
+    mol_features = [feat for feat in mol_features if (feat not in bad_features)]
+    return mol_features
+
+
+def get_patience_dict(max_number_epochs=30, min_number_epochs=3):
+    patience_dict = {
+        "1JHN": max(min_number_epochs, int(max_number_epochs * 43363 / 43363)),
+        "1JHC": max(min_number_epochs, int(max_number_epochs * 43363 / 709416)),
+        "2JHN": max(min_number_epochs, int(max_number_epochs * 43363 / 119253)),
+        "2JHC": max(min_number_epochs, int(max_number_epochs * 43363 / 1140674)),
+        "2JHH": max(min_number_epochs, int(max_number_epochs * 43363 / 378036)),
+        "3JHN": max(min_number_epochs, int(max_number_epochs * 43363 / 166415)),
+        "3JHC": max(min_number_epochs, int(max_number_epochs * 43363 / 1510379)),
+        "3JHH": max(min_number_epochs, int(max_number_epochs * 43363 / 590611)),
+    }
+    return patience_dict
+
+
+def run_nn(
+    load_existing_model,
+    k_fold,
+    trn_idx,
+    val_idx,
+    train,
+    nn_mol_features,
+    k_folds,
+    file_folder,
+    nn_features_for_lgb_test,
+    nn_features_for_lgb_train,
+    scores_nn,
+    test_selected,
+    mol_type,
+    oof_nn,
+    pred_nn,
+    run_number,
+    epoch_n,
+    batch_size,
+    verbose,
+    n_features,
+    cols_nn_features_for_lgb,
+):
+    raise RuntimeError("TensorFlow/Keras is unavailable in this environment.")
+
+
+def get_oofs_and_preds(df_type, mol_type, original_data_folder, preds_and_oofs_folder):
+    if df_type == "oof":
+        df = pd.read_csv(f"{original_data_folder}/train.csv", usecols=["id", "type"])
+        file_names = [
+            "OOF_FELIPE_LGB_1944.csv",
+            "OOF_FELIPE_NN_1917.csv",
+            "harsh_oof_1.688.csv",
+            "oof_lolstart_lgb_1720.csv",
+            "oof_yassine_lgb_5_folds_-1.295.csv",
+            "harsh_10fold_oof_1.670.csv",
+        ]
+    else:
+        df = pd.read_csv(f"{original_data_folder}/test.csv", usecols=["id", "type"])
+        file_names = [
+            "PRED_FELIPE_LGB_1944.csv",
+            "PRED_FELIPE_NN_1917.csv",
+            "harsh_pred_1.688.csv",
+            "pred_lolstart_lgb_1720.csv",
+            "pred_yassine_lgb_5_folds-1.295.csv",
+            "harsh_10fold_pred_1.670.csv",
+        ]
+
+    sc_columns = []
+    for i, file_name in enumerate(file_names):
+        path = f"{preds_and_oofs_folder}/{file_name}"
+        if not os.path.exists(path):
+            raise FileNotFoundError(path)
+        data = pd.read_csv(path)
+
+        for src in ["oof", "pred", "prediction"]:
+            if src in data.columns:
+                data.rename(columns={src: "scalar_coupling_constant"}, inplace=True)
+        if "ind" in data.columns:
+            data.rename(columns={"ind": "id"}, inplace=True)
+
+        data.sort_values("id", inplace=True)
+        df[f"sc_{i}"] = data["scalar_coupling_constant"].values
+        sc_columns.append(f"sc_{i}")
+
+    df = df[df["type"] == mol_type].copy()
+    del df["type"]
+
+    df.loc[:, sc_columns] -= df.loc[:, sc_columns].mean().mean()
+    df.loc[:, sc_columns] /= df.loc[:, sc_columns].stack().std()
+
+    return df, sc_columns
+
+
+def create_or_load_selected_features(
+    preds_and_oofs_folder, train, scalar_coupling_contributions, mol_type
+):
+    path = os.path.join(preds_and_oofs_folder, f"nn_mol_features_{mol_type}.npy")
+    if os.path.exists(path):
+        selected_features = np.load(path, allow_pickle=True)
+        print(
+            f"-------There are {len(selected_features)} features in your model-------"
+        )
+        return list(selected_features)
+
+    selected_features = select_best_features(
+        preds_and_oofs_folder, train, scalar_coupling_contributions, mol_type
+    )
+    np.save(path, np.array(selected_features, dtype=object))
+    return list(selected_features)
+
+
+
+
+## === cell 3
+original_data_folder = "../input/champs-scalar-coupling"
+preds_and_oofs_folder = "../input/preds-on-oof-and-test"
+train_and_test_with_feats_folder = "../input/features-for-top-5-lb-with-nn-or-lgb"
+
+epoch_n = 500
+verbose = 1
+batch_size = 2048
+
+mol_types = ["1JHN"]
+run_number = 0
+k_folds = 1
+
+scalar_coupling_contributions_path = os.path.join(
+    original_data_folder, "scalar_coupling_contributions.csv"
+)
+scalar_coupling_contributions = None
+if os.path.exists(scalar_coupling_contributions_path):
+    scalar_coupling_contributions = pd.read_csv(scalar_coupling_contributions_path)
+
+
+
+
+## === cell 4
+def can_run_full_pipeline():
+    needed_files = [
+        os.path.join(train_and_test_with_feats_folder, "train_1JHN.csv"),
+        os.path.join(train_and_test_with_feats_folder, "test_1JHN.csv"),
+    ]
+    if not all(os.path.exists(p) for p in needed_files):
+        return False
+    if not os.path.isdir(preds_and_oofs_folder):
+        return False
+    if scalar_coupling_contributions is None:
+        return False
+    if not TF_AVAILABLE:
+        return False
+    return True
+
+
+FULL_PIPELINE_AVAILABLE = can_run_full_pipeline()
+print("FULL_PIPELINE_AVAILABLE =", FULL_PIPELINE_AVAILABLE)
+
+
+
+
+## === cell 5
+def write_distance_linear_baseline_submission(
+    original_data_folder, out_path="final_sub.csv"
+):
+    from sklearn.linear_model import RidgeCV
+    from sklearn.preprocessing import StandardScaler
+
+    train_path = os.path.join(original_data_folder, "train.csv")
+    test_path = os.path.join(original_data_folder, "test.csv")
+    struct_path = os.path.join(original_data_folder, "structures.csv")
+    mulliken_path = os.path.join(original_data_folder, "mulliken_charges.csv")
+    shield_path = os.path.join(original_data_folder, "magnetic_shielding_tensors.csv")
+    dipole_path = os.path.join(original_data_folder, "dipole_moments.csv")
+    pe_path = os.path.join(original_data_folder, "potential_energy.csv")
+    sample_path = os.path.join(original_data_folder, "sample_submission.csv")
+
+    usecols_train = [
+        "id",
+        "molecule_name",
+        "atom_index_0",
+        "atom_index_1",
+        "type",
+        "scalar_coupling_constant",
+    ]
+    usecols_test = ["id", "molecule_name", "atom_index_0", "atom_index_1", "type"]
+
+    train = pd.read_csv(train_path, usecols=usecols_train)
+    test = pd.read_csv(test_path, usecols=usecols_test)
+
+    structures = pd.read_csv(
+        struct_path,
+        usecols=["molecule_name", "atom_index", "atom", "x", "y", "z"],
+        dtype={
+            "molecule_name": "object",
+            "atom_index": np.int32,
+            "atom": "object",
+            "x": np.float32,
+            "y": np.float32,
+            "z": np.float32,
+        },
+    )
+
+    en_map = {
+        "H": 2.20,
+        "C": 2.55,
+        "N": 3.04,
+        "O": 3.44,
+        "F": 3.98,
+        "P": 2.19,
+        "S": 2.58,
+        "Cl": 3.16,
+        "Br": 2.96,
+        "I": 2.66,
+    }
+    covrad_map = {
+        "H": 0.31,
+        "C": 0.76,
+        "N": 0.71,
+        "O": 0.66,
+        "F": 0.57,
+        "P": 1.07,
+        "S": 1.05,
+        "Cl": 1.02,
+        "Br": 1.20,
+        "I": 1.39,
+    }
+
+    structures["en"] = structures["atom"].map(en_map).astype(np.float32)
+    structures["covrad"] = structures["atom"].map(covrad_map).astype(np.float32)
+    structures[["en", "covrad"]] = structures[["en", "covrad"]].fillna(0.0)
+
+    s0 = structures.rename(
+        columns={
+            "atom_index": "atom_index_0",
+            "atom": "atom_0",
+            "x": "x0",
+            "y": "y0",
+            "z": "z0",
+            "en": "en0",
+            "covrad": "covrad0",
+        }
+    )
+    s1 = structures.rename(
+        columns={
+            "atom_index": "atom_index_1",
+            "atom": "atom_1",
+            "x": "x1",
+            "y": "y1",
+            "z": "z1",
+            "en": "en1",
+            "covrad": "covrad1",
+        }
+    )
+
+    train = train.merge(
+        s0, on=["molecule_name", "atom_index_0"], how="left", validate="many_to_one"
+    )
+    train = train.merge(
+        s1, on=["molecule_name", "atom_index_1"], how="left", validate="many_to_one"
+    )
+    test = test.merge(
+        s0, on=["molecule_name", "atom_index_0"], how="left", validate="many_to_one"
+    )
+    test = test.merge(
+        s1, on=["molecule_name", "atom_index_1"], how="left", validate="many_to_one"
+    )
+
+    if os.path.exists(mulliken_path):
+        mulliken = pd.read_csv(
+            mulliken_path,
+            usecols=["molecule_name", "atom_index", "mulliken_charge"],
+            dtype={
+                "molecule_name": "object",
+                "atom_index": np.int32,
+                "mulliken_charge": np.float32,
+            },
+        )
+        m0 = mulliken.rename(
+            columns={"atom_index": "atom_index_0", "mulliken_charge": "q0"}
+        )
+        m1 = mulliken.rename(
+            columns={"atom_index": "atom_index_1", "mulliken_charge": "q1"}
+        )
+        train = train.merge(
+            m0, on=["molecule_name", "atom_index_0"], how="left", validate="many_to_one"
+        )
+        train = train.merge(
+            m1, on=["molecule_name", "atom_index_1"], how="left", validate="many_to_one"
+        )
+        test = test.merge(
+            m0, on=["molecule_name", "atom_index_0"], how="left", validate="many_to_one"
+        )
+        test = test.merge(
+            m1, on=["molecule_name", "atom_index_1"], how="left", validate="many_to_one"
+        )
+        del mulliken, m0, m1
+        gc.collect()
+    else:
+        train["q0"] = np.nan
+        train["q1"] = np.nan
+        test["q0"] = np.nan
+        test["q1"] = np.nan
+
+    if os.path.exists(shield_path):
+        shield = pd.read_csv(
+            shield_path,
+            usecols=[
+                "molecule_name",
+                "atom_index",
+                "XX",
+                "YX",
+                "ZX",
+                "XY",
+                "YY",
+                "ZY",
+                "XZ",
+                "YZ",
+                "ZZ",
+            ],
+            dtype={
+                "molecule_name": "object",
+                "atom_index": np.int32,
+                "XX": np.float32,
+                "YX": np.float32,
+                "ZX": np.float32,
+                "XY": np.float32,
+                "YY": np.float32,
+                "ZY": np.float32,
+                "XZ": np.float32,
+                "YZ": np.float32,
+                "ZZ": np.float32,
+            },
+        )
+        shield["shield_trace"] = (shield["XX"] + shield["YY"] + shield["ZZ"]).astype(
+            np.float32
+        )
+        shield["shield_frob"] = np.sqrt(
+            (shield[["XX", "YX", "ZX", "XY", "YY", "ZY", "XZ", "YZ", "ZZ"]] ** 2)
+            .sum(axis=1)
+            .astype(np.float32)
+        ).astype(np.float32)
+
+        sh_use = shield[["molecule_name", "atom_index", "shield_trace", "shield_frob"]]
+        sh0 = sh_use.rename(
+            columns={
+                "atom_index": "atom_index_0",
+                "shield_trace": "sh_trace0",
+                "shield_frob": "sh_frob0",
+            }
+        )
+        sh1 = sh_use.rename(
+            columns={
+                "atom_index": "atom_index_1",
+                "shield_trace": "sh_trace1",
+                "shield_frob": "sh_frob1",
+            }
+        )
+        train = train.merge(
+            sh0,
+            on=["molecule_name", "atom_index_0"],
+            how="left",
+            validate="many_to_one",
+        )
+        train = train.merge(
+            sh1,
+            on=["molecule_name", "atom_index_1"],
+            how="left",
+            validate="many_to_one",
+        )
+        test = test.merge(
+            sh0,
+            on=["molecule_name", "atom_index_0"],
+            how="left",
+            validate="many_to_one",
+        )
+        test = test.merge(
+            sh1,
+            on=["molecule_name", "atom_index_1"],
+            how="left",
+            validate="many_to_one",
+        )
+        del shield, sh_use, sh0, sh1
+        gc.collect()
+    else:
+        for c in ["sh_trace0", "sh_frob0", "sh_trace1", "sh_frob1"]:
+            train[c] = np.nan
+            test[c] = np.nan
+
+    if os.path.exists(dipole_path):
+        dip = pd.read_csv(
+            dipole_path,
+            usecols=["molecule_name", "X", "Y", "Z"],
+            dtype={
+                "molecule_name": "object",
+                "X": np.float32,
+                "Y": np.float32,
+                "Z": np.float32,
+            },
+        )
+        dip["dip_norm"] = np.sqrt(
+            (dip["X"] ** 2 + dip["Y"] ** 2 + dip["Z"] ** 2).astype(np.float32)
+        ).astype(np.float32)
+        dip.rename(columns={"X": "dip_x", "Y": "dip_y", "Z": "dip_z"}, inplace=True)
+        train = train.merge(dip, on="molecule_name", how="left", validate="many_to_one")
+        test = test.merge(dip, on="molecule_name", how="left", validate="many_to_one")
+        del dip
+        gc.collect()
+    else:
+        for c in ["dip_x", "dip_y", "dip_z", "dip_norm"]:
+            train[c] = np.nan
+            test[c] = np.nan
+
+    if os.path.exists(pe_path):
+        pe = pd.read_csv(
+            pe_path,
+            usecols=["molecule_name", "potential_energy"],
+            dtype={"molecule_name": "object", "potential_energy": np.float32},
+        )
+        train = train.merge(pe, on="molecule_name", how="left", validate="many_to_one")
+        test = test.merge(pe, on="molecule_name", how="left", validate="many_to_one")
+        del pe
+        gc.collect()
+    else:
+        train["potential_energy"] = np.nan
+        test["potential_energy"] = np.nan
+
+    for df in (train, test):
+        dx = (df["x0"] - df["x1"]).astype(np.float32)
+        dy = (df["y0"] - df["y1"]).astype(np.float32)
+        dz = (df["z0"] - df["z1"]).astype(np.float32)
+        df["dist"] = np.sqrt(dx * dx + dy * dy + dz * dz).astype(np.float32)
+
+        inv = (1.0 / (df["dist"] + 1e-3)).astype(np.float32)
+        df["inv_dist"] = inv
+        df["inv_dist2"] = (inv * inv).astype(np.float32)
+        df["inv_dist3"] = (df["inv_dist2"] * inv).astype(np.float32)
+        df["dist2"] = (df["dist"] * df["dist"]).astype(np.float32)
+        df["dist_x_inv"] = (df["dist"] * df["inv_dist"]).astype(np.float32)
+
+        df["en_diff"] = (df["en0"] - df["en1"]).astype(np.float32)
+        df["en_sum"] = (df["en0"] + df["en1"]).astype(np.float32)
+        df["covrad_sum"] = (df["covrad0"] + df["covrad1"]).astype(np.float32)
+        df["covrad_diff"] = (df["covrad0"] - df["covrad1"]).astype(np.float32)
+        df["en_diff_x_inv"] = (df["en_diff"] * df["inv_dist"]).astype(np.float32)
+        df["en_sum_x_inv"] = (df["en_sum"] * df["inv_dist"]).astype(np.float32)
+
+        df["q0"] = df["q0"].astype(np.float32)
+        df["q1"] = df["q1"].astype(np.float32)
+        df["q_diff"] = (df["q0"] - df["q1"]).astype(np.float32)
+        df["q_sum"] = (df["q0"] + df["q1"]).astype(np.float32)
+        df["q_diff_x_inv"] = (df["q_diff"] * df["inv_dist"]).astype(np.float32)
+        df["q_sum_x_inv"] = (df["q_sum"] * df["inv_dist"]).astype(np.float32)
+
+        df["sh_trace0"] = df["sh_trace0"].astype(np.float32)
+        df["sh_trace1"] = df["sh_trace1"].astype(np.float32)
+        df["sh_frob0"] = df["sh_frob0"].astype(np.float32)
+        df["sh_frob1"] = df["sh_frob1"].astype(np.float32)
+        df["sh_trace_diff"] = (df["sh_trace0"] - df["sh_trace1"]).astype(np.float32)
+        df["sh_trace_sum"] = (df["sh_trace0"] + df["sh_trace1"]).astype(np.float32)
+        df["sh_frob_diff"] = (df["sh_frob0"] - df["sh_frob1"]).astype(np.float32)
+        df["sh_frob_sum"] = (df["sh_frob0"] + df["sh_frob1"]).astype(np.float32)
+        df["sh_trace_sum_x_inv"] = (df["sh_trace_sum"] * df["inv_dist"]).astype(
+            np.float32
+        )
+
+        df["dip_x"] = df["dip_x"].astype(np.float32)
+        df["dip_y"] = df["dip_y"].astype(np.float32)
+        df["dip_z"] = df["dip_z"].astype(np.float32)
+        df["dip_norm"] = df["dip_norm"].astype(np.float32)
+        df["dip_norm_x_inv"] = (df["dip_norm"] * df["inv_dist"]).astype(np.float32)
+
+        df["potential_energy"] = df["potential_energy"].astype(np.float32)
+        df["pe_x_inv"] = (df["potential_energy"] * df["inv_dist"]).astype(np.float32)
+
+        df["en0_x_inv"] = (df["en0"].astype(np.float32) * df["inv_dist"]).astype(
+            np.float32
+        )
+        df["en1_x_inv"] = (df["en1"].astype(np.float32) * df["inv_dist"]).astype(
+            np.float32
+        )
+        df["covrad0_x_inv"] = (
+            df["covrad0"].astype(np.float32) * df["inv_dist"]
+        ).astype(np.float32)
+        df["covrad1_x_inv"] = (
+            df["covrad1"].astype(np.float32) * df["inv_dist"]
+        ).astype(np.float32)
+        df["sh_trace_sum_x_inv2"] = (df["sh_trace_sum"] * df["inv_dist2"]).astype(
+            np.float32
+        )
+        df["q_sum_x_inv2"] = (df["q_sum"] * df["inv_dist2"]).astype(np.float32)
+
+    base_feat_cols = [
+        "dist",
+        "dist2",
+        "inv_dist",
+        "inv_dist2",
+        "inv_dist3",
+        "dist_x_inv",
+        "en_diff",
+        "en_sum",
+        "covrad_sum",
+        "covrad_diff",
+        "en_diff_x_inv",
+        "en_sum_x_inv",
+        "q0",
+        "q1",
+        "q_diff",
+        "q_sum",
+        "q_diff_x_inv",
+        "q_sum_x_inv",
+        "sh_trace0",
+        "sh_trace1",
+        "sh_frob0",
+        "sh_frob1",
+        "sh_trace_diff",
+        "sh_trace_sum",
+        "sh_frob_diff",
+        "sh_frob_sum",
+        "sh_trace_sum_x_inv",
+        "dip_x",
+        "dip_y",
+        "dip_z",
+        "dip_norm",
+        "dip_norm_x_inv",
+        "potential_energy",
+        "pe_x_inv",
+        "en0_x_inv",
+        "en1_x_inv",
+        "covrad0_x_inv",
+        "covrad1_x_inv",
+        "sh_trace_sum_x_inv2",
+        "q_sum_x_inv2",
+    ]
+
+    for c in base_feat_cols:
+        train[c] = (
+            train[c].replace([np.inf, -np.inf], np.nan).fillna(0.0).astype(np.float32)
+        )
+        test[c] = (
+            test[c].replace([np.inf, -np.inf], np.nan).fillna(0.0).astype(np.float32)
+        )
+
+    train_atoms = pd.get_dummies(
+        train[["atom_0", "atom_1"]].fillna("X"), prefix=["a0", "a1"], dtype=np.int8
+    )
+    test_atoms = pd.get_dummies(
+        test[["atom_0", "atom_1"]].fillna("X"), prefix=["a0", "a1"], dtype=np.int8
+    )
+    all_atom_cols = train_atoms.columns.union(test_atoms.columns)
+    train_atoms = train_atoms.reindex(columns=all_atom_cols, fill_value=0)
+    test_atoms = test_atoms.reindex(columns=all_atom_cols, fill_value=0)
+
+    X_train_all = pd.concat(
+        [
+            train[base_feat_cols].reset_index(drop=True),
+            train_atoms.reset_index(drop=True),
+        ],
+        axis=1,
+    )
+    X_test_all = pd.concat(
+        [
+            test[base_feat_cols].reset_index(drop=True),
+            test_atoms.reset_index(drop=True),
+        ],
+        axis=1,
+    )
+
+    global_mean = float(train["scalar_coupling_constant"].mean())
+    type_means = train.groupby("type")["scalar_coupling_constant"].mean()
+    alphas = np.array([0.1, 1.0, 10.0, 100.0], dtype=np.float64)
+
+    pred_by_id = {}
+
+    for t, tr_idx in train.groupby("type", sort=False).groups.items():
+        te_mask = test["type"].values == t
+        if not np.any(te_mask):
+            continue
+
+        te_ids = test.loc[te_mask, "id"].astype(int).values
+
+        tr_pos = np.asarray(tr_idx, dtype=np.int64)
+
+        X_tr = X_train_all.iloc[tr_pos].values
+        y_tr = train.loc[tr_idx, "scalar_coupling_constant"].values.astype(np.float64)
+        X_te = X_test_all.loc[te_mask].values
+
+        scaler = StandardScaler(with_mean=True, with_std=True)
+        X_tr = scaler.fit_transform(X_tr)
+        X_te = scaler.transform(X_te)
+
+        if np.isnan(X_tr).any() or np.isnan(X_te).any():
+            fill = float(type_means.get(t, global_mean))
+            for _id in te_ids:
+                pred_by_id[int(_id)] = fill
+            continue
+
+        y_mean = float(np.mean(y_tr))
+        y_std = float(np.std(y_tr))
+        if (not np.isfinite(y_std)) or (y_std < 1e-8):
+            for _id in te_ids:
+                pred_by_id[int(_id)] = y_mean
+            continue
+
+        y_tr_z = (y_tr - y_mean) / y_std
+        model = RidgeCV(alphas=alphas, fit_intercept=True, cv=3)
+        model.fit(X_tr, y_tr_z)
+        preds_z = model.predict(X_te)
+        preds_t = preds_z * y_std + y_mean
+
+        for _id, p in zip(te_ids, preds_t):
+            pred_by_id[int(_id)] = float(p)
+
+    sub = pd.read_csv(sample_path, usecols=["id"])
+    sub["scalar_coupling_constant"] = (
+        sub["id"].astype(int).map(pred_by_id).astype(np.float64)
+    )
+    sub["scalar_coupling_constant"] = sub["scalar_coupling_constant"].fillna(
+        global_mean
+    )
+
+    sub.to_csv(out_path, index=False)
+    print(
+        f"Wrote distance+atom+chem(+interactions)+charge+shielding+dipole+energy RidgeCV baseline submission to {out_path} with shape:",
+        sub.shape,
+    )
+
+
+if not FULL_PIPELINE_AVAILABLE:
+    write_distance_linear_baseline_submission(
+        original_data_folder, out_path="final_sub.csv"
+    )
+
+
+
+## === cell 6
+if FULL_PIPELINE_AVAILABLE:
+    scores_nn = dict()
+
+    for mol_type_index, mol_type in enumerate(mol_types):
+        print(mol_type, f"- run number {run_number}")
+
+        try:
+            scores_nn = np.load(
+                f"run_{run_number}_scores_nn.npy", allow_pickle=True
+            ).item()
+        except Exception:
+            scores_nn = dict()
+
+        train = pd.read_csv(
+            os.path.join(train_and_test_with_feats_folder, f"train_{mol_type}.csv")
+        ).fillna(0)
+        test_full = pd.read_csv(
+            os.path.join(train_and_test_with_feats_folder, f"test_{mol_type}.csv")
+        ).fillna(0)
+
+        print(f" Working with data of type {mol_type} and shape {train.shape}")
+
+        df_oofs, sc_columns = get_oofs_and_preds(
+            "oof", mol_type, original_data_folder, preds_and_oofs_folder
+        )
+        df_pred, _ = get_oofs_and_preds(
+            "pred", mol_type, original_data_folder, preds_and_oofs_folder
+        )
+
+        molecules_names = train["molecule_name"].unique()
+        type_scalar_contributions = scalar_coupling_contributions[
+            scalar_coupling_contributions["molecule_name"].isin(molecules_names)
+        ]
+        type_scalar_contributions = type_scalar_contributions[
+            type_scalar_contributions["type"] == mol_type
+        ].copy()
+
+        for col in ["fc", "sd", "pso", "dso"]:
+            train[col] = type_scalar_contributions[col].values
+
+        del type_scalar_contributions, molecules_names
+
+        nn_mol_features = create_or_load_selected_features(
+            preds_and_oofs_folder, train, scalar_coupling_contributions, mol_type
+        )
+        for col in sc_columns:
+            nn_mol_features.append(col)
+
+        train, index_folds = preprocess_train_data(
+            mol_type,
+            train,
+            scalar_coupling_contributions,
+            k_folds=k_folds,
+            val_data_ratio_if_no_kfolds=0.2,
+            verbose=True,
+        )
+
+        train = pd.merge(train, df_oofs, on=["id"])
+        test_full = pd.merge(test_full, df_pred, on=["id"])
+        del df_oofs, df_pred
+
+        std_scaler = StandardScaler().fit(train[nn_mol_features])
+        test_selected = std_scaler.transform(test_full[nn_mol_features].values)
+        del test_full
+
+        oof_nn = pd.DataFrame(np.zeros((len(train), 1)))
+        pred_nn = pd.DataFrame(
+            np.zeros((len(test_selected), k_folds)), columns=list(range(k_folds))
+        )
+
+        n_features = 32
+        cols_nn_features_for_lgb = np.array(
+            ["sc", "fc", "sd", "pso", "dso"]
+            + [
+                f"nn_feat_{k_fold}_{i}"
+                for k_fold in range(k_folds)
+                for i in range(1, n_features + 1)
+            ]
+        ).flatten()
+
+        nn_features_for_lgb_train = pd.DataFrame(
+            np.zeros((train.shape[0], n_features + 5)),
+            columns=cols_nn_features_for_lgb[: n_features + 5],
+        )
+        nn_features_for_lgb_test = pd.DataFrame(
+            np.zeros((test_selected.shape[0], n_features * k_folds + 5)),
+            columns=cols_nn_features_for_lgb,
+        )
+
+        if mol_type not in scores_nn:
+            scores_nn[mol_type] = dict()
+
+        gc.collect()
+
+        for k_fold, (trn_idx, val_idx) in enumerate(index_folds):
+            load_existing_model = True
+            (
+                nn_features_for_lgb_test,
+                nn_features_for_lgb_train,
+                pred_nn,
+                oof_nn,
+                scores_nn,
+            ) = run_nn(
+                load_existing_model,
+                k_fold,
+                trn_idx,
+                val_idx,
+                train,
+                nn_mol_features,
+                k_folds,
+                preds_and_oofs_folder,
+                nn_features_for_lgb_test,
+                nn_features_for_lgb_train,
+                scores_nn,
+                test_selected,
+                mol_type,
+                oof_nn,
+                pred_nn,
+                run_number,
+                epoch_n,
+                batch_size,
+                verbose,
+                n_features,
+                cols_nn_features_for_lgb,
+            )
+            gc.collect()
+
+        nn_features_for_lgb_test.loc[:, ["sc", "fc", "sd", "pso", "dso"]] /= k_folds
+
+        np.save(f"run_{run_number}_scores_nn.npy", scores_nn)
+        np.save(f"run_{run_number}_{mol_type}_oof_nn.npy", oof_nn.values)
+        pred_nn.to_pickle(f"run_{run_number}_{mol_type}_pred_nn.pkl")
+        nn_features_for_lgb_train.to_pickle(
+            f"run_{run_number}_{mol_type}_nn_features_for_lgb_train.pkl"
+        )
+        nn_features_for_lgb_test.to_pickle(
+            f"run_{run_number}_{mol_type}_nn_features_for_lgb_test.pkl"
+        )
+
+        gc.collect()
+
+
+
+## === cell 7
+if FULL_PIPELINE_AVAILABLE:
+    sample_path = os.path.join(original_data_folder, "sample_submission.csv")
+    sub = pd.read_csv(sample_path)
+    sub["scalar_coupling_constant"] = 0.0
+
+    test_meta = pd.read_csv(
+        os.path.join(original_data_folder, "test.csv"), usecols=["id", "type"]
+    )
+    for mol_type in mol_types:
+        pred_path = f"run_{run_number}_{mol_type}_pred_nn.pkl"
+        if os.path.exists(pred_path):
+            pred_nn = pd.read_pickle(pred_path)
+            test_ids = test_meta.loc[test_meta["type"] == mol_type, "id"].values
+            pred_vec = pred_nn.mean(axis=1).values
+            if len(pred_vec) == len(test_ids):
+                sub.loc[sub["id"].isin(test_ids), "scalar_coupling_constant"] = pred_vec
+            else:
+                print(
+                    f"Warning: length mismatch for {mol_type}: pred {len(pred_vec)} vs ids {len(test_ids)}; leaving zeros."
+                )
+        else:
+            print(f"Warning: missing {pred_path}; leaving zeros for {mol_type}.")
+
+    sub.to_csv("final_sub.csv", index=False)
+    print("Wrote submission to final_sub.csv with shape:", sub.shape)
+
+
+
+## === cell 8
+if FULL_PIPELINE_AVAILABLE:
+    try:
+        for i in range(32):
+            nn_feat = nn_features_for_lgb_train.iloc[val_idx, i + 5]
+            target = train.loc[val_idx, "scalar_coupling_constant"]
+            plt.scatter(target, nn_feat, s=0.2)
+            plt.xlabel("scalar coupling constant")
+            plt.ylabel(f"nn_feat_{i}")
+            plt.show()
+    except Exception as e:
+        print("Skipping diagnostic plots due to:", repr(e))
+
+
+
+## === cell 9
+assert os.path.exists("final_sub.csv"), "final_sub.csv was not created"
+check = pd.read_csv("final_sub.csv")
+assert list(check.columns) == [
+    "id",
+    "scalar_coupling_constant",
+], f"Wrong columns: {check.columns}"
+assert len(check) > 0, "Submission is empty"
+print(check.head())
+print("final_sub.csv ready.")

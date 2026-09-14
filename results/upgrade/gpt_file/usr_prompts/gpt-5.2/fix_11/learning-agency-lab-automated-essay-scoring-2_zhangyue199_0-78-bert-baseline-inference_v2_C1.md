@@ -1,0 +1,360 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the score of student essays.
+
+## Metric
+Quadratic weighted kappa.
+
+## Submission Format
+For each `essay_id` in the test set, you must predict the corresponding `score` (between 1-6, see [rubric](https://storage.googleapis.com/kaggle-forum-message-attachments/2733927/20538/Rubric_%20Holistic%20Essay%20Scoring.pdf) for more details). The file should contain a header and have the following format:
+
+```
+essay_id,score
+000d118,3
+000fe60,3
+001ab80,4
+...
+```
+
+## Dataset
+- **train.csv** - Essays and scores to be used as training data.
+    - `essay_id` - The unique ID of the essay
+    - `full_text` - The full essay response
+    - `score` - Holistic score of the essay on a 1-6 scale
+- **test.csv** - The essays to be used as test data. Contains the same fields as `train.csv`, aside from exclusion of `score`.
+- **sample_submission.csv** - A submission file in the correct format.
+    - `essay_id` - The unique ID of the essay
+    - `score` - The predicted holistic score of the essay on a 1-6 scale
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+datasets==4.4.1
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sentence-transformers==4.1.0
+sklearn-pandas==2.2.0
+tensorflow-datasets==4.9.9
+transformers==4.53.3
+vega-datasets==0.9.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (153 lines)
+            sample_submission.csv (1732 lines)
+            sample_submission.csv.zip (9.4 kB)
+            test.csv (15336 lines)
+            test.csv.zip (1.2 MB)
+            train.csv (139231 lines)
+            train.csv.zip (11.0 MB)
+            learning-agency-lab-automated-essay-scoring-2/
+                description.md (153 lines)
+                sample_submission.csv (1732 lines)
+                ... and 5 other files
+                learning-agency-lab-automated-essay-scoring-2/
+        input/
+            description.md (153 lines)
+            sample_submission.csv (1732 lines)
+            sample_submission.csv.zip (9.4 kB)
+            test.csv (15336 lines)
+            test.csv.zip (1.2 MB)
+            train.csv (139231 lines)
+            train.csv.zip (11.0 MB)
+            learning-agency-lab-automated-essay-scoring-2/
+                description.md (153 lines)
+                sample_submission.csv (1732 lines)
+                ... and 5 other files
+                learning-agency-lab-automated-essay-scoring-2/
+        working/
+            learning-agency-lab-automated-essay-scoring-2/
+                description.md (153 lines)
+                sample_submission.csv (1732 lines)
+                ... and 5 other files
+                learning-agency-lab-automated-essay-scoring-2/
+```
+
+-> data/learning-agency-lab-automated-essay-scoring-2/sample_submission.csv has 1731 rows and 2 columns.
+The columns are: essay_id, score
+
+-> data/learning-agency-lab-automated-essay-scoring-2/test.csv has 15335 rows and 2 columns.
+The columns are: essay_id, full_text
+
+-> data/learning-agency-lab-automated-essay-scoring-2/train.csv has 139230 rows and 3 columns.
+The columns are: essay_id, full_text, score
+
+-> data/sample_submission.csv has 1731 rows and 2 columns.
+The columns are: essay_id, score
+
+-> data/test.csv has 15335 rows and 2 columns.
+The columns are: essay_id, full_text
+
+-> data/train.csv has 139230 rows and 3 columns.
+The columns are: essay_id, full_text, score
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "true")
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", None)
+
+import re
+import random
+import numpy as np
+import pandas as pd
+
+import torch
+
+from transformers import (
+    AutoTokenizer,
+    AutoModelForSequenceClassification,
+    Trainer,
+    TrainingArguments,
+    set_seed,
+    DataCollatorWithPadding,
+)
+
+from datasets import Dataset as HFDataset
+
+SEED = 42
+set_seed(SEED)
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(SEED)
+
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+if torch.cuda.is_available():
+    try:
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+    except Exception:
+        pass
+
+train_path = "/kaggle/input/learning-agency-lab-automated-essay-scoring-2/train.csv"
+test_path = "/kaggle/input/learning-agency-lab-automated-essay-scoring-2/test.csv"
+
+train_df = pd.read_csv(train_path, usecols=["essay_id", "full_text", "score"])
+test_df = pd.read_csv(test_path, usecols=["essay_id", "full_text"])
+
+MAX_LEN = 512
+MODEL_ID = "bert-base-uncased"
+
+print("train_df:", train_df.shape, "test_df:", test_df.shape)
+print("train columns:", train_df.columns.tolist())
+print("test columns:", test_df.columns.tolist())
+
+
+
+## === cell 1
+_WS_RE = re.compile(r"\s+")
+_NON_ALNUM_RE = re.compile(r"[^a-zA-Z0-9]")
+
+
+def clean_text_series(s: pd.Series) -> pd.Series:
+    s = s.astype(str)
+    s = s.str.replace(_WS_RE, " ", regex=True)
+    s = s.str.replace(_NON_ALNUM_RE, " ", regex=True)
+    s = s.str.strip()
+    return s
+
+
+train_df["full_text"] = clean_text_series(train_df["full_text"])
+test_df["full_text"] = clean_text_series(test_df["full_text"])
+
+train_df["label"] = (train_df["score"].astype(int) - 1).clip(0, 5)
+
+print(train_df[["essay_id", "score", "label"]].head())
+
+
+
+## === cell 2
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, use_fast=True)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID, num_labels=6)
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print("Using device:", device)
+
+
+
+## === cell 3
+val_frac = 0.05
+val_size = max(1, int(len(train_df) * val_frac))
+train_split = train_df.iloc[:-val_size].reset_index(drop=True)
+val_split = train_df.iloc[-val_size:].reset_index(drop=True)
+
+_cpu = os.cpu_count() or 1
+num_proc = max(1, min(8, _cpu // 2))
+
+train_dataset = HFDataset.from_pandas(
+    train_split[["full_text", "label"]], preserve_index=False
+)
+val_dataset = HFDataset.from_pandas(
+    val_split[["full_text", "label"]], preserve_index=False
+)
+test_dataset = HFDataset.from_pandas(test_df[["full_text"]], preserve_index=False)
+
+train_dataset = train_dataset.rename_column("label", "labels")
+val_dataset = val_dataset.rename_column("label", "labels")
+
+train_n = len(train_dataset)
+val_n = len(val_dataset)
+
+combined = HFDataset.from_dict(
+    {
+        "full_text": train_split["full_text"].tolist()
+        + val_split["full_text"].tolist()
+        + test_df["full_text"].tolist(),
+        "part": (["train"] * train_n) + (["val"] * val_n) + (["test"] * len(test_df)),
+        "labels": train_split["label"].astype(int).tolist()
+        + val_split["label"].astype(int).tolist()
+        + ([-1] * len(test_df)),
+    }
+)
+
+
+def tokenize_and_add_length(batch):
+    enc = tokenizer(
+        batch["full_text"],
+        truncation=True,
+        max_length=MAX_LEN,
+        padding=False,  # dynamic padding done by DataCollatorWithPadding
+        return_attention_mask=True,
+    )
+    enc["length"] = [int(sum(m)) for m in enc["attention_mask"]]
+    enc["part"] = batch["part"]
+    enc["labels"] = batch["labels"]
+    return enc
+
+
+combined = combined.map(
+    tokenize_and_add_length,
+    batched=True,
+    num_proc=num_proc,
+    desc="Tokenizing combined (train+val+test)",
+    remove_columns=["full_text"],
+)
+
+train_dataset = combined.select(range(0, train_n)).remove_columns(["part"])
+val_dataset = combined.select(range(train_n, train_n + val_n)).remove_columns(["part"])
+test_dataset = combined.select(range(train_n + val_n, len(combined))).remove_columns(
+    ["part", "labels"]
+)
+
+data_collator = DataCollatorWithPadding(
+    tokenizer=tokenizer, pad_to_multiple_of=8 if torch.cuda.is_available() else None
+)
+
+print("train/val/test sizes:", len(train_dataset), len(val_dataset), len(test_dataset))
+
+
+
+## === cell 4
+num_workers = min(
+    4, (_cpu // 2)
+)  # keep moderate to avoid contention with HF multiprocessing
+
+per_device_bs = 16 if torch.cuda.is_available() else 8
+grad_accum = 2 if torch.cuda.is_available() else 1
+
+args = TrainingArguments(
+    output_dir="./output",
+    overwrite_output_dir=True,
+    report_to="none",
+    seed=SEED,
+    dataloader_drop_last=False,
+    do_train=True,
+    do_eval=True,
+    eval_strategy="epoch",
+    save_strategy="no",
+    per_device_train_batch_size=per_device_bs,
+    per_device_eval_batch_size=per_device_bs,
+    gradient_accumulation_steps=grad_accum,
+    num_train_epochs=1,
+    learning_rate=2e-5,
+    weight_decay=0.01,
+    warmup_ratio=0.06,
+    logging_steps=50,
+    fp16=False,
+    dataloader_num_workers=num_workers,
+    dataloader_pin_memory=True,
+    dataloader_prefetch_factor=2 if num_workers > 0 else None,
+    dataloader_persistent_workers=False,  # avoids worker warmup/shutdown overhead in short single-epoch run
+    group_by_length=True,
+    length_column_name="length",
+)
+
+trainer = Trainer(
+    model=model,
+    args=args,
+    tokenizer=tokenizer,
+    data_collator=data_collator,
+    train_dataset=train_dataset,
+    eval_dataset=val_dataset,
+)
+
+if torch.cuda.is_available():
+    try:
+        model = torch.compile(model)  # type: ignore[attr-defined]
+        trainer.model = model
+    except Exception:
+        pass
+
+train_result = trainer.train()
+eval_result = trainer.evaluate()
+print("train_result:", {k: float(v) for k, v in train_result.metrics.items()})
+print("eval_result:", {k: float(v) for k, v in eval_result.items()})
+
+
+
+## === cell 5
+pred_out = trainer.predict(test_dataset)
+preds = pred_out.predictions
+
+if isinstance(preds, (tuple, list)):
+    preds = preds[0]
+
+pred_labels = np.argmax(preds, axis=1).astype(int)
+scores = (pred_labels + 1).clip(1, 6).astype(int)
+
+sub = test_df[["essay_id"]].copy()
+sub["score"] = scores
+sub.to_csv("submission.csv", index=False)
+
+print(sub.head())
+print("Wrote submission.csv with shape:", sub.shape)
+assert list(sub.columns) == ["essay_id", "score"]
+assert sub.shape[0] == test_df.shape[0]
+assert os.path.exists("submission.csv")

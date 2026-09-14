@@ -1,0 +1,823 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+librosa==0.11.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+PyWavelets==1.8.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.4228925045416504
+
+# 6. Current score
+
+1.40995
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.40995) has done: 'I fix the inference generator/loop so it yields proper PyTorch tensors (not numpy arrays) and batches consistently, which is why `test_pred` ended up invalid and caused the DataFrame constructor error. I also add the missing `offset` column (set to 0 for test) that the generator expects, and make model loading robust across Kaggle/PyTorch versions by loading on CPU first then moving to GPU. Finally, I ensure the output probabilities are valid (non-negative and row-normalized to sum to 1) and that the submission has the exact required columns and a `.csv` suffix.'
+- What this solution (achieved 1.40995) has done: 'Your current score is far worse than the target (lower-is-better), and the biggest likely cause in this script is a semantic mismatch between the model’s expected inputs and what you feed it at inference: you apply `ToTensorV2` but never normalize to the same scale/distribution used in training, which can severely degrade KL. I keep the model and feature construction exactly the same, but add a minimal, standard inference-time normalization step (per-image mean/std) before `ToTensorV2`, which preserves core logic while making inputs closer to what pretrained CNN checkpoints typically expect. I also make the spectrogram parquet loading safer by selecting only numeric columns (some parquet files can include a time column), and keep the existing probability clipping + renormalization to guarantee a valid submission. These changes are small, end-to-end safe, and are directly aimed at reducing KL toward your target score.'
+- What this solution (achieved 1.40995) has done: 'Your current score (1.40995, lower-is-better) is far from the target (0.4229), so the most likely issue is inference-time input mismatch: your generator builds 0–255 images, but the loaded pretrained models typically expect ImageNet-normalized inputs. I keep the model and feature construction identical, but ensure the validation transform always includes the same `A.Normalize(..., max_pixel_value=255)` step (and make it the only transform used), so tensors fed to the model match expected scale/distribution. I also make the spectrogram parquet numeric-column handling deterministic (always drop a likely time/index column when present) to avoid subtle per-file shape/value inconsistencies that can harm KL. Finally, I keep your probability clipping + row renormalization to guarantee a valid submission.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995; lower is better) is much worse than the target (0.4229), so we should make the smallest changes that plausibly improve calibration/consistency without altering the core model or feature construction. The biggest low-risk gain here is to ensure inference uses the exact same preprocessing the original checkpoint expects: your code already builds 0–255 “images”, but the model may have been trained with additional simple intensity normalization beyond ImageNet stats. I add a minimal per-image standardization step (mean/std computed over pixels per channel) immediately before the existing Albumentations ImageNet `Normalize`, keeping the rest unchanged; this often fixes severe distribution mismatch and reduces KL. I also ensure the parquet numeric-column selection is deterministic and consistent (always dropping a likely leading index/time numeric column when present) to avoid subtle spec layout shifts.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995; lower is better) is far from the target (0.4229), so we should make the smallest change that most likely fixes a semantic mismatch hurting inference. The main issue is the added per-image standardization step: it changes the spectrogram intensity distribution in a way the provided MixNet checkpoint likely was not trained on, and it can easily blow up KL. I remove that extra standardization and keep only the standard ImageNet `A.Normalize(max_pixel_value=255)` that pretrained CNN checkpoints typically expect, while preserving your model ensemble, feature construction, and inference loop. I also keep the existing probability clipping + row renormalization to guarantee a valid submission.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995; lower is better) is far from the target (0.4229), so the smallest likely win is fixing inference-time preprocessing and model-output calibration without changing the model/feature core logic. I (1) make the spectrogram parquet-to-array conversion deterministic by always using only numeric columns and not arbitrarily dropping the first numeric column (which can remove real signal), (2) apply a very small temperature scaling on the logits before softmax to reduce overconfident probabilities (KL is very sensitive to overconfidence), and (3) mix in a tiny amount of uniform probability (“label-smoothing at inference”) to further stabilize KL while keeping row sums exactly 1. These are minimal, safe changes that preserve the architecture and overall pipeline while aiming to reduce KL toward your target.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995, lower-is-better) is much worse than the target (0.4229), so the most likely “minimal but big impact” fix is to align the prediction head with the metric: KL is computed against *vote-distribution* targets, but the model outputs here are being treated as probabilities directly (softmax), which can be overconfident and mismatched if the checkpoint was trained with BCE/MSE on normalized votes. I keep your ensemble, inputs, and transforms unchanged, but (1) switch the post-processing to use a safe `sigmoid -> normalize` mapping (common for multi-label-trained HMS checkpoints) instead of softmax, (2) reduce the amount of uniform mixing to avoid washing out signal, and (3) keep clipping+renormalization to guarantee valid submissions. These are small changes in inference semantics only and are specifically aimed at lowering KL toward the target without changing core feature/model code.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995; lower is better) is far from the target (0.4229), so we should make the smallest inference-only changes that plausibly correct a mismatch between the saved checkpoint and your post-processing. The biggest low-risk fix is to stop forcing a multi-label `sigmoid->normalize` mapping and instead use a standard multiclass `softmax`, which is the most common training head for this competition and often dramatically reduces KL when the wrong mapping is used. I keep your ensemble, transforms, feature construction, and batching identical, and only adjust the probability mapping plus make the temperature a no-op (1.0) to avoid extra calibration error. The script still writes a valid `submission.csv` with non-negative probabilities summing to 1 per row.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995, lower-is-better) is far from the target (0.4229), so the highest-leverage minimal fix is to ensure the *test-time* spectrogram parquet arrays are oriented the same way the generator expects. Right now you store `spectrograms2[name] = arr` with shape likely `(time, freq*4)` but later slice as if it were `(freq*4, time)`, which can silently feed “wrong images” and badly hurt KL. I transpose and enforce a deterministic `(400, 300)` shape at load time (without changing the feature logic), and keep your model ensemble, transforms, softmax, clipping, and row-normalization unchanged. This is a small, inference-only consistency fix that is very likely to reduce KL toward your target while preserving core semantics.'
+- What this solution (achieved 1.40995) has done: 'Your KL (1.40995, lower-is-better) is far above the target (0.4229), so we should make the smallest inference-only change that most plausibly fixes a severe input mismatch. The biggest likely issue is that the **Kaggle spectrogram parquets are loaded as (freq,time)** but your generator slices them as if they were **(time,freq)**; this silently produces “wrong images” for the Kaggle-spec half of the “both” input. I enforce a deterministic `(300, 400)` `(time, freq*4)` layout at load time (transpose when needed), keeping the rest of the feature construction, model ensemble, transforms, softmax, and probability normalization unchanged. This should materially reduce KL by feeding the model the correct spectrogram orientation while preserving core logic.'
+- What this solution (achieved 1.40995) has done: 'Your current KL (1.40995; lower is better) is far above the target (0.4229), so the most likely minimal improvement is fixing a silent input mismatch that makes the “Kaggle spectrogram” half of `DATA_TYPE="both"` wrong at inference. I make spectrogram loading enforce the expected `(300, 400)` time×(4*freq) layout more robustly by detecting and removing a leading numeric index/time column (common in these parquets) and transposing only when clearly needed. This keeps your model ensemble, feature construction, transforms, softmax, and submission formatting unchanged, but should materially reduce KL by feeding the model the correct spectrogram orientation/content. I also add a small safety fallback to resize/crop/pad only if a file still doesn’t match `(300,400)` so inference can’t degrade due to shape drift.'
+- What this solution (achieved 1.40995) has done: 'Your KL (1.40995; lower is better) is far above the target (0.4229), so we need a minimal inference-only change that plausibly fixes a major semantic mismatch rather than tuning for marginal gains. The most likely severe issue is the spectrogram parquet layout handling: the generator expects `spec` to be on the same scale as the original Kaggle spectrograms (nonnegative “power-like” values) because it applies `clip(exp(-4), exp(8))` then `log`, but your loader currently reads already-log spectrogram parquets as raw floats and then logs them again, producing distorted inputs. I convert the loaded spectrograms back to power scale with a safe `exp()` (with clipping to avoid overflow), keeping shapes/orientation logic and everything else unchanged. This should move the score materially down toward the target while preserving your model ensemble, transforms, inference loop, and submission formatting.'
+
+# 9. Code solution
+
+## === cell 0
+import glob
+import os
+
+import numpy as np
+import pandas as pd
+
+import matplotlib.pyplot as plt
+import torch
+import tqdm
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+FEATS2 = ["Fp1", "T3", "C3", "O1", "Fp2", "C4", "T4", "O2"]
+
+DATA_TYPE = "both"
+
+TARGETS = [
+    "seizure_vote",
+    "lpd_vote",
+    "gpd_vote",
+    "lrda_vote",
+    "grda_vote",
+    "other_vote",
+]
+
+test = pd.read_csv("/kaggle/input/hms-harmful-brain-activity-classification/test.csv")
+print("Test shape", test.shape)
+print(test.head())
+
+PATH2 = "/kaggle/input/hms-harmful-brain-activity-classification/test_spectrograms/"
+files2 = os.listdir(PATH2)
+print(f"There are {len(files2)} test spectrogram parquets")
+
+
+def _fix_spec_layout_to_300x400(tmp: pd.DataFrame) -> np.ndarray:
+    """
+    Expected by generator later:
+      spec[offset:offset+300, k*100:(k+1)*100] with spec shaped (300, 400)
+      i.e., (time, 4*freq_bins)
+
+    Minimal inference-only fix: some parquets include a leading numeric index/time column.
+    We drop it deterministically when present, then transpose only if clearly needed.
+    """
+    tmp_num = tmp.select_dtypes(include=[np.number])
+
+    if tmp_num.shape[1] == 401:
+        tmp_num = tmp_num.iloc[:, 1:]
+    elif tmp_num.shape[0] == 401:
+        tmp_num = tmp_num.iloc[1:, :]
+
+    arr = tmp_num.values.astype(np.float32, copy=False)
+
+    if arr.shape == (300, 400):
+        pass
+    elif arr.shape == (400, 300):
+        arr = arr.T
+    else:
+        if 300 in arr.shape and 400 in arr.shape:
+            if arr.shape[0] == 400 and arr.shape[1] == 300:
+                arr = arr.T
+
+    if arr.shape != (300, 400):
+        out = np.zeros((300, 400), dtype=np.float32)
+        h = min(300, arr.shape[0])
+        w = min(400, arr.shape[1])
+        hs = (arr.shape[0] - h) // 2 if arr.shape[0] > h else 0
+        ws = (arr.shape[1] - w) // 2 if arr.shape[1] > w else 0
+        out[:h, :w] = arr[hs : hs + h, ws : ws + w]
+        arr = out
+
+    return arr
+
+
+spectrograms2 = {}
+bad_specs = 0
+
+for i, f in enumerate(files2):
+    if i % 100 == 0:
+        print(i, ", ", end="")
+    tmp = pd.read_parquet(f"{PATH2}{f}")
+
+    arr = _fix_spec_layout_to_300x400(tmp)
+
+    arr = np.exp(np.clip(arr, -20.0, 20.0)).astype(np.float32, copy=False)
+
+    if arr.shape != (300, 400):
+        bad_specs += 1
+
+    name = int(f.split(".")[0])
+    spectrograms2[name] = arr
+
+print("\nLoaded spectrograms2:", len(spectrograms2), "bad_shapes:", bad_specs)
+
+test = test.rename({"spectrogram_id": "spec_id"}, axis=1)
+test["offset"] = 0
+
+PATH2 = "/kaggle/input/hms-harmful-brain-activity-classification/test_eegs/"
+DISPLAY = 0
+EEG_IDS2 = test.eeg_id.unique()
+all_eegs2 = {}
+
+print("Converting Test EEG to Spectrograms...")
+print()
+
+
+
+## === cell 1
+import librosa
+import pywt
+
+
+def eeg_from_parquet(parquet_path):
+    eeg = pd.read_parquet(parquet_path, columns=FEATS2)
+    rows = len(eeg)
+    offset = (rows - 10_000) // 2
+    eeg = eeg.iloc[offset : offset + 10_000]
+    data = np.zeros((10_000, len(FEATS2)))
+    for j, col in enumerate(FEATS2):
+        x = eeg[col].values.astype("float32")
+        m = np.nanmean(x)
+        if np.isnan(x).mean() < 1:
+            x = np.nan_to_num(x, nan=m)
+        else:
+            x[:] = 0
+        data[:, j] = x
+    return data
+
+
+def maddest(d, axis=None):
+    return np.mean(np.absolute(d - np.mean(d, axis)), axis)
+
+
+def denoise(x, wavelet="haar", level=1):
+    coeff = pywt.wavedec(x, wavelet, mode="per")
+    sigma = (1 / 0.6745) * maddest(coeff[-level])
+    uthresh = sigma * np.sqrt(2 * np.log(len(x)))
+    coeff[1:] = (pywt.threshold(i, value=uthresh, mode="hard") for i in coeff[1:])
+    ret = pywt.waverec(coeff, wavelet, mode="per")
+    return ret
+
+
+USE_WAVELET = None
+
+NAMES = ["LL", "LP", "RP", "RR"]
+
+FEATS = [
+    ["Fp1", "F7", "T3", "T5", "O1"],
+    ["Fp1", "F3", "C3", "P3", "O1"],
+    ["Fp2", "F8", "T4", "T6", "O2"],
+    ["Fp2", "F4", "C4", "P4", "O2"],
+]
+
+
+def spectrogram_from_eeg(parquet_path, display=False):
+    eeg = pd.read_parquet(parquet_path)
+    middle = (len(eeg) - 10_000) // 2
+    eeg = eeg.iloc[middle : middle + 10_000]
+
+    img = np.zeros((100, 300, 4), dtype="float32")
+
+    if display:
+        plt.figure(figsize=(10, 7))
+
+    signals = []
+    for k in range(4):
+        COLS = FEATS[k]
+        for kk in range(4):
+            x1 = eeg[COLS[kk]].values
+            x2 = eeg[COLS[kk + 1]].values
+
+            m = np.nanmean(x1)
+            if np.isnan(x1).mean() < 1:
+                x1 = np.nan_to_num(x1, nan=m)
+            else:
+                x1[:] = 0
+
+            m = np.nanmean(x2)
+            if np.isnan(x2).mean() < 1:
+                x2 = np.nan_to_num(x2, nan=m)
+            else:
+                x2[:] = 0
+
+            x = x1 - x2
+            if USE_WAVELET:
+                x = denoise(x, wavelet=USE_WAVELET)
+
+            signals.append(x)
+
+            mel_spec = librosa.feature.melspectrogram(
+                y=x,
+                sr=200,
+                hop_length=len(x) // 300,
+                n_fft=1024,
+                n_mels=100,
+                fmin=0,
+                fmax=20,
+                win_length=128,
+            )
+            width = (mel_spec.shape[1] // 30) * 30
+            mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max).astype(np.float32)[
+                :, :width
+            ]
+            img[:, :, k] += mel_spec_db
+
+        img[:, :, k] /= 4.0
+
+        if display:
+            plt.subplot(2, 2, k + 1)
+            plt.imshow(img[:, :, k], aspect="auto", origin="lower")
+
+    if display:
+        plt.show()
+        plt.figure(figsize=(10, 5))
+        offset = 0
+        for k in range(4):
+            if k > 0:
+                offset -= signals[3 - k].min()
+            plt.plot(range(10_000), signals[k] + offset, label=NAMES[3 - k])
+            offset += signals[3 - k].max()
+        plt.legend()
+        plt.show()
+
+    return img
+
+
+for i, eeg_id in enumerate(EEG_IDS2):
+    img = spectrogram_from_eeg(f"{PATH2}{eeg_id}.parquet", i < DISPLAY)
+    all_eegs2[eeg_id] = img
+
+
+
+
+## === cell 2
+class DataGenerator:
+    "Generates data for Keras"
+
+    def __init__(
+        self,
+        data,
+        specs=None,
+        eeg_specs=None,
+        raw_eegs=None,
+        augment=False,
+        mode="train",
+        data_type=DATA_TYPE,
+        trans=None,
+    ):
+        self.data = data
+        self.augment = augment
+        self.mode = mode
+        self.data_type = data_type
+        self.specs = specs
+        self.eeg_specs = eeg_specs
+        self.raw_eegs = raw_eegs
+        self.on_epoch_end()
+        self.trans = trans
+
+    def __len__(self):
+        return self.data.shape[0]
+
+    def __getitem__(self, index):
+        X, y = self.data_generation(index)
+        if self.augment:
+            X = self.augmentation(X)
+        return X, y
+
+    def __call__(self):
+        for i in range(self.__len__()):
+            yield self.__getitem__(i)
+            if i == self.__len__() - 1:
+                self.on_epoch_end()
+
+    def on_epoch_end(self):
+        if self.mode == "train":
+            self.data = self.data.sample(frac=1).reset_index(drop=True)
+
+    def data_generation(self, index):
+        if self.data_type == "both":
+            X, y = self.generate_all_specs(index)
+        elif self.data_type == "eeg" or self.data_type == "kaggle":
+            X, y = self.generate_specs(index)
+        elif self.data_type == "raw":
+            X, y = self.generate_raw(index)
+        return X, y
+
+    def generate_all_specs(self, index):
+        X = np.zeros((512, 512, 3), dtype="float32")
+        y = np.zeros((6,), dtype="float32")
+
+        row = self.data.iloc[index]
+        if self.mode == "test":
+            offset = 0
+        else:
+            offset = int(row.offset / 2)
+
+        eeg = self.eeg_specs[row.eeg_id]
+        spec = self.specs[row.spec_id]
+
+        imgs = [
+            spec[offset : offset + 300, k * 100 : (k + 1) * 100].T for k in [0, 2, 1, 3]
+        ]
+        img = np.stack(imgs, axis=-1)
+        img = np.clip(img, np.exp(-4), np.exp(8))
+        img = np.log(img)
+        img = np.nan_to_num(img, nan=0.0)
+
+        mn = img.flatten().min()
+        mx = img.flatten().max()
+        ep = 1e-5
+        img = 255 * (img - mn) / (mx - mn + ep)
+
+        X[0 + 56 : 100 + 56, :256, 0] = img[:, 22:-22, 0]
+        X[100 + 56 : 200 + 56, :256, 0] = img[:, 22:-22, 2]
+        X[0 + 56 : 100 + 56, :256, 1] = img[:, 22:-22, 1]
+        X[100 + 56 : 200 + 56, :256, 1] = img[:, 22:-22, 3]
+        X[0 + 56 : 100 + 56, :256, 2] = img[:, 22:-22, 2]
+        X[100 + 56 : 200 + 56, :256, 2] = img[:, 22:-22, 1]
+
+        X[0 + 56 : 100 + 56, 256:, 0] = img[:, 22:-22, 0]
+        X[100 + 56 : 200 + 56, 256:, 0] = img[:, 22:-22, 2]
+        X[0 + 56 : 100 + 56, 256:, 1] = img[:, 22:-22, 1]
+        X[100 + 56 : 200 + 56, 256:, 1] = img[:, 22:-22, 3]
+
+        img = eeg
+        mn = img.flatten().min()
+        mx = img.flatten().max()
+        ep = 1e-5
+        img = 255 * (img - mn) / (mx - mn + ep)
+
+        X[200 + 56 : 300 + 56, :256, 0] = img[:, 22:-22, 0]
+        X[300 + 56 : 400 + 56, :256, 0] = img[:, 22:-22, 2]
+        X[200 + 56 : 300 + 56, :256, 1] = img[:, 22:-22, 1]
+        X[300 + 56 : 400 + 56, :256, 1] = img[:, 22:-22, 3]
+        X[200 + 56 : 300 + 56, :256, 2] = img[:, 22:-22, 2]
+        X[300 + 56 : 400 + 56, :256, 2] = img[:, 22:-22, 1]
+
+        X[200 + 56 : 300 + 56, 256:, 0] = img[:, 22:-22, 0]
+        X[300 + 56 : 400 + 56, 256:, 0] = img[:, 22:-22, 2]
+        X[200 + 56 : 300 + 56, 256:, 1] = img[:, 22:-22, 1]
+        X[300 + 56 : 400 + 56, 256:, 1] = img[:, 22:-22, 3]
+
+        if self.trans is not None:
+            X = self.trans(image=X)["image"]
+        else:
+            X = torch.from_numpy(X).permute(2, 0, 1).contiguous()
+
+        if self.mode != "test":
+            y[:] = row[TARGETS]
+        return X, y
+
+    def generate_specs(self, index):
+        X = np.zeros((512, 512, 3), dtype="float32")
+        y = np.zeros((6,), dtype="float32")
+
+        row = self.data.iloc[index]
+        if self.mode == "test":
+            offset = 0
+        else:
+            offset = int(row.offset / 2)
+
+        if self.data_type == "eeg":
+            img = self.eeg_specs[row.eeg_id]
+        elif self.data_type == "kaggle":
+            spec = self.specs[row.spec_id]
+            imgs = [
+                spec[offset : offset + 300, k * 100 : (k + 1) * 100].T
+                for k in [0, 2, 1, 3]
+            ]
+            img = np.stack(imgs, axis=-1)
+            img = np.clip(img, np.exp(-4), np.exp(8))
+            img = np.log(img)
+            img = np.nan_to_num(img, nan=0.0)
+
+        mn = img.flatten().min()
+        mx = img.flatten().max()
+        ep = 1e-5
+        img = 255 * (img - mn) / (mx - mn + ep)
+
+        X[0 + 56 : 100 + 56, :256, 0] = img[:, 22:-22, 0]
+        X[100 + 56 : 200 + 56, :256, 0] = img[:, 22:-22, 2]
+        X[0 + 56 : 100 + 56, :256, 1] = img[:, 22:-22, 1]
+        X[100 + 56 : 200 + 56, :256, 1] = img[:, 22:-22, 3]
+        X[0 + 56 : 100 + 56, :256, 2] = img[:, 22:-22, 2]
+        X[100 + 56 : 200 + 56, :256, 2] = img[:, 22:-22, 1]
+
+        X[0 + 56 : 100 + 56, 256:, 0] = img[:, 22:-22, 0]
+        X[100 + 56 : 200 + 56, 256:, 0] = img[:, 22:-22, 1]
+        X[0 + 56 : 100 + 56, 256:, 1] = img[:, 22:-22, 2]
+        X[100 + 56 : 200 + 56, 256:, 1] = img[:, 22:-22, 3]
+
+        X[200 + 56 : 300 + 56, :256, 0] = img[:, 22:-22, 0]
+        X[300 + 56 : 400 + 56, :256, 0] = img[:, 22:-22, 1]
+        X[200 + 56 : 300 + 56, :256, 1] = img[:, 22:-22, 2]
+        X[300 + 56 : 400 + 56, :256, 1] = img[:, 22:-22, 3]
+        X[200 + 56 : 300 + 56, :256, 2] = img[:, 22:-22, 3]
+        X[300 + 56 : 400 + 56, :256, 2] = img[:, 22:-22, 2]
+
+        X[200 + 56 : 300 + 56, 256:, 0] = img[:, 22:-22, 0]
+        X[300 + 56 : 400 + 56, 256:, 0] = img[:, 22:-22, 2]
+        X[200 + 56 : 300 + 56, 256:, 1] = img[:, 22:-22, 1]
+        X[300 + 56 : 400 + 56, 256:, 1] = img[:, 22:-22, 3]
+
+        if self.trans is not None:
+            X = self.trans(image=X)["image"]
+        else:
+            X = torch.from_numpy(X).permute(2, 0, 1).contiguous()
+
+        if self.mode != "test":
+            y[:] = row[TARGETS]
+        return X, y
+
+
+
+
+## === cell 3
+val_transform = A.Compose(
+    [
+        A.Normalize(
+            mean=(0.485, 0.456, 0.406),
+            std=(0.229, 0.224, 0.225),
+            max_pixel_value=255.0,
+        ),
+        ToTensorV2(p=1.0),
+    ]
+)
+
+
+
+
+## === cell 4
+def run_inference_loop(model, test_gen, device, batch_size=16, temperature=1.0):
+    model.to(device)
+    model.eval()
+
+    preds = []
+    n = len(test_gen)
+
+    with torch.no_grad():
+        for start in tqdm.tqdm(range(0, n, batch_size)):
+            xs = []
+            for i in range(start, min(start + batch_size, n)):
+                x, _ = test_gen[i]  # torch tensor CHW
+                xs.append(x)
+            batch = torch.stack(xs, dim=0).to(device)  # NCHW
+
+            out = model(batch)
+            out = out / float(temperature)
+
+            prob = torch.softmax(out, dim=1)
+            preds.append(prob.detach().cpu().numpy())
+
+    return np.concatenate(preds, axis=0)
+
+
+preds = []
+
+test_gen_both = DataGenerator(
+    test,
+    mode="test",
+    data_type="both",
+    specs=spectrograms2,
+    eeg_specs=all_eegs2,
+    trans=val_transform,
+)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Using device:", device)
+
+model_glob = "/kaggle/input/model101-feature128-mixnet-xl-0-5kl/model_101/*/*.pt"
+model_paths = sorted(glob.glob(model_glob))
+print("Found models:", len(model_paths))
+
+for model_path in model_paths:
+    print("Loading:", model_path)
+    model = torch.load(model_path, map_location="cpu")
+    pred = run_inference_loop(
+        model, test_gen_both, device, batch_size=16, temperature=1.0
+    )
+    preds.append(pred)
+
+test_pred = np.mean(np.stack(preds, axis=0), axis=0) if len(preds) > 0 else None
+
+CLASSES = [
+    "seizure_vote",
+    "lpd_vote",
+    "gpd_vote",
+    "lrda_vote",
+    "grda_vote",
+    "other_vote",
+]
+
+if test_pred is None:
+    test_pred = np.full((len(test), len(CLASSES)), 1.0 / len(CLASSES), dtype=np.float32)
+else:
+    test_pred = np.asarray(test_pred, dtype=np.float32)
+    if test_pred.ndim != 2 or test_pred.shape[1] != len(CLASSES):
+        raise ValueError(
+            f"Bad prediction shape {test_pred.shape}, expected (n, {len(CLASSES)})"
+        )
+
+    eps_mix = 0.005
+    test_pred = (1.0 - eps_mix) * test_pred + eps_mix * (1.0 / len(CLASSES))
+
+    test_pred = np.clip(test_pred, 1e-8, 1.0)
+    test_pred = test_pred / test_pred.sum(axis=1, keepdims=True)
+
+test_pred_df = pd.DataFrame(test_pred, columns=CLASSES)
+test_pred_df = pd.concat(
+    [test[["eeg_id"]].reset_index(drop=True), test_pred_df.reset_index(drop=True)],
+    axis=1,
+)
+
+test_pred_df.to_csv("submission.csv", index=False)
+print(test_pred_df.head())
+print("Saved submission.csv with shape:", test_pred_df.shape)
+print(
+    "Row sums (min/mean/max):",
+    test_pred_df[CLASSES].sum(1).min(),
+    test_pred_df[CLASSES].sum(1).mean(),
+    test_pred_df[CLASSES].sum(1).max(),
+)

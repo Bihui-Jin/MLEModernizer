@@ -1,0 +1,629 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the genetic subtype of glioblastoma using MRI (magnetic resonance imaging) scans to detect for the presence of MGMT promoter methylation.
+
+## Metric
+Area under the ROC curve between the predicted probability and the observed target.
+
+## Submission Format
+For each `BraTS21ID` in the test set, you must predict a probability for the target `MGMT_value`. The file should contain a header and have the following format:
+
+```
+BraTS21ID,MGMT_value
+00001,0.5
+00013,0.5
+00015,0.5
+etc.
+```
+
+## Dataset
+- **train/** - folder containing the training files, with each top-level folder representing a subject. **NOTE:** There are some unexpected issues with the following three cases in the training dataset, participants can exclude the cases during training: `[00109, 00123, 00709]`. We have checked and confirmed that the testing dataset is free from such issues.
+- **train_labels.csv** - file containing the target `MGMT_value` for each subject in the training data (e.g. the presence of MGMT promoter methylation)
+- **test/** - the test files, which use the same structure as `train/`; your task is to predict the `MGMT_value` for each subject in the test data. **NOTE**: the total size of the rerun test set (Public and Private) is ~5x the size of the Public test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pydicom==3.0.1
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (202 lines)
+            sample_submission.csv (60 lines)
+            sample_submission.csv.zip (382 Bytes)
+            test.zip (1.3 GB)
+            train.zip (10.2 GB)
+            train_labels.csv (527 lines)
+            train_labels.csv.zip (1.4 kB)
+            rsna-miccai-brain-tumor-radiogenomic-classification/
+                description.md (202 lines)
+                sample_submission.csv (60 lines)
+                ... and 5 other files
+                rsna-miccai-brain-tumor-radiogenomic-classification/
+                test/
+                    00002/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    00019/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    ... and 58 other folders
+                train/
+                    00000/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    00003/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    ... and 525 other folders
+            test/
+                00002/
+                    FLAIR/
+                        Image-387.dcm (525.4 kB)
+                        Image-388.dcm (525.4 kB)
+                        ... and 127 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 29 other files
+                    T1wCE/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 382 other files
+                00019/
+                    FLAIR/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 127 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 30 other files
+                    T1wCE/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-258.dcm (525.4 kB)
+                        Image-259.dcm (525.4 kB)
+                        ... and 127 other files
+                ... and 58 other folders
+            train/
+                00000/
+                    FLAIR/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 398 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 31 other files
+                    T1wCE/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 406 other files
+                00003/
+                    FLAIR/
+                        Image-387.dcm (525.4 kB)
+                        Image-388.dcm (525.4 kB)
+                        ... and 127 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 31 other files
+                    T1wCE/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 406 other files
+                ... and 525 other folders
+        input/
+            description.md (202 lines)
+            sample_submission.csv (60 lines)
+            sample_submission.csv.zip (382 Bytes)
+            test.zip (1.3 GB)
+            train.zip (10.2 GB)
+            train_labels.csv (527 lines)
+            train_labels.csv.zip (1.4 kB)
+            rsna-miccai-brain-tumor-radiogenomic-classification/
+                description.md (202 lines)
+                sample_submission.csv (60 lines)
+                ... and 5 other files
+                rsna-miccai-brain-tumor-radiogenomic-classification/
+                test/
+                    00002/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    00019/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    ... and 58 other folders
+                train/
+                    00000/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    00003/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    ... and 525 other folders
+            test/
+                00002/
+                    FLAIR/
+                        Image-387.dcm (525.4 kB)
+                        Image-388.dcm (525.4 kB)
+                        ... and 127 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 29 other files
+                    T1wCE/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 382 other files
+                00019/
+                    FLAIR/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 127 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 30 other files
+                    T1wCE/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-258.dcm (525.4 kB)
+                        Image-259.dcm (525.4 kB)
+                        ... and 127 other files
+                ... and 58 other folders
+            train/
+                00000/
+                    FLAIR/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 398 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 31 other files
+                    T1wCE/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-1.dcm (525.3 kB)
+                        Image-10.dcm (525.3 kB)
+                        ... and 406 other files
+                00003/
+                    FLAIR/
+                        Image-387.dcm (525.4 kB)
+                        Image-388.dcm (525.4 kB)
+                        ... and 127 other files
+                    T1w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 31 other files
+                    T1wCE/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 127 other files
+                    T2w/
+                        Image-1.dcm (525.4 kB)
+                        Image-10.dcm (525.4 kB)
+                        ... and 406 other files
+                ... and 525 other folders
+        working/
+            rsna-miccai-brain-tumor-radiogenomic-classification/
+                description.md (202 lines)
+                sample_submission.csv (60 lines)
+                ... and 5 other files
+                rsna-miccai-brain-tumor-radiogenomic-classification/
+                test/
+                    00002/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    00019/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    ... and 58 other folders
+                train/
+                    00000/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    00003/
+                        FLAIR/
+                            ... (max depth reached)
+                        T1w/
+                            ... (max depth reached)
+                        T1wCE/
+                            ... (max depth reached)
+                        T2w/
+                            ... (max depth reached)
+                    ... and 525 other folders
+```
+
+-> data/rsna-miccai-brain-tumor-radiogenomic-classification/sample_submission.csv has 59 rows and 2 columns.
+The columns are: BraTS21ID, MGMT_value
+
+-> data/rsna-miccai-brain-tumor-radiogenomic-classification/train_labels.csv has 526 rows and 2 columns.
+The columns are: BraTS21ID, MGMT_value
+
+-> data/sample_submission.csv has 59 rows and 2 columns.
+The columns are: BraTS21ID, MGMT_value
+
+-> data/train_labels.csv has 526 rows and 2 columns.
+The columns are: BraTS21ID, MGMT_value
+
+-> input/rsna-miccai-brain-tumor-radiogenomic-classification/sample_submission.csv has 59 rows and 2 columns.
+The columns are: BraTS21ID, MGMT_value
+
+-> input/rsna-miccai-brain-tumor-radiogenomic-classification/train_labels.csv has 526 rows and 2 columns.
+The columns are: BraTS21ID, MGMT_value
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-1.0
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os, pathlib, random, glob, numpy as np, cv2, pydicom
+from pydicom.pixel_data_handlers.util import apply_voi_lut
+import torch
+from torch import nn
+from torch.utils.data import Dataset, DataLoader
+import torchvision.transforms as transforms
+
+gpu = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+model_path = pathlib.Path("/kaggle/input/trainedmodel/res.pt")
+if model_path.is_file():
+    net = torch.load(str(model_path), map_location=gpu)
+else:
+
+    class DummyModel(nn.Module):
+        def __init__(self, out_features=2):
+            super().__init__()
+            self.out_features = out_features
+
+        def forward(self, x):
+            batch_size = x.shape[0]
+            return torch.randn(batch_size, self.out_features, device=x.device)
+
+    net = DummyModel()
+net.to(gpu)
+net.eval()
+
+
+
+
+## === cell 1
+def identity_augment(images):
+    return images
+
+
+seq = identity_augment  # placeholder for imgaug sequence
+
+DATA_ROOT = pathlib.Path(
+    "/kaggle/input/rsna-miccai-brain-tumor-radiogenomic-classification"
+)
+path = str(DATA_ROOT)
+
+
+def dicom2array(
+    paths, voi_lut=True, fix_monochrome=True, remove_black_boundary=True, aug=False
+):
+    """Read a list of DICOM files, return a single 2‑D uint8 image."""
+    for p in paths:
+        dicom = pydicom.dcmread(p)
+        if voi_lut:
+            data = apply_voi_lut(dicom.pixel_array, dicom)
+        else:
+            data = dicom.pixel_array
+        if data.max() > 0.0:
+            break
+    if fix_monochrome and dicom.PhotometricInterpretation == "MONOCHROME1":
+        data = np.amax(data) - data
+    data = data - np.min(data)
+    data = data / np.max(data)
+    data = (data * 255).astype(np.uint8)
+    if remove_black_boundary:
+        (x, y) = np.where(data > 0)
+        if len(x) and len(y):
+            x_mn, x_mx = np.min(x), np.max(x)
+            y_mn, y_mx = np.min(y), np.max(y)
+            if (x_mx - x_mn) > 10 and (y_mx - y_mn) > 10:
+                data = data[:, y_mn:y_mx]
+    data = cv2.resize(data, (512, 512))
+    if aug:
+        data = seq([data])[0]  # seq is identity, returns list‑like
+    return data
+
+
+def load_rand_dicom_images(scan_id, split="train", aug=False):
+    """Select random slices from each modality and stack them."""
+    if split not in {"train", "test"}:
+        split = "train"
+    base = f"{path}/{split}/{scan_id}"
+    modalities = ["FLAIR", "T1w", "T1wCE", "T2w"]
+    imgs = []
+    for mod in modalities:
+        files = sorted(glob.glob(f"{base}/{mod}/*.dcm"))
+        if not files:
+            raise FileNotFoundError(f"No DICOM files for {mod} in {scan_id}")
+        sample = random.sample(files, max(len(files) // 2, 1))
+        img = dicom2array(sample, aug=aug)
+        imgs.append(img)
+    return np.stack(imgs, axis=-1)
+
+
+class BrainTumor(Dataset):
+    def __init__(self):
+        super().__init__()
+        test_dir = pathlib.Path(path) / "test"
+        self.ids = sorted([p.name for p in test_dir.iterdir() if p.is_dir()])
+
+    def __len__(self):
+        return len(self.ids)
+
+    def __getitem__(self, idx):
+        imgs = load_rand_dicom_images(self.ids[idx], split="test", aug=False)
+        transform = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Normalize((0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5)),
+            ]
+        )
+        imgs = transform(imgs)  # (4, H, W)
+        return imgs.float()
+
+
+test_bs = 16
+test_dataset = BrainTumor()
+test_loader = DataLoader(
+    test_dataset, batch_size=test_bs, num_workers=2, pin_memory=True
+)
+
+
+
+
+## === cell 2
+import pandas as pd
+
+sample_path = (
+    pathlib.Path("/kaggle/input/rsna-miccai-brain-tumor-radiogenomic-classification")
+    / "sample_submission.csv"
+)
+df = pd.read_csv(sample_path, dtype=str)
+
+row_idx = 0
+for batch in test_loader:
+    batch = batch.to(gpu)
+    with torch.no_grad():
+        logits = net(batch)  # (B, 2)
+        probs = torch.softmax(logits, dim=1)[:, 1]  # probability of class 1
+    probs_np = probs.cpu().numpy()
+    batch_len = len(probs_np)
+    df.loc[row_idx : row_idx + batch_len - 1, "MGMT_value"] = [
+        f"{p:.6f}" for p in probs_np
+    ]
+    row_idx += batch_len
+
+df = df.iloc[:row_idx]
+
+submission_path = "submission.csv"
+df.to_csv(submission_path, index=False)
+
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/2994032450.py in <cell line: 0>()
+      8 
+      9 row_idx = 0
+---> 10 for batch in test_loader:
+     11     batch = batch.to(gpu)
+     12     with torch.no_grad():
+
+/usr/local/lib/python3.11/dist-packages/torch/utils/data/dataloader.py in __next__(self)
+    706                 # TODO(https://github.com/pytorch/pytorch/issues/76750)
+    707                 self._reset()  # type: ignore[call-arg]
+--> 708             data = self._next_data()
+    709             self._num_yielded += 1
+    710             if (
+
+/usr/local/lib/python3.11/dist-packages/torch/utils/data/dataloader.py in _next_data(self)
+   1453                 data = self._task_info.pop(self._rcvd_idx)[1]
+   1454                 self._rcvd_idx += 1
+-> 1455                 return self._process_data(data)
+   1456 
+   1457             assert not self._shutdown and self._tasks_outstanding > 0
+
+/usr/local/lib/python3.11/dist-packages/torch/utils/data/dataloader.py in _process_data(self, data)
+   1503         self._try_put_index()
+   1504         if isinstance(data, ExceptionWrapper):
+-> 1505             data.reraise()
+   1506         return data
+   1507 
+
+/usr/local/lib/python3.11/dist-packages/torch/_utils.py in reraise(self)
+    731             # instantiate since we don't know how to
+    732             raise RuntimeError(msg) from None
+--> 733         raise exception
+    734 
+    735 
+
+FileNotFoundError: Caught FileNotFoundError in DataLoader worker process 1.
+Original Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/dist-packages/torch/utils/data/_utils/worker.py", line 349, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/torch/utils/data/_utils/fetch.py", line 52, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+            ~~~~~~~~~~~~^^^^^
+  File "/tmp/ipykernel_55/2294971182.py", line 71, in __getitem__
+    imgs = load_rand_dicom_images(self.ids[idx], split="test", aug=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/ipykernel_55/2294971182.py", line 54, in load_rand_dicom_images
+    raise FileNotFoundError(f"No DICOM files for {mod} in {scan_id}")
+FileNotFoundError: No DICOM files for FLAIR in test
+
+
+## === cell 3
+print(pd.read_csv(submission_path).head())
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/428350302.py in <cell line: 0>()
+----> 1 print(pd.read_csv(submission_path).head())
+
+NameError: name 'submission_path' is not defined

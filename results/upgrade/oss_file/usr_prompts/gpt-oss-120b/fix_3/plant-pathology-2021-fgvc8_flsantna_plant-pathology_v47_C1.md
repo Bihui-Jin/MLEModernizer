@@ -1,0 +1,300 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7607940904893831
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import tensorflow as tf
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+output_dir = "./"
+test_dir = "../input/plant-pathology-2021-fgpc2021-fgvc8/test_images/"
+model_dir = "../input/conve01/effb7-e8/epoch-8"  # optional checkpoint directory
+image_dims = (300, 300, 3)
+
+data_set = pd.read_csv("../input/plant-pathology-2021-fgvc8/train.csv")
+df_labels = data_set["labels"]
+one_hot = df_labels.str.get_dummies(sep=" ")
+dataset_labels = one_hot.columns.to_list()
+num_classes = len(dataset_labels)
+
+
+
+## === cell 2
+from tensorflow.keras.applications import EfficientNetB7
+from tensorflow.keras import Model
+from tensorflow.keras.layers import (
+    GlobalAveragePooling2D,
+    Dense,
+    Dropout,
+    Input,
+)
+
+
+class MultiLabel(Model):
+    def __init__(self, num_classes, **kwargs):
+        super().__init__(**kwargs)
+        self.backbone = EfficientNetB7(
+            include_top=False,
+            weights="imagenet",
+            input_shape=image_dims,
+        )
+        self.pool = GlobalAveragePooling2D()
+        self.dropout = Dropout(0.2)
+        self.classifier = Dense(num_classes, activation="sigmoid")
+
+    def call(self, inputs, training=False):
+        x = self.backbone(inputs, training=training)
+        x = self.pool(x)
+        x = self.dropout(x, training=training)
+        return self.classifier(x)
+
+
+
+
+## === cell 3
+if __name__ == "__main__":
+    model = MultiLabel(num_classes=num_classes)
+    model.build(input_shape=[None, *image_dims])
+
+    if os.path.isdir(model_dir) or os.path.isfile(model_dir):
+        try:
+            model.load_weights(model_dir)
+        except Exception as e:
+            print(f"Warning: could not load weights from {model_dir}: {e}")
+
+    images_path_list = sorted(
+        [f for f in os.listdir(test_dir) if f.lower().endswith(".jpg")]
+    )
+
+    def load_and_preprocess(idx):
+        img_path = os.path.join(test_dir, images_path_list[idx])
+        raw = tf.io.read_file(img_path)
+        img = tf.io.decode_image(raw, channels=3, dtype=tf.dtypes.float32)
+        img = tf.image.resize(img, [image_dims[0], image_dims[1]])
+        return images_path_list[idx], tf.expand_dims(img, axis=0)
+
+    results = []
+    for i in range(len(images_path_list)):
+        name, img_tensor = load_and_preprocess(i)
+        img_tensor = img_tensor * 255.0
+        preds = model(img_tensor, training=False).numpy()[0]
+        selected = [dataset_labels[idx] for idx, p in enumerate(preds) if p > 0.5]
+        label_str = " ".join(selected)
+        results.append([name, label_str])
+
+    submission_df = pd.DataFrame(results, columns=["image", "labels"])
+    submission_path = os.path.join(output_dir, "submission.csv")
+    submission_df.to_csv(submission_path, index=False)
+    print(f"Submission saved to {submission_path}")
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_11/299782224.py in <cell line: 0>()
+     13     # Prepare list of test images
+     14     images_path_list = sorted(
+---> 15         [f for f in os.listdir(test_dir) if f.lower().endswith(".jpg")]
+     16     )
+     17 
+
+FileNotFoundError: [Errno 2] No such file or directory: '../input/plant-pathology-2021-fgpc2021-fgvc8/test_images/'

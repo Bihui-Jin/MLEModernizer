@@ -1,0 +1,531 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Segment regions of salt in seismic images.
+
+## Metric
+Mean average precision at different intersection over union (IoU) thresholds. The IoU of a proposed set of object pixels and a set of true object pixels is calculated as:
+
+$$\text{IoU}(A, B)=\frac{A \cap B}{A \cup B}$$
+
+The metric sweeps over a range of IoU thresholds, at each point calculating an average precision value. The threshold values range from 0.5 to 0.95 with a step size of 0.05: `(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95)`. In other words, at a threshold of 0.5, a predicted object is considered a "hit" if its intersection over union with a ground truth object is greater than 0.5.
+
+At each threshold value 𝑡t, a precision value is calculated based on the number of true positives (TP), false negatives (FN), and false positives (FP) resulting from comparing the predicted object to all ground truth objects:
+
+$$\frac{T P(t)}{T P(t)+F P(t)+F N(t)}$$
+
+A true positive is counted when a single predicted object matches a ground truth object with an IoU above the threshold. A false positive indicates a predicted object had no associated ground truth object. A false negative indicates a ground truth object had no associated predicted object. The average precision of a single image is then calculated as the mean of the above precision values at each IoU threshold:
+
+$$\frac{1}{\mid \text { thresholds } \mid} \sum_t \frac{T P(t)}{T P(t)+F P(t)+F N(t)}$$
+
+## Submission Format
+Use run-length encoding on the pixel values. Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The pixels are one-indexed\
+and numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. It also checks that no two predicted masks for the same image are overlapping.
+
+The file should contain a header and have the following format. Each row in your submission represents a single predicted salt segmentation for the given image.
+
+```
+id,rle_mask
+3e06571ef3,1 1
+a51b08d882,1 1
+c32590b06f,1 1
+etc.
+```
+
+## Dataset
+The data is a set of images chosen at various locations chosen at random in the subsurface. The images are 101 x 101 pixels and each pixel is classified as either salt or sediment. In addition to the seismic images, the depth of the imaged location is provided for each image.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+protobuf==6.33.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            depths.csv (3001 lines)
+            depths.csv.zip (25.0 kB)
+            description.md (83 lines)
+            sample_submission.csv (1001 lines)
+            sample_submission.csv.zip (6.8 kB)
+            test.zip (9.8 MB)
+            train.csv (3001 lines)
+            train.csv.zip (293.9 kB)
+            train.zip (30.9 MB)
+            test/
+                images/
+                    a05ae39815.png (10.5 kB)
+                    9bf8a38b92.png (10.7 kB)
+                    ... and 998 other files
+                test/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+            train/
+                images/
+                    66cf41c563.png (7.7 kB)
+                    429bf7c665.png (8.2 kB)
+                    ... and 2998 other files
+                masks/
+                    6eeeda7f4a.png (230 Bytes)
+                    5d600057f5.png (230 Bytes)
+                    ... and 2998 other files
+                train/
+        input/
+            depths.csv (3001 lines)
+            depths.csv.zip (25.0 kB)
+            description.md (83 lines)
+            sample_submission.csv (1001 lines)
+            sample_submission.csv.zip (6.8 kB)
+            test.zip (9.8 MB)
+            train.csv (3001 lines)
+            train.csv.zip (293.9 kB)
+            train.zip (30.9 MB)
+            test/
+                images/
+                    a05ae39815.png (10.5 kB)
+                    9bf8a38b92.png (10.7 kB)
+                    ... and 998 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+            train/
+                images/
+                    66cf41c563.png (7.7 kB)
+                    429bf7c665.png (8.2 kB)
+                    ... and 2998 other files
+                masks/
+                    6eeeda7f4a.png (230 Bytes)
+                    5d600057f5.png (230 Bytes)
+                    ... and 2998 other files
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+        working/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+```
+
+-> data/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> data/sample_submission.csv has 1000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/tgs-salt-identification-challenge/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> data/tgs-salt-identification-challenge/sample_submission.csv has 1000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/tgs-salt-identification-challenge/train.csv has 3000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/train.csv has 3000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> input/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.72268
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+from PIL import Image
+from keras import layers, Model, callbacks, optimizers
+
+
+def rle_decode(mask_rle, shape=(101, 101)):
+    """Decode a run-length encoded mask."""
+    s = mask_rle.strip().split()
+    starts, lengths = [np.asarray(x, dtype=int) for x in (s[0::2], s[1::2])]
+    starts -= 1
+    ends = starts + lengths
+    img = np.zeros(shape[0] * shape[1], dtype=np.uint8)
+    for lo, hi in zip(starts, ends):
+        img[lo:hi] = 1
+    return img.reshape(shape, order="F")
+
+
+def rle_encode(img):
+    """Encode a binary mask to run-length encoding (1‑indexed, column‑major)."""
+    pixels = img.T.flatten()
+    pads = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pads[1:] != pads[:-1])[0] + 1
+    runs[1::2] = runs[1::2] - runs[::2]
+    return " ".join(str(x) for x in runs)
+
+
+def load_image(path):
+    """Load a grayscale image, normalise to [0,1] and pad to 102×102."""
+    img = Image.open(path).convert("L")
+    img = np.array(img, dtype=np.float32) / 255.0
+    img = np.pad(img, ((0, 1), (0, 1)), mode="constant")
+    return img
+
+
+def load_mask(rle):
+    """Decode RLE mask (original 101×101) and pad to 102×102."""
+    mask = rle_decode(rle)  # (101,101)
+    mask = np.pad(mask, ((0, 1), (0, 1)), mode="constant")
+    return mask.astype(np.float32)
+
+
+BASE_PATH = "/kaggle/input/tgs-salt-identification-challenge"
+TRAIN_CSV = os.path.join(BASE_PATH, "train.csv")
+DEPTH_CSV = os.path.join(BASE_PATH, "depths.csv")
+TRAIN_IMG_DIR = os.path.join(BASE_PATH, "train", "images")
+TEST_IMG_DIR = os.path.join(BASE_PATH, "test", "images")
+
+train_df = pd.read_csv(TRAIN_CSV)
+depth_df = pd.read_csv(DEPTH_CSV)
+depth_df["z"] = depth_df["z"] / depth_df["z"].max()  # normalise depth
+train_df = train_df.merge(depth_df, on="id")
+print("Train rows:", train_df.shape[0])
+
+imgs, masks = [], []
+for _, row in train_df.iterrows():
+    img = load_image(os.path.join(TRAIN_IMG_DIR, f"{row['id']}.png"))
+    mask = load_mask(row["rle_mask"])
+    depth = np.full((102, 102), row["z"], dtype=np.float32)
+    imgs.append(np.stack([img, depth], axis=-1))  # (102,102,2)
+    masks.append(mask[..., np.newaxis])  # (102,102,1)
+
+train_x = np.stack(imgs, axis=0)
+train_y = np.stack(masks, axis=0)
+
+print("train_x shape:", train_x.shape, "train_y shape:", train_y.shape)
+
+from sklearn.model_selection import train_test_split
+
+X_tr, X_val, y_tr, y_val = train_test_split(
+    train_x, train_y, test_size=0.1, random_state=42
+)
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+def conv_block(x, filters, kernel=3, activation="elu"):
+    x = layers.Conv2D(filters, kernel, padding="same", activation=activation)(x)
+    x = layers.BatchNormalization()(x)
+    return x
+
+
+def encoder_block(x, filters):
+    c = conv_block(x, filters)
+    c = conv_block(c, filters)
+    p = layers.MaxPooling2D((2, 2))(c)
+    return c, p
+
+
+def decoder_block(x, skip, filters):
+    us = layers.Conv2DTranspose(
+        filters, (2, 2), strides=(2, 2), padding="same", output_padding=1
+    )(x)
+    concat = layers.Concatenate()([us, skip])
+    c = conv_block(concat, filters)
+    c = conv_block(c, filters)
+    return c
+
+
+inputs = layers.Input(shape=(102, 102, 2), name="input_img")
+s1, p1 = encoder_block(inputs, 16)
+s2, p2 = encoder_block(p1, 32)
+s3, p3 = encoder_block(p2, 64)
+
+b = conv_block(p3, 128)
+b = conv_block(b, 128)
+
+d3 = decoder_block(b, s3, 64)
+d2 = decoder_block(d3, s2, 32)
+d1 = decoder_block(d2, s1, 16)
+
+outputs = layers.Conv2D(1, 1, activation="sigmoid")(d1)
+model = Model(inputs, outputs)
+model.compile(
+    optimizer=optimizers.Adam(), loss="binary_crossentropy", metrics=["accuracy"]
+)
+model.summary()
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/3132273269.py in <cell line: 0>()
+     30 b = conv_block(b, 128)
+     31 
+---> 32 d3 = decoder_block(b, s3, 64)
+     33 d2 = decoder_block(d3, s2, 32)
+     34 d1 = decoder_block(d2, s1, 16)
+
+/tmp/ipykernel_55/3132273269.py in decoder_block(x, skip, filters)
+     16         filters, (2, 2), strides=(2, 2), padding="same", output_padding=1
+     17     )(x)
+---> 18     concat = layers.Concatenate()([us, skip])
+     19     c = conv_block(concat, filters)
+     20     c = conv_block(c, filters)
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+--> 122             raise e.with_traceback(filtered_tb) from None
+    123         finally:
+    124             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/keras/src/layers/merging/concatenate.py in build(self, input_shape)
+     97                 )
+     98                 if len(unique_dims) > 1:
+---> 99                     raise ValueError(err_msg)
+    100         self.built = True
+    101 
+
+ValueError: A `Concatenate` layer requires inputs with matching shapes except for the concatenation axis. Received: input_shape=[(None, 23, 23, 64), (None, 25, 25, 64)]
+
+## === cell 2
+early_stop = callbacks.EarlyStopping(
+    patience=3, restore_best_weights=True, monitor="val_accuracy"
+)
+model.fit(
+    X_tr,
+    y_tr,
+    validation_data=(X_val, y_val),
+    epochs=20,
+    batch_size=32,
+    callbacks=[early_stop],
+    verbose=2,
+)
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2726105324.py in <cell line: 0>()
+      2     patience=3, restore_best_weights=True, monitor="val_accuracy"
+      3 )
+----> 4 model.fit(
+      5     X_tr,
+      6     y_tr,
+
+NameError: name 'model' is not defined
+
+## === cell 3
+test_df = depth_df[~depth_df["id"].isin(train_df["id"])].reset_index(drop=True)
+print("Test rows:", test_df.shape[0])
+
+test_imgs = []
+for _, row in test_df.iterrows():
+    img = load_image(os.path.join(TEST_IMG_DIR, f"{row['id']}.png"))
+    depth = np.full((102, 102), row["z"], dtype=np.float32)
+    test_imgs.append(np.stack([img, depth], axis=-1))
+
+test_x = np.stack(test_imgs, axis=0)
+print("test_x shape:", test_x.shape)
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/2948799258.py in <cell line: 0>()
+      9     test_imgs.append(np.stack([img, depth], axis=-1))
+     10 
+---> 11 test_x = np.stack(test_imgs, axis=0)
+     12 print("test_x shape:", test_x.shape)
+     13 
+
+/usr/local/lib/python3.11/dist-packages/numpy/core/shape_base.py in stack(arrays, axis, out, dtype, casting)
+    443     arrays = [asanyarray(arr) for arr in arrays]
+    444     if not arrays:
+--> 445         raise ValueError('need at least one array to stack')
+    446 
+    447     shapes = {arr.shape for arr in arrays}
+
+ValueError: need at least one array to stack
+
+## === cell 4
+preds = model.predict(test_x, batch_size=32, verbose=1)
+preds_cropped = preds[:, :101, :101, :]  # (N,101,101,1)
+pred_masks = (preds_cropped > 0.5).astype(np.uint8).squeeze(axis=-1)  # (N,101,101)
+
+rle_list = [rle_encode(m) if m.sum() > 0 else "" for m in pred_masks]
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2618024255.py in <cell line: 0>()
+----> 1 preds = model.predict(test_x, batch_size=32, verbose=1)
+      2 # Crop predictions back to original 101×101
+      3 preds_cropped = preds[:, :101, :101, :]  # (N,101,101,1)
+      4 pred_masks = (preds_cropped > 0.5).astype(np.uint8).squeeze(axis=-1)  # (N,101,101)
+      5 
+
+NameError: name 'model' is not defined
+
+## === cell 5
+submission = pd.DataFrame({"id": test_df["id"], "rle_mask": rle_list})
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission saved to {submission_path}")
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2924342734.py in <cell line: 0>()
+----> 1 submission = pd.DataFrame({"id": test_df["id"], "rle_mask": rle_list})
+      2 submission_path = "submission.csv"
+      3 submission.to_csv(submission_path, index=False)
+      4 print(f"Submission saved to {submission_path}")
+
+NameError: name 'rle_list' is not defined

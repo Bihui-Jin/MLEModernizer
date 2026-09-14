@@ -1,0 +1,460 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given some text, predict the author.
+
+## Metric
+Multi-class logarithmic loss. 
+
+The submitted probabilities for a given sentences are not required to sum to one because they are rescaled prior to being scored (each row is divided by the row sum).
+
+In order to avoid the extremes of the log function, predicted probabilities are replaced with \\(max(min(p,1-10^{-15}),10^{-15})\\).
+
+## Submission Format
+You must submit a csv file with the id, and a probability for each of the three classes. The order of the rows does not matter. The file must have a header and should look like the following:
+
+```
+id,EAP,HPL,MWS
+id07943,0.33,0.33,0.33
+...
+```
+
+## Dataset 
+### File descriptions
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Data fields
+- **id** - a unique identifier for each sentence
+- **text** - some text written by one of the authors
+- **author** - the author of the sentence (EAP: Edgar Allan Poe, HPL: HP Lovecraft; MWS: Mary Wollstonecraft Shelley)
+
+# 2. Python version
+
+3.6
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+nltk==3.9.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+wordcloud==1.9.4
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (98 lines)
+            sample_submission.csv (1959 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.csv (1959 lines)
+            test.csv.zip (133.3 kB)
+            train.csv (17622 lines)
+            train.csv.zip (1.2 MB)
+            train.zip (1.2 MB)
+            spooky-author-identification/
+                description.md (98 lines)
+                sample_submission.csv (1959 lines)
+                ... and 6 other files
+                spooky-author-identification/
+        input/
+            description.md (98 lines)
+            sample_submission.csv (1959 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.csv (1959 lines)
+            test.csv.zip (133.3 kB)
+            train.csv (17622 lines)
+            train.csv.zip (1.2 MB)
+            train.zip (1.2 MB)
+            spooky-author-identification/
+                description.md (98 lines)
+                sample_submission.csv (1959 lines)
+                ... and 6 other files
+                spooky-author-identification/
+        working/
+            spooky-author-identification/
+                description.md (98 lines)
+                sample_submission.csv (1959 lines)
+                ... and 6 other files
+                spooky-author-identification/
+```
+
+-> data/sample_submission.csv has 1958 rows and 4 columns.
+The columns are: id, EAP, HPL, MWS
+
+-> data/spooky-author-identification/sample_submission.csv has 1958 rows and 4 columns.
+The columns are: id, EAP, HPL, MWS
+
+-> data/spooky-author-identification/test.csv has 1958 rows and 2 columns.
+The columns are: id, text
+
+-> data/spooky-author-identification/train.csv has 17621 rows and 3 columns.
+The columns are: id, text, author
+
+-> data/test.csv has 1958 rows and 2 columns.
+The columns are: id, text
+
+-> data/train.csv has 17621 rows and 3 columns.
+The columns are: id, text, author
+
+-> input/sample_submission.csv has 1958 rows and 4 columns.
+The columns are: id, EAP, HPL, MWS
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.3847
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.42995) has done: 'I replace the outdated Keras imports with the current tensorflow‑keras API, fix the incorrect argument name for epochs, and remove unused imports that caused import errors. These minimal changes let the notebook run end‑to‑end, generate predictions, and write a properly formatted `result.csv` submission file.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import sys
+import subprocess
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
+from keras.models import Sequential
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
+from keras.layers import Embedding, GlobalAveragePooling1D, Dense
+
+import nltk
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+
+print(subprocess.check_output(["ls", "../input"]).decode("utf8"))
+
+train = pd.read_csv("../input/train.csv")
+test = pd.read_csv("../input/test.csv")
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+train.head()
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2745801949.py in <cell line: 0>()
+----> 1 train.head()
+      2 
+
+NameError: name 'train' is not defined
+
+## === cell 2
+mapping_target = {"EAP": 0, "HPL": 1, "MWS": 2}
+train = train.replace({"author": mapping_target})
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2470471726.py in <cell line: 0>()
+      1 mapping_target = {"EAP": 0, "HPL": 1, "MWS": 2}
+----> 2 train = train.replace({"author": mapping_target})
+      3 
+
+NameError: name 'train' is not defined
+
+## === cell 3
+test_id = test["id"]
+target = train["author"]
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3869981804.py in <cell line: 0>()
+----> 1 test_id = test["id"]
+      2 target = train["author"]
+      3 
+
+NameError: name 'test' is not defined
+
+## === cell 4
+import re
+
+stops = [
+    "the",
+    "a",
+    "an",
+    "and",
+    "but",
+    "if",
+    "or",
+    "because",
+    "as",
+    "what",
+    "which",
+    "this",
+    "that",
+    "these",
+    "those",
+    "then",
+    "just",
+    "so",
+    "than",
+    "such",
+    "both",
+    "through",
+    "about",
+    "for",
+    "is",
+    "of",
+    "while",
+    "during",
+    "to",
+    "What",
+    "Which",
+    "Is",
+    "If",
+    "While",
+    "This",
+]
+
+
+def cleanData(
+    text, lowercase=False, remove_stops=False, stemming=False, lemmatization=False
+):
+    txt = str(text)
+    if lowercase:
+        txt = txt.lower()
+    if remove_stops:
+        txt = " ".join([w for w in txt.split() if w not in stops])
+    if stemming:
+        st = PorterStemmer()
+        txt = " ".join([st.stem(w) for w in txt.split()])
+    if lemmatization:
+        lemmatizer = WordNetLemmatizer()
+        txt = " ".join([lemmatizer.lemmatize(w, pos="v") for w in txt.split()])
+    return txt
+
+
+
+
+## === cell 5
+train["text"] = train["text"].apply(lambda x: cleanData(x, lowercase=True))
+test["text"] = test["text"].apply(lambda x: cleanData(x, lowercase=True))
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3337837383.py in <cell line: 0>()
+----> 1 train["text"] = train["text"].apply(lambda x: cleanData(x, lowercase=True))
+      2 test["text"] = test["text"].apply(lambda x: cleanData(x, lowercase=True))
+      3 
+
+NameError: name 'train' is not defined
+
+## === cell 6
+MAX_SEQUENCE_LENGTH = 100
+MAX_NB_WORDS = 100000
+EMBEDDING_DIM = 64  # increased from 32 for better representation
+VALIDATION_SPLIT = 0.3
+
+
+
+## === cell 7
+print("Processing text dataset")
+texts_1 = train["text"].tolist()
+labels = train["author"].values
+print(f"Found {len(texts_1)} training texts.")
+
+test_texts_1 = test["text"].tolist()
+print(f"Found {len(test_texts_1)} test texts.")
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3110300558.py in <cell line: 0>()
+      1 print("Processing text dataset")
+----> 2 texts_1 = train["text"].tolist()
+      3 labels = train["author"].values
+      4 print(f"Found {len(texts_1)} training texts.")
+      5 
+
+NameError: name 'train' is not defined
+
+## === cell 8
+tokenizer = Tokenizer(num_words=MAX_NB_WORDS, oov_token="<OOV>")
+tokenizer.fit_on_texts(texts_1 + test_texts_1)
+
+sequences_1 = tokenizer.texts_to_sequences(texts_1)
+test_sequences_1 = tokenizer.texts_to_sequences(test_texts_1)
+
+word_index = tokenizer.word_index
+print(f"Found {len(word_index)} unique tokens.")
+
+data_1 = pad_sequences(sequences_1, maxlen=MAX_SEQUENCE_LENGTH)
+test_data_1 = pad_sequences(test_sequences_1, maxlen=MAX_SEQUENCE_LENGTH)
+
+labels = np.array(labels)
+print("Shape of data tensor:", data_1.shape)
+print("Shape of label tensor:", labels.shape)
+
+
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1098467840.py in <cell line: 0>()
+----> 1 tokenizer = Tokenizer(num_words=MAX_NB_WORDS, oov_token="<OOV>")
+      2 tokenizer.fit_on_texts(texts_1 + test_texts_1)
+      3 
+      4 sequences_1 = tokenizer.texts_to_sequences(texts_1)
+      5 test_sequences_1 = tokenizer.texts_to_sequences(test_texts_1)
+
+NameError: name 'Tokenizer' is not defined
+
+## === cell 9
+nb_words = min(MAX_NB_WORDS, len(word_index)) + 1
+
+model = Sequential()
+model.add(
+    Embedding(
+        input_dim=nb_words, output_dim=EMBEDDING_DIM, input_length=MAX_SEQUENCE_LENGTH
+    )
+)
+model.add(GlobalAveragePooling1D())
+model.add(Dense(3, activation="softmax"))
+
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+
+model.summary()
+
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2685520857.py in <cell line: 0>()
+----> 1 nb_words = min(MAX_NB_WORDS, len(word_index)) + 1
+      2 
+      3 model = Sequential()
+      4 model.add(
+      5     Embedding(
+
+NameError: name 'word_index' is not defined
+
+## === cell 10
+model.fit(
+    data_1,
+    to_categorical(labels),
+    epochs=40,  # increased from 25 for more training
+    batch_size=64,
+    validation_split=0.2,
+    verbose=2,
+)
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1155028833.py in <cell line: 0>()
+----> 1 model.fit(
+      2     data_1,
+      3     to_categorical(labels),
+      4     epochs=40,  # increased from 25 for more training
+      5     batch_size=64,
+
+NameError: name 'model' is not defined
+
+## === cell 11
+preds = model.predict(test_data_1, batch_size=64)
+
+
+
+## --- ERROR in cell 11, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/4011923786.py in <cell line: 0>()
+----> 1 preds = model.predict(test_data_1, batch_size=64)
+      2 
+
+NameError: name 'model' is not defined
+
+## === cell 12
+result = pd.DataFrame(
+    {"id": test_id, "EAP": preds[:, 0], "HPL": preds[:, 1], "MWS": preds[:, 2]}
+)
+
+result.to_csv("result.csv", index=False)
+print("Submission file 'result.csv' created with shape:", result.shape)
+
+## --- ERROR in cell 12, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3734216378.py in <cell line: 0>()
+      1 result = pd.DataFrame(
+----> 2     {"id": test_id, "EAP": preds[:, 0], "HPL": preds[:, 1], "MWS": preds[:, 2]}
+      3 )
+      4 
+      5 result.to_csv("result.csv", index=False)
+
+NameError: name 'test_id' is not defined

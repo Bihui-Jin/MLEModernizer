@@ -1,0 +1,451 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the score of student essays.
+
+## Metric
+Quadratic weighted kappa.
+
+## Submission Format
+For each `essay_id` in the test set, you must predict the corresponding `score` (between 1-6, see [rubric](https://storage.googleapis.com/kaggle-forum-message-attachments/2733927/20538/Rubric_%20Holistic%20Essay%20Scoring.pdf) for more details). The file should contain a header and have the following format:
+
+```
+essay_id,score
+000d118,3
+000fe60,3
+001ab80,4
+...
+```
+
+## Dataset
+- **train.csv** - Essays and scores to be used as training data.
+    - `essay_id` - The unique ID of the essay
+    - `full_text` - The full essay response
+    - `score` - Holistic score of the essay on a 1-6 scale
+- **test.csv** - The essays to be used as test data. Contains the same fields as `train.csv`, aside from exclusion of `score`.
+- **sample_submission.csv** - A submission file in the correct format.
+    - `essay_id` - The unique ID of the essay
+    - `score` - The predicted holistic score of the essay on a 1-6 scale
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (153 lines)
+            sample_submission.csv (1732 lines)
+            sample_submission.csv.zip (9.4 kB)
+            test.csv (15336 lines)
+            test.csv.zip (1.2 MB)
+            train.csv (139231 lines)
+            train.csv.zip (11.0 MB)
+            learning-agency-lab-automated-essay-scoring-2/
+                description.md (153 lines)
+                sample_submission.csv (1732 lines)
+                ... and 5 other files
+                learning-agency-lab-automated-essay-scoring-2/
+        input/
+            description.md (153 lines)
+            sample_submission.csv (1732 lines)
+            sample_submission.csv.zip (9.4 kB)
+            test.csv (15336 lines)
+            test.csv.zip (1.2 MB)
+            train.csv (139231 lines)
+            train.csv.zip (11.0 MB)
+            learning-agency-lab-automated-essay-scoring-2/
+                description.md (153 lines)
+                sample_submission.csv (1732 lines)
+                ... and 5 other files
+                learning-agency-lab-automated-essay-scoring-2/
+        working/
+            learning-agency-lab-automated-essay-scoring-2/
+                description.md (153 lines)
+                sample_submission.csv (1732 lines)
+                ... and 5 other files
+                learning-agency-lab-automated-essay-scoring-2/
+```
+
+-> data/learning-agency-lab-automated-essay-scoring-2/sample_submission.csv has 1731 rows and 2 columns.
+The columns are: essay_id, score
+
+-> data/learning-agency-lab-automated-essay-scoring-2/test.csv has 15335 rows and 2 columns.
+The columns are: essay_id, full_text
+
+-> data/learning-agency-lab-automated-essay-scoring-2/train.csv has 139230 rows and 3 columns.
+The columns are: essay_id, full_text, score
+
+-> data/sample_submission.csv has 1731 rows and 2 columns.
+The columns are: essay_id, score
+
+-> data/test.csv has 15335 rows and 2 columns.
+The columns are: essay_id, full_text
+
+-> data/train.csv has 139230 rows and 3 columns.
+The columns are: essay_id, full_text, score
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.72791
+
+# 6. Current score
+
+0.63211
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.45962) has done: 'The fix updates the TF‑IDF vectorizer’s `token_pattern` to correctly capture word tokens (removing the stray escape that produced an empty vocabulary). With a proper vocabulary the pipeline can fit, predict, and write a valid `submission.csv`. No other logic is altered, preserving the original model and preprocessing.'
+- What this solution (achieved 0.62047) has done: 'I adjust the TF‑IDF vectorizer to use sublinear term frequency, idf weighting, a broader n‑gram range and a lower min_df, and I give the LinearSVC a balanced class weight and a slightly higher C. These hyper‑parameter tweaks keep the original pipeline intact while improving feature representation and handling class imbalance, which should raise the quadratic weighted kappa toward the target score.'
+- What this solution (achieved 0.60275) has done: 'I slightly strengthen the TF‑IDF representation and the LinearSVC regularisation to capture more useful patterns without changing the overall pipeline.  
+- In the vectoriser I lower `min_df` to 2, extend the n‑gram range to (1, 3) and raise `max_features` to 300 000 so rarer but informative phrases are kept.  
+- In the classifier I increase the penalty `C` from 2.5 to 5.0 (still using a balanced class weight).  
+These minimal tweaks should raise the quadratic weighted kappa toward the target while keeping the original logic intact.'
+- What this solution (achieved 0.63211) has done: 'I slightly broaden the TF‑IDF representation (remove stop‑word removal, accept single‑character tokens, lower min_df, enlarge max_features) and increase the LinearSVC regularisation (C = 10, more iterations). These tweaks keep the same pipeline but give the model more expressive features, which should raise the quadratic weighted kappa toward the target without altering core logic.'
+
+# 9. Code solution
+
+## === cell 0
+import pandas as pd
+import numpy as np
+import os
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, confusion_matrix, cohen_kappa_score
+from sklearn.pipeline import make_pipeline
+from sklearn.svm import LinearSVC
+
+
+
+## === cell 1
+for dirname, _, filenames in os.walk("/kaggle/input"):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 2
+train_df = pd.read_csv(
+    "/kaggle/input/learning-agency-lab-automated-essay-scoring-2/train.csv"
+)
+
+
+
+## === cell 3
+train_df["score"].dtypes
+
+
+
+## === cell 4
+train_df.head(10)
+
+
+
+## === cell 5
+train_df["score"].value_counts()
+
+
+
+## === cell 6
+submission_template = pd.read_csv(
+    "/kaggle/input/learning-agency-lab-automated-essay-scoring-2/sample_submission.csv"
+)
+submission_template.head()
+
+
+
+## === cell 7
+cList = {
+    "ain't": "am not",
+    "aren't": "are not",
+    "can't": "cannot",
+    "can't've": "cannot have",
+    "'cause": "because",
+    "could've": "could have",
+    "couldn't": "could not",
+    "couldn't've": "could not have",
+    "didn't": "did not",
+    "doesn't": "does not",
+    "don't": "do not",
+    "hadn't": "had not",
+    "hadn't've": "had not have",
+    "hasn't": "has not",
+    "haven't": "have not",
+    "he'd": "he would",
+    "he'd've": "he would have",
+    "he'll": "he will",
+    "he'll've": "he will have",
+    "he's": "he is",
+    "how'd": "how did",
+    "how'd'y": "how do you",
+    "how'll": "how will",
+    "how's": "how is",
+    "I'd": "I would",
+    "I'd've": "I would have",
+    "I'll": "I will",
+    "I'll've": "I will have",
+    "I'm": "I am",
+    "I've": "I have",
+    "isn't": "is not",
+    "it'd": "it had",
+    "it'd've": "it would have",
+    "it'll": "it will",
+    "it'll've": "it will have",
+    "it's": "it is",
+    "let's": "let us",
+    "ma'am": "madam",
+    "mayn't": "may not",
+    "might've": "might have",
+    "mightn't": "might not",
+    "mightn't've": "might not have",
+    "must've": "must have",
+    "mustn't": "must not",
+    "mustn't've": "must not have",
+    "needn't": "need not",
+    "needn't've": "need not have",
+    "o'clock": "of the clock",
+    "oughtn't": "ought not",
+    "oughtn't've": "ought not have",
+    "shan't": "shall not",
+    "sha'n't": "shall not",
+    "shan't've": "shall not have",
+    "she'd": "she would",
+    "she'd've": "she would have",
+    "she'll": "she will",
+    "she'll've": "she will have",
+    "she's": "she is",
+    "should've": "should have",
+    "shouldn't": "should not",
+    "shouldn't've": "should not have",
+    "so've": "so have",
+    "so's": "so is",
+    "that'd": "that would",
+    "that'd've": "that would have",
+    "that's": "that is",
+    "there'd": "there had",
+    "there'd've": "there would have",
+    "there's": "there is",
+    "they'd": "they would",
+    "they'd've": "they would have",
+    "they'll": "they will",
+    "they'll've": "they will have",
+    "they're": "they are",
+    "they've": "they have",
+    "to've": "to have",
+    "wasn't": "was not",
+    "we'd": "we had",
+    "we'd've": "we would have",
+    "we'll": "we will",
+    "we'll've": "we will have",
+    "we're": "we are",
+    "we've": "we have",
+    "weren't": "were not",
+    "what'll": "what will",
+    "what'll've": "what will have",
+    "what're": "what are",
+    "what's": "what is",
+    "what've": "what have",
+    "when's": "when is",
+    "when've": "when have",
+    "where'd": "where did",
+    "where's": "where is",
+    "where've": "where have",
+    "who'll": "who will",
+    "who'll've": "who will have",
+    "who's": "who is",
+    "who've": "who have",
+    "will've": "will have",
+    "won't": "will not",
+    "won't've": "will not have",
+    "would've": "would have",
+    "wouldn't": "would not",
+    "wouldn't've": "would not have",
+    "y'all": "you all",
+    "y'alls": "you alls",
+    "y'all'd": "you all would",
+    "y'all'd've": "you all would have",
+    "y'all're": "you all are",
+    "y'all've": "you all have",
+    "you'd": "you had",
+    "you'd've": "you would have",
+    "you'll": "you will",
+    "you'll've": "you will have",
+    "you're": "you are",
+    "you've": "you have",
+}
+
+
+
+## === cell 8
+c_re = re.compile("(%s)" % "|".join(cList.keys()))
+
+
+
+
+## === cell 9
+def expandContractions(text, c_re=c_re):
+    def replace(match):
+        return cList[match.group(0)]
+
+    return c_re.sub(replace, text)
+
+
+
+
+## === cell 10
+def removeHTML(x):
+    html = re.compile(r"<.*?>")
+    return html.sub(r"", x)
+
+
+
+
+## === cell 11
+def dataPreprocessing(x):
+    x = x.apply(lambda s: s.lower())
+    x = x.apply(removeHTML)
+    x = x.apply(lambda s: re.sub("@\\w+", "", s))
+    x = x.apply(lambda s: re.sub("'\\d+", "", s))
+    x = x.apply(lambda s: re.sub("\\d+", "", s))
+    x = x.apply(lambda s: re.sub("http\\w+", "", s))
+    x = x.apply(lambda s: re.sub(r"\s+", " ", s))  # fixed regex
+    x = x.apply(expandContractions)
+    x = x.apply(lambda s: re.sub(r"\.+", ".", s))  # fixed regex
+    x = x.apply(lambda s: re.sub(r"\,+", ",", s))  # fixed regex
+    x = x.apply(lambda s: re.sub("\n", "", s))
+    x = x.apply(lambda s: re.sub("[^\w\s]", "", s))
+    x = x.apply(lambda s: s.strip())
+    return x
+
+
+
+
+## === cell 12
+X_text = dataPreprocessing(train_df["full_text"])
+
+
+
+## === cell 13
+test_df = pd.read_csv(
+    "/kaggle/input/learning-agency-lab-automated-essay-scoring-2/test.csv"
+)
+X_test_text = dataPreprocessing(test_df["full_text"])
+
+
+
+## === cell 14
+y = train_df["score"]
+
+
+
+## === cell 15
+X_train_text, X_valid_text, y_train, y_valid = train_test_split(
+    X_text, y, test_size=0.1, random_state=123, stratify=y
+)
+
+
+
+## === cell 16
+print("Train size:", X_train_text.shape[0])
+print("Valid size:", X_valid_text.shape[0])
+
+
+
+## === cell 17
+text_vectorizer = TfidfVectorizer(
+    stop_words=None,  # keep stop words (they can carry meaning in essays)
+    sublinear_tf=True,
+    strip_accents="unicode",
+    analyzer="word",
+    token_pattern=r"\w{1,}",  # accept 1‑character tokens
+    ngram_range=(1, 3),
+    norm="l2",
+    use_idf=True,
+    smooth_idf=True,
+    max_features=500000,  # larger vocabulary
+    min_df=1,  # include rare terms
+)
+
+
+
+## === cell 18
+X_train_features = text_vectorizer.fit_transform(X_train_text)
+X_valid_features = text_vectorizer.transform(X_valid_text)
+
+
+
+## === cell 19
+clf = make_pipeline(
+    LinearSVC(C=10.0, dual=False, max_iter=5000, class_weight="balanced")
+)
+
+
+
+## === cell 20
+clf.fit(X_train_features, y_train)
+y_pred_valid = clf.predict(X_valid_features)
+
+
+
+## === cell 21
+print(confusion_matrix(y_valid, y_pred_valid))
+print(classification_report(y_valid, y_pred_valid))
+
+
+
+## === cell 22
+kappa = cohen_kappa_score(y_valid, y_pred_valid, weights="quadratic")
+print("Cohen's kappa score:", kappa)
+
+
+
+## === cell 23
+X_test_features = text_vectorizer.transform(X_test_text)
+test_predictions = clf.predict(X_test_features)
+
+
+
+## === cell 24
+submission = pd.read_csv(
+    "/kaggle/input/learning-agency-lab-automated-essay-scoring-2/sample_submission.csv"
+)
+submission["score"] = test_predictions
+submission.to_csv("submission.csv", index=False)
+display(submission.head())

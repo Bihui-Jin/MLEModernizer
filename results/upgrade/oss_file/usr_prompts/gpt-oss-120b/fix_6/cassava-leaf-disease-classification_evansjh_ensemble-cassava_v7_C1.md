@@ -1,0 +1,492 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+from collections import Counter
+
+try:
+    from tensorflow.keras.models import load_model
+    from tensorflow.keras.preprocessing.image import load_img, img_to_array
+except Exception as e:
+    load_model = None
+    load_img = None
+    img_to_array = None
+    print("TensorFlow/Keras import failed:", e)
+
+
+
+
+## === cell 1
+test_image_dir = "/kaggle/input/cassava-leaf-disease-classification/test_images"
+sample_submission_path = (
+    "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+)
+train_csv_path = "/kaggle/input/cassava-leaf-disease-classification/train.csv"
+
+sample_df = pd.read_csv(sample_submission_path)
+train_df = pd.read_csv(train_csv_path)
+majority_label = train_df["label"].mode()[0]  # most common label in training set
+
+
+
+
+## === cell 2
+models_info = [
+    (
+        "/kaggle/input/combinedmodel3/tensorflow2/default/1/BestModel_3454_8937.h5",
+        (550, 550),
+    ),
+    (
+        "/kaggle/input/combinedmodel3/tensorflow2/default/1/best_model_0.37458707.h5",
+        (512, 512),
+    ),
+    (
+        "/kaggle/input/combinedmodel3/tensorflow2/default/1/googlenet_inceptionv3.h5",
+        (448, 448),
+    ),
+    (
+        "/kaggle/input/bestmodel_8875/tensorflow2/default/1/BestModel_8875.h5",
+        (512, 512),
+    ),
+]
+
+models = []
+if load_model is not None:
+    for path, size in models_info:
+        if os.path.isfile(path):
+            try:
+                mdl = load_model(path)
+                models.append((mdl, size))
+                print(f"Loaded model: {path}")
+            except Exception as e:
+                print(f"Failed to load model {path}: {e}")
+        else:
+            print(f"Model file not found, skipping: {path}")
+else:
+    print("Skipping model loading because TensorFlow/Keras could not be imported.")
+
+fallback_model = None
+
+
+def extract_features(
+    img_path, bins=16, rgb_size=(32, 32), hsv_size=(32, 32), flat_size=(32, 32)
+):
+    """Extract concatenated RGB/HSV histograms and flattened RGB pixels."""
+    from PIL import Image
+
+    img = Image.open(img_path).convert("RGB")
+    img_rgb = img.resize(rgb_size)
+    arr_rgb = np.array(img_rgb)
+    rgb_hist = []
+    for ch in range(3):
+        h, _ = np.histogram(arr_rgb[:, :, ch], bins=bins, range=(0, 256))
+        rgb_hist.append(h.astype(np.float32))
+    img_hsv = img.convert("HSV").resize(hsv_size)
+    arr_hsv = np.array(img_hsv)
+    hsv_hist = []
+    for ch in range(3):
+        h, _ = np.histogram(arr_hsv[:, :, ch], bins=bins, range=(0, 256))
+        hsv_hist.append(h.astype(np.float32))
+    img_flat = img.resize(flat_size)
+    flat_arr = np.array(img_flat).astype(np.float32).flatten()
+    return np.concatenate(rgb_hist + hsv_hist + [flat_arr])
+
+
+if not models:
+    print(
+        "Training enhanced fallback RandomForest classifier on color & HSV histograms + pixel data."
+    )
+    try:
+        from sklearn.ensemble import RandomForestClassifier
+
+        train_image_dir = (
+            "/kaggle/input/cassava-leaf-disease-classification/train_images"
+        )
+        X_list = []
+        y_list = []
+        for _, row in train_df.iterrows():
+            img_path = os.path.join(train_image_dir, row["image_id"])
+            if os.path.isfile(img_path):
+                X_list.append(extract_features(img_path))
+                y_list.append(int(row["label"]))
+        X = np.stack(X_list)
+        y = np.array(y_list)
+
+        rf = RandomForestClassifier(
+            n_estimators=800,
+            max_depth=None,
+            n_jobs=-1,
+            random_state=42,
+            class_weight="balanced",
+        )
+        rf.fit(X, y)
+        fallback_model = rf
+        print("Enhanced fallback model trained successfully.")
+    except Exception as e:
+        print("Failed to train enhanced fallback model:", e)
+
+
+
+
+## === cell 3
+image_predictions = []
+
+test_images = [
+    f
+    for f in os.listdir(test_image_dir)
+    if f.lower().endswith((".jpg", ".jpeg", ".png"))
+]
+
+for image_id in test_images:
+    if models:
+        model_predictions = []
+        confidence_scores = {}
+
+        img_path = os.path.join(test_image_dir, image_id)
+        raw_img = load_img(img_path)  # returns a PIL Image
+
+        for model, input_size in models:
+            resized_img = raw_img.resize(input_size)
+            img_array = np.expand_dims(img_to_array(resized_img) / 255.0, axis=0)
+
+            preds = model.predict(img_array, verbose=0)
+            predicted_class = int(np.argmax(preds, axis=1)[0])
+            confidence = float(preds[0][predicted_class])
+
+            model_predictions.append(predicted_class)
+            confidence_scores.setdefault(predicted_class, []).append(confidence)
+
+        vote_counts = Counter(model_predictions)
+        most_common = vote_counts.most_common()
+        final_pred = most_common[0][0]
+
+        if len(most_common) > 1 and most_common[0][1] == most_common[1][1]:
+            tied = [cls for cls, cnt in most_common if cnt == most_common[0][1]]
+            final_pred = max(tied, key=lambda cls: np.mean(confidence_scores[cls]))
+    elif fallback_model is not None:
+        feat = extract_features(os.path.join(test_image_dir, image_id)).reshape(1, -1)
+        final_pred = int(fallback_model.predict(feat)[0])
+    else:
+        final_pred = int(majority_label)
+
+    image_predictions.append({"image_id": image_id, "label": final_pred})
+
+submission_df = pd.DataFrame(image_predictions)
+submission_df = submission_df[["image_id", "label"]]
+
+
+
+
+## === cell 4
+output_path = "/kaggle/working/submission.csv"
+submission_df.to_csv(output_path, index=False)
+print(f"Submission written to {output_path}")
+
+
+
+
+## === cell 5
+submission_df.head()

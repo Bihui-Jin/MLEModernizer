@@ -1,0 +1,330 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images from digital pathology scans, predict if the center 32x32px region of a patch contains at least one pixel of tumor tissue. Tumor tissue in the outer region of the patch does not influence the label. 
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each `id` in the test set, you must predict a probability that center 32x32px region of a patch contains at least one pixel of tumor tissue. The file should contain a header and have the following format:
+
+```
+id,label
+0b2ea2a822ad23fdb1b5dd26653da899fbd2c0d5,0
+95596b92e5066c5c52466c90b69ff089b39f2737,0
+248e6738860e2ebcf6258cdc1f32f299e0c76914,0
+etc.
+```
+
+## Dataset
+Files are named with an image `id`. The `train_labels.csv` file provides the ground truth for the images in the `train` folder. You are predicting the labels for the images in the `test` folder.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scipy==1.15.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (63 lines)
+            sample_submission.csv (45562 lines)
+            sample_submission.csv.zip (1.1 MB)
+            test.zip (1.1 GB)
+            train.zip (4.2 GB)
+            train_labels.csv (174465 lines)
+            train_labels.csv.zip (4.2 MB)
+            histopathologic-cancer-detection/
+                description.md (63 lines)
+                sample_submission.csv (45562 lines)
+                ... and 5 other files
+                histopathologic-cancer-detection/
+                test/
+                    7d1637c3535cd849727c50dff5fb0efd42f500a7.tif (27.9 kB)
+                    c66203935db093d22a62c667636345dab7ee67ba.tif (27.9 kB)
+                    ... and 45559 other files
+                    test/
+                train/
+                    bc9b47c5fd125f59519a4f719bf459f919164104.tif (27.9 kB)
+                    0874a429121cea137156954353d1b287022a6f65.tif (27.9 kB)
+                    ... and 174462 other files
+                    train/
+            test/
+                7d1637c3535cd849727c50dff5fb0efd42f500a7.tif (27.9 kB)
+                c66203935db093d22a62c667636345dab7ee67ba.tif (27.9 kB)
+                ... and 45559 other files
+                test/
+            train/
+                bc9b47c5fd125f59519a4f719bf459f919164104.tif (27.9 kB)
+                0874a429121cea137156954353d1b287022a6f65.tif (27.9 kB)
+                ... and 174462 other files
+                train/
+        input/
+            description.md (63 lines)
+            sample_submission.csv (45562 lines)
+            sample_submission.csv.zip (1.1 MB)
+            test.zip (1.1 GB)
+            train.zip (4.2 GB)
+            train_labels.csv (174465 lines)
+            train_labels.csv.zip (4.2 MB)
+            histopathologic-cancer-detection/
+                description.md (63 lines)
+                sample_submission.csv (45562 lines)
+                ... and 5 other files
+                histopathologic-cancer-detection/
+                test/
+                    7d1637c3535cd849727c50dff5fb0efd42f500a7.tif (27.9 kB)
+                    c66203935db093d22a62c667636345dab7ee67ba.tif (27.9 kB)
+                    ... and 45559 other files
+                    test/
+                train/
+                    bc9b47c5fd125f59519a4f719bf459f919164104.tif (27.9 kB)
+                    0874a429121cea137156954353d1b287022a6f65.tif (27.9 kB)
+                    ... and 174462 other files
+                    train/
+            test/
+                7d1637c3535cd849727c50dff5fb0efd42f500a7.tif (27.9 kB)
+                c66203935db093d22a62c667636345dab7ee67ba.tif (27.9 kB)
+                ... and 45559 other files
+                test/
+                    7d1637c3535cd849727c50dff5fb0efd42f500a7.tif (27.9 kB)
+                    c66203935db093d22a62c667636345dab7ee67ba.tif (27.9 kB)
+                    ... and 45559 other files
+                    test/
+            train/
+                bc9b47c5fd125f59519a4f719bf459f919164104.tif (27.9 kB)
+                0874a429121cea137156954353d1b287022a6f65.tif (27.9 kB)
+                ... and 174462 other files
+                train/
+                    bc9b47c5fd125f59519a4f719bf459f919164104.tif (27.9 kB)
+                    0874a429121cea137156954353d1b287022a6f65.tif (27.9 kB)
+                    ... and 174462 other files
+                    train/
+        working/
+            histopathologic-cancer-detection/
+                description.md (63 lines)
+                sample_submission.csv (45562 lines)
+                ... and 5 other files
+                histopathologic-cancer-detection/
+                test/
+                    7d1637c3535cd849727c50dff5fb0efd42f500a7.tif (27.9 kB)
+                    c66203935db093d22a62c667636345dab7ee67ba.tif (27.9 kB)
+                    ... and 45559 other files
+                    test/
+                train/
+                    bc9b47c5fd125f59519a4f719bf459f919164104.tif (27.9 kB)
+                    0874a429121cea137156954353d1b287022a6f65.tif (27.9 kB)
+                    ... and 174462 other files
+                    train/
+```
+
+-> data/histopathologic-cancer-detection/sample_submission.csv has 45561 rows and 2 columns.
+The columns are: id, label
+
+-> data/histopathologic-cancer-detection/train_labels.csv has 174464 rows and 2 columns.
+The columns are: id, label
+
+-> data/sample_submission.csv has 45561 rows and 2 columns.
+The columns are: id, label
+
+-> data/train_labels.csv has 174464 rows and 2 columns.
+The columns are: id, label
+
+-> input/histopathologic-cancer-detection/sample_submission.csv has 45561 rows and 2 columns.
+The columns are: id, label
+
+-> input/histopathologic-cancer-detection/train_labels.csv has 174464 rows and 2 columns.
+The columns are: id, label
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9799
+
+# 6. Current score
+
+0.4531
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5) has done: 'I replace the failing reads of non‑existent blending submissions with a safe load of the provided sample submission, compute a simple baseline probability (the overall tumor rate from the training labels), assign this to every test sample, and write the result to `ensemble.csv`. This fixes the runtime errors and guarantees a correctly formatted CSV submission.'
+- What this solution (achieved 0.4531) has done: 'I add a lightweight image‑based feature: the average pixel intensity of each patch (using Pillow, which is available in the Kaggle environment). By normalising this intensity to a 0‑1 range we obtain a simple probability that is more correlated with the true label than a constant baseline, which should raise the AUC toward the target while keeping the original pipeline and output format unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+import scipy.special
+from PIL import Image
+
+sigmoid = lambda x: scipy.special.expit(x)
+
+
+
+## === cell 1
+sample_path_candidates = [
+    "../input/histopathologic-cancer-detection/sample_submission.csv",
+    "../input/sample_submission.csv",
+    "../input/histopathologic-cancer-detection/sample_submission.csv.zip",
+    "../input/sample_submission.csv.zip",
+]
+
+for path in sample_path_candidates:
+    if os.path.exists(path):
+        sample_sub = pd.read_csv(path)
+        break
+else:
+    raise FileNotFoundError("Sample submission file not found in expected locations.")
+
+train_labels_path = None
+for path in [
+    "../input/histopathologic-cancer-detection/train_labels.csv",
+    "../input/train_labels.csv",
+    "../input/histopathologic-cancer-detection/train_labels.csv.zip",
+    "../input/train_labels.csv.zip",
+]:
+    if os.path.exists(path):
+        train_labels_path = path
+        break
+
+if train_labels_path is None:
+    raise FileNotFoundError("train_labels.csv not found in expected locations.")
+
+train_labels = pd.read_csv(train_labels_path)
+
+
+
+
+## === cell 2
+def find_dir(possible_paths):
+    for p in possible_paths:
+        if os.path.isdir(p):
+            return p
+    raise FileNotFoundError("Directory not found among candidates.")
+
+
+train_dir = find_dir(
+    [
+        "../input/histopathologic-cancer-detection/train",
+        "../input/train",
+        "../input/histopathologic-cancer-detection/train/",
+        "../input/train/",
+    ]
+)
+
+test_dir = find_dir(
+    [
+        "../input/histopathologic-cancer-detection/test",
+        "../input/test",
+        "../input/histopathologic-cancer-detection/test/",
+        "../input/test/",
+    ]
+)
+
+
+
+
+## === cell 3
+def image_mean_intensity(filepath):
+    try:
+        img = Image.open(filepath)
+        arr = np.asarray(img).astype(np.float32)
+        if arr.ndim == 3:
+            arr = arr.mean(axis=2)
+        return arr.mean()
+    except Exception:
+        return np.nan
+
+
+
+
+## === cell 4
+subset_size = 2000  # small enough to stay fast
+np.random.seed(42)
+subset_ids = np.random.choice(
+    train_labels["id"].values, size=min(subset_size, len(train_labels)), replace=False
+)
+
+tumor_means = []
+non_tumor_means = []
+
+for img_id in subset_ids:
+    lbl = train_labels.loc[train_labels["id"] == img_id, "label"].values[0]
+    img_path = os.path.join(train_dir, f"{img_id}.tif")
+    mean_int = image_mean_intensity(img_path)
+    if np.isnan(mean_int):
+        continue
+    if lbl == 1:
+        tumor_means.append(mean_int)
+    else:
+        non_tumor_means.append(mean_int)
+
+tumor_mean = np.mean(tumor_means) if tumor_means else 0.0
+non_tumor_mean = np.mean(non_tumor_means) if non_tumor_means else 0.0
+global_min = min(tumor_mean, non_tumor_mean, 0.0)
+global_max = max(tumor_mean, non_tumor_mean, 255.0)
+
+
+def intensity_to_prob(mean_int):
+    if np.isnan(mean_int):
+        return train_labels["label"].mean()  # fallback to overall rate
+    return (mean_int - global_min) / (global_max - global_min)
+
+
+
+
+## === cell 5
+preds = []
+for idx, row in sample_sub.iterrows():
+    img_id = row["id"]
+    img_path = os.path.join(test_dir, f"{img_id}.tif")
+    mean_int = image_mean_intensity(img_path)
+    prob = intensity_to_prob(mean_int)
+    preds.append(prob)
+
+sample_sub["label"] = preds
+
+print(sample_sub.head())
+
+
+
+## === cell 6
+output_path = "ensemble.csv"
+sample_sub.to_csv(output_path, index=False)
+print(f"Ensemble submission written to {output_path}")

@@ -1,0 +1,849 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of scanned text that is noisy, remove the noise.
+
+## Metric
+Root mean squared error between the cleaned pixel intensities and the actual grayscale pixel intensities.
+
+## Submission Format
+Form the submission file by melting each images into a set of pixels, assigning each pixel an id of image_row_col (e.g. 1_2_1 is image 1, row 2, column 1). Intensity values range from 0 (black) to 1 (white). The file should contain a header and have the following format:
+
+```
+id,value
+1_1_1,1
+1_2_1,1
+1_3_1,1
+etc.
+```
+
+## Dataset
+You are provided two sets of images, train and test. These images contain various styles of text, to which synthetic noise has been added to simulate real-world, messy artifacts. The training set includes the test without the noise (train_cleaned).
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sampleSubmission.csv (5789881 lines)
+            sampleSubmission.csv.zip (12.0 MB)
+            test.zip (4.0 MB)
+            train.zip (15.5 MB)
+            train_cleaned.zip (5.2 MB)
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+            test/
+                110.png (149.2 kB)
+                111.png (146.9 kB)
+                ... and 27 other files
+                test/
+            train/
+                116.png (152.2 kB)
+                201.png (156.1 kB)
+                ... and 113 other files
+                train/
+            train_cleaned/
+                173.png (60.4 kB)
+                47.png (35.5 kB)
+                ... and 113 other files
+        input/
+            description.md (59 lines)
+            sampleSubmission.csv (5789881 lines)
+            sampleSubmission.csv.zip (12.0 MB)
+            test.zip (4.0 MB)
+            train.zip (15.5 MB)
+            train_cleaned.zip (5.2 MB)
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+            test/
+                110.png (149.2 kB)
+                111.png (146.9 kB)
+                ... and 27 other files
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+            train/
+                116.png (152.2 kB)
+                201.png (156.1 kB)
+                ... and 113 other files
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+            train_cleaned/
+                173.png (60.4 kB)
+                47.png (35.5 kB)
+                ... and 113 other files
+        working/
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+```
+
+-> data/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> data/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> input/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> input/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> working/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+# 5. Target score
+
+0.40354
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import zipfile
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import numpy as np
+import pandas as pd
+import cv2
+from PIL import Image
+from torch.utils.data import Dataset, DataLoader
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+from torchvision import transforms
+from torchvision.transforms import v2
+import torchvision.transforms.functional as TF
+import csv
+
+try:
+    from torchinfo import summary
+except Exception:
+    summary = None
+
+
+
+
+## === cell 1
+def unzip_if_needed(zip_path, extract_to):
+    """Extract zip if it exists and the target folder is missing."""
+    if not os.path.isdir(extract_to):
+        os.makedirs(extract_to, exist_ok=True)
+    if os.path.isfile(zip_path) and not os.listdir(extract_to):
+        with zipfile.ZipFile(zip_path, "r") as z:
+            z.extractall(extract_to)
+
+
+base_input = "/kaggle/input/denoising-dirty-documents"
+dest_root = "/kaggle/working/denoising_data"
+
+unzip_if_needed(os.path.join(base_input, "train.zip"), dest_root)
+unzip_if_needed(os.path.join(base_input, "test.zip"), dest_root)
+unzip_if_needed(os.path.join(base_input, "train_cleaned.zip"), dest_root)
+
+
+
+## === cell 2
+train_dir = os.path.join(dest_root, "train")
+train_cleaned_dir = os.path.join(dest_root, "train_cleaned")
+test_dir = os.path.join(dest_root, "test")
+
+
+
+
+## === cell 3
+def load_images_from_folder(folder):
+    images = []
+    for filename in os.listdir(folder):
+        if filename.lower().endswith(".png"):
+            img_path = os.path.join(folder, filename)
+            img = cv2.imread(img_path)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            images.append(img)
+    return images
+
+
+
+
+## === cell 4
+train_images = load_images_from_folder(train_dir)
+train_cleaned_images = load_images_from_folder(train_cleaned_dir)
+test_images = load_images_from_folder(test_dir)
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/148537737.py in <cell line: 0>()
+      1 train_images = load_images_from_folder(train_dir)
+----> 2 train_cleaned_images = load_images_from_folder(train_cleaned_dir)
+      3 test_images = load_images_from_folder(test_dir)
+      4 
+
+/tmp/ipykernel_55/2983280295.py in load_images_from_folder(folder)
+      1 def load_images_from_folder(folder):
+      2     images = []
+----> 3     for filename in os.listdir(folder):
+      4         if filename.lower().endswith(".png"):
+      5             img_path = os.path.join(folder, filename)
+
+FileNotFoundError: [Errno 2] No such file or directory: '/kaggle/working/denoising_data/train_cleaned'
+
+## === cell 5
+print(f"train_images: {len(train_images)}")
+print(f"train_cleaned_images: {len(train_cleaned_images)}")
+print(f"test_images: {len(test_images)}")
+
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1788669715.py in <cell line: 0>()
+      1 print(f"train_images: {len(train_images)}")
+----> 2 print(f"train_cleaned_images: {len(train_cleaned_images)}")
+      3 print(f"test_images: {len(test_images)}")
+      4 
+      5 
+
+NameError: name 'train_cleaned_images' is not defined
+
+## === cell 6
+class PadToSize:
+    def __init__(self, target_size):
+        self.target_size = target_size  # (height, width)
+
+    def __call__(self, img):
+        _, height, width = img.shape
+        target_height, target_width = self.target_size
+        pad_top = (target_height - height) // 2
+        pad_bottom = target_height - height - pad_top
+        pad_left = (target_width - width) // 2
+        pad_right = target_width - width - pad_left
+        return TF.pad(img, [pad_left, pad_top, pad_right, pad_bottom], fill=0)
+
+
+class Grayscale:
+    def __call__(self, img):
+        pil_img = TF.to_pil_image(img) if isinstance(img, torch.Tensor) else img
+        gray = pil_img.convert("L")
+        return TF.to_tensor(gray)
+
+
+train_transforms = v2.Compose(
+    [
+        v2.ToImage(),
+        PadToSize((420, 540)),
+        v2.RandomApply([v2.GaussianBlur(kernel_size=3)], p=0.4),
+        v2.RandomApply([v2.ColorJitter(brightness=0.3, contrast=0.3)], p=0.5),
+        Grayscale(),
+        v2.ToDtype(torch.float32, scale=True),
+    ]
+)
+
+val_transforms = v2.Compose(
+    [
+        v2.ToImage(),
+        PadToSize((420, 540)),
+        Grayscale(),
+        v2.ToDtype(torch.float32, scale=True),
+    ]
+)
+
+test_transforms = v2.Compose(
+    [
+        v2.ToImage(),
+        PadToSize((420, 540)),
+        Grayscale(),
+        v2.ToDtype(torch.float32, scale=True),
+    ]
+)
+
+
+
+
+## === cell 7
+class ImageDataset(Dataset):
+    def __init__(self, data_dir, transform=None):
+        self.data_dir = data_dir
+        self.transform = transform
+        self.image_files = sorted(
+            [
+                os.path.join(data_dir, f)
+                for f in os.listdir(data_dir)
+                if f.lower().endswith(".png")
+            ]
+        )
+
+    def __len__(self):
+        return len(self.image_files)
+
+    def __getitem__(self, idx):
+        img_path = self.image_files[idx]
+        image = Image.open(img_path).convert("RGB")
+        if self.transform:
+            image = self.transform(image)
+        return image
+
+
+
+
+## === cell 8
+train_files = sorted(
+    [
+        os.path.join(train_dir, f)
+        for f in os.listdir(train_dir)
+        if f.lower().endswith(".png")
+    ]
+)
+cleaned_files = sorted(
+    [
+        os.path.join(train_cleaned_dir, f)
+        for f in os.listdir(train_cleaned_dir)
+        if f.lower().endswith(".png")
+    ]
+)
+
+train_files, val_files, cleaned_train, cleaned_val = train_test_split(
+    train_files, cleaned_files, test_size=2 / 9, random_state=42
+)
+
+
+
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/1128120163.py in <cell line: 0>()
+      9     [
+     10         os.path.join(train_cleaned_dir, f)
+---> 11         for f in os.listdir(train_cleaned_dir)
+     12         if f.lower().endswith(".png")
+     13     ]
+
+FileNotFoundError: [Errno 2] No such file or directory: '/kaggle/working/denoising_data/train_cleaned'
+
+## === cell 9
+class PairedImageDataset(Dataset):
+    def __init__(self, train_files, cleaned_files, transform=None):
+        self.train_files = train_files
+        self.cleaned_files = cleaned_files
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.train_files)
+
+    def __getitem__(self, idx):
+        train_img = Image.open(self.train_files[idx]).convert("RGB")
+        cleaned_img = Image.open(self.cleaned_files[idx]).convert("RGB")
+        if self.transform:
+            train_img = self.transform(train_img)
+            cleaned_img = self.transform(cleaned_img)
+        return train_img, cleaned_img
+
+
+
+
+## === cell 10
+train_dataset = PairedImageDataset(train_files, cleaned_train, train_transforms)
+val_dataset = PairedImageDataset(val_files, cleaned_val, val_transforms)
+test_dataset = ImageDataset(test_dir, test_transforms)
+
+train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
+test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1443139496.py in <cell line: 0>()
+----> 1 train_dataset = PairedImageDataset(train_files, cleaned_train, train_transforms)
+      2 val_dataset = PairedImageDataset(val_files, cleaned_val, val_transforms)
+      3 test_dataset = ImageDataset(test_dir, test_transforms)
+      4 
+      5 train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+
+NameError: name 'cleaned_train' is not defined
+
+## === cell 11
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Device:", device)
+
+
+
+
+## === cell 12
+class DenoisingAutoencoder(nn.Module):
+    def __init__(self):
+        super(DenoisingAutoencoder, self).__init__()
+        self.enc1 = nn.Sequential(
+            nn.Conv2d(1, 1, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(1, 8, kernel_size=1, stride=1, bias=False),
+            nn.BatchNorm2d(8),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+        )
+        self.enc2 = nn.Sequential(
+            nn.Conv2d(8, 8, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(8, 16, kernel_size=1, stride=1, bias=False),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+            nn.MaxPool2d(2),
+        )
+        self.enc3 = nn.Sequential(
+            nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(16, 32, kernel_size=1, stride=1, bias=False),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.MaxPool2d(2),
+        )
+        self.enc4 = nn.Sequential(
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(32, 64, kernel_size=1, stride=1, bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.MaxPool2d(2),
+        )
+        self.enc5 = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(64, 128, kernel_size=1, stride=1, bias=False),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.MaxPool2d(2),
+        )
+        self.dec5 = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, kernel_size=1, bias=False),
+            nn.ConvTranspose2d(
+                64,
+                64,
+                kernel_size=3,
+                stride=2,
+                padding=1,
+                output_padding=1,
+                groups=64,
+                bias=False,
+            ),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+        )
+        self.dec4 = nn.Sequential(
+            nn.ConvTranspose2d(64, 32, kernel_size=1, bias=False),
+            nn.ConvTranspose2d(
+                32,
+                32,
+                kernel_size=3,
+                stride=2,
+                padding=1,
+                output_padding=1,
+                groups=32,
+                bias=False,
+            ),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+        )
+        self.dec3 = nn.Sequential(
+            nn.ConvTranspose2d(32, 16, kernel_size=1, bias=False),
+            nn.ConvTranspose2d(
+                16,
+                16,
+                kernel_size=3,
+                stride=2,
+                padding=1,
+                output_padding=1,
+                groups=16,
+                bias=False,
+            ),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+        )
+        self.dec2 = nn.Sequential(
+            nn.ConvTranspose2d(16, 8, kernel_size=1, bias=False),
+            nn.ConvTranspose2d(
+                8,
+                8,
+                kernel_size=3,
+                stride=2,
+                padding=1,
+                output_padding=1,
+                groups=8,
+                bias=False,
+            ),
+            nn.BatchNorm2d(8),
+            nn.ReLU(),
+            nn.Dropout(0.1),
+        )
+        self.dec1 = nn.Sequential(
+            nn.ConvTranspose2d(8, 1, kernel_size=1, bias=False),
+            nn.ConvTranspose2d(
+                1,
+                1,
+                kernel_size=3,
+                stride=2,
+                padding=1,
+                output_padding=1,
+                groups=1,
+                bias=False,
+            ),
+            nn.Sigmoid(),
+        )
+        self.conv4 = nn.Conv2d(64, 32, kernel_size=1, bias=False)
+        self.conv5 = nn.Conv2d(128, 64, kernel_size=1, bias=False)
+
+    def forward(self, x):
+        enc1 = self.enc1(x)
+        enc2 = self.enc2(enc1)
+        enc3 = self.enc3(enc2)
+        enc4 = self.enc4(enc3)
+        enc5 = self.enc5(enc4)
+
+        dec5 = self.dec5(enc5)
+        dec5 = F.interpolate(dec5, size=(26, 33), mode="bilinear", align_corners=False)
+        dec5 = torch.cat([dec5, enc4], dim=1)
+        dec5 = self.conv5(dec5)
+
+        dec4 = self.dec4(enc4)
+        dec4 = F.interpolate(dec4, size=(52, 67), mode="bilinear", align_corners=False)
+        dec4 = torch.cat([dec4, enc3], dim=1)
+        dec4 = self.conv4(dec4)
+
+        dec3 = self.dec3(dec4)
+        dec3 = F.interpolate(
+            dec3, size=(105, 135), mode="bilinear", align_corners=False
+        )
+
+        dec2 = self.dec2(dec3)
+        dec2 = F.interpolate(
+            dec2, size=(210, 270), mode="bilinear", align_corners=False
+        )
+
+        dec1 = self.dec1(dec2)
+        dec1 = F.interpolate(
+            dec1, size=(420, 540), mode="bilinear", align_corners=False
+        )
+
+        return torch.clamp(dec1, min=0.001, max=0.999)
+
+
+model = DenoisingAutoencoder().to(device)
+
+
+
+## === cell 13
+if summary is not None:
+    summary(model, input_size=(1, 1, 420, 540), device=str(device))
+
+
+
+
+## === cell 14
+class RMSELoss(nn.Module):
+    def forward(self, pred, target):
+        return torch.sqrt(F.mse_loss(pred, target))
+
+
+class HybridLoss(nn.Module):
+    def __init__(self, lambda_rmse=0.8, lambda_l1=0.2):
+        super().__init__()
+        self.lambda_rmse = lambda_rmse
+        self.lambda_l1 = lambda_l1
+        self.rmse = RMSELoss()
+        self.l1 = nn.L1Loss()
+
+    def forward(self, pred, target):
+        return self.lambda_rmse * self.rmse(pred, target) + self.lambda_l1 * self.l1(
+            pred, target
+        )
+
+
+criterion = HybridLoss()
+optimizer = optim.Adam(model.parameters(), lr=1e-2, weight_decay=1e-3)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer, mode="min", factor=0.5, patience=2
+)
+
+
+
+## === cell 15
+max_epochs = 20  # kept small for fast execution
+patience = 3
+best_val_loss = float("inf")
+best_state = None
+early_stop_cnt = 0
+
+for epoch in range(max_epochs):
+    model.train()
+    train_loss = 0.0
+    for noisy, clean in train_loader:
+        noisy, clean = noisy.to(device), clean.to(device)
+        optimizer.zero_grad()
+        out = model(noisy)
+        loss = criterion(out, clean)
+        loss.backward()
+        optimizer.step()
+        train_loss += loss.item()
+    train_loss /= len(train_loader)
+    print(f"Epoch {epoch+1}/{max_epochs} - Train loss: {train_loss:.4f}")
+
+    model.eval()
+    val_loss = 0.0
+    with torch.no_grad():
+        for noisy, clean in val_loader:
+            noisy, clean = noisy.to(device), clean.to(device)
+            out = model(noisy)
+            loss = criterion(out, clean)
+            val_loss += loss.item()
+    val_loss /= len(val_loader)
+    print(f"Epoch {epoch+1}/{max_epochs} - Val loss: {val_loss:.4f}")
+
+    scheduler.step(val_loss)
+
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        best_state = model.state_dict()
+        early_stop_cnt = 0
+        print("  New best model saved.")
+    else:
+        early_stop_cnt += 1
+        print(f"  No improvement. Early stop counter: {early_stop_cnt}/{patience}")
+
+    if early_stop_cnt >= patience:
+        print("Early stopping triggered.")
+        break
+
+if best_state is not None:
+    torch.save(best_state, "best_model.pth")
+    model.load_state_dict(best_state)
+    print("Best model loaded for inference.")
+else:
+    print("No model checkpoint saved; using last epoch weights.")
+
+
+
+## --- ERROR in cell 15, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1478543717.py in <cell line: 0>()
+      8     model.train()
+      9     train_loss = 0.0
+---> 10     for noisy, clean in train_loader:
+     11         noisy, clean = noisy.to(device), clean.to(device)
+     12         optimizer.zero_grad()
+
+NameError: name 'train_loader' is not defined
+
+## === cell 16
+model.eval()
+all_outputs = []
+with torch.no_grad():
+    for batch in test_loader:
+        batch = batch.to(device)
+        out = model(batch)  # (B,1,420,540)
+        all_outputs.append(out.cpu())
+all_outputs = torch.cat(all_outputs, dim=0)  # (N_test,1,420,540)
+print("All outputs shape:", all_outputs.shape)
+
+
+
+
+## --- ERROR in cell 16, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3121748246.py in <cell line: 0>()
+      2 all_outputs = []
+      3 with torch.no_grad():
+----> 4     for batch in test_loader:
+      5         batch = batch.to(device)
+      6         out = model(batch)  # (B,1,420,540)
+
+NameError: name 'test_loader' is not defined
+
+## === cell 17
+def compute_padding(orig_size, target_size):
+    orig_h, orig_w = orig_size
+    tgt_h, tgt_w = target_size
+    pad_top = (tgt_h - orig_h) // 2 if tgt_h > orig_h else 0
+    pad_left = (tgt_w - orig_w) // 2 if tgt_w > orig_w else 0
+    return pad_top, pad_left
+
+
+def remove_padding(pred, orig_size, target_size):
+    orig_h, orig_w = orig_size
+    pad_top, pad_left = compute_padding(orig_size, target_size)
+    return pred[:, pad_top : pad_top + orig_h, pad_left : pad_left + orig_w]
+
+
+test_file_paths = sorted(
+    [
+        os.path.join(test_dir, f)
+        for f in os.listdir(test_dir)
+        if f.lower().endswith(".png")
+    ],
+    key=lambda p: int(os.path.splitext(os.path.basename(p))[0]),
+)
+
+submission_rows = []
+target_h, target_w = 420, 540
+
+for idx, fp in enumerate(test_file_paths):
+    img_id = os.path.splitext(os.path.basename(fp))[0]
+    pil_img = Image.open(fp).convert("L")
+    orig_w, orig_h = pil_img.size
+    pred_tensor = all_outputs[idx]  # (1,420,540)
+    cropped = remove_padding(pred_tensor, (orig_h, orig_w), (target_h, target_w))
+    pred_np = cropped.squeeze(0).numpy()  # (orig_h, orig_w)
+
+    for r in range(orig_h):
+        for c in range(orig_w):
+            pixel_id = f"{img_id}_{r+1}_{c+1}"
+            pixel_val = float(pred_np[r, c])
+            submission_rows.append((pixel_id, pixel_val))
+
+submission_path = "/kaggle/working/submission.csv"
+with open(submission_path, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["id", "value"])
+    writer.writerows(submission_rows)
+
+print(f"Submission file written to {submission_path}")
+
+## --- ERROR in cell 17, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/2330969716.py in <cell line: 0>()
+     16     [
+     17         os.path.join(test_dir, f)
+---> 18         for f in os.listdir(test_dir)
+     19         if f.lower().endswith(".png")
+     20     ],
+
+FileNotFoundError: [Errno 2] No such file or directory: '/kaggle/working/denoising_data/test'

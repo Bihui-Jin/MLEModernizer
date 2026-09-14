@@ -1,0 +1,426 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7575253924284395
+
+# 6. Current score
+
+0.3155
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.28073) has done: 'The changes keep the same ResNet‑50 architecture and prediction logic but make inference much faster: images are resized to the native 224 × 224 size that the pretrained backbone expects, the batch size is increased, and the dataset pipeline now prefetches batches. These adjustments reduce the amount of work per image without altering the label‑threshold rules, preserving the original results while allowing the script to finish well within the 600‑second limit.'
+- What this solution (achieved 0.3155) has done: 'The fix adds a protobuf compatibility flag so TensorFlow can be imported without error, then builds a proper training pipeline using the provided `train.csv` to fine‑tune the ResNet‑50 backbone for a few epochs. This improves the model’s predictions and moves the F1 score toward the target while keeping the original architecture and inference logic unchanged. The script now ends by writing a valid `submission.csv` file.'
+
+# 9. Code solution
+
+## === cell 0
+import os, re, random, math
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import tensorflow.keras.backend as K
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras import optimizers
+
+print(tf.__version__)
+print(tf.keras.__version__)
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+import pathlib
+
+
+
+
+## === cell 2
+def decode_image(filename, label=None, image_size=(224, 224)):
+    bits = tf.io.read_file(filename)
+    image = tf.image.decode_jpeg(bits, channels=3)
+    image = tf.cast(image, tf.float32) / 255.0
+    image = tf.image.resize(image, image_size)
+    if label is None:
+        return image
+    else:
+        return image, label
+
+
+
+
+## === cell 3
+BATCH_SIZE = 64
+
+
+
+## === cell 4
+train_csv_path = "../input/plant-pathology-2021-fgvc8/train.csv"
+train_img_dir = "../input/plant-pathology-2021-fgvc8/train_images"
+test_img_dir = "../input/plant-pathology-2021-fgvc8/test_images"
+
+train_df = pd.read_csv(train_csv_path)
+
+train_df["filepath"] = train_df["image"].apply(lambda x: os.path.join(train_img_dir, x))
+
+name = {
+    0: "scab",
+    1: "frog_eye_leaf_spot",
+    2: "complex",
+    3: "rust",
+    4: "powdery_mildew",
+    5: "healthy",
+}
+label_to_idx = {v: k for k, v in name.items()}
+
+
+def encode_labels(label_str):
+    vec = np.zeros(len(name), dtype=np.float32)
+    for token in label_str.split():
+        idx = label_to_idx.get(token)
+        if idx is not None:
+            vec[idx] = 1.0
+    return vec
+
+
+train_df["label_vec"] = train_df["labels"].apply(encode_labels)
+
+
+
+## === cell 5
+train_paths = train_df["filepath"].values
+train_labels = np.stack(train_df["label_vec"].values)
+
+train_ds = (
+    tf.data.Dataset.from_tensor_slices((train_paths, train_labels))
+    .map(
+        lambda p, l: (decode_image(p), l),
+        num_parallel_calls=tf.data.experimental.AUTOTUNE,
+    )
+    .shuffle(buffer=1024, seed=42)
+    .batch(BATCH_SIZE)
+    .prefetch(tf.data.experimental.AUTOTUNE)
+)
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/792012797.py in <cell line: 0>()
+      9         num_parallel_calls=tf.data.experimental.AUTOTUNE,
+     10     )
+---> 11     .shuffle(buffer=1024, seed=42)
+     12     .batch(BATCH_SIZE)
+     13     .prefetch(tf.data.experimental.AUTOTUNE)
+
+TypeError: DatasetV2.shuffle() got an unexpected keyword argument 'buffer'
+
+## === cell 6
+from tensorflow.keras import layers, applications
+
+
+
+
+## === cell 7
+class FixedDropout(tf.keras.layers.Dropout):
+    def _get_noise_shape(self, inputs):
+        if self.noise_shape is None:
+            return self.noise_shape
+        symbolic_shape = K.shape(inputs)
+        noise_shape = [
+            symbolic_shape[axis] if shape is None else shape
+            for axis, shape in enumerate(self.noise_shape)
+        ]
+        return tuple(noise_shape)
+
+
+
+
+## === cell 8
+base = applications.ResNet50(
+    weights="imagenet", include_top=False, input_shape=(224, 224, 3)
+)
+x = layers.GlobalAveragePooling2D()(base.output)
+output = layers.Dense(6, activation="sigmoid")(x)  # 5 diseases + healthy
+model = Model(inputs=base.input, outputs=output)
+
+model.compile(
+    optimizer=optimizers.Adam(learning_rate=1e-4),
+    loss="binary_crossentropy",
+    metrics=[tf.keras.metrics.AUC(name="auc")],
+)
+
+
+
+## === cell 9
+model.fit(
+    train_ds,
+    epochs=3,
+    verbose=1,
+)
+
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3702737065.py in <cell line: 0>()
+      1 # Fine‑tune for a few epochs (kept short to satisfy 600 s limit)
+      2 model.fit(
+----> 3     train_ds,
+      4     epochs=3,
+      5     verbose=1,
+
+NameError: name 'train_ds' is not defined
+
+## === cell 10
+IMAGE_PATHS = [
+    os.path.join(test_img_dir, f)
+    for f in os.listdir(test_img_dir)
+    if re.search(r"([a-zA-Z0-9\s_\\.\-\(\):])+(\.jpg|\.jpeg|\.png)$", f, re.IGNORECASE)
+]
+print(f"Found {len(IMAGE_PATHS)} test images.")
+
+AUTO = tf.data.experimental.AUTOTUNE
+
+test_dataset = (
+    tf.data.Dataset.from_tensor_slices(IMAGE_PATHS)
+    .map(decode_image, num_parallel_calls=AUTO)
+    .batch(BATCH_SIZE)
+    .prefetch(AUTO)
+)
+
+
+
+## === cell 11
+probs = model.predict(test_dataset, verbose=0)
+temp_probs = probs  # alias kept for later cells
+print("Prediction shape:", probs.shape)
+
+
+
+## === cell 12
+threshold = {0: 0.35, 1: 0.35, 2: 0.35, 3: 0.35, 4: 0.35}
+
+pred_string = []
+for line in temp_probs:
+    s = ""
+    count = 0
+    for i in range(5):
+        if line[i] > threshold[i]:
+            s += name[i] + " "
+            count += 1
+    if count >= 2:
+        notComplex = True
+        for i in range(5):
+            if line[i] > threshold[i] and name[i] == "complex":
+                notComplex = False
+                break
+        if notComplex:
+            s += "complex" + " "
+    if s.strip() == "":
+        s = name[5]
+    pred_string.append(s.strip())
+
+
+
+## === cell 13
+print(pred_string[:5])
+
+
+
+## === cell 14
+image_names = [os.path.basename(p) for p in IMAGE_PATHS]
+df = pd.DataFrame({"image": image_names, "labels": pred_string})
+submission_path = "submission.csv"
+df.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")
+display(df.head())

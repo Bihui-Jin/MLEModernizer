@@ -1,0 +1,407 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict whether an image contains a cactus.
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each ID in the test set, you must predict a probability for the `has_cactus` variable. The file should contain a header and have the following format:
+
+```
+id,has_cactus
+000940378805c44108d287872b2f04ce.jpg,0.5
+0017242f54ececa4512b4d7937d1e21e.jpg,0.5
+001ee6d8564003107853118ab87df407.jpg,0.5
+etc.
+```
+
+## Dataset
+This dataset contains a large number of 32 x 32 thumbnail images containing aerial photos of a cactus. The file name of an image corresponds to its `id`.
+
+- **train/** - the training set images
+- **test/** - the test set images (you must predict the labels of these)
+- **train.csv** - the training set labels, indicates whether the image has a cactus (`has_cactus = 1`)
+- **sample_submission.csv** - a sample submission file in the correct format
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+joblib==1.5.2
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9914
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+image_size = (32, 32)
+
+import tensorflow as tf
+from tensorflow.keras.applications.vgg19 import VGG19, preprocess_input
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Flatten, Dense, Dropout
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.optimizers import Adam
+from pandas import read_csv
+from tqdm import tqdm
+import numpy as np
+import joblib
+import os
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+def extract_features(label_path: str, img_dir: str):
+    """Load images, extract VGG19 convolutional features and return (features, labels)."""
+    train_labels = read_csv(label_path)
+
+    images = []
+    labels = []
+
+    feature_extractor = VGG19(
+        include_top=False,
+        weights="imagenet",
+        input_shape=(image_size[0], image_size[1], 3),
+    )
+
+    for img_name in tqdm(os.listdir(img_dir), desc="Extracting features"):
+        if not img_name.lower().endswith(".jpg"):
+            continue
+        img_path = os.path.join(img_dir, img_name)
+        img = load_img(img_path, target_size=image_size)
+        img_array = img_to_array(img)
+        images.append(img_array)
+
+        lbl = train_labels[train_labels["id"] == img_name]["has_cactus"].item()
+        labels.append(lbl)
+
+    images_np = np.array(images, dtype=np.float32)
+    images_pre = preprocess_input(images_np)
+
+    features = feature_extractor.predict(images_pre, verbose=0)
+    return features, np.array(labels, dtype=np.float32)
+
+
+
+
+## === cell 2
+train_csv_path = "../input/train.csv"
+train_img_dir = "../input/train/train"
+
+features, training_labels = extract_features(train_csv_path, train_img_dir)
+joblib.dump(features, "features.dat")
+joblib.dump(training_labels, "labels.dat")
+print("Features and labels saved.")
+
+
+
+## === cell 3
+x_train = joblib.load("features.dat")
+y_train = joblib.load("labels.dat")
+
+model = Sequential()
+model.add(Flatten(input_shape=x_train.shape[1:]))
+model.add(Dense(512, activation="relu"))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation="sigmoid"))
+
+model.compile(optimizer=Adam(), loss="binary_crossentropy", metrics=["accuracy"])
+history = model.fit(
+    x_train,
+    y_train,
+    epochs=15,
+    batch_size=32,
+    shuffle=True,
+    validation_split=0.1,
+    verbose=2,
+)
+
+model_json = model.to_json()
+open("model_structure.json", "w").write(model_json)
+model.save_weights("model_weights.h5")
+print("Model saved (structure + weights).")
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/4042904929.py in <cell line: 0>()
+     24 model_json = model.to_json()
+     25 open("model_structure.json", "w").write(model_json)
+---> 26 model.save_weights("model_weights.h5")
+     27 print("Model saved (structure + weights).")
+     28 
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+--> 122             raise e.with_traceback(filtered_tb) from None
+    123         finally:
+    124             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/keras/src/saving/saving_api.py in save_weights(model, filepath, overwrite, **kwargs)
+    222 def save_weights(model, filepath, overwrite=True, **kwargs):
+    223     if not str(filepath).endswith(".weights.h5"):
+--> 224         raise ValueError(
+    225             "The filename must end in `.weights.h5`. "
+    226             f"Received: filepath={filepath}"
+
+ValueError: The filename must end in `.weights.h5`. Received: filepath=model_weights.h5
+
+## === cell 4
+model_structure = open("model_structure.json").read()
+model = model_from_json(model_structure)
+model.load_weights("model_weights.h5")
+print("Model loaded for inference.")
+
+test_dir = "../input/test/test"
+test_images = []
+test_names = []
+
+for img_name in tqdm(os.listdir(test_dir), desc="Preparing test"):
+    if not img_name.lower().endswith(".jpg"):
+        continue
+    img_path = os.path.join(test_dir, img_name)
+    img = load_img(img_path, target_size=image_size)
+    test_images.append(img_to_array(img))
+    test_names.append(img_name)
+
+test_images_np = np.array(test_images, dtype=np.float32)
+test_images_pre = preprocess_input(test_images_np)
+
+feature_extractor = VGG19(
+    include_top=False,
+    weights="imagenet",
+    input_shape=(image_size[0], image_size[1], 3),
+)
+test_features = feature_extractor.predict(test_images_pre, verbose=0)
+
+preds = model.predict(test_features, verbose=0)
+
+submission_path = "submission.csv"
+with open(submission_path, "w", newline="") as f:
+    csv_writer = f.write("id,has_cactus\n")
+    for name, prob in zip(test_names, preds):
+        f.write(f"{name},{float(prob[0])}\n")
+
+print(f"Submission written to {submission_path}")
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/2983741386.py in <cell line: 0>()
+      2 model_structure = open("model_structure.json").read()
+      3 model = model_from_json(model_structure)
+----> 4 model.load_weights("model_weights.h5")
+      5 print("Model loaded for inference.")
+      6 
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+--> 122             raise e.with_traceback(filtered_tb) from None
+    123         finally:
+    124             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/h5py/_hl/files.py in __init__(self, name, mode, driver, libver, userblock_size, swmr, rdcc_nslots, rdcc_nbytes, rdcc_w0, track_order, fs_strategy, fs_persist, fs_threshold, fs_page_size, page_buf_size, min_meta_keep, min_raw_keep, locking, alignment_threshold, alignment_interval, meta_block_size, **kwds)
+    562                                  fs_persist=fs_persist, fs_threshold=fs_threshold,
+    563                                  fs_page_size=fs_page_size)
+--> 564                 fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+    565 
+    566             if isinstance(libver, tuple):
+
+/usr/local/lib/python3.11/dist-packages/h5py/_hl/files.py in make_fid(name, mode, userblock_size, fapl, fcpl, swmr)
+    236         if swmr and swmr_support:
+    237             flags |= h5f.ACC_SWMR_READ
+--> 238         fid = h5f.open(name, flags, fapl=fapl)
+    239     elif mode == 'r+':
+    240         fid = h5f.open(name, h5f.ACC_RDWR, fapl=fapl)
+
+h5py/_objects.pyx in h5py._objects.with_phil.wrapper()
+
+h5py/_objects.pyx in h5py._objects.with_phil.wrapper()
+
+h5py/h5f.pyx in h5py.h5f.open()
+
+FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = 'model_weights.h5', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)

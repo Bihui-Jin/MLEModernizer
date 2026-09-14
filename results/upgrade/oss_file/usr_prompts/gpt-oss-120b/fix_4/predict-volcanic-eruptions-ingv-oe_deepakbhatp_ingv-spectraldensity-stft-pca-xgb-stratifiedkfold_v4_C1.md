@@ -1,0 +1,367 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Overview
+Given readings from several seismic sensors around a volcano, estimate how long it will be until the next eruption.
+
+## Metric
+Mean absolute error (MAE) between the predicted loss and the actual loss.
+
+## Submission Format
+For every id in the test set, you should predict the time until the next eruption. The file should contain a header and have the following format:
+
+```
+segment_id,time_to_eruption
+1,1
+2,2
+3,3
+etc.
+```
+
+## Data
+### Dataset Description
+
+#### Files
+**train.csv** Metadata for the train files.
+
+- `segment_id`: ID code for the data segment. Matches the name of the associated data file.
+- `time_to_eruption`: The target value, the time until the next eruption.
+
+**[train|test]/*.csv**: the data files. Each file contains ten minutes of logs from ten different sensors arrayed around a volcano. The readings have been normalized within each segment, in part to ensure that the readings fall within the range of int16 values. If you are using the Pandas library you may find that you still need to load the data as float32 due to the presence of some nulls.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (70 lines)
+            sample_submission.csv (445 lines)
+            sample_submission.csv.zip (2.8 kB)
+            test.zip (514.3 MB)
+            train.csv (3988 lines)
+            train.csv.zip (39.1 kB)
+            train.zip (4.6 GB)
+            predict-volcanic-eruptions-ingv-oe/
+                description.md (70 lines)
+                sample_submission.csv (445 lines)
+                ... and 5 other files
+                predict-volcanic-eruptions-ingv-oe/
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+            test/
+                1003520023.csv (60002 lines)
+                1004346803.csv (60002 lines)
+                ... and 442 other files
+                test/
+            train/
+                1000015382.csv (60002 lines)
+                1000554676.csv (60002 lines)
+                ... and 3985 other files
+                train/
+        input/
+            description.md (70 lines)
+            sample_submission.csv (445 lines)
+            sample_submission.csv.zip (2.8 kB)
+            test.zip (514.3 MB)
+            train.csv (3988 lines)
+            train.csv.zip (39.1 kB)
+            train.zip (4.6 GB)
+            predict-volcanic-eruptions-ingv-oe/
+                description.md (70 lines)
+                sample_submission.csv (445 lines)
+                ... and 5 other files
+                predict-volcanic-eruptions-ingv-oe/
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+            test/
+                1003520023.csv (60002 lines)
+                1004346803.csv (60002 lines)
+                ... and 442 other files
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+            train/
+                1000015382.csv (60002 lines)
+                1000554676.csv (60002 lines)
+                ... and 3985 other files
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+        working/
+            predict-volcanic-eruptions-ingv-oe/
+                description.md (70 lines)
+                sample_submission.csv (445 lines)
+                ... and 5 other files
+                predict-volcanic-eruptions-ingv-oe/
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+```
+
+-> data/predict-volcanic-eruptions-ingv-oe/sample_submission.csv has 444 rows and 2 columns.
+The columns are: segment_id, time_to_eruption
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1003520023.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1004346803.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1007996426.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1009749143.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1016956864.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1024522044.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1028325789.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+5009493.05033489
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 24402200.0) has done: 'Implemented a robust end‑to‑end pipeline that replaces missing pickle feature files with on‑the‑fly feature extraction, fixes the fold creation mismatch, adjusts XGBoost to a universally‑available histogram tree method, and ensures a correctly‑named CSV submission is written.'
+- What this solution (achieved 13069253.0) has done: 'The fix converts the segment IDs to strings so the feature tables line‑up with the metadata, restores the target array `y`, and slightly relaxes early‑stopping to let the XGBoost models train a bit longer. These changes resolve the KeyError and NameError, allowing the pipeline to run end‑to‑end and produce a proper `submission.csv`, while keeping the core modeling approach unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import pathlib
+from sklearn.model_selection import KFold
+import xgboost as xgb
+
+
+
+
+## === cell 1
+meta_path = pathlib.Path("../input/predict-volcanic-eruptions-ingv-oe/train.csv")
+meta_df = pd.read_csv(meta_path)
+meta_df["segment_id"] = meta_df["segment_id"].astype(str)
+
+meta_df = meta_df.sort_values("segment_id").reset_index(drop=True)
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+folds = np.empty(len(meta_df), dtype=int)
+for fold_idx, (_, val_idx) in enumerate(kf.split(meta_df), start=1):
+    folds[val_idx] = fold_idx
+meta_df["fold"] = folds
+
+
+
+
+## === cell 2
+def extract_features(segment_dir: pathlib.Path) -> pd.DataFrame:
+    """
+    For each segment CSV in `segment_dir`, compute mean, std, min, max and median
+    for every sensor. Returns a DataFrame indexed by segment_id with 50 feature columns.
+    """
+    feature_rows = []
+    for csv_path in sorted(segment_dir.glob("*.csv")):
+        seg_id = csv_path.stem  # filename without .csv
+        df = pd.read_csv(csv_path, dtype=np.float32)
+        means = df.mean()
+        stds = df.std()
+        mins = df.min()
+        maxs = df.max()
+        medians = df.median()
+        row = {"segment_id": seg_id}
+        for col in means.index:
+            row[f"{col}_mean"] = means[col]
+            row[f"{col}_std"] = stds[col]
+            row[f"{col}_min"] = mins[col]
+            row[f"{col}_max"] = maxs[col]
+            row[f"{col}_median"] = medians[col]
+        feature_rows.append(row)
+    return pd.DataFrame(feature_rows).set_index("segment_id")
+
+
+train_seg_dir = pathlib.Path("../input/predict-volcanic-eruptions-ingv-oe/train")
+test_seg_dir = pathlib.Path("../input/predict-volcanic-eruptions-ingv-oe/test")
+
+train_feat = extract_features(train_seg_dir)
+test_feat = extract_features(test_seg_dir)
+
+
+
+
+## === cell 3
+train_feat = train_feat.loc[meta_df["segment_id"]].reset_index(drop=True)
+
+y = meta_df["time_to_eruption"].values
+
+
+
+
+## === cell 4
+preds = np.zeros(len(test_feat))
+for fold in range(1, 6):
+    train_idx = meta_df[meta_df["fold"] != fold].index
+    val_idx = meta_df[meta_df["fold"] == fold].index
+
+    X_train = train_feat.iloc[train_idx]
+    y_train = y[train_idx]
+    X_val = train_feat.iloc[val_idx]
+    y_val = y[val_idx]
+
+    model = xgb.XGBRegressor(
+        n_estimators=100000,
+        tree_method="hist",
+        max_depth=8,
+        learning_rate=0.05,
+        alpha=0.1,
+        subsample=0.6,
+        colsample_bytree=0.5,
+        objective="reg:squarederror",
+        eval_metric="mae",
+        n_jobs=-1,
+        verbosity=0,
+    )
+    model.fit(
+        X_train,
+        y_train,
+        eval_set=[(X_val, y_val)],
+        early_stopping_rounds=20,
+        verbose=False,
+    )
+    print(f"Fold {fold} MAE:", model.evals_result()["validation_0"]["mae"][-1])
+    preds += model.predict(test_feat)
+
+preds /= 5.0
+
+
+
+
+## === cell 5
+sample_sub_path = pathlib.Path(
+    "../input/predict-volcanic-eruptions-ingv-oe/sample_submission.csv"
+)
+submission = pd.read_csv(sample_sub_path)
+
+pred_df = pd.DataFrame({"segment_id": test_feat.index, "time_to_eruption": preds})
+
+submission = submission.drop(columns=["time_to_eruption"]).merge(
+    pred_df, on="segment_id", how="left"
+)
+
+submission.to_csv("submission.csv", index=False)
+print("Submission written to submission.csv")
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/1299853785.py in <cell line: 0>()
+      8 
+      9 # Merge to ensure correct ordering
+---> 10 submission = submission.drop(columns=["time_to_eruption"]).merge(
+     11     pred_df, on="segment_id", how="left"
+     12 )
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in merge(self, right, how, on, left_on, right_on, left_index, right_index, sort, suffixes, copy, indicator, validate)
+  10830         from pandas.core.reshape.merge import merge
+  10831 
+> 10832         return merge(
+  10833             self,
+  10834             right,
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/reshape/merge.py in merge(left, right, how, on, left_on, right_on, left_index, right_index, sort, suffixes, copy, indicator, validate)
+    168         )
+    169     else:
+--> 170         op = _MergeOperation(
+    171             left_df,
+    172             right_df,
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/reshape/merge.py in __init__(self, left, right, how, on, left_on, right_on, left_index, right_index, sort, suffixes, indicator, validate)
+    805         # validate the merge keys dtypes. We may need to coerce
+    806         # to avoid incompatible dtypes
+--> 807         self._maybe_coerce_merge_keys()
+    808 
+    809         # If argument passed to validate,
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/reshape/merge.py in _maybe_coerce_merge_keys(self)
+   1506                     inferred_right in string_types and inferred_left not in string_types
+   1507                 ):
+-> 1508                     raise ValueError(msg)
+   1509 
+   1510             # datetimelikes must match exactly
+
+ValueError: You are trying to merge on int64 and object columns for key 'segment_id'. If you wish to proceed you should use pd.concat

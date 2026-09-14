@@ -1,0 +1,317 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Identify hotels from images.
+
+## Metric
+Mean Average Precision @ 5 (MAP@5)
+
+## Submission Format
+For each image in the test set, you must predict a space-delimited list of hotel IDs that could match that image. The first ID should be the most relevant one and the last the least relevant one. The file should contain a header and have the following format:
+
+```
+image,hotel_id
+99e91ad5f2870678.jpg,36363 53586 18807 64314 60181
+b5cc62ab665591a9.jpg,36363 53586 18807 64314 60181
+d5664a972d5a644b.jpg,36363 53586 18807 64314 60181
+```
+
+## Dataset
+**train.csv** - The training set metadata.
+
+- `image` - The image ID.
+
+- `chain` - An ID code for the hotel chain. A `chain` of zero (0) indicates that the hotel is either not part of a chain or the chain is not known. This field is not available for the test set. The number of hotels per chain varies widely.
+
+- `hotel_id` - The hotel ID. The target class.
+
+- `timestamp` - When the image was taken. Provided for the training set only.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image` The image ID
+
+- `hotel_id` The hotel ID. The target class.
+
+**train_images** - The training set contains 97000+ images from around 7700 hotels from across the globe. All of the images for each hotel chain are in a dedicated subfolder for that chain.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 13,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (120 lines)
+            sample_submission.csv (9757 lines)
+            sample_submission.csv.zip (106.8 kB)
+            test.zip (160 Bytes)
+            test_images.zip (2.6 GB)
+            train.csv (87799 lines)
+            train.csv.zip (1.9 MB)
+            train.zip (162 Bytes)
+            train_images.zip (23.5 GB)
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+            test/
+                test/
+            test_images/
+                ccc436fc41bf402f.jpg (72.8 kB)
+                fb9d48b39c614c32.jpg (91.3 kB)
+                ... and 9754 other files
+                test_images/
+            train/
+                train/
+            train_images/
+                0/
+                    b5bd0a0a2de05bb5.jpg (73.8 kB)
+                    c242bcf0719f9d61.jpg (71.9 kB)
+                    ... and 18211 other files
+                1/
+                    a7ad6a44813b77c8.jpg (81.1 kB)
+                    9b89db65b496490d.jpg (630.0 kB)
+                    ... and 1116 other files
+                ... and 87 other folders
+        input/
+            description.md (120 lines)
+            sample_submission.csv (9757 lines)
+            sample_submission.csv.zip (106.8 kB)
+            test.zip (160 Bytes)
+            test_images.zip (2.6 GB)
+            train.csv (87799 lines)
+            train.csv.zip (1.9 MB)
+            train.zip (162 Bytes)
+            train_images.zip (23.5 GB)
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+            test/
+                test/
+                    test/
+            test_images/
+                ccc436fc41bf402f.jpg (72.8 kB)
+                fb9d48b39c614c32.jpg (91.3 kB)
+                ... and 9754 other files
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+            train/
+                train/
+                    train/
+            train_images/
+                0/
+                    b5bd0a0a2de05bb5.jpg (73.8 kB)
+                    c242bcf0719f9d61.jpg (71.9 kB)
+                    ... and 18211 other files
+                1/
+                    a7ad6a44813b77c8.jpg (81.1 kB)
+                    9b89db65b496490d.jpg (630.0 kB)
+                    ... and 1116 other files
+                ... and 87 other folders
+        working/
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+```
+
+-> data/hotel-id-2021-fgvc8/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> data/hotel-id-2021-fgvc8/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> data/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> data/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> input/hotel-id-2021-fgvc8/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> input/hotel-id-2021-fgvc8/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7445482866043597
+
+# 6. Current score
+
+0.00142
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.00209) has done: 'I replaced the failing external module call with a self‑contained baseline that predicts the five most common hotel IDs for every test image. The script now safely loads the training data, computes global hotel‑id frequencies, builds a constant prediction string of the top‑5 IDs, applies it to all rows of the provided sample submission, and writes a correctly formatted `submission.csv`. This fixes the syntax and file‑not‑found errors while producing a valid submission ready for evaluation.'
+- What this solution (achieved 0.00214) has done: 'I add a lightweight per‑image heuristic: use the first two characters of each image filename to look up the most common hotel ID seen with that prefix in the training data. For each test image the prediction list starts with this prefix‑specific ID (if any) and is then filled with the globally most frequent IDs to reach five IDs. This keeps the original constant‑prediction logic but tailors it slightly per image, which should raise MAP@5 toward the target while still producing a valid `submission.csv`.'
+- What this solution (achieved 0.00142) has done: 'I extend the prefix‑based heuristic by using a longer prefix (3 characters) and by storing the top‑5 most frequent hotel IDs for each prefix instead of only the single most common one. The prediction now starts with the prefix‑specific list (up to five IDs) and is padded with the global most frequent IDs, which should raise MAP@5 modestly and move the score closer to the target while keeping the original logic intact.'
+- What this solution (achieved 0.00142) has done: 'I add a direct lookup that assigns the exact hotel ID when a test image filename also appears in the training set, which gives a perfect first‑rank prediction for those cases. For all other images the existing prefix‑based heuristic remains unchanged, still padded with the global most‑frequent IDs. This small lookup can noticeably raise MAP@5 toward the target while preserving the original workflow and without altering any core modeling logic.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+
+BASE_DIR = "/kaggle/input/hotel-id-2021-fgvc8"
+
+TRAIN_CSV = os.path.join(BASE_DIR, "train.csv")
+SAMPLE_SUBMIT_CSV = os.path.join(BASE_DIR, "sample_submission.csv")
+OUTPUT_SUBMIT = "submission.csv"
+
+train_df = pd.read_csv(TRAIN_CSV, dtype=str)
+
+TOP_N = 5
+
+global_top_ids = train_df["hotel_id"].value_counts().head(TOP_N).index.tolist()
+print(f"Global top {TOP_N} hotel IDs: {' '.join(global_top_ids)}")
+
+PREFIX_LEN = 3
+
+prefix_groups = (
+    train_df.assign(prefix=train_df["image"].str[:PREFIX_LEN])
+    .groupby("prefix")["hotel_id"]
+    .apply(lambda x: x.value_counts().index.tolist()[:TOP_N])
+    .to_dict()
+)
+print(
+    f"Created prefix map for {len(prefix_groups)} distinct prefixes (length {PREFIX_LEN})"
+)
+
+image_to_hotel = train_df.set_index("image")["hotel_id"].to_dict()
+print(f"Exact lookup covers {len(image_to_hotel)} training images")
+
+
+
+## === cell 1
+sample_sub_df = pd.read_csv(SAMPLE_SUBMIT_CSV, dtype=str)
+
+expected_cols = {"image", "hotel_id"}
+if not expected_cols.issubset(set(sample_sub_df.columns)):
+    raise ValueError(f"Sample submission must contain columns {expected_cols}")
+
+
+def build_prediction(image_name: str) -> str:
+    """Return a space‑separated list of 5 hotel IDs for the given image."""
+    if image_name in image_to_hotel:
+        first_id = image_to_hotel[image_name]
+        preds = [first_id]
+    else:
+        prefix = image_name[:PREFIX_LEN]
+        pref_ids = prefix_groups.get(prefix, [])
+        preds = []
+        for pid in pref_ids:
+            if pid not in preds:
+                preds.append(pid)
+            if len(preds) == TOP_N:
+                break
+
+    for gid in global_top_ids:
+        if gid not in preds:
+            preds.append(gid)
+        if len(preds) == TOP_N:
+            break
+
+    return " ".join(preds)
+
+
+sample_sub_df["hotel_id"] = sample_sub_df["image"].apply(build_prediction)
+
+sample_sub_df.to_csv(OUTPUT_SUBMIT, index=False)
+
+print(f"Submission file written to {OUTPUT_SUBMIT}")
+print(sample_sub_df.head())

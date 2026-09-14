@@ -1,0 +1,285 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+The training data is the purchase history of customers across time. The task is to predict what articles each customer will purchase in the 7-day period immediately after the training data ends.
+
+## Metric
+Mean Average Precision @ 12 (MAP@12):
+
+$$
+\text{MAP@12}=\frac{1}{U} \sum_{u=1}^U \frac{1}{\min (m, 12)} \sum_{k=1}^{\min (n, 12)} P(k) \times \text{rel}(k)
+$$
+
+where $U$ is the number of customers, $P(k)$ is the precision at cutoff $k, n$ is the number predictions per customer, $m$ is the number of ground truth values per customer, and $\text{rel}(k)$ is an indicator function equaling 1 if the item at rank $k$ is a relevant (correct) label, zero otherwise.
+
+You must make predictions for all `customer_id` values found in the sample submission. All customers who made purchases during the test period are scored, regardless of whether they had purchase history in the training data.
+
+## Submission Format
+For each `customer_id` observed in the training data, you may predict up to 12 labels for the `article_id`, which is the predicted items a customer will buy in the next 7-day period after the training time period. The file should contain a header and have the following format:
+
+```
+customer_id,prediction
+00000dba,0706016001 0706016002 0372860001 ...
+0000423b,0706016001 0706016002 0372860001 ...
+...
+```
+
+## Dataset
+- **images/** - a folder of images corresponding to each `article_id`; images are placed in subfolders starting with the first three digits of the `article_id`; note, not all `article_id` values have a corresponding image.
+- **articles.csv** - detailed metadata for each `article_id` available for purchase
+- **customers.csv** - metadata for each `customer_id` in dataset
+- **sample_submission.csv** - a sample submission file in the correct format
+- **transactions_train.csv** - the training data, consisting of the purchases each customer for each date, as well as additional information. Duplicate rows correspond to multiple purchases of the same item. Your task is to predict the `article_id`s each customer will purchase during the 7-day period immediately after the training data period.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+lightgbm==4.6.0
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            articles.csv (105543 lines)
+            articles.csv.zip (4.4 MB)
+            customers.csv (1371981 lines)
+            customers.csv.zip (102.4 MB)
+            description.md (74 lines)
+            images.zip (30.0 GB)
+            sample_submission.csv (1371981 lines)
+            sample_submission.csv.zip (53.3 MB)
+            transactions_train.csv (31521961 lines)
+            transactions_train.csv.zip (604.1 MB)
+            h-and-m-personalized-fashion-recommendations/
+                articles.csv (105543 lines)
+                articles.csv.zip (4.4 MB)
+                ... and 8 other files
+                h-and-m-personalized-fashion-recommendations/
+                images/
+                    010/
+                        0108775015.jpg (154.6 kB)
+                        0108775044.jpg (106.7 kB)
+                        ... and 1 other files
+                    011/
+                        0110065001.jpg (148.6 kB)
+                        0110065002.jpg (85.7 kB)
+                        ... and 18 other files
+                    ... and 84 other folders
+            images/
+                010/
+                    0108775015.jpg (154.6 kB)
+                    0108775044.jpg (106.7 kB)
+                    ... and 1 other files
+                011/
+                    0110065001.jpg (148.6 kB)
+                    0110065002.jpg (85.7 kB)
+                    ... and 18 other files
+                ... and 84 other folders
+        input/
+            articles.csv (105543 lines)
+            articles.csv.zip (4.4 MB)
+            customers.csv (1371981 lines)
+            customers.csv.zip (102.4 MB)
+            description.md (74 lines)
+            images.zip (30.0 GB)
+            sample_submission.csv (1371981 lines)
+            sample_submission.csv.zip (53.3 MB)
+            transactions_train.csv (31521961 lines)
+            transactions_train.csv.zip (604.1 MB)
+            h-and-m-personalized-fashion-recommendations/
+                articles.csv (105543 lines)
+                articles.csv.zip (4.4 MB)
+                ... and 8 other files
+                h-and-m-personalized-fashion-recommendations/
+                images/
+                    010/
+                        0108775015.jpg (154.6 kB)
+                        0108775044.jpg (106.7 kB)
+                        ... and 1 other files
+                    011/
+                        0110065001.jpg (148.6 kB)
+                        0110065002.jpg (85.7 kB)
+                        ... and 18 other files
+                    ... and 84 other folders
+            images/
+                010/
+                    0108775015.jpg (154.6 kB)
+                    0108775044.jpg (106.7 kB)
+                    ... and 1 other files
+                011/
+                    0110065001.jpg (148.6 kB)
+                    0110065002.jpg (85.7 kB)
+                    ... and 18 other files
+                ... and 84 other folders
+        working/
+            h-and-m-personalized-fashion-recommendations/
+                articles.csv (105543 lines)
+                articles.csv.zip (4.4 MB)
+                ... and 8 other files
+                h-and-m-personalized-fashion-recommendations/
+                images/
+                    010/
+                        0108775015.jpg (154.6 kB)
+                        0108775044.jpg (106.7 kB)
+                        ... and 1 other files
+                    011/
+                        0110065001.jpg (148.6 kB)
+                        0110065002.jpg (85.7 kB)
+                        ... and 18 other files
+                    ... and 84 other folders
+```
+
+-> data/articles.csv has 105542 rows and 25 columns.
+The columns are: article_id, product_code, prod_name, product_type_no, product_type_name, product_group_name, graphical_appearance_no, graphical_appearance_name, colour_group_code, colour_group_name, perceived_colour_value_id, perceived_colour_value_name, perceived_colour_master_id, perceived_colour_master_name, department_no... and 10 more columns
+
+-> data/customers.csv has 1371980 rows and 7 columns.
+The columns are: customer_id, FN, Active, club_member_status, fashion_news_frequency, age, postal_code
+
+-> data/h-and-m-personalized-fashion-recommendations/articles.csv has 105542 rows and 25 columns.
+The columns are: article_id, product_code, prod_name, product_type_no, product_type_name, product_group_name, graphical_appearance_no, graphical_appearance_name, colour_group_code, colour_group_name, perceived_colour_value_id, perceived_colour_value_name, perceived_colour_master_id, perceived_colour_master_name, department_no... and 10 more columns
+
+-> data/h-and-m-personalized-fashion-recommendations/customers.csv has 1371980 rows and 7 columns.
+The columns are: customer_id, FN, Active, club_member_status, fashion_news_frequency, age, postal_code
+
+-> data/h-and-m-personalized-fashion-recommendations/sample_submission.csv has 1371980 rows and 2 columns.
+The columns are: customer_id, prediction
+
+-> data/h-and-m-personalized-fashion-recommendations/transactions_train.csv has 31521960 rows and 5 columns.
+The columns are: t_dat, customer_id, article_id, price, sales_channel_id
+
+-> data/sample_submission.csv has 1371980 rows and 2 columns.
+The columns are: customer_id, prediction
+
+-> data/transactions_train.csv has 31521960 rows and 5 columns.
+The columns are: t_dat, customer_id, article_id, price, sales_channel_id
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.0204628930615779
+
+# 6. Current score
+
+0.00904
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.00296) has done: 'The script now loads the original CSV files (instead of missing parquet files), creates a simple baseline that predicts the 12 most‑frequent articles for every customer, and writes a correctly formatted `submission.csv`. This fixes all the previous `FileNotFoundError` and undefined‑variable errors while still producing a valid submission file that can achieve a modest MAP@12 score.'
+- What this solution (achieved 0.00904) has done: 'I replace the simple “same‑top‑12‑global‑articles‑for‑everyone” prediction with a lightweight personalized baseline: for each customer I compute their 12 most‑frequent purchased articles in the training set and use those; if a customer has fewer than 12 items, I pad with the global most‑frequent articles that they haven’t already bought. This modest personalization should raise MAP@12 from ~0.003 toward the target while keeping the overall structure unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import pandas as pd
+import numpy as np
+
+
+
+
+## === cell 1
+def customer_hex_id_to_int(series):
+    return series.str[-16:].apply(lambda x: int(x, 16))
+
+
+
+
+## === cell 2
+transactions = pd.read_csv(
+    "/kaggle/input/h-and-m-personalized-fashion-recommendations/transactions_train.csv"
+)
+customers = pd.read_csv(
+    "/kaggle/input/h-and-m-personalized-fashion-recommendations/customers.csv"
+)
+articles = pd.read_csv(
+    "/kaggle/input/h-and-m-personalized-fashion-recommendations/articles.csv"
+)
+
+transactions["t_dat"] = pd.to_datetime(transactions["t_dat"])
+transactions["week"] = transactions["t_dat"].dt.isocalendar().week.astype(int)
+
+
+
+
+## === cell 3
+top_articles = (
+    transactions.groupby("article_id")
+    .size()
+    .sort_values(ascending=False)
+    .head(12)
+    .index.astype(str)
+    .tolist()
+)
+
+
+
+
+## === cell 4
+cust_counts = (
+    transactions.groupby(["customer_id", "article_id"]).size().reset_index(name="cnt")
+)
+
+cust_counts = cust_counts.sort_values(["customer_id", "cnt"], ascending=[True, False])
+
+cust_top = cust_counts.groupby("customer_id")["article_id"].apply(
+    lambda x: x.head(12).astype(str).tolist()
+)
+
+cust_top_dict = cust_top.to_dict()
+
+
+def build_prediction(cust_id):
+    """Return a space‑separated string of up to 12 article_ids for the given customer."""
+    personal = cust_top_dict.get(cust_id, [])
+    if len(personal) < 12:
+        needed = 12 - len(personal)
+        pad = [a for a in top_articles if a not in personal][:needed]
+        personal = personal + pad
+    return " ".join(personal[:12])
+
+
+sub = pd.read_csv(
+    "/kaggle/input/h-and-m-personalized-fashion-recommendations/sample_submission.csv"
+)
+
+sub["prediction"] = sub["customer_id"].apply(build_prediction)
+
+
+
+
+## === cell 5
+sub_name = "basic_model_submission"
+sub.to_csv(f"{sub_name}.csv", index=False)

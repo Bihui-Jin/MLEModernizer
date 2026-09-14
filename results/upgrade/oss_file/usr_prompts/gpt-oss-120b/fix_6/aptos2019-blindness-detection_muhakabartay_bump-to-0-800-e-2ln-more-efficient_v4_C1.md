@@ -1,0 +1,410 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+from pathlib import Path
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms, models
+from sklearn.metrics import cohen_kappa_score
+import warnings
+from PIL import Image  # added import for image handling
+
+warnings.filterwarnings("ignore")
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+SEED = 42
+torch.manual_seed(SEED)
+np.random.seed(SEED)
+torch.backends.cudnn.benchmark = True  # enable CuDNN auto‑tuner for faster convolutions
+
+
+
+
+## === cell 1
+class AptosDataset(Dataset):
+    """Fast dataset that pre‑computes image paths and stores labels as numpy arrays."""
+
+    def __init__(self, df, img_dir, transform=None):
+        self.paths = [
+            os.path.join(img_dir, f"{pid}.png") for pid in df["id_code"].values
+        ]
+        self.labels = df["diagnosis"].values if "diagnosis" in df.columns else None
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, idx):
+        img = Image.open(self.paths[idx]).convert("RGB")
+        if self.transform:
+            img = self.transform(img)
+        if self.labels is not None:
+            label = torch.tensor(int(self.labels[idx]), dtype=torch.long)
+            return img, label
+        else:
+            id_code = Path(self.paths[idx]).stem
+            return img, id_code
+
+
+def load_data():
+    base_dir = Path("..") / "input" / "aptos2019-blindness-detection"
+    train_dir = base_dir / "train_images"
+    test_dir = base_dir / "test_images"
+    train_df = pd.read_csv(base_dir / "train.csv")
+    test_df = pd.read_csv(base_dir / "test.csv")
+    return train_df, test_df, str(train_dir), str(test_dir)
+
+
+train_df, test_df, train_img_dir, test_img_dir = load_data()
+
+
+
+## === cell 2
+IMG_SIZE = 256
+BATCH_SIZE = 32
+NUM_EPOCHS = 8
+NUM_WORKERS = min(os.cpu_count() if os.cpu_count() else 2, 8)
+
+train_transform = transforms.Compose(
+    [
+        transforms.Resize((IMG_SIZE, IMG_SIZE)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ]
+)
+
+val_transform = transforms.Compose(
+    [
+        transforms.Resize((IMG_SIZE, IMG_SIZE)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ]
+)
+
+from sklearn.model_selection import train_test_split
+
+train_idx, val_idx = train_test_split(
+    np.arange(len(train_df)),
+    test_size=0.2,
+    stratify=train_df["diagnosis"],
+    random_state=SEED,
+)
+
+train_subset = train_df.iloc[train_idx].reset_index(drop=True)
+val_subset = train_df.iloc[val_idx].reset_index(drop=True)
+
+train_dataset = AptosDataset(train_subset, train_img_dir, transform=train_transform)
+val_dataset = AptosDataset(val_subset, train_img_dir, transform=val_transform)
+
+
+def seed_worker(worker_id):
+    """Ensure each DataLoader worker has a deterministic seed."""
+    worker_seed = SEED + worker_id
+    np.random.seed(worker_seed)
+    torch.manual_seed(worker_seed)
+
+
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    num_workers=NUM_WORKERS,
+    pin_memory=True,
+    persistent_workers=True,
+    worker_init_fn=seed_worker,
+)
+val_loader = DataLoader(
+    val_dataset,
+    batch_size=BATCH_SIZE,
+    shuffle=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=True,
+    persistent_workers=True,
+    worker_init_fn=seed_worker,
+)
+
+
+
+## === cell 3
+model = models.efficientnet_b0(pretrained=True)
+model.classifier[1] = nn.Linear(model.classifier[1].in_features, 5)  # 5 classes
+model = model.to(DEVICE)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+scaler = torch.cuda.amp.GradScaler() if DEVICE.type == "cuda" else None
+
+
+def evaluate(loader):
+    model.eval()
+    all_preds = []
+    all_labels = []
+    class_range = torch.arange(5, dtype=torch.float32, device=DEVICE)
+    with torch.no_grad():
+        for imgs, lbls in loader:
+            imgs = imgs.to(DEVICE, non_blocking=True)
+            with torch.cuda.amp.autocast(enabled=DEVICE.type == "cuda"):
+                outputs = model(imgs)
+                probs = F.softmax(outputs, dim=1)
+                expected = torch.sum(probs * class_range, dim=1)
+                preds = torch.round(expected).clamp(0, 4).cpu().numpy().astype(int)
+            all_preds.extend(preds)
+            all_labels.extend(lbls.numpy())
+    kappa = cohen_kappa_score(all_labels, all_preds, weights="quadratic")
+    return kappa
+
+
+
+
+## === cell 4
+for epoch in range(1, NUM_EPOCHS + 1):
+    model.train()
+    running_loss = 0.0
+    for imgs, lbls in train_loader:
+        imgs = imgs.to(DEVICE, non_blocking=True)
+        lbls = lbls.to(DEVICE, non_blocking=True)
+        optimizer.zero_grad()
+        with torch.cuda.amp.autocast(enabled=DEVICE.type == "cuda"):
+            outputs = model(imgs)
+            loss = criterion(outputs, lbls)
+        if scaler:
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            loss.backward()
+            optimizer.step()
+        running_loss += loss.item() * imgs.size(0)
+    epoch_loss = running_loss / len(train_loader.dataset)
+    val_kappa = evaluate(val_loader)
+    print(
+        f"Epoch {epoch}/{NUM_EPOCHS} - Loss: {epoch_loss:.4f} - Val Kappa: {val_kappa:.4f}"
+    )
+
+
+
+## === cell 5
+test_dataset = AptosDataset(test_df, test_img_dir, transform=val_transform)
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=BATCH_SIZE,
+    shuffle=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=True,
+    persistent_workers=True,
+    worker_init_fn=seed_worker,
+)
+
+model.eval()
+predictions = []
+ids = []
+class_range = torch.arange(5, dtype=torch.float32, device=DEVICE)
+with torch.no_grad():
+    for imgs, batch_ids in test_loader:
+        imgs = imgs.to(DEVICE, non_blocking=True)
+        with torch.cuda.amp.autocast(enabled=DEVICE.type == "cuda"):
+            outputs = model(imgs)
+            probs = F.softmax(outputs, dim=1)
+            expected = torch.sum(probs * class_range, dim=1)
+            preds = torch.round(expected).clamp(0, 4).cpu().numpy().astype(int)
+        predictions.extend(preds)
+        ids.extend(batch_ids)
+
+submission = pd.DataFrame({"id_code": ids, "diagnosis": predictions})
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")

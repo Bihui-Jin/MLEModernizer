@@ -1,0 +1,268 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the sentiment of phrases.
+
+## Metric
+Classification accuracy.
+
+## Submission Format
+For each phrase in the test set, predict a label for the sentiment. Your submission should have a header and look like the following:
+
+```
+PhraseId,Sentiment
+156061,2
+156062,2
+156063,2
+...
+```
+
+## Dataset
+The dataset is comprised of tab-separated files with phrases. Each phrase has a PhraseId. Each sentence has a SentenceId.
+
+The sentiment labels are:
+
+0 - negative
+
+1 - somewhat negative
+
+2 - neutral
+
+3 - somewhat positive
+
+4 - positive
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (72 lines)
+            sampleSubmission.csv (46819 lines)
+            sampleSubmission.csv.zip (146.0 kB)
+            test.tsv (46819 lines)
+            test.tsv.zip (1.1 MB)
+            train.tsv (109243 lines)
+            train.tsv.zip (2.7 MB)
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+        input/
+            description.md (72 lines)
+            sampleSubmission.csv (46819 lines)
+            sampleSubmission.csv.zip (146.0 kB)
+            test.tsv (46819 lines)
+            test.tsv.zip (1.1 MB)
+            train.tsv (109243 lines)
+            train.tsv.zip (2.7 MB)
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+        working/
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+```
+
+-> data/movie-review-sentiment-analysis-kernels-only/sampleSubmission.csv has 46818 rows and 2 columns.
+Here is some information about the columns:
+PhraseId (int64) has range: 29.00 - 156030.00, 0 nan values
+Sentiment (int64) has 1 unique values: [2]
+
+-> data/sampleSubmission.csv has 46818 rows and 2 columns.
+Here is some information about the columns:
+PhraseId (int64) has range: 29.00 - 156030.00, 0 nan values
+Sentiment (int64) has 1 unique values: [2]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.64657
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+from sklearn import model_selection
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+
+def locate(path):
+    """
+    Return an existing path for `path` by checking several common Kaggle locations.
+    """
+    if os.path.exists(path):
+        return path
+    data_path = os.path.join("data", path)
+    if os.path.exists(data_path):
+        return data_path
+    kaggle_path = os.path.join("kaggle", "input", path)
+    if os.path.exists(kaggle_path):
+        return kaggle_path
+    kaggle_data_path = os.path.join("kaggle", "input", "data", path)
+    if os.path.exists(kaggle_data_path):
+        return kaggle_data_path
+    raise FileNotFoundError(f"Cannot find {path}")
+
+
+def get_data(validation_set_ratio=0.1):
+    train_path = locate("train.tsv")
+    test_path = locate("test.tsv")
+    train_df = pd.read_csv(train_path, sep="\t")
+    test_df = pd.read_csv(test_path, sep="\t")
+    train_ids, val_ids = model_selection.train_test_split(
+        np.unique(train_df["SentenceId"]),
+        test_size=validation_set_ratio,
+        random_state=0,
+    )
+    train_split = train_df[train_df["SentenceId"].isin(train_ids)].reset_index(
+        drop=True
+    )
+    val_split = train_df[train_df["SentenceId"].isin(val_ids)].reset_index(drop=True)
+    print(f"Split: {len(train_split)} train / {len(val_split)} validation examples.")
+    return train_split, val_split, test_df
+
+
+train_df, val_df, test_df = get_data()
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_11/3106317744.py in <cell line: 0>()
+     48 
+     49 
+---> 50 train_df, val_df, test_df = get_data()
+     51 
+     52 
+
+/tmp/ipykernel_11/3106317744.py in get_data(validation_set_ratio)
+     31 
+     32 def get_data(validation_set_ratio=0.1):
+---> 33     train_path = locate("train.tsv")
+     34     test_path = locate("test.tsv")
+     35     train_df = pd.read_csv(train_path, sep="\t")
+
+/tmp/ipykernel_11/3106317744.py in locate(path)
+     27     if os.path.exists(kaggle_data_path):
+     28         return kaggle_data_path
+---> 29     raise FileNotFoundError(f"Cannot find {path}")
+     30 
+     31 
+
+FileNotFoundError: Cannot find train.tsv
+
+## === cell 1
+vectorizer = TfidfVectorizer(
+    lowercase=True,
+    stop_words="english",
+    ngram_range=(1, 2),
+    max_features=20000,
+)
+
+X_train = vectorizer.fit_transform(train_df["Phrase"])
+y_train = train_df["Sentiment"]
+
+X_val = vectorizer.transform(val_df["Phrase"])
+y_val = val_df["Sentiment"]
+
+clf = LogisticRegression(
+    multi_class="multinomial",
+    solver="lbfgs",
+    max_iter=1000,
+    n_jobs=-1,
+    random_state=0,
+)
+clf.fit(X_train, y_train)
+
+val_pred = clf.predict(X_val)
+val_acc = accuracy_score(y_val, val_pred)
+print(f"Validation accuracy: {val_acc:.5f}")
+
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/4268975747.py in <cell line: 0>()
+      6 )
+      7 
+----> 8 X_train = vectorizer.fit_transform(train_df["Phrase"])
+      9 y_train = train_df["Sentiment"]
+     10 
+
+NameError: name 'train_df' is not defined
+
+## === cell 2
+X_test = vectorizer.transform(test_df["Phrase"])
+test_pred = clf.predict(X_test)
+
+submission = pd.DataFrame(
+    {
+        "PhraseId": test_df["PhraseId"],
+        "Sentiment": test_pred,
+    }
+)
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission file written to {submission_path}")
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1780901738.py in <cell line: 0>()
+----> 1 X_test = vectorizer.transform(test_df["Phrase"])
+      2 test_pred = clf.predict(X_test)
+      3 
+      4 submission = pd.DataFrame(
+      5     {
+
+NameError: name 'test_df' is not defined

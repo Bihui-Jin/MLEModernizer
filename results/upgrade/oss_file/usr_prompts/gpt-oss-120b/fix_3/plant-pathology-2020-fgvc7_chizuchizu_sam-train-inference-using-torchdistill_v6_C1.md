@@ -1,0 +1,387 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean column-wise ROC AUC.
+
+## Submission Format
+For each image_id in the test set, you must predict a probability for each target variable. The file should contain a header and have the following format:
+
+```
+image_id,
+test_0,0.25,0.25,0.25,0.25
+test_1,0.25,0.25,0.25,0.25
+test_2,0.25,0.25,0.25,0.25
+etc.
+```
+
+## Dataset
+Given a photo of an apple leaf, can you accurately assess its health? This competition will challenge you to distinguish between leaves which are healthy, those which are infected with apple rust, those that have apple scab, and those with more than one disease.
+
+**train.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+**images**
+
+A folder containing the train and test images, in jpg format.
+
+**test.csv**
+
+- `image_id`: the foreign key
+
+**sample_submission.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        input/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        working/
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+```
+
+-> data/plant-pathology-2020-fgvc7/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/plant-pathology-2020-fgvc7/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/plant-pathology-2020-fgvc7/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.91219
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+from PIL import Image
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+
+
+
+## === cell 1
+BASE_PATH = os.path.abspath(
+    os.path.join(os.getcwd(), "..", "input", "plant-pathology-2020-fgvc7")
+)
+TRAIN_CSV = os.path.join(BASE_PATH, "train.csv")
+TEST_CSV = os.path.join(BASE_PATH, "test.csv")
+SAMPLE_SUBMISSION = os.path.join(BASE_PATH, "sample_submission.csv")
+SUBMISSION_PATH = "submission.csv"
+IMAGE_DIR = os.path.join(BASE_PATH, "images")
+
+IMG_SIZE = (224, 224)
+BATCH_SIZE = 32
+NUM_EPOCHS = 3
+LR = 1e-3
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+
+
+## === cell 2
+def load_image(image_id):
+    img_path = os.path.join(IMAGE_DIR, f"{image_id}.jpg")
+    img = Image.open(img_path).convert("RGB")
+    img = img.resize(IMG_SIZE)
+    img_array = np.array(img).astype(np.float32) / 255.0  # scale to [0,1]
+    img_tensor = torch.from_numpy(img_array).permute(2, 0, 1)
+    return img_tensor
+
+
+class PlantDataset(Dataset):
+    def __init__(self, df, is_train=True):
+        self.df = df.reset_index(drop=True)
+        self.is_train = is_train
+        self.labels = ["healthy", "multiple_diseases", "rust", "scab"]
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        image_id = row["image_id"]
+        img = load_image(image_id)
+        if self.is_train:
+            target = torch.tensor(row[self.labels].values.astype(np.float32))
+            return img, target
+        else:
+            return img, image_id
+
+
+
+
+## === cell 3
+class SimpleCNN(nn.Module):
+    def __init__(self, num_classes=4):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=2, padding=1)
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1)
+        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1)
+        self.fc = nn.Linear(64 * (IMG_SIZE[0] // 8) * (IMG_SIZE[1] // 8), num_classes)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = F.relu(self.conv2(x))
+        x = F.relu(self.conv3(x))
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+
+
+
+
+## === cell 4
+train_df = pd.read_csv(TRAIN_CSV)
+
+val_frac = 0.2
+val_df = train_df.sample(frac=val_frac, random_state=42)
+train_df = train_df.drop(val_df.index)
+
+train_dataset = PlantDataset(train_df, is_train=True)
+val_dataset = PlantDataset(val_df, is_train=True)
+
+train_loader = DataLoader(
+    train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2, pin_memory=True
+)
+val_loader = DataLoader(
+    val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2, pin_memory=True
+)
+
+model = SimpleCNN(num_classes=4).to(DEVICE)
+criterion = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=LR)
+
+
+def train_one_epoch(loader):
+    model.train()
+    epoch_loss = 0.0
+    for imgs, targets in loader:
+        imgs = imgs.to(DEVICE)
+        targets = targets.to(DEVICE)
+        optimizer.zero_grad()
+        logits = model(imgs)
+        loss = criterion(logits, targets)
+        loss.backward()
+        optimizer.step()
+        epoch_loss += loss.item() * imgs.size(0)
+    return epoch_loss / len(loader.dataset)
+
+
+def evaluate(loader):
+    model.eval()
+    all_logits = []
+    all_targets = []
+    with torch.no_grad():
+        for imgs, targets in loader:
+            imgs = imgs.to(DEVICE)
+            logits = model(imgs)
+            all_logits.append(logits.cpu())
+            all_targets.append(targets)
+    logits = torch.cat(all_logits)
+    targets = torch.cat(all_targets)
+    probs = torch.sigmoid(logits)
+    loss = criterion(logits, targets).item()
+    return loss, probs.numpy()
+
+
+for epoch in range(1, NUM_EPOCHS + 1):
+    train_loss = train_one_epoch(train_loader)
+    val_loss, _ = evaluate(val_loader)
+    print(f"Epoch {epoch}: Train loss {train_loss:.4f} | Val loss {val_loss:.4f}")
+
+
+
+## === cell 5
+test_df = pd.read_csv(TEST_CSV)
+test_dataset = PlantDataset(test_df, is_train=False)
+test_loader = DataLoader(
+    test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2, pin_memory=True
+)
+
+model.eval()
+all_preds = []
+all_ids = []
+with torch.no_grad():
+    for imgs, ids in test_loader:
+        imgs = imgs.to(DEVICE)
+        logits = model(imgs)
+        probs = torch.sigmoid(logits).cpu().numpy()
+        all_preds.append(probs)
+        all_ids.extend(ids)
+
+test_predictions = np.concatenate(all_preds, axis=0)  # shape (num_test, 4)
+
+
+
+## === cell 6
+submission = pd.read_csv(SAMPLE_SUBMISSION)
+label_cols = ["healthy", "multiple_diseases", "rust", "scab"]
+id_to_pred = {img_id: pred for img_id, pred in zip(all_ids, test_predictions)}
+submission[label_cols] = (
+    submission["image_id"]
+    .map(id_to_pred)
+    .apply(lambda x: x if isinstance(x, np.ndarray) else np.zeros(4))
+)
+submission[label_cols] = pd.DataFrame(
+    submission[label_cols].tolist(), index=submission.index
+)
+
+submission.to_csv(SUBMISSION_PATH, index=False)
+print(f"Submission saved to {SUBMISSION_PATH}")
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/3319147646.py in <cell line: 0>()
+      4 # Ensure ordering matches test CSV
+      5 id_to_pred = {img_id: pred for img_id, pred in zip(all_ids, test_predictions)}
+----> 6 submission[label_cols] = (
+      7     submission["image_id"]
+      8     .map(id_to_pred)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __setitem__(self, key, value)
+   4297             self._setitem_frame(key, value)
+   4298         elif isinstance(key, (Series, np.ndarray, list, Index)):
+-> 4299             self._setitem_array(key, value)
+   4300         elif isinstance(value, DataFrame):
+   4301             self._set_item_frame_value(key, value)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in _setitem_array(self, key, value)
+   4356 
+   4357             else:
+-> 4358                 self._iset_not_inplace(key, value)
+   4359 
+   4360     def _iset_not_inplace(self, key, value):
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in _iset_not_inplace(self, key, value)
+   4375         if self.columns.is_unique:
+   4376             if np.shape(value)[-1] != len(key):
+-> 4377                 raise ValueError("Columns must be same length as key")
+   4378 
+   4379             for i, col in enumerate(key):
+
+ValueError: Columns must be same length as key
+
+## === cell 7
+if __name__ == "__main__":
+    pass

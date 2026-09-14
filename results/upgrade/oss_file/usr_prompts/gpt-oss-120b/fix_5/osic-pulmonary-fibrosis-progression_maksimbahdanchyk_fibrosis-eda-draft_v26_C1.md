@@ -1,0 +1,525 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-10.251
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
+
+
+
+## === cell 1
+train = pd.read_csv("../input/osic-pulmonary-fibrosis-progression/train.csv")
+test = pd.read_csv("../input/osic-pulmonary-fibrosis-progression/test.csv")
+
+
+
+
+## === cell 2
+train_exp = pd.DataFrame()
+
+for patient in tqdm(train.Patient.unique()):
+    df = train.loc[train.Patient == patient, :]
+
+    for idx, week in zip(df.index, df.Weeks):
+        temp_df_pos = df.loc[idx:, :"SmokingStatus"].copy()
+        temp_df_pos["Weeks"] = week
+        temp_df_pos["target"] = temp_df_pos["FVC"]
+        temp_df_pos["delta"] = df.loc[idx:, "Weeks"] - df.loc[idx, "Weeks"]
+        temp_df_pos["FVC"] = temp_df_pos.loc[idx, "FVC"]
+
+        temp_df_neg = df.loc[:idx, :"SmokingStatus"].copy()
+        temp_df_neg["Weeks"] = week
+        temp_df_neg["target"] = temp_df_neg["FVC"]
+        temp_df_neg["delta"] = df.loc[:idx, "Weeks"] - df.loc[idx, "Weeks"]
+        temp_df_neg["FVC"] = temp_df_neg.loc[idx, "FVC"]
+
+        train_exp = pd.concat([train_exp, temp_df_pos, temp_df_neg], axis=0)
+
+train_exp = (
+    train_exp[train_exp.delta != 0]
+    .drop_duplicates()
+    .dropna(axis=0)
+    .reset_index(drop=True)
+)
+
+
+
+
+## === cell 3
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.pipeline import make_pipeline
+from sklearn.compose import make_column_transformer
+from sklearn.preprocessing import (
+    RobustScaler,
+    StandardScaler,
+    MinMaxScaler,
+    OrdinalEncoder,
+)
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+X = train_exp.drop(["Patient", "target"], axis=1)
+y = train_exp["target"]
+
+X_train, X_val, y_train, y_val = train_test_split(
+    X, y, test_size=0.2, random_state=42, shuffle=True
+)
+
+transformer = make_column_transformer(
+    (RobustScaler(), ["FVC"]),
+    (StandardScaler(), ["Age"]),
+    (MinMaxScaler(), ["Percent", "delta"]),
+    (OrdinalEncoder(), ["Sex", "SmokingStatus"]),
+    remainder="passthrough",
+)
+
+pipeline = make_pipeline(
+    transformer, RandomForestRegressor(n_estimators=200, random_state=42)
+)
+
+param_grid = {
+    "randomforestregressor__n_estimators": [10, 100, 500, 200],
+    "randomforestregressor__max_depth": [2, 10, 50, 100],
+}
+
+search = GridSearchCV(pipeline, param_grid, cv=5, scoring="neg_mean_squared_error")
+search.fit(X_train, y_train)
+
+print("Best RMSE:", np.sqrt(-search.best_score_))
+print("Best params:", search.best_params_)
+
+pipeline = search.best_estimator_  # already fitted on the CV folds
+
+val_pred = pipeline.predict(X_val)
+print(
+    "Val RMSE:",
+    np.sqrt(mean_squared_error(y_val, val_pred)),
+)
+
+
+
+
+## === cell 4
+sample_sub = pd.read_csv(
+    "../input/osic-pulmonary-fibrosis-progression/sample_submission.csv"
+)
+
+patient_week_split = sample_sub["Patient_Week"].str.rsplit("_", n=1, expand=True)
+sample_sub["Patient"] = patient_week_split[0]
+sample_sub["Week"] = patient_week_split[1].astype(int)
+
+test_base = test[
+    ["Patient", "FVC", "Percent", "Age", "Sex", "SmokingStatus", "Weeks"]
+].rename(columns={"Weeks": "Baseline_Week"})
+
+merged = sample_sub.merge(test_base, on="Patient", how="left")
+merged = merged.rename(columns={"FVC_x": "FVC_placeholder", "FVC_y": "FVC"}).drop(
+    columns=["FVC_placeholder"]
+)
+
+merged["Weeks"] = merged["Week"]  # target week
+merged["delta"] = merged["Weeks"] - merged["Baseline_Week"]
+
+X_test = merged[
+    ["FVC", "Age", "Percent", "Sex", "SmokingStatus", "Weeks", "delta"]
+].copy()
+
+pred = pipeline.predict(X_test)
+
+
+
+
+## === cell 5
+df_pred = merged.copy()
+df_pred["FVC_pred"] = pred
+
+conf_df = (
+    df_pred.groupby("Patient")["FVC_pred"]
+    .std()
+    .reset_index()
+    .rename(columns={"FVC_pred": "Confidence"})
+)
+
+df_pred = df_pred.merge(conf_df, on="Patient", how="left")
+df_pred["Confidence"].fillna(100.0, inplace=True)
+
+df_pred["Confidence"] = df_pred["Confidence"].clip(lower=70.0)
+
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3804         try:
+-> 3805             return self._engine.get_loc(casted_key)
+   3806         except KeyError as err:
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+KeyError: 'Confidence'
+
+The above exception was the direct cause of the following exception:
+
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_11/2731437595.py in <cell line: 0>()
+     11 
+     12 df_pred = df_pred.merge(conf_df, on="Patient", how="left")
+---> 13 df_pred["Confidence"].fillna(100.0, inplace=True)
+     14 
+     15 # Clip confidence to respect competition's minimum sigma of 70
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4100             if self.columns.nlevels > 1:
+   4101                 return self._getitem_multilevel(key)
+-> 4102             indexer = self.columns.get_loc(key)
+   4103             if is_integer(indexer):
+   4104                 indexer = [indexer]
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3810             ):
+   3811                 raise InvalidIndexError(key)
+-> 3812             raise KeyError(key) from err
+   3813         except TypeError:
+   3814             # If we have a listlike key, _check_indexing_error will raise
+
+KeyError: 'Confidence'
+
+## === cell 6
+submission = pd.DataFrame(
+    {
+        "Patient_Week": df_pred["Patient_Week"],
+        "FVC": df_pred["FVC_pred"],
+        "Confidence": df_pred["Confidence"],
+    }
+)
+
+submission.to_csv("submission.csv", index=False)
+print("Submission file written to submission.csv")
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3804         try:
+-> 3805             return self._engine.get_loc(casted_key)
+   3806         except KeyError as err:
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+KeyError: 'Confidence'
+
+The above exception was the direct cause of the following exception:
+
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_11/2625010442.py in <cell line: 0>()
+      3         "Patient_Week": df_pred["Patient_Week"],
+      4         "FVC": df_pred["FVC_pred"],
+----> 5         "Confidence": df_pred["Confidence"],
+      6     }
+      7 )
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4100             if self.columns.nlevels > 1:
+   4101                 return self._getitem_multilevel(key)
+-> 4102             indexer = self.columns.get_loc(key)
+   4103             if is_integer(indexer):
+   4104                 indexer = [indexer]
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3810             ):
+   3811                 raise InvalidIndexError(key)
+-> 3812             raise KeyError(key) from err
+   3813         except TypeError:
+   3814             # If we have a listlike key, _check_indexing_error will raise
+
+KeyError: 'Confidence'

@@ -1,0 +1,437 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict whether an image contains a cactus.
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each ID in the test set, you must predict a probability for the `has_cactus` variable. The file should contain a header and have the following format:
+
+```
+id,has_cactus
+000940378805c44108d287872b2f04ce.jpg,0.5
+0017242f54ececa4512b4d7937d1e21e.jpg,0.5
+001ee6d8564003107853118ab87df407.jpg,0.5
+etc.
+```
+
+## Dataset
+This dataset contains a large number of 32 x 32 thumbnail images containing aerial photos of a cactus. The file name of an image corresponds to its `id`.
+
+- **train/** - the training set images
+- **test/** - the test set images (you must predict the labels of these)
+- **train.csv** - the training set labels, indicates whether the image has a cactus (`has_cactus = 1`)
+- **sample_submission.csv** - a sample submission file in the correct format
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.5521
+
+# 6. Current score
+
+0.99998
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.99998) has done: 'I filter the test directory so that only image files are passed to the dataset, preventing the DataLoader from trying to open a sub‑folder named “test” as an image. This removes the FileNotFoundError and ensures a valid `.csv` submission is written.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import cv2
+import numpy as np
+import pandas as pd
+import torch
+import torchvision
+import torchvision.transforms as T
+from torch import nn, optim
+from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+from torchmetrics import AUROC
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("Device:", device)
+
+
+
+## === cell 1
+possible_dirs = [
+    "/kaggle/input/aerial-cactus-identification",
+    "./input/aerial-cactus-identification",
+    "./aerial-cactus-identification",
+]
+base_dir = next((d for d in possible_dirs if os.path.isdir(d)), None)
+if base_dir is None:
+    raise FileNotFoundError("Could not locate the dataset directory.")
+train_csv_path = os.path.join(base_dir, "train.csv")
+train_img_dir = os.path.join(base_dir, "train")
+test_img_dir = os.path.join(base_dir, "test")
+
+train_df = pd.read_csv(train_csv_path)
+train_df = train_df.sample(frac=1, random_state=42).reset_index(drop=True)  # shuffle
+
+val_frac = 0.1
+val_size = int(len(train_df) * val_frac)
+train_idx = list(range(val_size, len(train_df)))
+val_idx = list(range(val_size))
+
+
+
+## === cell 2
+train_transform = A.Compose(
+    [
+        A.RandomResizedCrop(size=(224, 224), scale=(0.8, 1.0)),
+        A.HorizontalFlip(),
+        A.VerticalFlip(),
+        A.RandomBrightnessContrast(),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+test_transform = A.Compose(
+    [
+        A.Resize(224, 224),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+
+
+
+## === cell 3
+class CactusDataset(Dataset):
+    def __init__(self, df, img_dir, transform, is_train=True):
+        self.df = df.reset_index(drop=True)
+        self.img_dir = img_dir
+        self.transform = transform
+        self.is_train = is_train
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        img_id = self.df.loc[idx, "id"]
+        label = self.df.loc[idx, "has_cactus"] if self.is_train else 0.0
+        img_path = os.path.join(self.img_dir, img_id)
+        img = cv2.imread(img_path)
+        if img is None:
+            raise FileNotFoundError(f"Image not found: {img_path}")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        augmented = self.transform(image=img)
+        image = augmented["image"]
+        label = torch.tensor(label, dtype=torch.float32)
+        return image, label
+
+
+
+
+## === cell 4
+train_dataset = CactusDataset(train_df, train_img_dir, train_transform, is_train=True)
+val_dataset = CactusDataset(
+    train_df, train_img_dir, test_transform, is_train=True
+)  # validation without augmentation
+
+batch_size = 128
+num_workers = 2
+
+train_sampler = SubsetRandomSampler(train_idx)
+val_sampler = SubsetRandomSampler(val_idx)
+
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=batch_size,
+    sampler=train_sampler,
+    num_workers=num_workers,
+    pin_memory=True,
+)
+
+val_loader = DataLoader(
+    val_dataset,
+    batch_size=batch_size,
+    sampler=val_sampler,
+    num_workers=num_workers,
+    pin_memory=True,
+)
+
+
+
+## === cell 5
+model = torchvision.models.resnet18(pretrained=True)
+model.fc = nn.Linear(model.fc.in_features, 1)  # output single logit
+model = model.to(device)
+
+criterion = nn.BCEWithLogitsLoss()
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.5, patience=2)
+
+auc_metric = AUROC(task="binary").to(device)
+
+
+
+## === cell 6
+num_epochs = 12  # increased epochs for modest AUC improvement
+best_auc = 0.0
+
+for epoch in range(1, num_epochs + 1):
+    model.train()
+    train_losses = []
+    for imgs, labels in train_loader:
+        imgs = imgs.to(device)
+        labels = labels.to(device).unsqueeze(1)
+
+        optimizer.zero_grad()
+        outputs = model(imgs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+        train_losses.append(loss.item())
+
+    model.eval()
+    val_losses = []
+    all_preds = []
+    all_targets = []
+    with torch.no_grad():
+        for imgs, labels in val_loader:
+            imgs = imgs.to(device)
+            labels = labels.to(device).unsqueeze(1)
+            outputs = model(imgs)
+            loss = criterion(outputs, labels)
+            val_losses.append(loss.item())
+            probs = torch.sigmoid(outputs)
+            all_preds.append(probs.cpu())
+            all_targets.append(labels.cpu())
+
+    val_auc = auc_metric(torch.cat(all_preds), torch.cat(all_targets).squeeze())
+    scheduler.step(val_auc)
+
+    avg_train_loss = np.mean(train_losses)
+    avg_val_loss = np.mean(val_losses)
+
+    print(
+        f"Epoch {epoch}/{num_epochs} | "
+        f"Train loss: {avg_train_loss:.4f} | "
+        f"Val loss: {avg_val_loss:.4f} | "
+        f"Val AUC: {val_auc:.4f}"
+    )
+
+    if val_auc > best_auc:
+        best_auc = val_auc
+        torch.save(model.state_dict(), "best_model.pth")
+
+print("Best validation AUC:", best_auc)
+
+
+
+## === cell 7
+if os.path.exists("best_model.pth"):
+    model.load_state_dict(torch.load("best_model.pth", map_location=device))
+else:
+    print("Warning: best_model.pth not found; using current model weights.")
+model.eval()
+
+valid_exts = (".jpg", ".jpeg", ".png", ".bmp")
+test_imgs = [
+    f
+    for f in sorted(os.listdir(test_img_dir))
+    if f.lower().endswith(valid_exts) and os.path.isfile(os.path.join(test_img_dir, f))
+]
+
+test_df = pd.DataFrame(test_imgs, columns=["id"])
+
+test_dataset = CactusDataset(test_df, test_img_dir, test_transform, is_train=False)
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=batch_size,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=True,
+)
+
+predictions = []
+with torch.no_grad():
+    for imgs, _ in test_loader:
+        imgs = imgs.to(device)
+        logits = model(imgs)
+        probs = torch.sigmoid(logits).cpu().numpy().flatten()
+        predictions.extend(probs.tolist())
+
+submission = pd.DataFrame({"id": test_df["id"], "has_cactus": predictions})
+submission.to_csv("sub.csv", index=False)
+print("Submission saved to sub.csv")

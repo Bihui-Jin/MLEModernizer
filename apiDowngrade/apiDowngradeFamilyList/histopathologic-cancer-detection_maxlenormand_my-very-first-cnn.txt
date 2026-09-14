@@ -1,0 +1,10 @@
+ipython<=7.2.0
+keras<=2.2.4
+matplotlib<=3.0.2
+numpy<=1.16.1
+opencv-python<=4.0.0.21
+opencv-python-headless<=4.0.0.21
+pandas<=0.24.1
+pillow<=5.4.1
+pydot<=1.4.1
+tensorflow<=1.12.0

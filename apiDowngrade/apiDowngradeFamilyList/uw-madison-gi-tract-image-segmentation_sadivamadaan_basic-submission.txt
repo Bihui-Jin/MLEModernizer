@@ -1,0 +1,5 @@
+fastai<=2.5.6
+matplotlib<=3.5.1
+opencv-python<=3.4.17.63
+opencv-python-headless<=3.4.17.63
+pandas<=1.4.2

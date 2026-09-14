@@ -1,0 +1,10 @@
+matplotlib<=3.2.1
+nltk<=3.5
+numpy<=1.18.5
+pandas<=1.0.4
+plotly<=4.8.1
+scikit-learn<=0.23.1
+seaborn<=0.10.1
+spacy<=2.3.0.dev1
+tqdm<=4.46.1
+wordcloud<=1.7.0

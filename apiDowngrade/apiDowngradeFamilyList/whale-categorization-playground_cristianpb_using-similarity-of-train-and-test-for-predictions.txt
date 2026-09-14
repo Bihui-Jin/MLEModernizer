@@ -1,0 +1,6 @@
+matplotlib<=2.1.1
+numpy<=1.14.0
+opencv-python<=3.4.0.14
+opencv-python-headless<=3.4.3.18
+pandas<=0.22.0
+pillow<=5.0.0

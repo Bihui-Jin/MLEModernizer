@@ -1,0 +1,4 @@
+numpy<=2.4.0rc1
+pandas<=3.0.0rc0
+torch<=2.9.1
+tqdm<=4.67.1

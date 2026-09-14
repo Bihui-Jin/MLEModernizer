@@ -1,0 +1,7 @@
+numpy<=1.18.3
+opencv-python<=4.2.0.34
+opencv-python-headless<=4.2.0.34
+pandas<=1.0.3
+scikit-learn<=0.22.2.post1
+tqdm<=4.45.0
+xgboost<=1.1.0rc1

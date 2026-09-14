@@ -1,0 +1,8 @@
+fastai<=2.1.9
+torch<=1.7.1
+opencv-python<=4.4.0.46
+pandas<=1.1.5
+numpy<=1.19.4
+opencv-python-headless<=4.4.0.46
+matplotlib<=3.3.3
+plotly<=4.14.1

@@ -1,0 +1,11 @@
+albumentations<=0.4.6
+efficientnet-pytorch<=0.7.0
+matplotlib<=2.2.5
+numpy<=1.18.5
+opencv-python<=3.4.11.41
+opencv-python-headless<=4.3.0.38
+pandas<=0.25.3
+scikit-image<=0.14.5
+scikit-learn<=0.22.2.post1
+torch<=1.5.1
+torchvision<=0.8.2

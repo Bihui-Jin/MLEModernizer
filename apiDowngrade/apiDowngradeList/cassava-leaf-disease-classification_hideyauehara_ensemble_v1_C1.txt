@@ -1,0 +1,11 @@
+albumentations<=0.5.2
+efficientnet-pytorch<=0.7.0
+matplotlib<=3.3.4
+numpy<=1.20.0
+opencv-python<=3.4.13.47
+opencv-python-headless<=3.4.13.47
+pandas<=1.2.1
+seaborn<=0.11.1
+torch<=1.7.1
+torchvision<=0.8.2
+tqdm<=4.56.0

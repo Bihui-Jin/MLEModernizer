@@ -1,0 +1,5 @@
+fastai<=1.0.61
+numpy<=1.19.1
+pandas<=1.1.0
+scipy<=1.5.2
+tqdm<=4.48.2

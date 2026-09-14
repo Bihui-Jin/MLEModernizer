@@ -1,0 +1,8 @@
+sentiwordnet
+averaged_perceptron_tagger
+popular
+punkt
+wordnet
+omw-1.4
+stopwords
+vader_lexicon

@@ -1,0 +1,7 @@
+numpy<=1.16.6
+opencv-python<=4.3.0.38
+opencv-python-headless<=4.3.0.38
+pandas<=0.24.2
+pytorch-lightning<=0.5.3.1
+scikit-learn<=0.20.4
+torch<=1.5.1

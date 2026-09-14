@@ -1,0 +1,7 @@
+joblib<=1.4.2
+lightning<=2.4.0.dev20240630
+numpy<=2.0.0
+pandas<=2.2.2
+torch<=2.3.1
+tqdm<=4.66.4
+transformers<=4.42.3

@@ -1,0 +1,104 @@
+# docker pull gcr.io/kaggle-images/python:latest (CPU-only) or gcr.io/kaggle-gpu-images/python:latest (GPU)
+# docker pull gcr.io/kaggle-gpu-images/python@sha256:7a9d2a6b13b3566aa6cc5a22447f3b3f99acf55dce44408deb90584b6d4b0dde
+# Then build as follows:
+# docker build --platform=linux/amd64 -t kaggle_coding -f docker/Dockerfile.base . 
+FROM gcr.io/kaggle-gpu-images/python:7a9d2a6b13b3566aa6cc5a22447f3b3f99acf55dce44408deb90584b6d4b0dde
+
+# Avoid interactive dialog
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 1. Install system dependencies and build tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    apt-utils ca-certificates gnupg \
+    curl wget git vim nano unzip zip p7zip-full \
+    build-essential libssl-dev zlib1g-dev \
+    libbz2-dev libreadline-dev libsqlite3-dev llvm \
+    libncurses5-dev libncursesw5-dev xz-utils tk-dev \
+    libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
+    # python-openssl \
+    sudo openssh-server tmux gettext ffmpeg libsm6 libxext6 \
+    && rm -rf /var/lib/apt/lists/* # removes cache
+
+# # 2. Install basic APIs that kaggle images do not include
+# ARG REQUIREMENTS=/tmp/requirements.txt
+# COPY baseline/requirements.txt ${REQUIREMENTS}
+# RUN pip install --upgrade pip setuptools wheel && \
+#     # python -m pip install --upgrade pip && \
+#     pip install pip-tools && \
+#     # grep -v '^#' ${REQUIREMENTS} | xargs -n 1 pip install --prefer-binary 
+#     # grep -v '^#' ${REQUIREMENTS} | xargs -n 1 sh -c 'pip install --prefer-binary "$1" || echo "SKIPPED: $1"' _ || true
+#     pip-compile -o --upgrade ${REQUIREMENTS}
+#     # pip install -r ${REQUIREMENTS} --prefer-binary 
+#     #--no-deps --ignore-installed  
+
+# 2. Install NVIDIA container toolkit
+RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+RUN sudo apt-get update
+
+RUN export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1 \
+  && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+      libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+
+RUN sudo nvidia-ctk runtime configure --runtime=docker
+
+# 3. Install pyenv to manage multiple Python versions
+ENV PYENV_ROOT="/opt/pyenv"
+# ENV PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+ENV PATH="/usr/local/bin:/usr/bin:/bin:$PYENV_ROOT/shims:$PYENV_ROOT/bin"
+RUN curl -fsSL https://pyenv.run | bash
+
+# 4. Preload NLTK corpora
+COPY baseline/nltk_corpora.txt /tmp/nltk_corpora.txt
+RUN python - <<EOF
+import ssl, nltk
+
+with open("/tmp/nltk_corpora.txt") as f:
+    corpora = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+
+# allow unverified HTTPS context (for corporate proxies or missing certs)
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+# non-interactive, quiet downloads
+for pkg in corpora:
+    nltk.download(pkg, quiet=True)
+    
+EOF
+
+# 5. Pre-install necessary Python versions using pyenv
+# Add interactive shell initialization
+RUN echo 'export PYENV_ROOT="/opt/pyenv"' >> /root/.bashrc && \
+    echo 'export PATH="/usr/local/bin:/usr/bin:/bin:$PYENV_ROOT/shims:$PYENV_ROOT/bin"' >> /root/.bashrc && \
+    echo 'eval "$(pyenv init -)"' >> /root/.bashrc
+# Creating Virtual Environments and Installing Requirements
+WORKDIR /opt/venvs
+
+
+# 6. Copy requirement files and run environment builder
+COPY apiDowngrade/apiDowngradeFamilyList /tmp/requirements/
+COPY apiDowngrade/apiDowngradeList /tmp/requirements/
+COPY docker/install_envs.sh /opt/install_envs.sh
+RUN chmod +x /opt/install_envs.sh
+
+RUN mkdir -p \
+    /kaggle \
+    /kaggle/input \
+    /kaggle/data \
+    /kaggle/working \
+    && chmod -R a+rwx /kaggle
+
+# Reset DEBIAN_FRONTEND
+ENV DEBIAN_FRONTEND=
+USER root
+WORKDIR /kaggle/working

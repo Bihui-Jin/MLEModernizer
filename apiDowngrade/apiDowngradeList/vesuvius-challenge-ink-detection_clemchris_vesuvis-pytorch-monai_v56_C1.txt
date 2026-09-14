@@ -1,0 +1,11 @@
+lovely-numpy<=0.2.9.dev1
+matplotlib<=3.7.1
+monai<=1.1.0
+numpy<=1.24.2
+pandas<=2.0.0
+pillow<=9.5.0
+pytorch-lightning<=2.0.1.post0
+seaborn<=0.12.2
+torch<=2.0.0
+torchmetrics<=0.11.4
+tqdm<=4.65.0

@@ -1,0 +1,7 @@
+keras<=2.4.3
+numpy<=1.19.5
+opencv-python<=3.4.13.47
+opencv-python-headless<=3.4.13.47
+pandas<=1.2.0
+pillow<=8.1.0
+tensorflow<=1.15.5

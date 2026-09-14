@@ -1,0 +1,5 @@
+geopy<=1.15.0
+numpy<=1.15.0
+pandas<=0.23.3
+scikit-learn<=0.19.2
+xgboost<=0.72.1

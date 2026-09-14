@@ -1,0 +1,5 @@
+matplotlib<=2.2.2
+numpy<=1.15.0
+pandas<=0.23.4
+tensorflow<=1.9.0
+word2vec<=0.9.4

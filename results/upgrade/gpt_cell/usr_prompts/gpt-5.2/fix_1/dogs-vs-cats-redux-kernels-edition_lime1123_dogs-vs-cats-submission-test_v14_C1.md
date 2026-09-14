@@ -1,0 +1,426 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.13
+
+# 2. Installed packages
+
+No external packages required in the script and installed.
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+        input/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+        working/
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+```
+
+-> data/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> data/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> working/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+# 4. Code solution
+
+## === cell 0
+%%bash
+
+if [ ! -d "/kaggle/working/train" ]; then
+    unzip -q /kaggle/input/dogs-vs-cats-redux-kernels-edition/train.zip -d /kaggle/working
+fi
+
+if [ ! -d "/kaggle/working/test" ]; then
+    unzip -q /kaggle/input/dogs-vs-cats-redux-kernels-edition/test.zip -d /kaggle/working
+fi
+
+
+## === cell 1
+import os
+import glob
+import numpy as np
+import random
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import pytorch_lightning as pl
+from torch.utils.data import Dataset, DataLoader
+from torchvision import models
+import cv2
+import timm
+from torch.optim.lr_scheduler import _LRScheduler
+import math
+import pandas as pd
+import tqdm
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint, TQDMProgressBar
+import albumentations as A
+from albumentations.pytorch import ToTensorV2   
+from sklearn.model_selection import KFold
+import pprint
+
+
+## === cell 2
+class Config:
+    dog = 1
+    cat = 0
+    train_dir = '/kaggle/working/train'
+    test_dir = '/kaggle/working/test'
+    n_fold = 5
+    num_workers = 16
+    pin_memory = True
+    batch_size = 64
+    seed = 2025
+    drop_last = True
+    device = 'cuda'
+    epochs = 2
+    early_stopping = 3
+    lr = 1e-5
+    optimizer = torch.optim.AdamW
+    warmup_epochs = 0
+    criterion = nn.BCEWithLogitsLoss()
+    size = (320, 320)
+
+cfg = Config()
+
+
+## === cell 3
+def square_pad_and_resize(image, size):
+    h, w, _ = image.shape
+    
+    max_dim = max(h, w)
+    
+    top = (max_dim - h) // 2
+    bottom = max_dim - h - top
+    left = (max_dim - w) // 2
+    right = max_dim - w - left
+    
+    padded_image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+    
+    resized_image = cv2.resize(padded_image, (size))
+    return resized_image
+
+class DC_Dataset(Dataset):
+    def __init__(self, paths, valid=False):
+        super().__init__()
+        self.paths = paths
+        self.valid = valid
+
+        if not self.valid:
+            self.transform = transform = A.Compose([
+                A.ShiftScaleRotate(shift_limit=0.2, scale_limit=0.2, rotate_limit=15, p=0.5),
+                A.HorizontalFlip(p=0.5),
+                A.Normalize(),
+                ToTensorV2(),
+            ])
+        else:
+            self.transform = transform = A.Compose([
+                A.Normalize(),
+                ToTensorV2(),
+            ])
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, index):
+        img = square_pad_and_resize(cv2.imread(self.paths[index]), cfg.size)
+        img = self.transform(image=img)['image']
+        return img
+
+class DC_Model(pl.LightningModule):
+    def __init__(self, model_name='convnext_small', pretrained=True, num_batch=0, fold=0):
+        super().__init__()
+        if 'vit' in model_name or 'convnext' in model_name:
+            self.model = timm.create_model(
+                model_name,
+                pretrained=pretrained,
+                num_classes=1,
+            )
+        else:
+            self.model = timm.create_model(
+                model_name,
+                pretrained=pretrained,
+            )
+            self.model.classifier = nn.Linear(self.model.classifier.in_features, 1)
+        self.fold = fold
+        self.num_batch = num_batch
+        self.criterion = cfg.criterion
+        self.model_name = model_name
+        self.pretrained = pretrained
+
+        self.save_hyperparameters()
+
+    def forward(self, x):
+        return self.model(x).squeeze()
+
+    def training_step(self, batch, batch_idx):
+        img, label = batch
+        output = self(img)
+        loss = self.criterion(output, label)
+        self.log('train_loss', loss, prog_bar=True)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        img, label = batch
+        output = self(img)
+        loss = self.criterion(output, label)
+        pred = torch.sigmoid(output) > 0.5
+        acc = (pred == label).float().mean()
+        self.log('val_loss', loss, prog_bar=True)
+        self.log('val_acc', acc, prog_bar=True)
+        return loss
+
+    def test_step(self, batch, batch_idx):
+        img, label = batch
+        output = self(img)
+        loss = self.criterion(output, label)
+        pred = torch.sigmoid(output) > 0.5
+        acc = (pred == label).float().mean()
+        self.log('test_loss', loss, prog_bar=True)
+        self.log('test_acc', acc, prog_bar=True)
+
+    def configure_optimizers(self):
+        optimizer = cfg.optimizer(self.parameters(), lr=cfg.lr, weight_decay=0.1)
+        scheduler = WarmupCosineAnnealingLR(optimizer, warmup_epochs=cfg.warmup_epochs*self.num_batch, total_epochs=cfg.epochs*self.num_batch+1)
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": {
+                "scheduler": scheduler,
+                "interval": "step",
+                "frequency": 1,
+            }
+        }
+
+def collate(x):
+    return x
+
+
+## === cell 4
+test_paths = glob.glob(cfg.test_dir + '/*')
+image_ids = []
+
+for path in test_paths:
+    image_ids.append(os.path.basename(path).split('.')[0])
+
+
+## === cell 5
+model_paths = glob.glob('/kaggle/input/dogs-vs-cats-lightning/lightning_logs/version_*/checkpoints/*.ckpt')
+pprint.pprint(model_paths)
+
+
+## === cell 6
+outputs = []
+
+
+## === cell 7
+test_dataset = DC_Dataset(test_paths, valid=True)
+test_loader = DataLoader(
+    test_dataset, batch_size=cfg.batch_size, shuffle=False,
+    num_workers=cfg.num_workers, pin_memory=cfg.pin_memory,
+)
+
+
+## === cell 8
+for model_path in model_paths:
+    model = DC_Model.load_from_checkpoint(model_path)
+    trainer = pl.Trainer(
+        accelerator='gpu',
+        precision='16-mixed',
+        log_every_n_steps=10,
+        enable_checkpointing=False,
+        gradient_clip_val=1.0,
+    )
+    predict = trainer.predict(model, test_loader)
+    outputs.append(predict)
+
+
+## === cell 9
+output_ = [torch.cat(output) for output in outputs]
+outputs = torch.stack(output_)
+outputs = outputs.mean(dim=0)
+outputs = torch.sigmoid(outputs)
+
+
+## --- ERROR in cell 9, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/3016871444.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m      1[0m [0moutput_[0m [0;34m=[0m [0;34m[[0m[0mtorch[0m[0;34m.[0m[0mcat[0m[0;34m([0m[0moutput[0m[0;34m)[0m [0;32mfor[0m [0moutput[0m [0;32min[0m [0moutputs[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 2[0;31m [0moutputs[0m [0;34m=[0m [0mtorch[0m[0;34m.[0m[0mstack[0m[0;34m([0m[0moutput_[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      3[0m [0moutputs[0m [0;34m=[0m [0moutputs[0m[0;34m.[0m[0mmean[0m[0;34m([0m[0mdim[0m[0;34m=[0m[0;36m0[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      4[0m [0moutputs[0m [0;34m=[0m [0mtorch[0m[0;34m.[0m[0msigmoid[0m[0;34m([0m[0moutputs[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mRuntimeError[0m: stack expects a non-empty TensorList
+
+## === cell 10
+for clip in [0.01, 0.005, 0.015, 0.0125, 0.0025, 0, 0.0075, 0.004]:
+    submission = pd.DataFrame({'id':image_ids, 'label':torch.clamp(outputs, min=clip, max=1-clip).tolist()})
+    submission['id'] = pd.to_numeric(submission['id'])
+    submission = submission.sort_values(by='id')
+    submission.to_csv(f'/kaggle/working/submission-clip={clip}.csv', index=False)

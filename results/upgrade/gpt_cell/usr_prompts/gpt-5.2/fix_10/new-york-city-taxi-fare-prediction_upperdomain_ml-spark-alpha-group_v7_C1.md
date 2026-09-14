@@ -1,0 +1,508 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+4.07608
+
+# 6. Current score
+
+5.46072
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 5.44092) has done: 'Diagnosis: Cell 7 crashes because `sklearn.impute.SimpleImputer` (scikit-learn 1.2.2) no longer accepts the `axis` argument, and `missing_values='NaN'` is also incorrect for representing actual NaN values. The rest of the cell doesn’t actually use the imputer output, but removing the invalid parameters is the minimal change to unblock execution while preserving the same model training logic.  
+Patch summary: Update the `SimpleImputer` initialization to remove the unsupported `axis` parameter and use `missing_values=np.nan` to correctly denote NaNs. Keep all other logic (fit, model, training, scoring) unchanged.  
+Updated cells: Only cell 7 is modified.  
+Compatibility notes for cell k+1: All variables created in cell 7 (`imp`, `regr`) remain defined as before; downstream cells are unaffected.  
+Assumptions: The intent was to impute NaN values column-wise (default behavior), and training data is numeric so `np.nan` is the correct missing marker.'
+- What this solution (achieved 7.25567) has done: 'Your current score is worse than the target (RMSE 5.44092 vs 4.07608), so we should improve predictive accuracy with the smallest changes that don’t alter the core model/training approach. The biggest issue is that the imputer is fit but never actually applied to `train_X`/`test_X`, while it *is* applied to the test features at inference—this train/serve mismatch can hurt score; we apply the same transform to train and validation features. Second, `distance_travel()` can create NaNs/Infs when latitude differences are zero; we make the angle computation numerically safe to reduce bad rows/features without changing the feature definition. Finally, we ensure the submission uses finite, non-negative fares (a legitimate post-processing consistent with the problem) to avoid extreme errors.'
+- What this solution (achieved 6.05799) has done: 'We keep your exact feature set and model (GradientBoostingRegressor on distance_travel + passenger_count + bias) but fix two small issues that hurt RMSE: (1) the current train/validation split is order-based (first 70% vs last 30%), which can create distribution shift; we switch to a deterministic random split while keeping the same 70/30 ratio. (2) `distance_travel` is computed on the raw data without removing invalid/NaN coordinates, so extreme/NaN distances can slip into training and test; we add minimal coordinate sanity filtering (NYC bounding box + finite checks) and apply the same cleaning to both train and test before feature building. These are minimal, metric-aligned fixes that typically move RMSE down toward your 4.07608 target without changing your core approach.'
+- What this solution (achieved 6.34982) has done: 'I make two minimal, score-relevant fixes to move RMSE down toward your 4.07608 target without changing the model/feature core. First, your test preprocessing currently *drops rows* via `clean_coords(tdf)`, then merges back to the sample keys and fills missing predictions with a mean—this hurts RMSE; instead we keep all test rows and only clip/repair invalid coordinates so every key gets a model-based prediction. Second, your cleaning is applied as row filtering on train but should be consistent and less destructive; we keep your training filters but implement a non-dropping “repair” path used only for test to avoid NaNs/Infs while preserving row alignment. Everything else (distance feature, GradientBoostingRegressor, imputer, and training loop) remains the same.'
+- What this solution (achieved 5.49404) has done: 'We make two minimal, score-relevant fixes to reduce RMSE toward your 4.07608 target without changing your core approach (same distance feature + passenger_count + bias and the same GradientBoostingRegressor training). First, we align the training objective with the Kaggle metric by training the regressor on `log1p(fare_amount)` and then invert with `expm1` at prediction time; this is a common, lightweight stabilization for skewed, positive fares and typically improves RMSE with the same model. Second, we apply the exact same “repair (no-drop) + distance_travel + bad distance imputation” preprocessing to the *training* dataframe before filtering/splitting, so train/test feature distributions match what you do at inference. Everything else (filters, model type, n_estimators, submission schema/path) stays the same.'
+- What this solution (achieved 5.45023) has done: 'Your RMSE is still above the target, so the smallest likely win is to keep the exact same model/features but fix train/test distribution mismatch caused by how you “repair then filter” only in training. I (1) compute `distance_travel` on the raw data, then apply your coordinate cleaning, then **recompute** `distance_travel` on the cleaned rows so the feature is consistent with what the model sees; (2) add a minimal, metric-aligned time feature (pickup hour) derived from the already-present `pickup_datetime` and include it as an additional numeric input (same GradientBoostingRegressor, same training loop/loss, no new model). These are small, legitimate changes that usually move RMSE down without altering the overall approach. Submission writing and schema remain unchanged.'
+- What this solution (achieved 5.46072) has done: 'The timeout is dominated by heavy pandas work on 1,000,000 rows: repeated DataFrame filtering in `clean_coords`, multiple passes of `distance_travel`, expensive `pd.to_datetime` with UTC, and plotting. I keep the same model/training logic and identical feature definitions, but reduce overhead by (a) reading only needed columns with explicit dtypes, (b) vectorizing/avoiding repeated DataFrame slicing inside loops, (c) computing distance once per stage using NumPy arrays (still producing the same `distance_travel`), and (d) skipping plots (they don’t affect the submission). These changes preserve evaluation semantics while cutting CPU and memory overhead enough to fit within 600 seconds.'
+
+# 9. Code solution
+
+## === cell 0
+from sklearn.impute import SimpleImputer as Imputer
+import numpy as np  # linear algebra
+from scipy.interpolate import griddata
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+
+import math
+import os
+
+print(os.listdir("../input"))
+
+pd.options.mode.chained_assignment = None
+np.random.seed(21)
+
+
+
+## === cell 1
+train_path = "../input/train.csv"
+usecols_train = [
+    "key",
+    "fare_amount",
+    "pickup_datetime",
+    "pickup_longitude",
+    "pickup_latitude",
+    "dropoff_longitude",
+    "dropoff_latitude",
+    "passenger_count",
+]
+dtypes_train = {
+    "key": "string",
+    "fare_amount": "float32",
+    "pickup_longitude": "float32",
+    "pickup_latitude": "float32",
+    "dropoff_longitude": "float32",
+    "dropoff_latitude": "float32",
+    "passenger_count": "float32",
+}
+df = pd.read_csv(train_path, nrows=10_00_000, usecols=usecols_train, dtype=dtypes_train)
+df.head()
+
+
+
+## === cell 2
+df = df[df.passenger_count > 0]
+df = df[df.fare_amount > 0]
+df.head()
+
+
+
+## === cell 3
+alpha_ang = 0.506
+
+
+def distance_travel(df):
+    plon = df["pickup_longitude"].to_numpy(dtype=np.float64, copy=False)
+    plat = df["pickup_latitude"].to_numpy(dtype=np.float64, copy=False)
+    dlon = df["dropoff_longitude"].to_numpy(dtype=np.float64, copy=False)
+    dlat = df["dropoff_latitude"].to_numpy(dtype=np.float64, copy=False)
+
+    abs_diff_longitude = np.abs(dlon - plon) * 50.0
+    abs_diff_latitude = np.abs(dlat - plat) * 69.0
+    dv = np.sqrt(
+        abs_diff_latitude * abs_diff_latitude + abs_diff_longitude * abs_diff_longitude
+    )
+
+    angle = np.arctan2(abs_diff_longitude, abs_diff_latitude) - alpha_ang
+    actual_long = np.abs(dv * np.sin(angle))
+    actual_lat = np.abs(dv * np.cos(angle))
+    df["distance_travel"] = (actual_long + actual_lat).astype("float32", copy=False)
+
+
+def clean_coords(df):
+    cols = [
+        "pickup_longitude",
+        "pickup_latitude",
+        "dropoff_longitude",
+        "dropoff_latitude",
+        "passenger_count",
+    ]
+    arr = np.column_stack([df[c].to_numpy(copy=False) for c in cols])
+    finite_mask = np.isfinite(arr).all(axis=1)
+
+    df = df.loc[finite_mask]
+    df = df[
+        (df.pickup_longitude.between(-74.3, -73.7))
+        & (df.dropoff_longitude.between(-74.3, -73.7))
+        & (df.pickup_latitude.between(40.5, 41.0))
+        & (df.dropoff_latitude.between(40.5, 41.0))
+    ]
+    return df
+
+
+def repair_coords_no_drop(df):
+    df = df.copy()
+
+    coord_cols = [
+        "pickup_longitude",
+        "pickup_latitude",
+        "dropoff_longitude",
+        "dropoff_latitude",
+        "passenger_count",
+    ]
+
+    for c in coord_cols:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    pc = df["passenger_count"].to_numpy()
+    pc_bad = ~np.isfinite(pc) | (pc <= 0)
+    if pc_bad.any():
+        df.loc[pc_bad, "passenger_count"] = 1.0
+
+    bounds = {
+        "pickup_longitude": (-74.3, -73.7),
+        "dropoff_longitude": (-74.3, -73.7),
+        "pickup_latitude": (40.5, 41.0),
+        "dropoff_latitude": (40.5, 41.0),
+    }
+    for c, (lo, hi) in bounds.items():
+        vals = df[c].to_numpy()
+        bad = ~np.isfinite(vals)
+        if bad.any():
+            med = float(np.nanmedian(vals))
+            if not np.isfinite(med):
+                med = (lo + hi) / 2.0
+            df.loc[bad, c] = med
+        df[c] = df[c].clip(lo, hi)
+
+    return df
+
+
+def add_time_features(df):
+    dt = pd.to_datetime(df["pickup_datetime"], errors="coerce", utc=True)
+    hr = dt.dt.hour.astype("float32")
+    if hr.isna().any():
+        med = float(np.nanmedian(hr.to_numpy()))
+        if not np.isfinite(med):
+            med = 12.0
+        hr = hr.fillna(med)
+    df["pickup_hour"] = hr
+    return df
+
+
+df = repair_coords_no_drop(df)
+df = add_time_features(df)
+
+distance_travel(df)
+dist_tr = df["distance_travel"].to_numpy(copy=False)
+bad_dist_tr = ~np.isfinite(dist_tr) | (dist_tr <= 0)
+if bad_dist_tr.any():
+    good = np.isfinite(dist_tr) & (dist_tr > 0)
+    fill_val = float(np.nanmedian(dist_tr[good]) if np.any(good) else 0.1)
+    df.loc[bad_dist_tr, "distance_travel"] = fill_val
+
+df = clean_coords(df)
+
+distance_travel(df)
+dist_tr = df["distance_travel"].to_numpy(copy=False)
+bad_dist_tr = ~np.isfinite(dist_tr) | (dist_tr <= 0)
+if bad_dist_tr.any():
+    good = np.isfinite(dist_tr) & (dist_tr > 0)
+    fill_val = float(np.nanmedian(dist_tr[good]) if np.any(good) else 0.1)
+    df.loc[bad_dist_tr, "distance_travel"] = fill_val
+
+df = df[np.isfinite(df.distance_travel.to_numpy())]
+df = df[df.distance_travel > 0]
+df.head()
+
+
+
+## === cell 4
+pass
+
+
+
+## === cell 5
+df = df[df.distance_travel < 30]
+df = df[df.fare_amount < 100]
+pass
+
+
+
+## === cell 6
+l = len(df)
+print(l)
+
+rng = np.random.RandomState(21)
+idx = rng.permutation(l)
+cut = int(0.7 * l)
+train_idx = idx[:cut]
+test_idx = idx[cut:]
+
+df_train = df.iloc[train_idx]
+df_test = df.iloc[test_idx]
+
+train_X = np.column_stack(
+    (
+        df_train.distance_travel.to_numpy(dtype=np.float32, copy=False),
+        df_train.passenger_count.to_numpy(dtype=np.float32, copy=False),
+        df_train.pickup_hour.to_numpy(dtype=np.float32, copy=False),
+        np.ones(len(df_train), dtype=np.float32),
+    )
+)
+test_X = np.column_stack(
+    (
+        df_test.distance_travel.to_numpy(dtype=np.float32, copy=False),
+        df_test.passenger_count.to_numpy(dtype=np.float32, copy=False),
+        df_test.pickup_hour.to_numpy(dtype=np.float32, copy=False),
+        np.ones(len(df_test), dtype=np.float32),
+    )
+)
+train_y = df_train.fare_amount.to_numpy(dtype=np.float32, copy=False)
+test_y = df_test.fare_amount.to_numpy(dtype=np.float32, copy=False)
+
+
+
+## === cell 7
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.metrics import mean_squared_error
+
+X_all = np.column_stack(
+    (
+        df.distance_travel.to_numpy(dtype=np.float32, copy=False),
+        df.passenger_count.to_numpy(dtype=np.float32, copy=False),
+        df.pickup_hour.to_numpy(dtype=np.float32, copy=False),
+        np.ones(len(df), dtype=np.float32),
+    )
+)
+y_all = df.fare_amount.to_numpy(dtype=np.float32, copy=False)
+
+imp = Imputer(missing_values=np.nan, strategy="mean")
+imp = imp.fit(X_all)
+
+train_X = imp.transform(train_X)
+test_X = imp.transform(test_X)
+X_all = imp.transform(X_all)
+
+train_y_log = np.log1p(train_y)
+test_y_log = np.log1p(test_y)
+y_all_log = np.log1p(y_all)
+
+regr_report = GradientBoostingRegressor(random_state=21, n_estimators=400)
+regr_report.fit(train_X, train_y_log)
+pred_log = regr_report.predict(test_X)
+pred = np.expm1(pred_log)
+pred = np.maximum(pred, 0.0)
+rmse = mean_squared_error(test_y, pred, squared=False)
+print("Holdout RMSE:", rmse)
+
+regr = GradientBoostingRegressor(random_state=21, n_estimators=400)
+regr.fit(X_all, y_all_log)
+
+
+
+## === cell 8
+test_path = "../input/test.csv"
+usecols_test = [
+    "key",
+    "pickup_datetime",
+    "pickup_longitude",
+    "pickup_latitude",
+    "dropoff_longitude",
+    "dropoff_latitude",
+    "passenger_count",
+]
+dtypes_test = {
+    "key": "string",
+    "pickup_longitude": "float32",
+    "pickup_latitude": "float32",
+    "dropoff_longitude": "float32",
+    "dropoff_latitude": "float32",
+    "passenger_count": "float32",
+}
+tdf = pd.read_csv(test_path, nrows=10_00_000, usecols=usecols_test, dtype=dtypes_test)
+
+tdf = repair_coords_no_drop(tdf)
+tdf = add_time_features(tdf)
+
+distance_travel(tdf)
+
+dist = tdf["distance_travel"].to_numpy(copy=False)
+bad_dist = ~np.isfinite(dist) | (dist <= 0)
+if bad_dist.any():
+    good = np.isfinite(dist) & (dist > 0)
+    tdf.loc[bad_dist, "distance_travel"] = float(
+        np.nanmedian(dist[good]) if np.any(good) else 0.1
+    )
+
+tdf.head()
+
+
+
+## === cell 9
+ttrain_X = np.column_stack(
+    (
+        tdf.distance_travel.to_numpy(dtype=np.float32, copy=False),
+        tdf.passenger_count.to_numpy(dtype=np.float32, copy=False),
+        tdf.pickup_hour.to_numpy(dtype=np.float32, copy=False),
+        np.ones(len(tdf), dtype=np.float32),
+    )
+)
+ttrain_X = imp.transform(ttrain_X)
+
+output_log = regr.predict(ttrain_X)
+output = np.expm1(output_log)
+
+output = np.where(np.isfinite(output), output, np.nan)
+if np.isnan(output).any():
+    output = np.nan_to_num(output, nan=float(np.nanmean(output)))
+output = np.maximum(output, 0.0)
+
+print(output)
+
+
+
+## === cell 10
+sample = pd.read_csv("../input/sample_submission.csv")
+
+my_submission = pd.DataFrame({"key": tdf["key"].values, "fare_amount": output})
+
+my_submission = sample[["key"]].merge(my_submission, on="key", how="left")
+
+if my_submission["fare_amount"].isna().any():
+    my_submission["fare_amount"] = my_submission["fare_amount"].fillna(
+        float(np.nanmean(output))
+    )
+
+my_submission.to_csv("submission.csv", index=False)
+my_submission.head()

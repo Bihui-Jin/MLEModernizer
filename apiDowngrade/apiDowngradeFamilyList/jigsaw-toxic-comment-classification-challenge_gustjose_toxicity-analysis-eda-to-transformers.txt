@@ -1,0 +1,5 @@
+matplotlib<=3.10.7
+numpy<=2.4.0rc1
+pandas<=3.0.0rc0
+scikit-learn<=1.8.0rc1
+seaborn<=0.13.2

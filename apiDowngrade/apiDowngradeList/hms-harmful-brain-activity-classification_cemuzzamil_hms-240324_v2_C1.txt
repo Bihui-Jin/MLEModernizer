@@ -1,0 +1,10 @@
+albumentations<=1.4.2
+matplotlib<=3.7.5
+numpy<=1.26.4
+opencv-python<=4.9.0.80
+opencv-python-headless<=4.9.0.80
+pandas<=2.2.1
+scipy<=1.13.0rc1
+timm<=0.9.16
+torch<=2.2.1
+tqdm<=4.66.2

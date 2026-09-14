@@ -1,0 +1,8 @@
+matplotlib<=3.7.0rc1
+numpy<=1.24.1
+opencv-python<=3.4.18.65
+opencv-python-headless<=3.4.18.65
+pandas<=1.5.3
+scikit-learn<=1.2.1
+torch<=1.13.1
+torchvision<=0.14.1

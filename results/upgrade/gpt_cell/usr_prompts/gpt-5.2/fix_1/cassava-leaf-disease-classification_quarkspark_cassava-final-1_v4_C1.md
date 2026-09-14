@@ -1,0 +1,441 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.9
+
+# 2. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import os, sys, cv2
+import torch
+import torchvision
+import torch.nn as nn
+import numpy as np
+import os, time, cv2, sys
+from PIL import Image
+import torchvision.transforms as transforms
+
+
+sz=224
+num_classes=4
+proj_dir = '/kaggle/input/cassava-leaf-disease-classification/'
+
+
+## === cell 1
+def softmax(X, theta=1.0, axis=None):
+    y = np.atleast_2d(X)
+
+    if axis is None:
+        axis = next(j[0] for j in enumerate(y.shape) if j[1] > 1)
+
+    y = y * float(theta)
+    y = y - np.expand_dims(np.max(y, axis=axis), axis)
+    y = np.exp(y)
+    ax_sum = np.expand_dims(np.sum(y, axis=axis), axis)
+    p = y / ax_sum
+    if len(X.shape) == 1: p = p.flatten()
+    return p
+
+
+## === cell 2
+def light_model(num_classes):
+    squeezenet_custom=torchvision.models.squeezenet1_0(pretrained=False)
+
+    classifier = nn.Sequential(
+        nn.Dropout(0.5),
+        nn.Conv2d(in_channels=512
+                  , out_channels=num_classes
+                  , kernel_size=(1, 1)
+                  , stride=(1, 1)
+                  , padding=(1, 1)),
+        nn.ReLU(inplace=True),
+        nn.AdaptiveAvgPool2d((1, 1))
+    )
+
+    squeezenet_custom.classifier = classifier
+    return squeezenet_custom
+
+squeezenet_custom_4 = light_model(4)
+squeezenet_custom_2 = light_model(2)
+
+
+## === cell 3
+
+leaf_transform=transforms.Compose([
+    transforms.CenterCrop(400)
+    , transforms.Resize(size=(224, 224))
+    
+    , transforms.ToTensor()
+    , transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+
+## === cell 4
+minority_idx = {
+    0: 0
+    , 1: 1
+    , 2: 2
+    , 3: 4    
+}
+
+binary_idx = {
+    0: '0_1_2_4'
+    , 1: 3
+}
+
+
+## === cell 5
+weight_dir='../input/cassava-models'
+model_1_path=os.path.join(weight_dir, 'minority_weights.pth')
+model_2_path=os.path.join(weight_dir, 'binary_weights.pth')
+
+
+## === cell 6
+model_1=torch.load(model_1_path, map_location=torch.device('cpu'))
+weights_1 = model_1.state_dict()
+squeezenet_custom_4.load_state_dict(weights_1)
+squeezenet_custom_4.eval()
+
+model_2=torch.load(model_2_path, map_location=torch.device('cpu'))
+weights_2 = model_2.state_dict()
+squeezenet_custom_2.load_state_dict(weights_2)
+squeezenet_custom_2.eval()
+
+
+## --- ERROR in cell 6, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mFileNotFoundError[0m                         Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/4283133212.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[0;32m----> 1[0;31m [0mmodel_1[0m[0;34m=[0m[0mtorch[0m[0;34m.[0m[0mload[0m[0;34m([0m[0mmodel_1_path[0m[0;34m,[0m [0mmap_location[0m[0;34m=[0m[0mtorch[0m[0;34m.[0m[0mdevice[0m[0;34m([0m[0;34m'cpu'[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      2[0m [0mweights_1[0m [0;34m=[0m [0mmodel_1[0m[0;34m.[0m[0mstate_dict[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0msqueezenet_custom_4[0m[0;34m.[0m[0mload_state_dict[0m[0;34m([0m[0mweights_1[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      4[0m [0msqueezenet_custom_4[0m[0;34m.[0m[0meval[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      5[0m [0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/torch/serialization.py[0m in [0;36mload[0;34m(f, map_location, pickle_module, weights_only, mmap, **pickle_load_args)[0m
+[1;32m   1423[0m         [0mpickle_load_args[0m[0;34m[[0m[0;34m"encoding"[0m[0;34m][0m [0;34m=[0m [0;34m"utf-8"[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   1424[0m [0;34m[0m[0m
+[0;32m-> 1425[0;31m     [0;32mwith[0m [0m_open_file_like[0m[0;34m([0m[0mf[0m[0;34m,[0m [0;34m"rb"[0m[0;34m)[0m [0;32mas[0m [0mopened_file[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m   1426[0m         [0;32mif[0m [0m_is_zipfile[0m[0;34m([0m[0mopened_file[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   1427[0m             [0;31m# The zipfile reader is going to advance the current file position.[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/torch/serialization.py[0m in [0;36m_open_file_like[0;34m(name_or_buffer, mode)[0m
+[1;32m    749[0m [0;32mdef[0m [0m_open_file_like[0m[0;34m([0m[0mname_or_buffer[0m[0;34m,[0m [0mmode[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    750[0m     [0;32mif[0m [0m_is_path[0m[0;34m([0m[0mname_or_buffer[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 751[0;31m         [0;32mreturn[0m [0m_open_file[0m[0;34m([0m[0mname_or_buffer[0m[0;34m,[0m [0mmode[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    752[0m     [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    753[0m         [0;32mif[0m [0;34m"w"[0m [0;32min[0m [0mmode[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/torch/serialization.py[0m in [0;36m__init__[0;34m(self, name, mode)[0m
+[1;32m    730[0m [0;32mclass[0m [0m_open_file[0m[0;34m([0m[0m_opener[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    731[0m     [0;32mdef[0m [0m__init__[0m[0;34m([0m[0mself[0m[0;34m,[0m [0mname[0m[0;34m,[0m [0mmode[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 732[0;31m         [0msuper[0m[0;34m([0m[0;34m)[0m[0;34m.[0m[0m__init__[0m[0;34m([0m[0mopen[0m[0;34m([0m[0mname[0m[0;34m,[0m [0mmode[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    733[0m [0;34m[0m[0m
+[1;32m    734[0m     [0;32mdef[0m [0m__exit__[0m[0;34m([0m[0mself[0m[0;34m,[0m [0;34m*[0m[0margs[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mFileNotFoundError[0m: [Errno 2] No such file or directory: '../input/cassava-models/minority_weights.pth'
+
+## === cell 7
+def prediction_logic(img, squeezenet_custom_4, squeezenet_custom_2, thresh_3=0.65):
+    
+    preds_minority = softmax(squeezenet_custom_4(img).cpu().detach().numpy())
+    preds_binary = softmax(squeezenet_custom_2(img).cpu().detach().numpy())
+    binary_cls=np.argmax(preds_binary)
+    minority_cls=np.argmax(preds_minority)
+    
+    cls_3 = preds_binary[0][1]
+
+    if cls_3 < thresh_3:
+        return minority_idx[minority_cls]
+    else: 
+        return binary_idx[binary_cls]

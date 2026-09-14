@@ -1,0 +1,11 @@
+brown
+wordnet
+sentiwordnet
+vader_lexicon
+names
+omw-1.4
+stopwords
+averaged_perceptron_tagger
+popular
+words
+punkt

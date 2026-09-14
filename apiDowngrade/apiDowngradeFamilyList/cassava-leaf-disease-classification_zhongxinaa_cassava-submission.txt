@@ -1,0 +1,10 @@
+keras<=3.3.2
+matplotlib<=3.9.0rc2
+numpy<=1.26.4
+opencv-python<=4.9.0.80
+opencv-python-headless<=4.9.0.80
+pandas<=2.2.2
+pillow<=10.3.0
+scikit-learn<=1.4.2
+seaborn<=0.13.2
+tensorflow<=2.16.1

@@ -1,0 +1,6 @@
+[submodule "papers/issta26"]
+	path = papers/issta26
+	url = https://git@git.overleaf.com/696e845973f96f4de4611a40
+[submodule "papers/issta26-mrletter"]
+	path = papers/issta26-mrletter
+	url = https://git@git.overleaf.com/6a0f754cfe4c96e909033390

@@ -1,0 +1,4 @@
+fastai<=2.2.5
+numpy<=1.19.5
+pandas<=1.2.1
+tensorflow<=2.4.1

@@ -1,0 +1,4 @@
+albumentations<=0.5.2
+numpy<=1.20.1
+pandas<=1.2.2
+torch<=1.7.1

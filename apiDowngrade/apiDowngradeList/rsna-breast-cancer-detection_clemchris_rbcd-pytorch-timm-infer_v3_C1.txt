@@ -1,0 +1,12 @@
+dicomsdl<=0.109.1
+joblib<=1.1.1
+numpy<=1.24.1
+opencv-python<=3.4.18.65
+opencv-python-headless<=3.4.18.65
+pandas<=1.5.2
+pillow<=9.3.0
+pytorch-lightning<=1.8.6
+seaborn<=0.12.1
+timm<=0.8.3.dev0
+torch<=1.13.1
+tqdm<=4.64.1

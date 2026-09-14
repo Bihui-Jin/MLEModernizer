@@ -1,0 +1,5 @@
+fastai<=2.7.18
+fastcore<=1.7.29
+numpy<=2.2.3
+pandas<=2.2.3
+scikit-learn<=1.6.1

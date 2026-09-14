@@ -1,0 +1,10 @@
+librosa<=0.10.1
+matplotlib<=3.7.5
+numpy<=1.26.4
+pandas<=2.2.1
+scikit-learn<=1.4.1.post1
+scipy<=1.12.0
+torch<=2.2.1
+torchaudio<=2.2.1
+torchvision<=0.17.1
+tqdm<=4.66.2

@@ -1,0 +1,545 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.6
+
+# 2. Installed packages
+
+No external packages required in the script and installed.
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (99 lines)
+            sample_submission.csv (322 lines)
+            sample_submission.csv.7z (2.0 kB)
+            sample_submission.csv.zip (2.0 kB)
+            test.json (1 lines)
+            test.json.7z (8.9 MB)
+            train.json (1 lines)
+            train.json.7z (35.8 MB)
+            statoil-iceberg-classifier-challenge/
+                description.md (99 lines)
+                sample_submission.csv (322 lines)
+                ... and 6 other files
+                statoil-iceberg-classifier-challenge/
+        input/
+            description.md (99 lines)
+            sample_submission.csv (322 lines)
+            sample_submission.csv.7z (2.0 kB)
+            sample_submission.csv.zip (2.0 kB)
+            test.json (1 lines)
+            test.json.7z (8.9 MB)
+            train.json (1 lines)
+            train.json.7z (35.8 MB)
+            statoil-iceberg-classifier-challenge/
+                description.md (99 lines)
+                sample_submission.csv (322 lines)
+                ... and 6 other files
+                statoil-iceberg-classifier-challenge/
+        working/
+            statoil-iceberg-classifier-challenge/
+                description.md (99 lines)
+                sample_submission.csv (322 lines)
+                ... and 6 other files
+                statoil-iceberg-classifier-challenge/
+```
+
+-> data/sample_submission.csv has 321 rows and 2 columns.
+The columns are: id, is_iceberg
+
+-> data/statoil-iceberg-classifier-challenge/sample_submission.csv has 321 rows and 2 columns.
+The columns are: id, is_iceberg
+
+-> data/statoil-iceberg-classifier-challenge/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle"
+    ]
+  }
+}
+
+-> data/statoil-iceberg-classifier-challenge/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "is_iceberg": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle",
+      "is_iceberg"
+    ]
+  }
+}
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle"
+    ]
+  }
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "is_iceberg": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle",
+      "is_iceberg"
+    ]
+  }
+}
+
+-> input/sample_submission.csv has 321 rows and 2 columns.
+The columns are: id, is_iceberg
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+
+from subprocess import check_output
+print(check_output(["ls", "../input"]).decode("utf8"))
+
+path = "../input/"
+test = pd.read_json("../input/test.json")
+train = pd.read_json("../input/train.json")
+
+
+## === cell 10
+def sigmoid(z):
+    """
+    Compute the sigmoid of z
+
+    Arguments:
+    z -- A scalar or numpy array of any size.
+
+    Return:
+    s -- sigmoid(z)
+    """
+
+    
+    s = 1/(1+np.exp(-z))
+    
+    
+    return s
+
+
+## === cell 15
+def initialize_with_zeros(dim):
+    """
+    This function creates a vector of zeros of shape (dim, 1) for w and initializes b to 0.
+    
+    Argument:
+    dim -- size of the w vector we want (or number of parameters in this case)
+    
+    Returns:
+    w -- initialized vector of shape (dim, 1)
+    b -- initialized scalar (corresponds to the bias)
+    """
+    
+    
+    w = np.zeros(dim).reshape(dim,1)
+    b = 0
+    
+
+    assert(w.shape == (dim, 1))
+    assert(isinstance(b, float) or isinstance(b, int))
+    
+    return w, b
+
+
+## === cell 20
+def propagate(w, b, X, Y):
+    """
+    Implement the cost function and its gradient for the propagation explained above
+
+    Arguments:
+    w -- weights, a numpy array of size (num_px * num_px * 3, 1)
+    b -- bias, a scalar
+    X -- data of size (num_px * num_px * 3, number of examples)
+    Y -- true "label" vector (containing 0 if non-cat, 1 if cat) of size (1, number of examples)
+
+    Return:
+    cost -- negative log-likelihood cost for logistic regression
+    dw -- gradient of the loss with respect to w, thus same shape as w
+    db -- gradient of the loss with respect to b, thus same shape as b
+    
+    Tips:
+    - Write your code step by step for the propagation. np.log(), np.dot()
+    J=−1m∑mi=1y(i)log(a(i))+(1−y(i))log(1−a(i))J=−1m∑i=1my(i)log⁡(a(i))+(1−y(i))log⁡(1−a(i))
+    
+    
+    """
+    
+    
+    
+    m = X.shape[1]
+    
+    
+    A = sigmoid(np.dot(w.T, X) + b)  # compute activation
+    mat1=(Y*np.log(A))
+    mat2=((1-Y)*np.log(1-A))
+    
+    
+    cost = -1/m*np.sum(mat1+mat2)
+    
+    
+    
+    dw = 1/m*(np.dot(X, (A-Y).T))
+    db = 1/m*np.sum((A-Y))
+    
+
+    assert(dw.shape == w.shape)
+    assert(db.dtype == float)
+    cost = np.squeeze(cost)
+    assert(cost.shape == ())
+    
+    grads = {"dw": dw,
+             "db": db}
+    
+    return grads, cost
+
+
+## === cell 25
+def optimize(w, b, X, Y, num_iterations, learning_rate, print_cost = False):
+    """
+    This function optimizes w and b by running a gradient descent algorithm
+    
+    Arguments:
+    w -- weights, a numpy array of size (num_px * num_px * 3, 1)
+    b -- bias, a scalar
+    X -- data of shape (num_px * num_px * 3, number of examples)
+    Y -- true "label" vector (containing 0 if non-cat, 1 if cat), of shape (1, number of examples)
+    num_iterations -- number of iterations of the optimization loop
+    learning_rate -- learning rate of the gradient descent update rule
+    print_cost -- True to print the loss every 100 steps
+    
+    Returns:
+    params -- dictionary containing the weights w and bias b
+    grads -- dictionary containing the gradients of the weights and bias with respect to the cost function
+    costs -- list of all the costs computed during the optimization, this will be used to plot the learning curve.
+    
+    Tips:
+    You basically need to write down two steps and iterate through them:
+        1) Calculate the cost and the gradient for the current parameters. Use propagate().
+        2) Update the parameters using gradient descent rule for w and b.
+    """
+    
+    costs = []
+    
+    for i in range(num_iterations):
+        
+        
+        
+        grads, cost = propagate(w, b, X, Y)
+        
+        dw = grads["dw"]
+        db = grads["db"]
+        
+        
+        w = w-(learning_rate*dw)
+        b = b-(learning_rate*db)
+        
+        
+        if i % 100 == 0:
+            costs.append(cost)
+        
+        if print_cost and i % 100 == 0:
+            print ("Cost after iteration %i: %f" %(i, cost))
+    
+    params = {"w": w,
+              "b": b}
+    
+    grads = {"dw": dw,
+             "db": db}
+    
+    return params, grads, costs
+
+
+## === cell 30
+def predict(w, b, X):
+    '''
+    Predict whether the label is 0 or 1 using learned logistic regression parameters (w, b)
+    
+    Arguments:
+    w -- weights, a numpy array of size (num_px * num_px * 3, 1)
+    b -- bias, a scalar
+    X -- data of size (num_px * num_px * 3, number of examples)
+    
+    Returns:
+    Y_prediction -- a numpy array (vector) containing all predictions (0/1) for the examples in X
+    '''
+    
+    m = X.shape[1]
+    Y_prediction = np.zeros((1,m))
+    w = w.reshape(X.shape[0], 1)
+    
+    
+    A = sigmoid(np.dot(w.T, X) + b)
+    
+    
+    Y_prediction = np.array(((A > 0.5).squeeze()*1).reshape(1,m))
+    
+    
+    assert(Y_prediction.shape == (1, m))
+    
+    return (Y_prediction,A)
+
+
+## === cell 37
+def model(X_train, Y_train, X_test, Y_test, num_iterations = 2000, learning_rate = 0.5, print_cost = False):
+    """
+    Builds the logistic regression model by calling the function you've implemented previously
+    
+    Arguments:
+    X_train -- training set represented by a numpy array of shape (num_px * num_px * 3, m_train)
+    Y_train -- training labels represented by a numpy array (vector) of shape (1, m_train)
+    X_test -- test set represented by a numpy array of shape (num_px * num_px * 3, m_test)
+    Y_test -- test labels represented by a numpy array (vector) of shape (1, m_test)
+    num_iterations -- hyperparameter representing the number of iterations to optimize the parameters
+    learning_rate -- hyperparameter representing the learning rate used in the update rule of optimize()
+    print_cost -- Set to true to print the cost every 100 iterations
+    
+    Returns:
+    d -- dictionary containing information about the model.
+    """
+    
+    
+    
+    w, b = initialize_with_zeros(X_train.shape[0])
+
+    parameters, grads, costs = optimize(w, b, X_train, Y_train, num_iterations, learning_rate, print_cost)
+    
+    w = parameters["w"]
+    b = parameters["b"]
+    
+    Y_prediction_test, A_test = predict(w, b, X_test)
+    Y_prediction_train, A_train = predict(w, b, X_train)
+
+    
+    print("train accuracy: {} %".format(100 - np.mean(np.abs(Y_prediction_train - Y_train)) * 100))
+    print("test accuracy: {} %".format(100 - np.mean(np.abs(Y_prediction_test - Y_test)) * 100))
+
+    
+    d = {"costs": costs,
+         "Y_prediction_test": Y_prediction_test, 
+         "Y_prediction_train" : Y_prediction_train, 
+         "w" : w, 
+         "b" : b,
+         "learning_rate" : learning_rate,
+         "train_with_prob" : A_train,
+         "test_with_prob" : A_test,
+         "num_iterations": num_iterations}
+    return d
+
+
+## === cell 46
+def train_test_split_fun(array_in, array_out, split_perc=0.25):
+    from sklearn.model_selection import train_test_split
+    X_train, X_val_test, y_train, y_val_test = train_test_split(array_in.T, array_out.T,
+                                                    stratify=array_out.T, 
+                                                     test_size=split_perc)
+    dataset = (X_train.T, X_val_test.T, y_train.T, y_val_test.T)
+    return dataset
+
+
+## === cell 51
+def JSON_to_array(split_perc = 0.25, file='train.json'):
+
+
+    train_set=pd.read_json(path+file)
+    inc_set = train_set[train_set['inc_angle']!='na']
+    
+    band_1=[np.array(i) for i in train_set['band_1']]
+    band_2=[np.array(i) for i in train_set['band_2']]
+    inc_ang = [np.array(i) for i in inc_set['inc_angle']]
+
+    ice_berg=[np.array(i) for i in train_set['is_iceberg']]
+    ice_berg = np.array(ice_berg).reshape(1, 1604)
+    inc_set_ice_berg = [np.array(i) for i in inc_set['is_iceberg']]
+    inc_set_ice_berg = np.array(inc_set_ice_berg).reshape(1, 1471)
+
+    max_band_1 = np.max(np.array(np.abs(band_1)))
+    max_band_2 = np.max(np.array(np.abs(band_2)))
+    max_inc_ang = np.max(np.array(np.abs(inc_ang)))
+    
+    band_2 = np.array(band_2).T/max_band_2
+    band_1 = np.array(band_1).T/max_band_1
+    inc_ang = np.array(inc_ang).T/max_inc_ang
+    inc_ang = inc_ang.reshape(1, 1471)
+    
+    
+    band_1_array = train_test_split_fun(band_1, ice_berg, split_perc=split_perc)    
+    band_2_array = train_test_split_fun(band_2, ice_berg, split_perc=split_perc)    
+    inc_ang_array = train_test_split_fun(inc_ang, inc_set_ice_berg, split_perc=split_perc)    
+    
+    return(band_1_array, band_2_array, inc_ang_array)
+
+
+## === cell 55
+(band_1_array, band_2_array, inc_ang_array) = JSON_to_array(file='train.json')
+
+
+## --- ERROR in cell 55, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/1995091355.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[0;32m----> 1[0;31m [0;34m([0m[0mband_1_array[0m[0;34m,[0m [0mband_2_array[0m[0;34m,[0m [0minc_ang_array[0m[0;34m)[0m [0;34m=[0m [0mJSON_to_array[0m[0;34m([0m[0mfile[0m[0;34m=[0m[0;34m'train.json'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;32m/tmp/ipykernel_11/1631624718.py[0m in [0;36mJSON_to_array[0;34m(split_perc, file)[0m
+[1;32m     12[0m [0;34m[0m[0m
+[1;32m     13[0m     [0mice_berg[0m[0;34m=[0m[0;34m[[0m[0mnp[0m[0;34m.[0m[0marray[0m[0;34m([0m[0mi[0m[0;34m)[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0mtrain_set[0m[0;34m[[0m[0;34m'is_iceberg'[0m[0;34m][0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 14[0;31m     [0mice_berg[0m [0;34m=[0m [0mnp[0m[0;34m.[0m[0marray[0m[0;34m([0m[0mice_berg[0m[0;34m)[0m[0;34m.[0m[0mreshape[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m1604[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     15[0m     [0minc_set_ice_berg[0m [0;34m=[0m [0;34m[[0m[0mnp[0m[0;34m.[0m[0marray[0m[0;34m([0m[0mi[0m[0;34m)[0m [0;32mfor[0m [0mi[0m [0;32min[0m [0minc_set[0m[0;34m[[0m[0;34m'is_iceberg'[0m[0;34m][0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[1;32m     16[0m     [0minc_set_ice_berg[0m [0;34m=[0m [0mnp[0m[0;34m.[0m[0marray[0m[0;34m([0m[0minc_set_ice_berg[0m[0;34m)[0m[0;34m.[0m[0mreshape[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m1471[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mValueError[0m: cannot reshape array of size 1283 into shape (1,1604)
+
+## === cell 74
+X_train_band_1, X_val_test_band_1, y_train_band_1, y_val_test_band_1 = band_1_array
+d_band_1 = model(X_train_band_1, y_train_band_1, X_val_test_band_1, y_val_test_band_1, num_iterations = 15000, learning_rate = 0.005, print_cost = True)

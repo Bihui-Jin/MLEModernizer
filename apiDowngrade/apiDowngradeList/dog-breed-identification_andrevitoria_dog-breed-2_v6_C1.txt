@@ -1,0 +1,8 @@
+keras<=2.13.1rc1
+path<=16.6.0
+pandas<=2.0.2
+numpy<=1.24.4
+seaborn<=0.12.2
+matplotlib<=3.7.1
+tensorflow<=2.13.0rc2
+tensorflow<=2.13.0rc2

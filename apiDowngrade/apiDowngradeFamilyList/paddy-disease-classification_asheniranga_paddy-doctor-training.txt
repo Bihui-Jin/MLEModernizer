@@ -1,0 +1,11 @@
+albumentations<=1.2.0
+matplotlib<=3.5.2
+numpy<=1.22.4
+opencv-python<=3.4.18.65
+opencv-python-headless<=3.4.18.65
+pandas<=1.4.2
+scikit-learn<=1.1.1
+seaborn<=0.11.2
+tensorflow<=2.9.1
+tensorflow-addons<=0.17.1
+tensorflow-hub<=0.12.0

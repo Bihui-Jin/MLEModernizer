@@ -1,0 +1,11 @@
+catboost<=1.2.5
+ipython<=8.24.0
+matplotlib<=3.9.0rc2
+nltk<=3.8.1
+numpy<=1.26.4
+pandas<=2.2.2
+scikit-learn<=1.5.0rc1
+scikit-multilearn<=0.2.0
+scikit-multilearn-ng<=0.0.7
+seaborn<=0.13.2
+tqdm<=4.66.4

@@ -1,0 +1,5 @@
+numpy<=1.17.0
+keras<=2.2.4
+scikit-learn<=0.21.3
+pandas<=0.25.0
+tensorflow<=1.13.2

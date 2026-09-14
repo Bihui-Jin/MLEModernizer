@@ -1,0 +1,8 @@
+mylib<=0.0.1
+numpy<=1.21.2
+pandas<=1.3.3
+pytorch-lightning<=1.4.8
+scml<=0.4.9
+torch<=1.9.1
+tqdm<=4.62.3
+transformers<=4.11.0

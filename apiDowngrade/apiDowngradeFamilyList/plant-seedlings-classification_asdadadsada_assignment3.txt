@@ -1,0 +1,7 @@
+imageio<=2.5.0
+keras<=2.2.4
+matplotlib<=3.0.3
+numpy<=1.16.2
+pandas<=0.24.2
+pillow<=5.4.1
+tensorflow<=1.13.1

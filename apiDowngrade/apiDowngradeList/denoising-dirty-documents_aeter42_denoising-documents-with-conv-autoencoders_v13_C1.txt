@@ -1,0 +1,9 @@
+keras<=2.2.0
+opencv-python<=3.4.1.15
+pandas<=0.23.3
+numpy<=1.14.5
+PyYAML<=3.13
+opencv-python-headless<=3.4.3.18
+matplotlib<=2.2.2
+ipython<=6.4.0
+tensorflow<=1.9.0

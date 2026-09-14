@@ -1,0 +1,11 @@
+albumentations<=0.5.2
+matplotlib<=3.4.2
+numpy<=1.20.3
+opencv-python<=3.4.14.51
+opencv-python-headless<=3.4.14.51
+pandas<=1.2.4
+plotly<=4.14.3
+scikit-learn<=0.24.2
+torch<=1.8.1
+torchvision<=0.9.1
+tqdm<=4.60.0

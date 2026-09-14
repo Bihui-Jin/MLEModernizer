@@ -1,0 +1,9 @@
+ipython<=5.9.0
+matplotlib<=3.2.0rc3
+nltk<=3.4.5
+numpy<=1.18.1
+pandas<=1.0.1
+scikit-learn<=0.22.1
+scikit-multilearn<=0.2.0
+scikit-multilearn-ng<=0.0.1
+wordcloud<=1.6.0

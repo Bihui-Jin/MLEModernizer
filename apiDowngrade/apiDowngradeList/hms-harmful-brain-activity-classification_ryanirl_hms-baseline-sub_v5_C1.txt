@@ -1,0 +1,8 @@
+librosa<=0.10.1
+numpy<=1.26.4
+pandas<=2.2.1
+polars<=0.20.16
+scipy<=1.12.0
+timm<=0.9.16
+torch<=2.2.1
+tqdm<=4.66.2

@@ -1,0 +1,10 @@
+kaggle<=1.6.17
+matplotlib<=3.9.3
+numpy<=2.2.0
+pandas<=2.2.3
+pillow<=11.0.0
+scikit-learn<=1.6.0
+seaborn<=0.13.2
+torch<=2.5.1
+torchinfo<=1.8.0
+torchvision<=0.20.1

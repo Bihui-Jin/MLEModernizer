@@ -1,0 +1,432 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.8
+
+# 2. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+protobuf==6.33.0
+pydicom==3.0.1
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tqdm==4.67.1
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import pydicom
+import os
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+from PIL import Image
+
+
+## === cell 2
+ROOT = "../input/osic-pulmonary-fibrosis-progression"
+DESIRED_SIZE = 128
+
+
+## === cell 3
+tr = pd.read_csv(f"{ROOT}/train.csv")
+tr.drop_duplicates(keep=False, inplace=True, subset=['Patient','Weeks'])
+chunk = pd.read_csv(f"{ROOT}/test.csv")
+tr['WHERE'] = 'train'
+chunk['WHERE'] = 'test'
+
+
+## === cell 4
+data = pd.concat([tr, chunk], axis=0, ignore_index=True)
+
+
+## === cell 6
+COLS = ['Sex','SmokingStatus']
+FE = []
+for col in COLS:
+    for mod in data[col].unique():
+        FE.append(mod)
+        data[mod] = (data[col] == mod).astype(int)
+
+
+## === cell 7
+data['age'] = (data['Age'] - data['Age'].min() ) / ( data['Age'].max() - data['Age'].min() )
+data['week'] = (data['Weeks'] - data['Weeks'].min() ) / ( data['Weeks'].max() - data['Weeks'].min() )
+data['percent'] = (data['Percent'] - data['Percent'].min() ) / ( data['Percent'].max() - data['Percent'].min() )
+FE += ['age','percent','week']
+
+
+## === cell 8
+data.head()
+
+
+## === cell 9
+data.shape, tr.shape
+
+
+## === cell 10
+tr = data.loc[data.WHERE=='train']
+chunk = data.loc[data.WHERE=='test']
+del data
+
+
+## === cell 11
+tr.shape, chunk.shape
+
+
+## === cell 13
+sub = pd.read_csv(f"{ROOT}/sample_submission.csv")
+sub.drop('FVC', axis=1, inplace=True)
+
+
+## === cell 15
+sub['Patient'] = sub['Patient_Week'].apply(lambda x:x.split('_')[0])
+sub['Weeks'] = sub['Patient_Week'].apply(lambda x: int(x.split('_')[-1]))
+sub =  sub[['Patient','Weeks','Confidence','Patient_Week']]
+
+
+## === cell 16
+print(sub.shape)
+sub = sub.merge(chunk.drop('Weeks', axis=1), on="Patient")
+print(sub.shape)
+
+
+## === cell 17
+sub.head()
+
+
+## === cell 18
+def get_images(df, how="train"):
+    xo = []
+    p = []
+    w  = []
+    for i in tqdm(range(df.shape[0])):
+        patient = df.iloc[i,0]
+        week = df.iloc[i,1]
+        try:
+            img_path = f"{ROOT}/{how}/{patient}/{week}.dcm"
+            ds = pydicom.dcmread(img_path)
+            im = Image.fromarray(ds.pixel_array)
+            im = im.resize((DESIRED_SIZE,DESIRED_SIZE)) 
+            im = np.array(im)
+            xo.append(im[np.newaxis,:,:])
+            p.append(patient)
+            w.append(week)
+        except:
+            pass
+    data = pd.DataFrame({"Patient":p,"Weeks":w})
+    return np.concatenate(xo, axis=0), data
+
+
+## === cell 19
+x, df_tr = get_images(tr, how="train")
+
+
+## === cell 20
+x.shape, df_tr.shape
+
+
+## === cell 21
+idx = np.random.randint(x.shape[0])
+plt.imshow(x[idx], cmap=plt.cm.bone)
+plt.show()
+
+
+## === cell 22
+df_tr = df_tr.merge(tr, how="left", on=['Patient', 'Weeks'])
+
+
+## === cell 23
+y = df_tr['FVC'].values
+z = df_tr[FE].values
+
+
+## === cell 24
+z.shape
+
+
+## === cell 25
+import os
+
+try:
+    import google.protobuf
+
+    _pb_ver = getattr(google.protobuf, "__version__", "0.0.0")
+    _pb_major = int(str(_pb_ver).split(".", 1)[0])
+    if _pb_major >= 5:
+        raise RuntimeError(
+            f"Incompatible protobuf version detected: protobuf=={_pb_ver}. "
+            "This notebook's TensorFlow import path requires protobuf<=4.x. "
+            "Please use an environment with protobuf==4.* (or a TensorFlow build "
+            "compatible with protobuf 6) and rerun."
+        )
+except Exception as e:
+    if isinstance(e, RuntimeError):
+        raise
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.pop("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", None)
+
+import tensorflow as tf
+import tensorflow.keras.backend as K
+import tensorflow.keras.layers as L
+import tensorflow.keras.models as M
+
+
+## --- ERROR in cell 25, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/3581787942.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m     10[0m     [0m_pb_major[0m [0;34m=[0m [0mint[0m[0;34m([0m[0mstr[0m[0;34m([0m[0m_pb_ver[0m[0;34m)[0m[0;34m.[0m[0msplit[0m[0;34m([0m[0;34m"."[0m[0;34m,[0m [0;36m1[0m[0;34m)[0m[0;34m[[0m[0;36m0[0m[0;34m][0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     11[0m     [0;32mif[0m [0m_pb_major[0m [0;34m>=[0m [0;36m5[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 12[0;31m         raise RuntimeError(
+[0m[1;32m     13[0m             [0;34mf"Incompatible protobuf version detected: protobuf=={_pb_ver}. "[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     14[0m             [0;34m"This notebook's TensorFlow import path requires protobuf<=4.x. "[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mRuntimeError[0m: Incompatible protobuf version detected: protobuf==6.33.0. This notebook's TensorFlow import path requires protobuf<=4.x. Please use an environment with protobuf==4.* (or a TensorFlow build compatible with protobuf 6) and rerun.
+
+## === cell 26
+C1, C2 = tf.constant(70, dtype='float32'), tf.constant(1000, dtype="float32")
+def kloss(y_true, y_pred):
+    tf.dtypes.cast(y_true, tf.float32)
+    tf.dtypes.cast(y_pred, tf.float32)
+    sigma = y_pred[:, 1]
+    fvc_pred = y_pred[:, 0]
+    
+    sigma_clip = tf.maximum(sigma, C1)
+    delta = tf.abs(y_true[:, 0] - fvc_pred)
+    delta = tf.minimum(delta, C2)
+    sq2 = tf.sqrt( tf.dtypes.cast(2, dtype=tf.float32) )
+    metric = (delta / sigma_clip)*sq2 + tf.math.log(sigma_clip* sq2)
+    return K.mean(metric)
+def kmae(y_true, y_pred):
+    tf.dtypes.cast(y_true, tf.float32)
+    tf.dtypes.cast(y_pred, tf.float32)
+    spread = tf.abs( (y_true[:, 0] -  y_pred[:, 0])  / y_true[:, 0] )
+    return K.mean(spread)
+
+def mloss(_lambda):
+    def loss(y_true, y_pred):
+        return _lambda * kloss(y_true, y_pred) + (1 - _lambda)*kmae(y_true, y_pred)
+    return loss
+def make_model():
+    inp = L.Input((DESIRED_SIZE,DESIRED_SIZE), name="input")
+    z = L.Input((8,), name="Patient")
+    x = L.Conv1D(50, 4, activation="relu", name="conv1")(inp)
+    x = L.MaxPool1D(2, name='pool1')(x)
+    
+    x = L.Conv1D(50, 4, activation="relu", name="conv2")(x)
+    x = L.MaxPool1D(2, name='pool2')(x)
+    
+    x = L.Conv1D(50, 4, activation="relu", name="conv3")(x)
+    x = L.MaxPool1D(2, name='pool3')(x)
+    
+    x = L.Flatten(name="features")(x)
+    x = L.Dense(50, activation="relu", name="d1")(x)
+    l = L.Dense(10, activation="relu", name="d2")(z)
+    x = L.Concatenate(name="combine")([x, l])
+    x = L.Dense(50, activation="relu", name="d3")(x)
+    preds = L.Dense(2, activation="linear", name="preds")(x)
+    
+    model = M.Model([inp, z], preds, name="CNN")
+    model.compile(loss=mloss(0.5), optimizer="adam", metrics=[kloss])
+    return model

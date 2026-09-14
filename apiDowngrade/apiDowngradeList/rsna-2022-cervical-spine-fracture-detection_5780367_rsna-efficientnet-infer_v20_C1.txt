@@ -1,0 +1,14 @@
+joblib<=1.1.0
+matplotlib<=3.5.2
+numpy<=1.23.1
+opencv-python<=3.4.18.65
+opencv-python-headless<=3.4.18.65
+pandas<=1.4.3
+pydicom<=2.3.0
+scikit-learn<=1.1.1
+scipy<=1.9.0
+seaborn<=0.12.0b3
+tifffile<=2022.8.3
+torch<=1.12.0
+torchvision<=0.13.0
+tqdm<=4.64.0

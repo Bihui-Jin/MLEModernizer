@@ -1,0 +1,8 @@
+matplotlib<=3.3.4
+pandas<=1.2.2
+pillow<=8.1.0
+scikit-learn<=0.24.1
+timm<=0.3.4
+torch<=1.7.1
+torchvision<=0.8.2
+tqdm<=4.56.1

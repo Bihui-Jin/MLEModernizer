@@ -1,0 +1,4 @@
+matplotlib<=3.7.4
+numpy<=1.26.1
+pandas<=2.1.2
+tensorflow<=2.15.0rc1

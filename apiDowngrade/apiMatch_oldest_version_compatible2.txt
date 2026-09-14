@@ -1,0 +1,15 @@
+AI4Code_valentinaliferov_ai4code-submit_v63_C1.ipynb | TMLF<=0.0.0 | oldest 2025-02-16 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python=>=3.12 INCOMPATIBLE
+AI4Code_valentinaliferov_ai4code-submit_v63_C1.ipynb | drl-model<=0.1 | oldest 2020-10-26 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.7 INCOMPATIBLE
+AI4Code_valentinaliferov_ai4code-submit_v63_C1.ipynb | gender-classifier-cnn-usoltsev37<=0.0.1 | oldest 2022-11-22 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.9.12 INCOMPATIBLE
+AI4Code_valentinaliferov_ai4code-submit_v63_C1.ipynb | motifcal<=0.0.1 | oldest 2022-03-28 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python=>=3.6, <3.8 INCOMPATIBLE
+AI4Code_vaaliferov_ai4code-submit_v50_C1.ipynb | TMLF<=0.0.0 | oldest 2025-02-16 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python=>=3.12 INCOMPATIBLE
+AI4Code_vaaliferov_ai4code-submit_v50_C1.ipynb | drl-model<=0.1 | oldest 2020-10-26 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.7 INCOMPATIBLE
+AI4Code_vaaliferov_ai4code-submit_v50_C1.ipynb | gender-classifier-cnn-usoltsev37<=0.0.1 | oldest 2022-11-22 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.9.12 INCOMPATIBLE
+AI4Code_vaaliferov_ai4code-submit_v50_C1.ipynb | motifcal<=0.0.1 | oldest 2022-03-28 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python=>=3.6, <3.8 INCOMPATIBLE
+AI4Code_vaaliferov_ai4code-submit_v52_C1.ipynb | drl-model<=0.1 | oldest 2020-10-26 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.7 INCOMPATIBLE
+AI4Code_vaaliferov_ai4code-submit_v52_C1.ipynb | gender-classifier-cnn-usoltsev37<=0.0.1 | oldest 2022-11-22 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.9.12 INCOMPATIBLE
+AI4Code_vaaliferov_ai4code-submit_v52_C1.ipynb | motifcal<=0.0.1 | oldest 2022-03-28 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python=>=3.6, <3.8 INCOMPATIBLE
+AI4Code_valentinaliferov_ai4code-submit_v61_C1.ipynb | TMLF<=0.0.0 | oldest 2025-02-16 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python=>=3.12 INCOMPATIBLE
+AI4Code_valentinaliferov_ai4code-submit_v61_C1.ipynb | drl-model<=0.1 | oldest 2020-10-26 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.7 INCOMPATIBLE
+AI4Code_valentinaliferov_ai4code-submit_v61_C1.ipynb | gender-classifier-cnn-usoltsev37<=0.0.1 | oldest 2022-11-22 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python===3.9.12 INCOMPATIBLE
+AI4Code_valentinaliferov_ai4code-submit_v61_C1.ipynb | motifcal<=0.0.1 | oldest 2022-03-28 >= submission 2022-11-11 | adjusted_python=3.11.12 |required_python=>=3.6, <3.8 INCOMPATIBLE

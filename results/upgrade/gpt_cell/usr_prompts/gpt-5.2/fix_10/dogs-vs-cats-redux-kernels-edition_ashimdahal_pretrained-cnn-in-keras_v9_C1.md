@@ -1,0 +1,666 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of dogs and cats, predict if an image is a dog or a cat.
+
+## Metric
+Log loss.
+
+## Submission Format
+For each image in the test set, you must submit a probability that image is a dog. The file should have a header and be in the following format:
+
+```
+id,label
+1,0.5
+2,0.5
+3,0.5
+...
+```
+
+## Dataset
+The train folder contains 25,000 images of dogs and cats. Each image in this folder has the label as part of the filename. The test folder contains 12,500 images, named according to a numeric id.
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+        input/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+        working/
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+```
+
+-> data/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> data/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> working/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+# 5. Target score
+
+0.24047
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+import sys
+import subprocess
+
+try:
+    import google.protobuf  # noqa: F401
+    from google.protobuf import __version__ as _pb_ver
+except Exception:
+    _pb_ver = None
+
+
+def _major(v):
+    try:
+        return int(str(v).split(".", 1)[0])
+    except Exception:
+        return None
+
+
+if _major(_pb_ver) is None or _major(_pb_ver) >= 5:
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "-q", "protobuf==4.25.3"]
+    )
+    for _m in list(sys.modules):
+        if _m.startswith("google.protobuf"):
+            del sys.modules[_m]
+
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "2")
+
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+import tensorflow as tf
+
+import cv2
+
+import zipfile
+import matplotlib.pyplot as plt
+
+print("TensorFlow:", tf.__version__)
+
+
+
+## === cell 1
+TEST_DIR = "../input/dogs-vs-cats-redux-kernels-edition/test.zip"
+TRAIN_DIR = "../input/dogs-vs-cats-redux-kernels-edition/train.zip"
+
+
+
+## === cell 2
+EXTRACT_ROOT = "./extracted"
+TRAIN_EXTRACT_DIR = os.path.join(EXTRACT_ROOT, "trainzip")
+TEST_EXTRACT_DIR = os.path.join(EXTRACT_ROOT, "testzip")
+
+os.makedirs(TRAIN_EXTRACT_DIR, exist_ok=True)
+os.makedirs(TEST_EXTRACT_DIR, exist_ok=True)
+
+train_marker = os.path.join(TRAIN_EXTRACT_DIR, ".done")
+test_marker = os.path.join(TEST_EXTRACT_DIR, ".done")
+
+if not os.path.exists(train_marker):
+    with zipfile.ZipFile(TRAIN_DIR, "r") as z:
+        z.extractall(TRAIN_EXTRACT_DIR)
+    with open(train_marker, "w") as f:
+        f.write("ok")
+
+if not os.path.exists(test_marker):
+    with zipfile.ZipFile(TEST_DIR, "r") as z:
+        z.extractall(TEST_EXTRACT_DIR)
+    with open(test_marker, "w") as f:
+        f.write("ok")
+
+print("Extracted train.zip to:", TRAIN_EXTRACT_DIR)
+print("Extracted test.zip to:", TEST_EXTRACT_DIR)
+
+
+
+## === cell 3
+print("Top-level folders under extracted root:")
+for p in sorted(os.listdir(EXTRACT_ROOT)):
+    print(" -", p)
+
+
+
+## === cell 4
+testdir = "test/"
+traindir = "train/"
+
+
+
+
+## === cell 5
+def _find_image_dir(candidates, exts=(".jpg", ".jpeg", ".png", ".bmp")):
+    for d in candidates:
+        if os.path.isdir(d):
+            try:
+                files = os.listdir(d)
+            except Exception:
+                continue
+            if any(f.lower().endswith(exts) for f in files):
+                return d if d.endswith("/") else (d + "/")
+
+    for base in candidates:
+        root = (
+            base.rstrip("/").split("/", 1)[0]
+            if "/" in base.rstrip("/")
+            else base.rstrip("/")
+        )
+        if not root:
+            root = "."
+        if os.path.isdir(root):
+            for dirpath, dirnames, filenames in os.walk(root):
+                if any(fn.lower().endswith(exts) for fn in filenames):
+                    return dirpath if dirpath.endswith("/") else (dirpath + "/")
+    return None
+
+
+_test_img_dir = _find_image_dir(
+    [
+        os.path.join(TEST_EXTRACT_DIR, "test"),
+        os.path.join(TEST_EXTRACT_DIR, "test/"),
+        os.path.join(TEST_EXTRACT_DIR, "test/test"),
+        os.path.join(TEST_EXTRACT_DIR, "test/test/unknown"),
+        testdir,
+        "test/test",
+        "test/test/unknown",
+        "dogs-vs-cats-redux-kernels-edition/test",
+        "dogs-vs-cats-redux-kernels-edition/test/test",
+        "dogs-vs-cats-redux-kernels-edition/test/test/unknown",
+    ]
+)
+_train_img_dir = _find_image_dir(
+    [
+        os.path.join(TRAIN_EXTRACT_DIR, "train"),
+        os.path.join(TRAIN_EXTRACT_DIR, "train/"),
+        os.path.join(TRAIN_EXTRACT_DIR, "train/train"),
+        traindir,
+        "train/train",
+        "train/cat",
+        "train/dog",
+        "dogs-vs-cats-redux-kernels-edition/train",
+        "dogs-vs-cats-redux-kernels-edition/train/train",
+        "dogs-vs-cats-redux-kernels-edition/train/cat",
+        "dogs-vs-cats-redux-kernels-edition/train/dog",
+    ]
+)
+
+if _test_img_dir is None:
+    raise FileNotFoundError(
+        f"Could not locate extracted test images directory. Searched extracted test at {TEST_EXTRACT_DIR!r} and common nested paths."
+    )
+if _train_img_dir is None:
+    raise FileNotFoundError(
+        f"Could not locate extracted train images directory. Searched extracted train at {TRAIN_EXTRACT_DIR!r} and common nested paths."
+    )
+
+test_images = [
+    os.path.join(_test_img_dir, i)
+    for i in os.listdir(_test_img_dir)
+    if i.lower().endswith(".jpg")
+]
+
+all_images = []
+if any(
+    os.path.isdir(os.path.join(_train_img_dir, d)) for d in os.listdir(_train_img_dir)
+):
+    for dirpath, dirnames, filenames in os.walk(_train_img_dir):
+        for fn in filenames:
+            if fn.lower().endswith(".jpg"):
+                all_images.append(os.path.join(dirpath, fn))
+else:
+    all_images = [
+        os.path.join(_train_img_dir, i)
+        for i in os.listdir(_train_img_dir)
+        if i.lower().endswith(".jpg")
+    ]
+
+all_images = sorted(all_images)
+test_images = sorted(test_images)
+
+rng = np.random.default_rng(42)
+perm = rng.permutation(len(all_images))
+all_images = [all_images[i] for i in perm]
+
+limit = int(0.8 * len(all_images))
+train_images = all_images[0:limit]
+validation_images = all_images[limit:]
+
+print("Train images:", len(train_images))
+print("Val images:", len(validation_images))
+print("Test images:", len(test_images))
+print("Train dir used:", _train_img_dir)
+print("Test dir used:", _test_img_dir)
+
+if len(test_images) != 12500:
+    print(
+        "WARNING: Expected 12500 test images for this competition, but found:",
+        len(test_images),
+    )
+if len(all_images) != 25000:
+    print(
+        "WARNING: Expected 25000 train images for this competition, but found:",
+        len(all_images),
+    )
+
+
+
+## === cell 6
+img = cv2.imread(train_images[1])
+plt.imshow(img[:, :, ::-1])  # BGR->RGB for display
+plt.axis("off")
+
+
+
+## === cell 7
+rows, columns = 160, 160
+
+
+
+## === cell 8
+AUTOTUNE = tf.data.AUTOTUNE
+BATCH_SIZE = 32
+
+
+def _label_from_path(p):
+    b = os.path.basename(p).lower()
+    return 1 if "dog" in b else 0
+
+
+train_labels = np.array([_label_from_path(p) for p in train_images], dtype=np.int32)
+val_labels = np.array([_label_from_path(p) for p in validation_images], dtype=np.int32)
+
+
+def _load_preprocess_image(path):
+    img_bytes = tf.io.read_file(path)
+    img = tf.image.decode_jpeg(img_bytes, channels=3)
+    img = tf.image.resize(img, [rows, columns], method=tf.image.ResizeMethod.BICUBIC)
+    img = tf.cast(img, tf.uint8)  # keep uint8-like values before model preprocessing
+    return img
+
+
+def _train_map(path, y):
+    img = _load_preprocess_image(path)
+    img = tf.keras.applications.resnet.preprocess_input(tf.cast(img, tf.float32))
+    y = tf.cast(y, tf.float32)
+    return img, y
+
+
+def _test_map(path):
+    img = _load_preprocess_image(path)
+    img = tf.keras.applications.resnet.preprocess_input(tf.cast(img, tf.float32))
+    return img
+
+
+train_ds = tf.data.Dataset.from_tensor_slices((train_images, train_labels))
+train_ds = train_ds.shuffle(
+    buffer_size=min(len(train_images), 4096), seed=42, reshuffle_each_iteration=True
+)
+train_ds = (
+    train_ds.map(_train_map, num_parallel_calls=AUTOTUNE)
+    .batch(BATCH_SIZE)
+    .prefetch(AUTOTUNE)
+)
+
+val_ds = tf.data.Dataset.from_tensor_slices((validation_images, val_labels))
+val_ds = (
+    val_ds.map(_train_map, num_parallel_calls=AUTOTUNE)
+    .batch(BATCH_SIZE)
+    .prefetch(AUTOTUNE)
+)
+
+test_ds = tf.data.Dataset.from_tensor_slices(test_images)
+test_ds = (
+    test_ds.map(_test_map, num_parallel_calls=AUTOTUNE)
+    .batch(BATCH_SIZE)
+    .prefetch(AUTOTUNE)
+)
+
+print("Prepared tf.data datasets.")
+
+
+
+## === cell 9
+for xb, yb in train_ds.take(1):
+    print("train batch x:", xb.shape, xb.dtype, "y:", yb.shape, yb.dtype)
+
+
+
+## === cell 10
+print("validation_label[:10]:", val_labels[:10].tolist())
+
+
+
+## === cell 11
+image_shape = (rows, rows, 3)
+
+
+
+## === cell 12
+print("Using tf.data streaming instead of in-memory numpy arrays.")
+
+
+
+## === cell 13
+base_model = tf.keras.applications.ResNet101(
+    weights="imagenet", include_top=False, input_shape=image_shape
+)
+
+
+
+## === cell 14
+base_model.trainable = False
+
+
+
+## === cell 15
+base_model.summary()
+
+
+
+## === cell 16
+model = tf.keras.Sequential(
+    [
+        base_model,
+        tf.keras.layers.GlobalAveragePooling2D(),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ]
+)
+
+
+
+## === cell 17
+model.summary()
+
+
+
+## === cell 18
+base_learning_rate = 0.001
+model.compile(
+    optimizer=tf.keras.optimizers.RMSprop(learning_rate=base_learning_rate),
+    loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+    metrics=["accuracy"],
+)
+
+
+
+## === cell 19
+epochs = 5
+validation_steps = 20
+
+
+
+## === cell 20
+model.fit(
+    train_ds,
+    validation_data=val_ds,
+    epochs=epochs,
+    shuffle=True,
+)
+
+
+
+## === cell 21
+prediction = model.predict(test_ds, verbose=1)
+
+
+
+## === cell 22
+_idx = 4
+_img = cv2.imread(test_images[_idx])
+_img = cv2.resize(_img, (rows, columns), interpolation=cv2.INTER_CUBIC)
+_img = cv2.cvtColor(_img, cv2.COLOR_BGR2RGB)
+plt.xlabel(str(float(prediction[_idx][0])))
+plt.imshow(_img)
+plt.axis("off")
+
+
+
+
+## === cell 23
+def _extract_id(fp):
+    base = os.path.basename(fp)
+    stem = os.path.splitext(base)[0]  # e.g., "cat.0" or "123"
+    last_token = stem.split(".")[-1]  # e.g., "0" or "123"
+    return int(last_token)
+
+
+test_id = [_extract_id(i) for i in test_images]
+
+pred = prediction[:, 0].astype(np.float64)
+pred = np.clip(pred, 1e-7, 1 - 1e-7)
+
+pred_df = pd.DataFrame({"id": test_id, "label": pred})
+
+sample_path = "../input/dogs-vs-cats-redux-kernels-edition/sample_submission.csv"
+sample = pd.read_csv(sample_path)
+
+submission = sample[["id"]].merge(pred_df, on="id", how="left").sort_values("id")
+
+if submission["label"].isna().any():
+    missing = submission.loc[submission["label"].isna(), "id"].head(10).tolist()
+    raise ValueError(
+        f"Some test ids were not matched when creating submission (examples: {missing}). "
+        "Check test id extraction/pathing."
+    )
+
+submission.to_csv("submission.csv", index=False, header=True)
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)
+print(
+    "Prediction stats: min/max/mean =",
+    submission["label"].min(),
+    submission["label"].max(),
+    submission["label"].mean(),
+)

@@ -1,0 +1,8 @@
+matplotlib<=3.5.2
+monai<=0.8.1
+nibabel<=3.2.2
+numpy<=1.21.6
+pandas<=1.4.2
+pillow<=9.1.0
+torch<=1.11.0
+tqdm<=4.64.0

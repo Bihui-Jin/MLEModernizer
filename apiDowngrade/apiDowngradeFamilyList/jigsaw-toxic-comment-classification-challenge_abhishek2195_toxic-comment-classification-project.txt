@@ -1,0 +1,8 @@
+gensim<=3.8.2
+imbalanced-learn<=0.6.2
+joblib<=0.14.1
+matplotlib<=3.2.1
+numpy<=1.18.2
+pandas<=1.0.3
+scikit-learn<=0.22.2.post1
+wordcloud<=1.6.0

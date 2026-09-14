@@ -1,0 +1,5 @@
+numpy<=1.22.4
+pandas<=1.4.2
+sentence-transformers<=2.2.0
+torch<=1.11.0
+transformers<=4.19.2

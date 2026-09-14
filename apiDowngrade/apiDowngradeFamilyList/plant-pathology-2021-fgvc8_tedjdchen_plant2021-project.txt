@@ -1,0 +1,7 @@
+keras<=2.5.0rc0
+matplotlib<=3.4.2
+numpy<=1.20.3
+pandas<=1.2.4
+pillow<=8.2.0
+tensorflow<=2.4.1
+tqdm<=4.60.0

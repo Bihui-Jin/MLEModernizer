@@ -1,0 +1,13 @@
+haiqv-profiling<=0.0.1
+lightgbm<=3.3.1
+matplotlib<=3.5.0
+numpy<=1.21.4
+opencv-python<=3.4.16.59
+opencv-python-headless<=3.4.16.59
+pandas<=1.3.4
+pandas-profiling<=3.1.0
+scikit-learn<=1.0.1
+ydata-profiling<=4.0.0
+ydata-profiling-multilingual<=1.0.6
+ydata-profiling-snowpark<=0.0.10
+ydata-profiling-thorrester<=0.0.0

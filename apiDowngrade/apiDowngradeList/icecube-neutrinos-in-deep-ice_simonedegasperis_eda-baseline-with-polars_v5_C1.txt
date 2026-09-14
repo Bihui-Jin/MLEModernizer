@@ -1,0 +1,6 @@
+matplotlib<=3.7.1
+numpy<=1.24.2
+pandas<=2.0.0rc0
+plotly<=5.13.1
+polars<=0.16.11
+scipy<=1.10.1

@@ -1,0 +1,6 @@
+ipython<=8.20.0
+numpy<=1.26.3
+pandas<=2.2.0
+timm<=0.9.12
+torch<=2.1.2
+torchvision<=0.16.2

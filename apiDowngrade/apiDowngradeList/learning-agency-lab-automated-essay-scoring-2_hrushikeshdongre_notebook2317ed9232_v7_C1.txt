@@ -1,0 +1,7 @@
+catboost<=1.2.5
+lightgbm<=4.3.0
+numpy<=1.26.4
+pandas<=2.2.2
+polars<=0.20.22
+scikit-learn<=1.4.2
+tqdm<=4.66.2

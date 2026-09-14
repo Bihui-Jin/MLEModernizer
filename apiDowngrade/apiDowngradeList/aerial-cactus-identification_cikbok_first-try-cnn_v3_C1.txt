@@ -1,0 +1,12 @@
+scikit-learn<=0.20.3
+keras<=2.2.4
+opencv-python<=4.1.0.25
+pandas<=0.24.2
+numpy<=1.16.2
+ipython<=7.4.0
+seaborn<=0.9.0
+matplotlib<=3.0.3
+opencv-python-headless<=4.1.0.25
+tensorflow<=1.12.2
+imageio<=2.5.0
+tensorflow<=1.12.2

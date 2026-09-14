@@ -1,0 +1,6 @@
+matplotlib<=3.2.0rc3
+numpy<=1.18.1
+pandas<=1.0.1
+seaborn<=0.10.0
+tensorflow<=1.15.2
+transformers<=2.4.1

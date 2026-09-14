@@ -1,0 +1,4 @@
+fastai<=1.0.57
+ipython<=7.8.0
+numpy<=1.16.5
+pandas<=0.25.1

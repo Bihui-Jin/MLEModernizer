@@ -1,0 +1,7 @@
+efficientnet-pytorch<=0.7.0
+matplotlib<=2.2.5
+numpy<=1.18.5
+pandas<=0.25.3
+scikit-image<=0.14.5
+torch<=1.5.1
+torchvision<=0.8.2

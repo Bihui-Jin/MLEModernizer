@@ -1,0 +1,7 @@
+ipython<=8.3.0
+lightautoml<=0.3.4
+numpy<=1.21.6
+pandas<=1.4.2
+scikit-learn<=1.0.2
+tensorflow<=2.9.0rc2
+torch<=1.11.0

@@ -1,0 +1,10 @@
+librosa<=0.10.1
+lightgbm<=4.2.0
+matplotlib<=3.7.4
+numpy<=1.26.3
+opencv-python<=4.9.0.80
+opencv-python-headless<=4.9.0.80
+pandas<=2.2.0rc0
+scikit-learn<=1.4.0rc1
+seaborn<=0.13.1
+xgboost<=2.0.3

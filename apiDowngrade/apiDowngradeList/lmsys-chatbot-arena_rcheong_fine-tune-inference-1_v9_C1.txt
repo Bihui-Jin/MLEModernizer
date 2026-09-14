@@ -1,0 +1,6 @@
+numpy<=2.3.4
+pandas<=2.3.3
+peft<=0.18.0rc0
+torch<=2.9.0
+tqdm<=4.67.1
+transformers<=4.57.1

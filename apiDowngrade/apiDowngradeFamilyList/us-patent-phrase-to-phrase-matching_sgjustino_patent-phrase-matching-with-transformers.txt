@@ -1,0 +1,9 @@
+datasets<=2.16.0
+matplotlib<=3.7.4
+numpy<=1.26.2
+pandas<=2.2.0rc0
+scikit-learn<=1.4.0rc1
+seaborn<=0.13.0
+torch<=2.1.2
+tqdm<=4.66.1
+transformers<=4.36.2

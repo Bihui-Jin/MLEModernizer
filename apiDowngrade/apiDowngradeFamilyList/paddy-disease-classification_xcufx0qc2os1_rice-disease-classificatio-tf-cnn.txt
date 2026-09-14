@@ -1,0 +1,7 @@
+keras<=3.0.4
+matplotlib<=3.7.4
+numpy<=1.26.3
+pandas<=2.2.0
+scikit-learn<=1.4.0
+seaborn<=0.13.2
+tensorflow<=2.15.0.post1

@@ -1,0 +1,17 @@
+base_atlas<=1.2.1
+basemap<=1.4.1
+basemap-data<=1.3.2
+basemap-data-hires<=1.3.2
+datasets<=2.19.0
+matplotlib<=3.9.0rc2
+matplotlib-Chinese<=0.0.1
+matplotlib-aipy<=3.9.2
+matplotlib-arm64<=3.3.4
+mis-modulos<=0.1
+mpl-toolkits.clifford<=0.0.3
+numpy<=1.26.4
+pandas<=2.2.2
+scikit-learn<=1.4.2
+torch<=2.3.0
+tqdm<=4.66.4
+transformers<=4.40.1

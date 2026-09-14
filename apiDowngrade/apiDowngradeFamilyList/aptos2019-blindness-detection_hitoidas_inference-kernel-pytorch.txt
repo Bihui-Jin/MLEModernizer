@@ -1,0 +1,5 @@
+fastai<=1.0.55
+numpy<=1.16.4
+pandas<=0.25.0
+torch<=1.1.0
+torchvision<=0.3.0

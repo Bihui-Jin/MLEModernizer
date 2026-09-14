@@ -1,0 +1,9 @@
+albumentations<=2.0.8
+numpy<=2.2.6
+opencv-python<=4.11.0.86
+opencv-python-headless<=4.11.0.86
+pandas<=2.3.0
+scikit-learn<=1.7.0
+timm<=1.0.15
+torch<=2.7.1
+tqdm<=4.67.1

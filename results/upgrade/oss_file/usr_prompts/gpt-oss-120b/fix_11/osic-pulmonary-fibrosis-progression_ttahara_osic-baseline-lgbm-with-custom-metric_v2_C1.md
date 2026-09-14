@@ -1,0 +1,498 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+category_encoders==2.7.0
+geopandas==0.14.4
+lightgbm==4.6.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pydicom==3.0.1
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-6.8726
+
+# 6. Current score
+
+-8.01766
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -9.04995) has done: 'We fix the LightGBM call that caused the “unexpected keyword argument ‘fobj’” error by switching to the standard LGBMRegressor API.  
+The model now predicts only the FVC values; a constant confidence (100 ml) is added to match the required submission format.  
+All downstream cells can use the new `oof` and `predictions` arrays, and the final CSV is written correctly.'
+- What this solution (achieved -10.6845) has done: 'I make the data‑loading path robust so the CSV files are found, and keep the rest of the pipeline unchanged. This fixes the FileNotFoundError and the subsequent NameError cascades, allowing the script to run end‑to‑end and write a valid `submission.csv`.'
+- What this solution (achieved -8.51127) has done: 'The change increases the constant confidence value from 100 to 200 for both training OOF predictions and test predictions. A larger σ (confidence) reduces the dominant error term \(-√2·Δ/σ\) more than it hurts the log‑penalty, which raises the overall metric and moves the score closer to the target -6.8726.'
+- What this solution (achieved -8.01766) has done: 'I increase the LightGBM model capacity (more trees, slightly lower learning rate, deeper trees) to improve prediction accuracy, and raise the constant confidence from 200 to 300 to further reduce the dominant error term while keeping the overall logic unchanged. This should move the metric closer to the target score.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import random
+import logging
+from logging import getLogger, INFO, StreamHandler, Formatter, FileHandler
+
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
+import lightgbm as lgb
+from sklearn.model_selection import GroupKFold
+import category_encoders as ce
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+def get_logger(filename="log"):
+    """Create a simple console+file logger."""
+    logger = getLogger(__name__)
+    logger.setLevel(INFO)
+    if not logger.handlers:
+        handler1 = StreamHandler()
+        handler1.setFormatter(Formatter("%(message)s"))
+        handler2 = FileHandler(filename=f"{filename}.log")
+        handler2.setFormatter(Formatter("%(message)s"))
+        logger.addHandler(handler1)
+        logger.addHandler(handler2)
+    return logger
+
+
+logger = get_logger()
+
+
+def seed_everything(seed: int = 777):
+    """Fix random seeds for reproducibility."""
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    try:
+        import torch
+
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.backends.cudnn.deterministic = True
+    except Exception:
+        pass
+
+
+
+
+## === cell 1
+_possible_paths = [
+    "./data/osic-pulmonary-fibrosis-progression",
+    "/kaggle/input/osic-pulmonary-fibrosis-progression",
+    "/kaggle/input",
+]
+BASE_PATH = next(
+    (p for p in _possible_paths if os.path.isdir(p)),
+    None,
+)
+if BASE_PATH is None:
+    raise FileNotFoundError(
+        "Dataset directory not found. Checked locations: " + ", ".join(_possible_paths)
+    )
+
+TRAIN_PATH = os.path.join(BASE_PATH, "train.csv")
+TEST_PATH = os.path.join(BASE_PATH, "test.csv")
+SAMPLE_SUB_PATH = os.path.join(BASE_PATH, "sample_submission.csv")
+OUTPUT_DIR = "./"
+ID_COL = "Patient_Week"
+TARGET = "FVC"
+SEED = 42
+N_FOLD = 4
+
+seed_everything(SEED)
+
+logger.info("Loading data...")
+train = pd.read_csv(TRAIN_PATH)
+test_raw = pd.read_csv(TEST_PATH)
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+
+train[ID_COL] = train["Patient"].astype(str) + "_" + train["Weeks"].astype(str)
+logger.info(f"train shape: {train.shape}")
+
+
+
+
+## === cell 2
+test = sample_sub.copy()
+test["Patient"] = test["Patient_Week"].apply(lambda x: x.split("_")[0])
+test["predict_Week"] = test["Patient_Week"].apply(lambda x: int(x.split("_")[1]))
+
+test = test.drop(columns=["FVC", "Confidence"]).merge(
+    test_raw, on="Patient", how="left"
+)
+test["Week_passed"] = test["predict_Week"] - test["Weeks"]
+test[ID_COL] = test["Patient"] + "_" + test["predict_Week"].astype(str)
+logger.info(f"test shape after merge: {test.shape}")
+
+
+
+
+## === cell 3
+cat_features = ["Sex", "SmokingStatus"]
+drop_features = [ID_COL, TARGET, "Patient", "predict_Week"]
+num_features = [c for c in train.columns if c not in cat_features + drop_features]
+
+features = num_features + cat_features
+
+if cat_features:
+    encoder = ce.OrdinalEncoder(cols=cat_features, handle_unknown="impute")
+    encoder.fit(train[cat_features])
+    train[cat_features] = encoder.transform(train[cat_features])[cat_features]
+    test[cat_features] = encoder.transform(test[cat_features])[cat_features]
+
+folds = train[[ID_COL, "Patient", TARGET]].copy()
+group_kfold = GroupKFold(n_splits=N_FOLD)
+for fold_idx, (tr_idx, val_idx) in enumerate(
+    group_kfold.split(folds, folds[TARGET], groups=folds["Patient"])
+):
+    folds.loc[val_idx, "fold"] = fold_idx
+folds["fold"] = folds["fold"].astype(int)
+
+oof_pred = np.zeros(len(train))
+test_pred = np.zeros(len(test))
+
+lgb_params = dict(
+    learning_rate=0.03,  # lower learning rate
+    n_estimators=8000,  # more trees
+    subsample=0.4,
+    max_depth=6,  # deeper trees
+    random_state=SEED,
+    n_jobs=5,
+    objective="regression",
+)
+
+logger.info("Starting LightGBM training with GroupKFold...")
+for fold in range(N_FOLD):
+    tr_idx = folds[folds["fold"] != fold].index
+    val_idx = folds[folds["fold"] == fold].index
+
+    model = lgb.LGBMRegressor(**lgb_params)
+    model.fit(train.loc[tr_idx, features], train.loc[tr_idx, TARGET])
+
+    oof_pred[val_idx] = model.predict(train.loc[val_idx, features])
+    test_pred += model.predict(test[features]) / N_FOLD
+
+CONST_CONFIDENCE = 300.0
+oof = np.column_stack([oof_pred, np.full(len(train), CONST_CONFIDENCE)])
+predictions = np.column_stack([test_pred, np.full(len(test), CONST_CONFIDENCE)])
+
+
+
+
+## === cell 4
+train["FVC_pred"] = oof[:, 0]
+train["Confidence"] = oof[:, 1]
+test["FVC_pred"] = predictions[:, 0]
+test["Confidence"] = predictions[:, 1]
+
+
+
+
+## === cell 5
+submission = sample_sub.copy()
+submission = submission.drop(columns=["FVC", "Confidence"]).merge(
+    test[[ID_COL, "FVC_pred", "Confidence"]],
+    left_on=ID_COL,
+    right_on=ID_COL,
+    how="left",
+)
+submission.rename(columns={"FVC_pred": "FVC", "Confidence": "Confidence"}, inplace=True)
+
+submission = submission[[ID_COL, "FVC", "Confidence"]]
+output_path = os.path.join(OUTPUT_DIR, "submission.csv")
+submission.to_csv(output_path, index=False)
+logger.info(f"Submission written to {output_path}")
+
+
+
+
+## === cell 6
+if False:  # set to True if you want the plot
+    feature_importance_df = pd.DataFrame()
+    plt.figure(figsize=(6, 4))
+    sns.barplot(
+        x="importance",
+        y="Feature",
+        data=feature_importance_df.sort_values(by="importance", ascending=False),
+    )
+    plt.title("Features importance (placeholder)")
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUTPUT_DIR, "feature_importance_placeholder.png"))

@@ -1,0 +1,333 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import glob
+import numpy as np
+import pandas as pd
+from PIL import Image
+
+print("Libraries loaded successfully.")
+
+
+
+
+## === cell 1
+IMG_WIDTH = 300
+IMG_HEIGHT = 300
+NR_CHANNELS = 3
+
+
+
+
+## === cell 2
+def find_file(filename: str) -> str | None:
+    """
+    Recursively search for *filename* inside any directory that contains
+    'plant-pathology-2021-fgvc8' and return the first match.
+    """
+    pattern = os.path.join("**", filename)
+    candidates = glob.glob(pattern, recursive=True)
+    for p in candidates:
+        if "plant-pathology-2021-fgvc8" in p:
+            return p
+    return None
+
+
+sample_path = find_file("sample_submission.csv")
+if sample_path is None:
+    raise FileNotFoundError(
+        "sample_submission.csv not found in the dataset directories."
+    )
+sample_df = pd.read_csv(sample_path)
+test_img_names = sample_df["image"].tolist()
+
+test_img_dir = os.path.join(os.path.dirname(sample_path), "test_images")
+test_img_paths = [os.path.join(test_img_dir, name) for name in test_img_names]
+
+print(f"Found {len(test_img_names)} test images listed in sample submission.")
+print(f"Sample submission path: {sample_path}")
+
+
+
+
+## === cell 3
+train_path = find_file("train.csv")
+if train_path is None:
+    raise FileNotFoundError("train.csv not found in the dataset directories.")
+train_df = pd.read_csv(train_path)
+
+from collections import Counter
+
+label_counter = Counter()
+for lbls in train_df["labels"]:
+    for lbl in str(lbls).split():
+        label_counter[lbl] += 1
+
+TOP_N = 5
+top_labels = [lbl for lbl, _ in label_counter.most_common(TOP_N)]
+baseline_pred = " ".join(top_labels)
+
+print(f"Top {TOP_N} frequent labels from training data: {top_labels}")
+print(f"Using baseline prediction: '{baseline_pred}' for all test images (fallback).")
+
+primary_label = "healthy" if "healthy" in top_labels else top_labels[0]
+secondary_label = top_labels[1] if len(top_labels) > 1 else primary_label
+
+train_img_dir = os.path.join(os.path.dirname(train_path), "train_images")
+healthy_greens = []
+diseased_greens = []
+healthy_reds = []
+diseased_reds = []
+MAX_SAMPLES = 2000
+
+for idx, (img_name, lbls) in enumerate(zip(train_df["image"], train_df["labels"])):
+    if idx >= MAX_SAMPLES:
+        break
+    img_path = os.path.join(train_img_dir, img_name)
+    try:
+        img = Image.open(img_path).convert("RGB")
+        arr = np.array(img)
+        green_mean = arr[:, :, 1].mean()
+        red_mean = arr[:, :, 0].mean()
+        if "healthy" in str(lbls).split():
+            healthy_greens.append(green_mean)
+            healthy_reds.append(red_mean)
+        else:
+            diseased_greens.append(green_mean)
+            diseased_reds.append(red_mean)
+    except Exception:
+        continue
+
+if healthy_greens and diseased_greens:
+    THRESHOLD = (np.mean(healthy_greens) + np.mean(diseased_greens)) / 2
+else:
+    THRESHOLD = 120  # fallback empirical value
+
+if healthy_reds and diseased_reds:
+    RED_THRESHOLD = (np.mean(healthy_reds) + np.mean(diseased_reds)) / 2
+else:
+    RED_THRESHOLD = 130  # fallback empirical value
+
+print(f"Computed green‑channel threshold: {THRESHOLD:.2f}")
+print(f"Computed red‑channel threshold (rust heuristic): {RED_THRESHOLD:.2f}")
+
+
+
+
+## === cell 4
+def predict_label(image_path: str) -> str:
+    """
+    Predict labels for a single image.
+
+    - If the average green channel is higher than THRESHOLD, predict the primary label (usually 'healthy').
+    - Otherwise start from the multi‑label baseline.
+      * If the average red channel exceeds RED_THRESHOLD, add the 'rust' label.
+      * Always add the 'complex' label for diseased samples to capture multi‑disease cases.
+    """
+    try:
+        img = Image.open(image_path).convert("RGB")
+        img_arr = np.array(img)
+        green_mean = img_arr[:, :, 1].mean()
+        red_mean = img_arr[:, :, 0].mean()
+        if green_mean > THRESHOLD:
+            return primary_label
+        else:
+            labels = set(baseline_pred.split())
+            if red_mean > RED_THRESHOLD:
+                labels.add("rust")
+            labels.add("complex")
+            return " ".join(sorted(labels))
+    except Exception:
+        return baseline_pred
+
+
+test_predtags = [predict_label(p) for p in test_img_paths]
+
+df_submission = pd.DataFrame({"image": test_img_names, "labels": test_predtags})
+print("Submission preview:")
+print(df_submission.head())
+
+
+
+
+## === cell 5
+output_path = "submission.csv"
+df_submission.to_csv(output_path, index=False)
+print(f"Submission file written to {output_path}")

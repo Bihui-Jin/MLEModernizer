@@ -1,0 +1,601 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given questions and answers from various StackExchange properties, predict target values of 30 labels for each question-answer pair.
+
+## Metric
+Mean column-wise Spearman's correlation coefficient. The Spearman's rank correlation is computed for each target column, and the mean of these values is calculated for the submission score.
+
+## Submission Format
+For each qa_id in the test set, you must predict a probability for each target variable. The predictions should be in the range [0,1]. The file should contain a header and have the following format:
+
+```
+qa_id,question_asker_intent_understanding,...,answer_well_written
+6,0.0,...,0.5
+8,0.5,...,0.1
+18,1.0,...,0.0
+etc.
+```
+
+## Dataset
+The list of 30 target labels are the same as the column names in the `sample_submission.csv` file. Target labels with the prefix `question_` relate to the `question_title` and/or `question_body` features in the data. Target labels with the prefix `answer_` relate to the `answer` feature.
+
+Target labels are aggregated from multiple raters, and can have continuous values in the range `[0,1]`. Therefore, predictions must also be in that range.
+
+- **train.csv** - the training data (target labels are the last 30 columns)
+- **test.csv** - the test set (you must predict 30 labels for each test set row)
+- **sample_submission.csv** - a sample submission file in the correct format; column names are the 30 target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+category_encoders==2.7.0
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (83 lines)
+            sample_submission.csv (609 lines)
+            sample_submission.csv.zip (8.9 kB)
+            test.csv (19551 lines)
+            test.csv.zip (471.7 kB)
+            train.csv (159837 lines)
+            train.csv.zip (4.2 MB)
+            google-quest-challenge/
+                description.md (83 lines)
+                sample_submission.csv (609 lines)
+                ... and 5 other files
+                google-quest-challenge/
+        input/
+            description.md (83 lines)
+            sample_submission.csv (609 lines)
+            sample_submission.csv.zip (8.9 kB)
+            test.csv (19551 lines)
+            test.csv.zip (471.7 kB)
+            train.csv (159837 lines)
+            train.csv.zip (4.2 MB)
+            google-quest-challenge/
+                description.md (83 lines)
+                sample_submission.csv (609 lines)
+                ... and 5 other files
+                google-quest-challenge/
+        working/
+            google-quest-challenge/
+                description.md (83 lines)
+                sample_submission.csv (609 lines)
+                ... and 5 other files
+                google-quest-challenge/
+```
+
+-> data/google-quest-challenge/sample_submission.csv has 608 rows and 31 columns.
+The columns are: qa_id, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer, question_fact_seeking, question_has_commonly_accepted_answer, question_interestingness_others, question_interestingness_self, question_multi_intent, question_not_really_a_question, question_opinion_seeking, question_type_choice, question_type_compare, question_type_consequence... and 16 more columns
+
+-> data/google-quest-challenge/test.csv has 19550 rows and 11 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host
+
+-> data/google-quest-challenge/train.csv has 159836 rows and 41 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer... and 26 more columns
+
+-> data/sample_submission.csv has 608 rows and 31 columns.
+The columns are: qa_id, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer, question_fact_seeking, question_has_commonly_accepted_answer, question_interestingness_others, question_interestingness_self, question_multi_intent, question_not_really_a_question, question_opinion_seeking, question_type_choice, question_type_compare, question_type_consequence... and 16 more columns
+
+-> data/test.csv has 19550 rows and 11 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host
+
+-> data/train.csv has 159836 rows and 41 columns.
+The columns are: qa_id, question_title, question_body, question_user_name, question_user_page, answer, answer_user_name, answer_user_page, url, category, host, question_asker_intent_understanding, question_body_critical, question_conversational, question_expect_short_answer... and 26 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.28795
+
+# 6. Current score
+
+0.31875
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.36056) has done: 'I fix the runtime error caused by scikit-learn now rejecting `random_state` when `KFold(shuffle=False)` by explicitly setting `shuffle=True` in both CV loops; this is required for the notebook to run end-to-end. I also ensure the submission file is written with the required `qa_id` column (not only as an index) to avoid format-related submission issues. Because your current score (0.33304) is already above the target (0.28795) and within the ±10% tolerance band, I avoid any modeling or calibration changes that could move the score away from the target. All other logic (features, models, blending) is kept the same.'
+- What this solution (achieved 0.35011) has done: 'Your current score (0.36056) is better than the target (0.28795), so to move *toward* the target we should slightly reduce model strength while keeping the same overall pipeline (TFIDF+SVD features, Ridge + PyTorch estimators, and rank-blending). The smallest, most controllable change is to shrink the text representation a bit by reducing the SVD dimensionality, which typically lowers Spearman without breaking semantics. I also make the Spearman helper deterministic by using a fixed RNG seed for its tiny noise term (this doesn’t aim to improve, just stabilizes local CV reporting). Everything else (data paths, models, loops, blending, and submission format) stays the same and still writes a valid `submission.csv`.'
+- What this solution (achieved 0.3429) has done: 'Your current score (0.35011) is higher than the target (0.28795), so to move toward the target we should slightly weaken the representation while keeping the exact same pipeline (TF-IDF→SVD features, Ridge + PyTorch models, and rank-blending). The most minimal and controlled knob is the TruncatedSVD dimensionality; reducing it typically lowers Spearman without changing training loops, losses, or blending semantics. I only adjust `n_components` in the text SVD and keep all paths and submission formatting identical so it still runs end-to-end and writes a valid `submission.csv`. Everything else remains unchanged.'
+- What this solution (achieved 0.33911) has done: 'Your current score (0.3429) is higher than the target (0.28795), so to move *toward* the target we should make the smallest controlled change that slightly weakens the text representation without changing the overall pipeline (TF‑IDF→SVD features, Ridge + PyTorch models, and rank-blending). The most direct knob is `TruncatedSVD(n_components=...)`; reducing it typically lowers Spearman while preserving the same modeling/training logic. I keep everything else identical (data paths, CV, models, blending, and submission format) so the script still runs end-to-end and writes a valid `submission.csv`. This should reduce the score magnitude and move it closer to the target band.'
+- What this solution (achieved 0.33505) has done: 'Your current score (0.33911) is higher than the target (0.28795), so to move closer we should slightly reduce model strength without changing the overall pipeline (TF‑IDF→SVD features, Ridge + PyTorch models, rank-based blending, same loss/loops). The smallest, most controlled knob is the `TruncatedSVD(n_components=...)` dimensionality used in the text encoder; reducing it typically lowers Spearman while keeping evaluation semantics identical. I only reduce `n_components` further (from 25 to 15) and keep everything else (CV, models, blending, file paths, and submission writing) unchanged so it still runs end-to-end and outputs a valid `submission.csv` with `qa_id` as a column.'
+- What this solution (achieved 0.32853) has done: 'Your current score (0.33505) is above the target (0.28795), so we should make a small, controlled weakening change to move the score down toward the target band without altering the overall pipeline. The most minimal knob that preserves the same feature/model/training/blending logic is further reducing the text SVD dimensionality, which typically lowers Spearman while keeping everything else identical. I only change `TruncatedSVD(n_components=...)` from 15 to 10 and keep CV, models, rank-blend, and submission formatting unchanged so it still runs end-to-end and writes a valid `submission.csv`.'
+- What this solution (achieved 0.32626) has done: 'Your current score (0.32853) is higher than the target (0.28795), so to move closer we should apply a small, controlled weakening change while keeping the same TF‑IDF→SVD features, Ridge + PyTorch models, CV loops, rank-blending, and submission formatting. The most minimal knob that preserves the pipeline is reducing the TruncatedSVD dimensionality slightly further, which typically lowers Spearman without breaking anything. I only change `n_components` from 10 to 7 and keep everything else identical so it still runs end-to-end and writes a valid `submission.csv` with the correct columns and `qa_id`.'
+- What this solution (achieved 0.31875) has done: 'Your current score (0.32626) is above the target (0.28795), so to move closer we should make a small, controlled change that slightly weakens the text representation while preserving the same TF‑IDF→SVD features, Ridge + PyTorch models, CV loops, rank-blending, and submission formatting. The most minimal knob that preserves the pipeline is reducing `TruncatedSVD(n_components=...)` a bit further, which typically lowers mean Spearman without changing evaluation semantics. I only change `n_components` from 7 to 5 and keep everything else identical so it still runs end-to-end and writes a valid `submission.csv` with `qa_id` as a column.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+
+import warnings
+
+warnings.simplefilter("ignore")
+
+import os
+
+for dirname, _, filenames in os.walk("/kaggle/input"):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 1
+train = pd.read_csv("../input/google-quest-challenge/train.csv", index_col="qa_id")
+train.shape
+
+
+
+## === cell 2
+test = pd.read_csv("../input/google-quest-challenge/test.csv", index_col="qa_id")
+test.shape
+
+
+
+## === cell 3
+train.head(3).T
+
+
+
+## === cell 4
+target_columns = [
+    "question_asker_intent_understanding",
+    "question_body_critical",
+    "question_conversational",
+    "question_expect_short_answer",
+    "question_fact_seeking",
+    "question_has_commonly_accepted_answer",
+    "question_interestingness_others",
+    "question_interestingness_self",
+    "question_multi_intent",
+    "question_not_really_a_question",
+    "question_opinion_seeking",
+    "question_type_choice",
+    "question_type_compare",
+    "question_type_consequence",
+    "question_type_definition",
+    "question_type_entity",
+    "question_type_instructions",
+    "question_type_procedure",
+    "question_type_reason_explanation",
+    "question_type_spelling",
+    "question_well_written",
+    "answer_helpful",
+    "answer_level_of_information",
+    "answer_plausible",
+    "answer_relevance",
+    "answer_satisfaction",
+    "answer_type_instructions",
+    "answer_type_procedure",
+    "answer_type_reason_explanation",
+    "answer_well_written",
+]
+
+
+
+## === cell 5
+y_train = train[target_columns].copy()
+x_train = train.drop(target_columns, axis=1)
+del train
+
+x_test = test.copy()
+del test
+
+
+
+## === cell 6
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+
+
+
+## === cell 7
+text_encoder = Pipeline(
+    [
+        ("Text-TF-IDF", TfidfVectorizer(ngram_range=(1, 3))),
+        ("Text-SVD", TruncatedSVD(n_components=5, random_state=42)),
+    ],
+    verbose=True,
+)
+
+
+
+## === cell 8
+from urllib.parse import urlparse
+import re
+from sklearn.preprocessing import FunctionTransformer
+from category_encoders.one_hot import OneHotEncoder
+
+before_dot = re.compile("^[^.]*")
+
+
+def transform_url(x):
+    return x.apply(lambda v: re.findall(before_dot, urlparse(v).netloc)[0])
+
+
+url_encoder = Pipeline(
+    [
+        ("URL-transformer", FunctionTransformer(transform_url, validate=False)),
+        ("URL-OHE", OneHotEncoder(drop_invariant=True)),
+    ],
+    verbose=True,
+)
+
+
+
+## === cell 9
+from category_encoders.one_hot import OneHotEncoder
+
+ohe = OneHotEncoder(cols="category", drop_invariant=True)
+
+
+
+## === cell 10
+from sklearn.preprocessing import StandardScaler
+
+
+def count_words(data):
+    out = pd.DataFrame(index=data.index)
+    for column in data.columns:
+        out[column] = data[column].str.split().str.len()
+    return out
+
+
+word_counter = Pipeline(
+    [
+        ("WordCounter-transformer", FunctionTransformer(count_words, validate=False)),
+        ("WordCounter-std", StandardScaler()),
+    ],
+    verbose=True,
+)
+
+
+
+## === cell 11
+preprocessor = ColumnTransformer(
+    [
+        ("Q-T", text_encoder, "question_title"),
+        ("Q-B", text_encoder, "question_body"),
+        ("A", text_encoder, "answer"),
+        ("URL", url_encoder, "url"),
+        ("Categoty", ohe, "category"),
+        ("W-C", word_counter, ["question_body", "answer"]),
+    ],
+    verbose=True,
+)
+
+
+
+## === cell 12
+x_train = preprocessor.fit_transform(x_train)
+
+
+
+## === cell 13
+x_test = preprocessor.transform(x_test)
+
+
+
+## === cell 14
+x_train.shape
+
+
+
+## === cell 15
+y_train = y_train.values
+
+
+
+## === cell 16
+from scipy.stats import spearmanr
+
+_spearman_rng = np.random.RandomState(42)
+
+
+def mean_spearmanr_correlation_score(y_true, y_pred):
+    return np.mean(
+        [
+            spearmanr(
+                y_pred[:, idx] + _spearman_rng.normal(0, 1e-7, y_pred.shape[0]),
+                y_true[:, idx],
+            ).correlation
+            for idx in range(len(target_columns))
+        ]
+    )
+
+
+
+
+## === cell 17
+trained_estimators = []
+
+
+
+## === cell 18
+from sklearn.linear_model import RidgeCV
+
+ridge_grid = RidgeCV(alphas=np.linspace(0.1, 2.0, num=100)).fit(x_train, y_train)
+best_Alpha = ridge_grid.alpha_
+best_Alpha
+
+
+
+## === cell 19
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import KFold
+import math
+
+n_splits = 10
+scores = []
+
+cv = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+for train_idx, valid_idx in cv.split(x_train, y_train):
+    x_train_train = x_train[train_idx]
+    y_train_train = y_train[train_idx]
+    x_train_valid = x_train[valid_idx]
+    y_train_valid = y_train[valid_idx]
+
+    estimator = Ridge(alpha=best_Alpha, random_state=42)
+    estimator.fit(x_train_train, y_train_train)
+
+    oof_part = estimator.predict(x_train_valid)
+    score = mean_spearmanr_correlation_score(y_train_valid, oof_part)
+    print("Score:", score)
+
+    if not math.isnan(score):
+        trained_estimators.append(estimator)
+        scores.append(score)
+
+print("Mean score:", np.mean(scores))
+
+
+
+## === cell 20
+import torch
+import torch.nn as nn
+
+from torch.nn import Sequential
+from torch.nn import Linear
+from torch.nn import ReLU
+from torch.nn.utils.weight_norm import weight_norm
+
+from torch.nn import MSELoss
+from torch.optim import Adam
+
+import random
+
+random.seed(42)
+np.random.seed(42)
+torch.manual_seed(42)
+
+
+class PyTorch:
+
+    def __init__(self, in_features, out_features, n_epochs, patience):
+        self.in_features = in_features
+        self.out_features = out_features
+        self.n_epochs = n_epochs
+        self.patience = patience
+
+    def init_model(self):
+
+        self.model = Sequential(
+            weight_norm(Linear(self.in_features, 128)),
+            ReLU(),
+            weight_norm(Linear(128, 128)),
+            ReLU(),
+            weight_norm(Linear(128, self.out_features)),
+        )
+
+        for t in self.model:
+            if isinstance(t, Linear):
+                nn.init.kaiming_normal_(t.weight_v)
+                nn.init.kaiming_normal_(t.weight_g)
+                nn.init.constant_(t.bias, 0)
+
+        self.loss_func = MSELoss()
+        self.optimizer = Adam(self.model.parameters(), lr=1e-3)
+
+    def fit(self, x_train, y_train, x_valid, y_valid):
+
+        validate = (x_valid is not None) & (y_valid is not None)
+
+        self.init_model()
+
+        x_train_tensor = torch.as_tensor(x_train, dtype=torch.float32)
+        y_train_tensor = torch.as_tensor(y_train, dtype=torch.float32)
+
+        if validate:
+            x_valid_tensor = torch.as_tensor(x_valid, dtype=torch.float32)
+            y_valid_tensor = torch.as_tensor(y_valid, dtype=torch.float32)
+
+        min_loss = np.inf
+        counter = 0
+
+        for epoch in range(self.n_epochs):
+
+            self.model.train()
+            y_pred = self.model(x_train_tensor)
+            loss = self.loss_func(y_pred, y_train_tensor)
+
+            loss.backward()
+            self.optimizer.step()
+            self.optimizer.zero_grad()
+
+            current_loss = loss.item()
+
+            if validate:
+                self.model.eval()
+                with torch.no_grad():
+                    current_loss = self.loss_func(
+                        self.model(x_valid_tensor), y_valid_tensor
+                    ).item()
+
+            if current_loss < min_loss:
+                min_loss = current_loss
+                counter = 0
+            else:
+                counter += 1
+                if counter >= self.patience:
+                    break
+
+    def predict(self, x):
+        x_tenson = torch.as_tensor(x, dtype=torch.float32)
+        self.model.eval()
+        with torch.no_grad():
+            return self.model(x_tenson).numpy()
+
+
+
+
+## === cell 21
+pytorch_params = {
+    "in_features": x_train.shape[1],
+    "out_features": y_train.shape[1],
+    "n_epochs": 2500,
+    "patience": 5,
+}
+
+
+
+## === cell 22
+estimator = PyTorch(**pytorch_params)
+estimator.fit(x_train, y_train, None, None)
+trained_estimators.append(estimator)
+
+
+
+## === cell 23
+from sklearn.model_selection import KFold
+import math
+
+n_splits = 10
+scores = []
+
+cv = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+for train_idx, valid_idx in cv.split(x_train, y_train):
+
+    x_train_train = x_train[train_idx]
+    y_train_train = y_train[train_idx]
+    x_train_valid = x_train[valid_idx]
+    y_train_valid = y_train[valid_idx]
+
+    estimator = PyTorch(**pytorch_params)
+    estimator.fit(x_train_train, y_train_train, x_train_valid, y_train_valid)
+
+    oof_part = estimator.predict(x_train_valid)
+    score = mean_spearmanr_correlation_score(y_train_valid, oof_part)
+    print("Score:", score)
+
+    if not math.isnan(score):
+        trained_estimators.append(estimator)
+        scores.append(score)
+
+print("Mean score:", np.mean(scores))
+
+
+
+## === cell 24
+len(trained_estimators)
+
+
+
+## === cell 25
+y_pred = []
+for estimator in trained_estimators:
+    y_pred.append(estimator.predict(x_test))
+
+
+
+## === cell 26
+from scipy.stats import rankdata
+
+
+def blend_by_ranking(data, weights):
+    out = np.zeros(data.shape[0])
+    for idx, column in enumerate(data.columns):
+        out += weights[idx] * rankdata(data[column].values)
+    out /= np.max(out)
+    return out
+
+
+
+
+## === cell 27
+submission = pd.read_csv(
+    "../input/google-quest-challenge/sample_submission.csv", index_col="qa_id"
+)
+
+out = pd.DataFrame(index=submission.index)
+for column_idx, column in enumerate(target_columns):
+
+    column_data = pd.DataFrame(index=submission.index)
+    for prediction_idx, prediction in enumerate(y_pred):
+        column_data[str(prediction_idx)] = prediction[:, column_idx]
+
+    out[column] = blend_by_ranking(column_data, np.ones(column_data.shape[1]))
+
+
+
+## === cell 28
+out.head()
+
+
+
+## === cell 29
+out_to_save = out.copy()
+out_to_save.insert(0, "qa_id", out_to_save.index)
+out_to_save.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", out_to_save.shape)

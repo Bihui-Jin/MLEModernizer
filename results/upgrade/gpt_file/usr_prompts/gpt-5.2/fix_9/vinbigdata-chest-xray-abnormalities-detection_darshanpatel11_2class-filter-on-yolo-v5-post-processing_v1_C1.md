@@ -1,0 +1,494 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify and localize common thoracic lung diseases and critical findings.
+
+For each test image, you will be predicting a bounding box and class for all findings. If you predict that there are no findings, you should create a prediction of "14 1 0 0 1 1" (14 is the class ID for no finding, and this provides a one-pixel bounding box with a confidence of 1.0).
+
+## Metric
+PASCAL VOC 2010 [mean Average Precision (mAP)](http://host.robots.ox.ac.uk/pascal/VOC/voc2010/devkit_doc_08-May-2010.pdf) at IoU > 0.4.
+
+## Submission Format
+Images in the test set may contain more than one object. For each object in a given test image, you must predict a class ID, `confidence` score, and bounding box in format `xmin ymin xmax ymax`. If you predict that there are NO objects in a given image, you should predict `14 1.0 0 0 1 1`, where `14` is the class ID for "No finding", 1.0 is the confidence, and `0 0 1 1` is a one-pixel bounding box.
+
+The submission file should contain a header and have the following format:
+
+```
+ID,TARGET
+004f33259ee4aef671c2b95d54e4be68,14 1 0 0 1 1
+004f33259ee4aef671c2b95d54e4be69,11 0.5 100 100 200 200 13 0.7 10 10 20 20
+etc.
+```
+
+## Dataset
+The dataset comprises postero-anterior (PA) CXR scans in DICOM format.
+
+All images were labeled for the presence of 14 critical radiographic findings as listed below:
+
+```
+0 - Aortic enlargement
+1 - Atelectasis
+2 - Calcification
+3 - Cardiomegaly
+4 - Consolidation
+5 - ILD
+6 - Infiltration
+7 - Lung Opacity
+8 - Nodule/Mass
+9 - Other lesion
+10 - Pleural effusion
+11 - Pleural thickening
+12 - Pneumothorax
+13 - Pulmonary fibrosis
+```
+
+The "No finding" observation (`14`) was intended to capture the absence of all findings above.
+
+### Files
+- **train.csv** - the train set metadata, with one row for each object, including a class and a bounding box. Some images in both test and train have multiple objects.
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `image_id` - unique image identifier
+- `class_name` - the name of the class of detected object (or "No finding")
+- `class_id` - the ID of the class of detected object
+- `rad_id` - the ID of the radiologist that made the observation
+- `x_min` - minimum X coordinate of the object's bounding box
+- `y_min` - minimum Y coordinate of the object's bounding box
+- `x_max` - maximum X coordinate of the object's bounding box
+- `y_max` - maximum Y coordinate of the object's bounding box
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (132 lines)
+            sample_submission.csv (1501 lines)
+            sample_submission.csv.zip (30.9 kB)
+            test.zip (12.7 GB)
+            train.csv (61172 lines)
+            train.csv.zip (1.7 MB)
+            train.zip (114.6 GB)
+            test/
+                00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                ... and 1498 other files
+                test/
+            train/
+                000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                ... and 13498 other files
+                train/
+            vinbigdata-chest-xray-abnormalities-detection/
+                description.md (132 lines)
+                sample_submission.csv (1501 lines)
+                ... and 5 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+                vinbigdata-chest-xray-abnormalities-detection/
+        input/
+            description.md (132 lines)
+            sample_submission.csv (1501 lines)
+            sample_submission.csv.zip (30.9 kB)
+            test.zip (12.7 GB)
+            train.csv (61172 lines)
+            train.csv.zip (1.7 MB)
+            train.zip (114.6 GB)
+            test/
+                00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                ... and 1498 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+            train/
+                000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                ... and 13498 other files
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+            vinbigdata-chest-xray-abnormalities-detection/
+                description.md (132 lines)
+                sample_submission.csv (1501 lines)
+                ... and 5 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+                vinbigdata-chest-xray-abnormalities-detection/
+        working/
+            vinbigdata-chest-xray-abnormalities-detection/
+                description.md (132 lines)
+                sample_submission.csv (1501 lines)
+                ... and 5 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+                vinbigdata-chest-xray-abnormalities-detection/
+```
+
+-> data/sample_submission.csv has 1500 rows and 2 columns.
+The columns are: image_id, PredictionString
+
+-> data/train.csv has 61171 rows and 8 columns.
+The columns are: image_id, class_name, class_id, rad_id, x_min, y_min, x_max, y_max
+
+-> data/vinbigdata-chest-xray-abnormalities-detection/sample_submission.csv has 1500 rows and 2 columns.
+The columns are: image_id, PredictionString
+
+-> data/vinbigdata-chest-xray-abnormalities-detection/train.csv has 61171 rows and 8 columns.
+The columns are: image_id, class_name, class_id, rad_id, x_min, y_min, x_max, y_max
+
+-> input/sample_submission.csv has 1500 rows and 2 columns.
+The columns are: image_id, PredictionString
+
+-> input/train.csv has 61171 rows and 8 columns.
+The columns are: image_id, class_name, class_id, rad_id, x_min, y_min, x_max, y_max
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.2177142085841383
+
+# 6. Current score
+
+0.05214
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0475) has done: 'The current notebook fails because it references two external Kaggle datasets/paths that are not available in your environment. I replace those reads with a self-contained fallback that uses the provided `sample_submission.csv` as the base detection submission and generates a reasonable `pred_2class` (image-level “normal” probability) from the provided `train.csv` priors, so the pipeline runs end-to-end and writes a valid `submission.csv`. I also make the merge robust to missing columns and ensure every test image has a non-empty `PredictionString` (defaulting to the required “No finding” string). These changes are minimal and keep your existing post-processing logic/threshold semantics intact while producing a valid submission.'
+- What this solution (achieved 0.06606) has done: 'Your current score (0.0475) is far below the target (0.2177), so we should legitimately increase mAP with the smallest change that preserves your “sample_submission-as-base + add/replace No finding based on class0 thresholds” core logic. The main issue is that you currently start from *all No finding* detections, which yields near-zero true positives for abnormal boxes; instead, we can build a simple, legal baseline detector by copying *training-set consensus boxes* (grouped by class) onto each test image, producing non-empty abnormal predictions while keeping your thresholding/post-processing semantics intact. To avoid flooding with too many low-quality boxes (which can hurt mAP), we keep only the top few most frequent classes and use the class frequency as the confidence, clipped to a reasonable range. We also keep your “No finding” threshold logic, but we ensure the produced PredictionString is always valid and formatted correctly.'
+- What this solution (achieved 0.06689) has done: 'I keep your “training-consensus template boxes + optional No finding append/replace” core logic intact, but slightly increase the amount of useful signal in the template so mAP can move toward the 0.2177 target from 0.0661. Concretely, I (1) use class-wise box *medians* as you do but also add a second, slightly different box per class (using 25th/75th percentiles) to better cover size variability without changing model type, (2) increase TOPK_CLASSES a bit and cap total predicted boxes per image to avoid flooding, and (3) make the No finding append safe by inserting a separator space only when needed. These are minimal, legal post-processing changes that should increase true positives relative to your current single-template-per-class approach while keeping runtime well under the limit and preserving your thresholding semantics.'
+- What this solution (achieved 0.06711) has done: 'We’re far below the target (0.06689 vs 0.2177, higher-is-better), so we should increase true positives with minimal risk while keeping your “train-template boxes + No finding append/replace by class0 thresholds” logic intact. The smallest legitimate boost is to make the template boxes slightly more image-size-aware by scaling the consensus boxes to the typical train image dimensions (reduces systematic IoU mismatch on many images) and to include one more robust size-variation box per class (10th/90th) while keeping a strict cap on total boxes. I also adjust the template confidence very slightly upward (still clipped) because your current confidences are quite low and mAP is sensitive to ranking; this keeps semantics the same (still priors-based, no new model). Finally, I keep submission formatting/validity guarantees unchanged.'
+- What this solution (achieved 0.06741) has done: 'We’re far below the target (0.06711 vs 0.2177, higher-is-better), so the smallest legitimate way to move mAP upward is to improve ranking/recall within your existing “train-consensus template boxes + optional No finding append/replace by class0 thresholds” logic rather than changing models. I keep the same template-generation approach but (1) expand TOPK_CLASSES slightly and (2) allocate a small fixed per-class box budget (median + IQR + tail) while enforcing a strict global cap, which increases recall without flooding too many low-quality boxes. I also slightly re-balance confidence scaling so the most frequent classes rank higher (mAP is sensitive to ranking), while keeping the same priors-based confidence semantics and your No-finding threshold logic untouched. The script still run end-to-end and write a valid `submission.csv` with guaranteed non-empty `PredictionString` for every test image.'
+- What this solution (achieved 0.06727) has done: 'Your current score (0.06741) is far below the target (0.2177), so we should increase mAP by improving recall/ranking while preserving your existing “train-derived template boxes + optional No finding append/replace by class0 thresholds” core logic. The smallest effective change here is to generate the template boxes using *radiologist-consensus boxes* (group by `class_id, image_id` first, then take per-class quantiles), which reduces label-noise in the templates and tends to improve IoU alignment without changing the approach. I also modestly increase the per-image box cap and slightly raise the minimum confidence floor for frequent classes to improve ranking, while keeping your No-finding threshold logic and submission formatting intact. Everything still runs end-to-end and writes a valid `submission.csv`.'
+- What this solution (achieved 0.06729) has done: 'We’re far below the target (0.06727 vs 0.21771, higher-is-better), so the smallest legitimate way to move mAP upward without changing your core “train-derived template boxes + optional No finding append/replace” logic is to improve the template box coverage and ranking slightly. I (1) add one more moderate-variation template box per class (using 0.40/0.60 quantiles) for the most frequent classes to improve IoU chances without flooding, and (2) make the confidence mapping a bit more separative (higher for frequent classes, still clipped) to help mAP ranking. I keep your thresholds, formatting, and end-to-end submission writing identical, while enforcing the same global cap so runtime stays well under 600s. These changes are minimal and remain purely train-prior/template based (no new model, no new data).'
+- What this solution (achieved 0.05214) has done: 'Your current score (0.06729) is far below the target (0.2177), so we should increase mAP by making the existing “train-derived template boxes + optional No Finding append/replace” produce more *image-specific* boxes without changing the overall approach. The smallest safe step is to derive a per-test-image template by matching each test image to a small set of most-similar *train* images based on the already-available metadata (`x_min..y_max` distributions per image), then copying those images’ consensus boxes into the PredictionString (still purely train-prior/template based, no new model). This tends to raise IoU/recall versus one global template while keeping your same post-processing and No Finding threshold logic intact. I also keep a strict per-image box cap and confidence mapping based on class frequency to avoid flooding (which can hurt mAP).'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+RANDOM_SEED = 42
+np.random.seed(RANDOM_SEED)
+
+
+
+## === cell 1
+DATA_DIR_CANDIDATES = [
+    "/kaggle/input/vinbigdata-chest-xray-abnormalities-detection",
+    "/kaggle/data/vinbigdata-chest-xray-abnormalities-detection",
+    "/kaggle/input",
+    "/kaggle/data",
+]
+
+
+def _first_existing(path_list):
+    for p in path_list:
+        if os.path.exists(p):
+            return p
+    return None
+
+
+BASE_DIR = _first_existing(DATA_DIR_CANDIDATES)
+if BASE_DIR is None:
+    raise FileNotFoundError(
+        "Could not locate Kaggle input data directory. Checked: "
+        + str(DATA_DIR_CANDIDATES)
+    )
+
+sample_path = os.path.join(BASE_DIR, "sample_submission.csv")
+train_path = os.path.join(BASE_DIR, "train.csv")
+
+sample_df = pd.read_csv(sample_path)
+train_df = pd.read_csv(train_path)
+
+test_image_ids = sample_df["image_id"].values
+
+t = train_df.copy()
+for col in ["class_id", "x_min", "y_min", "x_max", "y_max"]:
+    t[col] = pd.to_numeric(t[col], errors="coerce")
+t = t.dropna(subset=["class_id", "x_min", "y_min", "x_max", "y_max"])
+t["class_id"] = t["class_id"].astype(int)
+
+t_abn = t[t["class_id"] != 14].copy()
+
+NORMAL = "14 1 0 0 1 1"
+
+
+def _sanitize_box(x1, y1, x2, y2):
+    xmin = max(0.0, min(float(x1), float(x2)))
+    ymin = max(0.0, min(float(y1), float(y2)))
+    xmax = max(xmin + 1.0, max(float(x1), float(x2)))
+    ymax = max(ymin + 1.0, max(float(y1), float(y2)))
+    return xmin, ymin, xmax, ymax
+
+
+def _build_image_level_features(df_abn: pd.DataFrame) -> pd.DataFrame:
+    g = df_abn.groupby("image_id")
+    feat = pd.DataFrame(
+        {
+            "image_id": g.size().index,
+            "n_box": g.size().values.astype(float),
+            "x_min_med": g["x_min"].median().values,
+            "y_min_med": g["y_min"].median().values,
+            "x_max_med": g["x_max"].median().values,
+            "y_max_med": g["y_max"].median().values,
+            "w_med": (g["x_max"].median() - g["x_min"].median()).values,
+            "h_med": (g["y_max"].median() - g["y_min"].median()).values,
+        }
+    )
+    for c in feat.columns:
+        if c != "image_id":
+            feat[c] = pd.to_numeric(feat[c], errors="coerce").fillna(0.0)
+    return feat
+
+
+if len(t_abn) == 0:
+    pred_det_df = sample_df.copy()
+    if "PredictionString" not in pred_det_df.columns:
+        pred_det_df["PredictionString"] = NORMAL
+else:
+    t_cons = (
+        t_abn.groupby(["image_id", "class_id"], as_index=False)[
+            ["x_min", "y_min", "x_max", "y_max"]
+        ]
+        .median()
+        .copy()
+    )
+
+    cls_counts = t_cons["class_id"].value_counts().sort_values(ascending=False)
+    total_abn = float(cls_counts.sum())
+
+    TOPK_CLASSES = 13
+    top_classes = cls_counts.head(TOPK_CLASSES).index.tolist()
+
+    def _conf_from_count(c):
+        p = float(c) / total_abn
+        return float(np.clip(p, 0.20, 0.92))
+
+    conf_map = {
+        int(cid): _conf_from_count(int(cls_counts.loc[cid])) for cid in top_classes
+    }
+
+    train_feat = _build_image_level_features(t_abn)
+    feat_cols = [c for c in train_feat.columns if c != "image_id"]
+    X = train_feat[feat_cols].to_numpy(dtype=np.float32)
+
+    mu = X.mean(axis=0, keepdims=True)
+    sig = X.std(axis=0, keepdims=True) + 1e-6
+    Xn = (X - mu) / sig
+
+    n_anchor = min(350, len(train_feat))
+    anchor_ids = train_feat["image_id"].iloc[:n_anchor].values
+    X_anchor = Xn[:n_anchor]
+
+    cons_by_img = t_cons[t_cons["class_id"].isin(top_classes)].groupby("image_id")
+    anchor_pred = {}
+    MAX_BOXES_PER_IMAGE = 24  # slight increase; still strict cap
+
+    for aid in anchor_ids:
+        if aid not in cons_by_img.groups:
+            anchor_pred[aid] = NORMAL
+            continue
+        img_boxes = cons_by_img.get_group(aid)
+        parts = []
+        img_boxes = img_boxes.copy()
+        img_boxes["cls_rank"] = img_boxes["class_id"].map(
+            lambda c: -cls_counts.get(int(c), 0)
+        )
+        img_boxes = img_boxes.sort_values(["cls_rank", "class_id"])
+        for _, r in img_boxes.iterrows():
+            cid = int(r["class_id"])
+            if cid not in conf_map:
+                continue
+            conf = conf_map[cid]
+            xmin, ymin, xmax, ymax = _sanitize_box(
+                r["x_min"], r["y_min"], r["x_max"], r["y_max"]
+            )
+            parts.append(
+                f"{cid} {conf:.4f} {xmin:.1f} {ymin:.1f} {xmax:.1f} {ymax:.1f}"
+            )
+            if len(parts) >= MAX_BOXES_PER_IMAGE:
+                break
+        s = " ".join(parts).strip()
+        anchor_pred[aid] = s if s else NORMAL
+
+    K_NEIGHBORS = 5  # small for speed; increases per-image specificity
+    pred_strings = []
+    test_feat = np.tile(Xn.mean(axis=0, keepdims=True), (len(test_image_ids), 1))
+
+    chunk = 300
+    for start in range(0, len(test_image_ids), chunk):
+        end = min(len(test_image_ids), start + chunk)
+        T = test_feat[start:end]  # (m,d)
+        d2 = ((T[:, None, :] - X_anchor[None, :, :]) ** 2).sum(axis=2)
+        nn_idx = np.argpartition(d2, kth=min(K_NEIGHBORS, d2.shape[1] - 1), axis=1)[
+            :, :K_NEIGHBORS
+        ]
+        for i in range(nn_idx.shape[0]):
+            aids = anchor_ids[nn_idx[i]]
+            tokens = []
+            for aid in aids:
+                s = anchor_pred.get(aid, "")
+                if s and s != NORMAL:
+                    tokens.append(s)
+            merged = " ".join(tokens).strip()
+            if not merged:
+                merged = NORMAL
+            else:
+                fields = merged.split()
+                max_fields = MAX_BOXES_PER_IMAGE * 6
+                if len(fields) > max_fields:
+                    fields = fields[:max_fields]
+                merged = " ".join(fields)
+            pred_strings.append(merged)
+
+    pred_det_df = pd.DataFrame(
+        {"image_id": test_image_ids, "PredictionString": pred_strings}
+    )
+
+has_finding_per_image = train_df.groupby("image_id")["class_id"].apply(
+    lambda s: (pd.to_numeric(s, errors="coerce").fillna(14).astype(int) != 14).any()
+)
+normal_prior = float((~has_finding_per_image).mean())  # P(normal)
+
+pred_2class = pd.DataFrame(
+    {"image_id": pred_det_df["image_id"].values, "class0": normal_prior}
+)
+
+low_threshold = 0.0
+high_threshold = 0.976
+
+print(f"Using BASE_DIR={BASE_DIR}")
+print(
+    f"Built pred_2class with constant class0(normal) prior={normal_prior:.6f} for {len(pred_2class)} test images"
+)
+print("Example PredictionString:")
+print(pred_det_df.head(1))
+
+
+
+## === cell 2
+NORMAL = "14 1 0 0 1 1"
+
+if "PredictionString" not in pred_det_df.columns:
+    for c in pred_det_df.columns:
+        if c.lower() in ("predictionstring", "target"):
+            pred_det_df = pred_det_df.rename(columns={c: "PredictionString"})
+            break
+if "PredictionString" not in pred_det_df.columns:
+    pred_det_df["PredictionString"] = NORMAL
+
+pred_det_df["PredictionString"] = pred_det_df["PredictionString"].fillna("").astype(str)
+pred_det_df.loc[
+    pred_det_df["PredictionString"].str.strip().eq(""), "PredictionString"
+] = NORMAL
+
+n_normal_before = len(pred_det_df.query("PredictionString == @NORMAL"))
+
+merged_df = pd.merge(pred_det_df, pred_2class, on="image_id", how="left")
+
+if "target" in merged_df.columns and "class0" not in merged_df.columns:
+    merged_df["class0"] = 1 - merged_df["target"]
+
+if "class0" not in merged_df.columns:
+    merged_df["class0"] = 1.0
+merged_df["class0"] = merged_df["class0"].fillna(1.0).astype(float)
+
+c0, c1, c2 = 0, 0, 0
+for i in range(len(merged_df)):
+    p0 = float(merged_df.loc[i, "class0"])
+    if p0 < low_threshold:
+        c0 += 1
+    elif low_threshold <= p0 and p0 < high_threshold:
+        base = str(merged_df.loc[i, "PredictionString"]).strip()
+        if base == "":
+            base = NORMAL
+        merged_df.loc[i, "PredictionString"] = (base + f" 14 {p0:.4f} 0 0 1 1").strip()
+        c1 += 1
+    else:
+        merged_df.loc[i, "PredictionString"] = NORMAL
+        c2 += 1
+
+merged_df["PredictionString"] = merged_df["PredictionString"].fillna("").astype(str)
+merged_df.loc[merged_df["PredictionString"].str.strip().eq(""), "PredictionString"] = (
+    NORMAL
+)
+
+n_normal_after = len(merged_df.query("PredictionString == @NORMAL"))
+print(
+    f"n_normal: {n_normal_before} -> {n_normal_after} with threshold {low_threshold} & {high_threshold}"
+)
+print(f"Keep {c0} Add {c1} Replace {c2}")
+
+submission_filepath = "submission.csv"
+submission_df = merged_df[["image_id", "PredictionString"]].copy()
+submission_df.to_csv(submission_filepath, index=False)
+print(f"Saved to {submission_filepath}")
+print(submission_df.head())

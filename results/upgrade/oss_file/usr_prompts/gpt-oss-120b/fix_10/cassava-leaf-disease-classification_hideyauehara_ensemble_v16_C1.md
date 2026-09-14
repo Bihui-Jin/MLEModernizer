@@ -1,0 +1,924 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8934723481414325
+
+# 6. Current score
+
+0.10762
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.05531) has done: 'I fix the failure caused by the Albumentations RandomResizedCrop transform (it requires a “size” argument in the installed version) by replacing it with a simple Resize operation, and I also filter the test directory so that only image files are loaded, preventing extra non‑image entries that broke the submission length check. These minimal changes let the notebook run end‑to‑end and generate a correctly sized `submission.csv`.'
+- What this solution (achieved 0.05531) has done: 'I correct the dataset and model directory paths so the pretrained weights are actually found and loaded, which replace the fallback constant‑zero predictions with real model outputs and therefore raise the accuracy toward the target score.'
+- What this solution (achieved 0.05531) has done: 'I adjust the model weight loading to use `strict=False` so that any mismatched keys (e.g., from a different final‑layer size) don’t prevent loading the pretrained convolutional features. This small change lets the networks use their learned feature extractors, which should raise the accuracy markedly toward the target while keeping all other logic unchanged.'
+- What this solution (achieved 0.05531) has done: 'I limit the test‑time augmentations to a single deterministic resize+normalize transform. Using multiple aggressive transforms (flips, rotations, etc.) can introduce noise that harms prediction quality, especially when the model was trained without such test‑time augmentations. By applying only the first, simple transform we keep the core model logic unchanged while making the predictions more stable, which should move the validation accuracy toward the target score.'
+- What this solution (achieved 0.0) has done: 'Implemented two key fixes to raise the Kaggle accuracy toward the target:
+
+1. **Recursive model search** – Updated the glob pattern to locate any *.pth* files anywhere under `/kaggle/input`, ensuring pretrained weights are actually found.
+2. **Fallback inference** – Added a safe fallback that runs an ImageNet‑pretrained ResNet‑50 when no custom weights are located, guaranteeing non‑random predictions instead of all‑zero outputs.
+
+These minimal changes keep the original pipeline intact while providing realistic model predictions, moving the score much closer to the target.'
+- What this solution (achieved 0.10762) has done: 'I add a small ensemble fallback: when no pretrained .pth files are found, the script run two ImageNet‑pretrained models (ResNet‑50 and DenseNet‑201) with the same deterministic resize‑normalize transform, average their softmax predictions, and use that as the final probability. This keeps the original pipeline intact while giving a better-than‑zero prediction, moving the score toward the target.'
+- What this solution (achieved 0.0) has done: 'Implemented a fix for the fallback inference path that caused a runtime error when converting tensors that require gradients to NumPy arrays. The tensors are now detached before calling `.numpy()`, and the inference loop is wrapped in a `torch.no_grad()` block to avoid gradient tracking. This resolves the errors in cells 15 and 16, allowing the script to generate a correct `submission.csv` and move the validation score toward the target.'
+- What this solution (achieved 0.10762) has done: 'I add a lightweight training stage that runs when no pretrained *.pth models are found. It loads the training images, fine‑tunes a pretrained ResNet‑50 for a couple of epochs, then uses this trained model (instead of the previous ImageNet‑only fallback) to generate predictions. This small addition should raise the accuracy far above the current 0 score and move it toward the target 0.893 while keeping the original inference logic intact.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import glob
+
+
+
+
+## === cell 1
+INPUT_ROOT = "/kaggle/input"
+pretrained_models = glob.glob(f"{INPUT_ROOT}/**/*.pth", recursive=True)
+print(f"{len(pretrained_models)} models found.")
+print("\n".join(np.sort(pretrained_models)))
+
+
+
+
+## === cell 2
+import pandas as pd
+import torch
+import torch.nn as nn
+import torch.utils.data as data
+import torchvision
+from torchvision import models, transforms
+import albumentations as A
+from albumentations import Compose
+from albumentations.pytorch import ToTensorV2
+import os
+from pathlib import Path
+import random
+import json
+import time
+import pickle
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+import seaborn as sns
+import cv2
+import sys
+
+
+def seed_everything(seed=42):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
+
+
+SEED = 42
+seed_everything(seed=SEED)
+
+
+
+
+## === cell 3
+sys.path.append("/kaggle/input/package/EfficientNet-PyTorch-1.0")
+try:
+    from efficientnet_pytorch import EfficientNet
+except ModuleNotFoundError:
+    EfficientNet = None
+    print("EfficientNet-PyTorch not available; efficientnet models will be skipped.")
+
+
+
+
+## === cell 4
+SIZE = 512  # image size
+num_classes = 5
+
+
+
+
+## === cell 5
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"使用デバイス: {device}")
+
+
+
+
+## === cell 6
+BASE_DIR = f"{INPUT_ROOT}/cassava-leaf-disease-classification"
+TEST_PATH = f"{BASE_DIR}/test_images"
+if not os.path.isdir(TEST_PATH):
+    TEST_PATH = f"{BASE_DIR}/train_images"  # fallback for debugging
+test_files = [
+    f for f in os.listdir(TEST_PATH) if f.lower().endswith((".jpg", ".jpeg", ".png"))
+]
+print(f"Number of test images: {len(test_files)}")
+
+
+
+
+## === cell 7
+df_test = pd.DataFrame(test_files, columns=["image_id"])
+df_test["label"] = 1  # placeholder, will be overwritten later
+
+
+
+
+## === cell 8
+if len(df_test) == 1:
+    df_test = pd.concat([df_test, df_test], ignore_index=True)
+    print(df_test)
+
+
+
+
+## === cell 9
+mean = [0.485, 0.456, 0.406]
+std = [0.229, 0.224, 0.225]
+
+transform = {
+    "test": [
+        Compose(
+            [
+                A.Resize(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.HorizontalFlip(p=1.0),
+                A.CenterCrop(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.Resize(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.HorizontalFlip(p=1.0),
+                A.Resize(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.VerticalFlip(p=1.0),
+                A.Resize(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.Rotate(p=1.0),
+                A.Resize(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+    ]
+}
+
+
+
+
+## === cell 10
+class FinalLayerMixupModel(nn.Module):
+    def __init__(self, model, criterion, num_classes, alpha):
+        super(FinalLayerMixupModel, self).__init__()
+        self.convlayer = torch.nn.Sequential(*(list(model.children())[:-1]))
+        num_ftrs = model.fc.in_features
+        self.fc = nn.Linear(num_ftrs, num_classes)
+        self.criterion = criterion
+        self.alpha = alpha
+
+    def forward(self, inputs, labels, phase):
+        if phase == "val":
+            x = self.convlayer(inputs)
+            x = x.squeeze()
+            outputs = self.fc(x)
+            loss = self.criterion(outputs, labels)
+            return outputs, loss
+
+        if phase == "test":
+            x = self.convlayer(inputs)
+            x = x.squeeze()
+            outputs = self.fc(x)
+            return outputs
+
+        alpha = self.alpha
+        lam = np.random.beta(alpha, alpha) if alpha > 0 else 1
+        index = torch.randperm(len(labels))
+        x1 = self.convlayer(inputs)
+        x2 = self.convlayer(inputs[index])
+        mixed_x = lam * x1 + (1 - lam) * x2
+        mixed_x = mixed_x.squeeze()
+        outputs = self.fc(mixed_x)
+        loss = lam * self.criterion(outputs, labels) + (1 - lam) * self.criterion(
+            outputs, labels[index]
+        )
+        return outputs, loss, labels, labels[index], lam
+
+
+
+
+## === cell 11
+class FinalLayerMixupModelDenseNet(nn.Module):
+    def __init__(self, model, criterion, num_classes, alpha):
+        super(FinalLayerMixupModelDenseNet, self).__init__()
+        self.convlayer = model.features
+        self.AdaptiveAvgPool2d = nn.AdaptiveAvgPool2d(output_size=(1, 1))
+        num_ftrs = model.classifier.in_features
+        self.fc = nn.Linear(num_ftrs, num_classes)
+        self.criterion = criterion
+        self.alpha = alpha
+
+    def forward(self, inputs, labels, phase):
+        if phase == "val":
+            x = self.convlayer(inputs)
+            x = self.AdaptiveAvgPool2d(x).squeeze()
+            outputs = self.fc(x)
+            loss = self.criterion(outputs, labels)
+            return outputs, loss
+
+        if phase == "test":
+            x = self.convlayer(inputs)
+            x = self.AdaptiveAvgPool2d(x).squeeze()
+            outputs = self.fc(x)
+            return outputs
+
+        alpha = self.alpha
+        lam = np.random.beta(alpha, alpha) if alpha > 0 else 1
+        index = torch.randperm(len(labels))
+        x1 = self.AdaptiveAvgPool2d(self.convlayer(inputs))
+        x2 = self.AdaptiveAvgPool2d(self.convlayer(inputs[index]))
+        mixed_x = lam * x1 + (1 - lam) * x2
+        mixed_x = mixed_x.squeeze()
+        outputs = self.fc(mixed_x)
+        loss = lam * self.criterion(outputs, labels) + (1 - lam) * self.criterion(
+            outputs, labels[index]
+        )
+        return outputs, loss, labels, labels[index], lam
+
+
+
+
+## === cell 12
+class FinalLayerMixupModelEN(nn.Module):
+    def __init__(self, model, criterion, num_classes, alpha):
+        super(FinalLayerMixupModelEN, self).__init__()
+        num_ftrs = model._fc.in_features
+        model._fc = nn.Linear(num_ftrs, num_classes)
+        self.model = model
+        self.criterion = criterion
+
+    def forward(self, inputs, labels, phase):
+        if phase == "val":
+            outputs = self.model(inputs)
+            loss = self.criterion(outputs, labels)
+            return outputs, loss
+        if phase == "test":
+            outputs = self.model(inputs)
+            return outputs
+        print("Unexpected phase")
+        sys.exit()
+
+
+
+
+## === cell 13
+class TestDataset(data.Dataset):
+    def __init__(self, df, transform=None):
+        super().__init__()
+        self.image_ids = df.image_id.tolist()
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_ids)
+
+    def load_image(self, image_id):
+        img = cv2.imread(f"{TEST_PATH}/{image_id}")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        return img
+
+    def __getitem__(self, index):
+        image_id = self.image_ids[index]
+        img = self.load_image(image_id)
+        if self.transform:
+            img = self.transform(image=img)["image"]
+        return img, image_id
+
+
+
+
+## === cell 14
+def predict_model(basename, net, dataloader):
+    model_start_time = time.time()
+    net.to(device)
+    net.eval()
+    torch.set_grad_enabled(False)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
+
+    probability = []
+    for inputs, image_ids in tqdm(dataloader["test"], desc=f"{basename}: "):
+        inputs = inputs.to(device)
+        outputs = net(inputs, None, "test")
+        probability.append(torch.softmax(outputs, dim=1).cpu().numpy())
+    print(f"{basename} time: {time.time() - model_start_time:.2f}[sec]")
+    return np.concatenate(probability, axis=0)
+
+
+
+
+## === cell 15
+TRAIN_PATH = f"{BASE_DIR}/train_images"
+train_df = pd.read_csv(f"{BASE_DIR}/train.csv")
+train_df.head()
+
+
+class TrainDataset(data.Dataset):
+    def __init__(self, df, transform=None):
+        super().__init__()
+        self.image_ids = df["image_id"].tolist()
+        self.labels = df["label"].tolist()
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_ids)
+
+    def load_image(self, image_id):
+        img = cv2.imread(f"{TRAIN_PATH}/{image_id}")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        return img
+
+    def __getitem__(self, idx):
+        image_id = self.image_ids[idx]
+        label = self.labels[idx]
+        img = self.load_image(image_id)
+        if self.transform:
+            img = self.transform(image=img)["image"]
+        return img, label
+
+
+
+
+## === cell 16
+if not pretrained_models:
+    print(
+        "No pretrained .pth models found – training a ResNet‑50 on the provided data."
+    )
+    train_transform = Compose(
+        [
+            A.Resize(height=SIZE, width=SIZE),
+            A.HorizontalFlip(p=0.5),
+            A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+            ToTensorV2(p=1.0),
+        ],
+        p=1.0,
+    )
+    train_dataset = TrainDataset(train_df, transform=train_transform)
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset,
+        batch_size=64,
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True,
+    )
+    backbone = models.resnet50(pretrained=True)
+    backbone.fc = nn.Linear(backbone.fc.in_features, num_classes)
+    backbone = backbone.to(device)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(backbone.fc.parameters(), lr=1e-3)
+
+    epochs = 2
+    backbone.train()
+    for epoch in range(epochs):
+        epoch_loss = 0.0
+        for imgs, lbls in tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs}"):
+            imgs = imgs.to(device)
+            lbls = lbls.to(device)
+            optimizer.zero_grad()
+            outputs = backbone(imgs)
+            loss = criterion(outputs, lbls)
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
+        print(f"Epoch {epoch+1} loss: {epoch_loss/len(train_loader):.4f}")
+
+    backbone.eval()
+    test_dataset = TestDataset(df_test, transform=transform["test"][0])
+    test_loader = torch.utils.data.DataLoader(
+        test_dataset,
+        batch_size=64,
+        shuffle=False,
+        num_workers=4,
+        pin_memory=True,
+    )
+    probability = []
+    with torch.no_grad():
+        for inputs, image_ids in tqdm(test_loader, desc="Inference (trained model)"):
+            inputs = inputs.to(device)
+            outputs = backbone(inputs)
+            probability.append(torch.softmax(outputs, dim=1).cpu().numpy())
+    probability = np.concatenate(probability, axis=0)
+else:
+    probability = []
+    start_time = time.time()
+
+    for pretrained_model in pretrained_models:
+        basename = os.path.splitext(os.path.basename(pretrained_model))[0]
+        criterion = nn.CrossEntropyLoss()
+
+        if "resnet18" in basename:
+            MODEL_NAME = "resnet18"
+            net = models.resnet18(pretrained=False)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 64
+        elif "resnet50" in basename:
+            MODEL_NAME = "resnet50"
+            net = models.resnet50(pretrained=False)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 32
+        elif "resnet152" in basename:
+            MODEL_NAME = "resnet152"
+            net = models.resnet152(pretrained=False)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 16
+        elif "resnext101" in basename:
+            MODEL_NAME = "resnext101"
+            net = models.resnext101_32x8d(pretrained=False)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 12
+        elif "densenet201" in basename:
+            MODEL_NAME = "densenet201"
+            net = models.densenet201(pretrained=False)
+            net = FinalLayerMixupModelDenseNet(net, criterion, num_classes, False)
+            BATCH_SIZE = 12
+        elif "efficientnet-b7" in basename:
+            if EfficientNet is None:
+                print(f"Skipping {basename} because EfficientNet is unavailable.")
+                continue
+            MODEL_NAME = "efficientnet-b7"
+            net = EfficientNet.from_name(MODEL_NAME)
+            net = FinalLayerMixupModelEN(net, criterion, num_classes, False)
+            BATCH_SIZE = 10
+        else:
+            print(f"{basename} is not supported, skipping.")
+            continue
+
+        print(f"{basename}: {MODEL_NAME}")
+
+        state_dict = torch.load(pretrained_model, map_location=device)
+        if MODEL_NAME == "efficientnet-b7":
+            net.model.load_state_dict(state_dict, strict=False)
+        else:
+            net.load_state_dict(state_dict, strict=False)
+
+        for param in net.parameters():
+            param.requires_grad = False
+
+        for tid, transform_ in enumerate(transform["test"][:1]):  # deterministic only
+            print(f"transform loop={tid}")
+            dataset = {"test": TestDataset(df_test, transform=transform_)}
+            dataloader = {
+                "test": torch.utils.data.DataLoader(
+                    dataset["test"],
+                    batch_size=BATCH_SIZE,
+                    shuffle=False,
+                    num_workers=4,
+                    pin_memory=True,
+                )
+            }
+            proba = predict_model(basename, net, dataloader)
+            probability.append(proba)
+
+        del net
+        torch.cuda.empty_cache()
+    print(f"model ensemble total time: {time.time() - start_time:.2f}[sec]")
+
+if probability:
+    avg_probs = np.mean(np.stack(probability), axis=0)  # (num_test, num_classes)
+    df_test["mean"] = avg_probs.argmax(axis=1)
+else:
+    df_test["mean"] = 0  # safety fallback
+
+
+
+
+## --- ERROR in cell 16, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/414688628.py in <cell line: 0>()
+    148 # Aggregate predictions (single model or ensemble) and prepare submission.
+    149 # ----------------------------------------------------------------------
+--> 150 if probability:
+    151     avg_probs = np.mean(np.stack(probability), axis=0)  # (num_test, num_classes)
+    152     df_test["mean"] = avg_probs.argmax(axis=1)
+
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+
+## === cell 17
+df_test["label"] = df_test["mean"].astype(int)
+
+
+
+
+## --- ERROR in cell 17, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3804         try:
+-> 3805             return self._engine.get_loc(casted_key)
+   3806         except KeyError as err:
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+index.pyx in pandas._libs.index.IndexEngine.get_loc()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+pandas/_libs/hashtable_class_helper.pxi in pandas._libs.hashtable.PyObjectHashTable.get_item()
+
+KeyError: 'mean'
+
+The above exception was the direct cause of the following exception:
+
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_55/3181488290.py in <cell line: 0>()
+----> 1 df_test["label"] = df_test["mean"].astype(int)
+      2 
+      3 
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4100             if self.columns.nlevels > 1:
+   4101                 return self._getitem_multilevel(key)
+-> 4102             indexer = self.columns.get_loc(key)
+   4103             if is_integer(indexer):
+   4104                 indexer = [indexer]
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in get_loc(self, key)
+   3810             ):
+   3811                 raise InvalidIndexError(key)
+-> 3812             raise KeyError(key) from err
+   3813         except TypeError:
+   3814             # If we have a listlike key, _check_indexing_error will raise
+
+KeyError: 'mean'
+
+## === cell 18
+df_test.head()
+
+
+
+
+## === cell 19
+df_test[["image_id", "label"]].to_csv("submission.csv", index=False)

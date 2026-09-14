@@ -1,0 +1,882 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect functional tissue units (FTUs) across different tissue preparation pipelines. An FTU is defined as a "three-dimensional block of cells centered around a capillary, such that each cell in this block is within diffusion distance from any other cell in the same block".
+
+## Metric
+Dice coefficient.
+
+## Submission Format
+Use run-length encoding on the pixel values. Submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+Note that, at the time of encoding, the mask should be binary, meaning the masks for all objects in an image are joined into a single large mask. A value of 0 should indicate pixels that are not masked, and a value of 1 will indicate pixels that are masked.
+
+The pixels are numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The file should contain a header and have the following format:
+
+```
+img,pixels\
+1,1 1 5 1\
+2,1 1\
+3,1 1\
+etc.
+```
+
+## Dataset
+The training set includes annotations in both RLE-encoded and unencoded (JSON) forms. The annotations denote segmentations of glomeruli.
+
+Both the training and public test sets also include anatomical structure segmentations. They are intended to help you identify the various parts of the tissue.
+
+### File structure
+The JSON files are structured as follows, with each feature having:
+
+-   A `type` (`Feature`) and object type `id` (`PathAnnotationObject`). Note that these fields are the same between all files and do not offer signal.
+-   A `geometry` containing a `Polygon` with `coordinates` for the feature's enclosing volume
+-   Additional `properties`, including the name and color of the feature in the image.
+-   The `IsLocked` field is the same across file types (locked for glomerulus, unlocked for anatomical structure) and is not signal-bearing.
+
+Note that the objects themselves do NOT have unique IDs. The expected prediction for a given image is an RLE-encoded mask containing ALL objects in the image. The mask, as mentioned in the Evaluation page, should be binary when encoded - with `0` indicating the lack of a masked pixel, and `1` indicating a masked pixel.
+
+`train.csv` contains the unique IDs for each image, as well as an RLE-encoded representation of the mask for the objects in the image.
+
+`HuBMAP-20-dataset_information.csv` contains additional information (including anonymized patient data) about each image.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+tifffile==2025.6.11
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            HuBMAP-20-dataset_information.csv (16 lines)
+            HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+            description.md (211 lines)
+            sample_submission.csv (4 lines)
+            sample_submission.csv.zip (238 Bytes)
+            test.zip (3.3 GB)
+            train.csv (13 lines)
+            train.csv.zip (5.0 MB)
+            train.zip (16.5 GB)
+            hubmap-kidney-segmentation/
+                HuBMAP-20-dataset_information.csv (16 lines)
+                HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+                ... and 7 other files
+                hubmap-kidney-segmentation/
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+            test/
+                0486052bb-anatomical-structure.json (161 lines)
+                0486052bb.json (11619 lines)
+                ... and 8 other files
+                test/
+            train/
+                1e2425f28-anatomical-structure.json (127 lines)
+                1e2425f28.json (30956 lines)
+                ... and 34 other files
+                train/
+        input/
+            HuBMAP-20-dataset_information.csv (16 lines)
+            HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+            description.md (211 lines)
+            sample_submission.csv (4 lines)
+            sample_submission.csv.zip (238 Bytes)
+            test.zip (3.3 GB)
+            train.csv (13 lines)
+            train.csv.zip (5.0 MB)
+            train.zip (16.5 GB)
+            hubmap-kidney-segmentation/
+                HuBMAP-20-dataset_information.csv (16 lines)
+                HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+                ... and 7 other files
+                hubmap-kidney-segmentation/
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+            test/
+                0486052bb-anatomical-structure.json (161 lines)
+                0486052bb.json (11619 lines)
+                ... and 8 other files
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+            train/
+                1e2425f28-anatomical-structure.json (127 lines)
+                1e2425f28.json (30956 lines)
+                ... and 34 other files
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+        working/
+            hubmap-kidney-segmentation/
+                HuBMAP-20-dataset_information.csv (16 lines)
+                HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+                ... and 7 other files
+                hubmap-kidney-segmentation/
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+```
+
+-> data/HuBMAP-20-dataset_information.csv has 15 rows and 16 columns.
+The columns are: image_file, width_pixels, height_pixels, anatomical_structures_segmention_file, glomerulus_segmentation_file, patient_number, race, ethnicity, sex, age, weight_kilograms, height_centimeters, bmi_kg/m^2, laterality, percent_cortex... and 1 more columns
+
+-> data/hubmap-kidney-segmentation/HuBMAP-20-dataset_information.csv has 15 rows and 16 columns.
+The columns are: image_file, width_pixels, height_pixels, anatomical_structures_segmention_file, glomerulus_segmentation_file, patient_number, race, ethnicity, sex, age, weight_kilograms, height_centimeters, bmi_kg/m^2, laterality, percent_cortex... and 1 more columns
+
+-> data/hubmap-kidney-segmentation/sample_submission.csv has 3 rows and 2 columns.
+The columns are: id, predicted
+
+-> data/hubmap-kidney-segmentation/test/0486052bb-anatomical-structure.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/0486052bb.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/095bf7a1f-anatomical-structure.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/095bf7a1f.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/8242609fa-anatomical-structure.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9446739630779464
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'We fix the OpenCV resize error by guarding against empty source images and ensure the loop over the test set never aborts on a single failure, which also restores the correct number of rows in the submission file.'
+- What this solution (achieved 0.0) has done: 'I add a lightweight fallback segmentation that thresholds the saturation channel when the loaded models produce only empty predictions, ensuring a non‑zero Dice and a valid .csv submission.'
+- What this solution (achieved 0.0) has done: 'I add a simple fallback mask when the model produces no foreground (or the image cannot be read). Instead of leaving the mask empty, the code now creates a small central square mask (or uses the saturation mask if the image exists). This guarantees non‑zero predictions, turning a 0.0 Dice score into a small positive value and moving the result toward the target while preserving the original workflow.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import gc
+import cv2
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+from tqdm import tqdm
+import tifffile as tiff
+import segmentation_models_pytorch as smp
+
+sz = 256  # tile size
+reduce = 4  # down‑sampling factor
+TH = 0.52  # threshold for positive predictions
+DATA = "../input/hubmap-kidney-segmentation/test/"
+MODELS = [
+    f"../input/skfoldalldata/efficientnet-b4-unet-BCELoss-256-FOLD-{i}-model.pth"
+    for i in range(5)
+]
+df_sample = pd.read_csv("../input/hubmap-kidney-segmentation/sample_submission.csv")
+bs = 32
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model_name = "efficientnet-b4"
+shift = True  # use the shift‑based tiling branch
+minoverlap = 300
+
+mean = np.array([0.65459856, 0.48386562, 0.69428385])
+std = np.array([0.15167958, 0.23584107, 0.13146145])
+s_th = 15  # lowered saturation threshold for fallback
+p_th = 1000 * (sz // 256) ** 2  # minimum number of foreground pixels
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+ModuleNotFoundError                       Traceback (most recent call last)
+/tmp/ipykernel_55/378286627.py in <cell line: 0>()
+      9 from tqdm import tqdm
+     10 import tifffile as tiff
+---> 11 import segmentation_models_pytorch as smp
+     12 
+     13 # ----- constants and parameters -----
+
+ModuleNotFoundError: No module named 'segmentation_models_pytorch'
+
+## === cell 1
+if shift:
+
+    def fallback_mask(full_img):
+        """
+        Produce a simple mask when the model yields no foreground.
+        Uses a relaxed saturation threshold and Otsu on the V channel.
+        Guarantees a small central square if the image is empty.
+        """
+        if full_img.size == 0:
+            h, w = full_img.shape[:2]
+            mask = np.zeros((h, w), dtype=np.uint8)
+            cx, cy = h // 2, w // 2
+            sz2 = max(1, min(h, w) // 20)  # ~5 % of size
+            mask[cx - sz2 : cx + sz2, cy - sz2 : cy + sz2] = 1
+            return mask
+
+        hsv = cv2.cvtColor(full_img, cv2.COLOR_BGR2HSV)
+        sat_mask = (hsv[:, :, 1] > s_th).astype(np.uint8)
+
+        _, otsu_mask = cv2.threshold(
+            hsv[:, :, 2], 0, 1, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        )
+        otsu_mask = otsu_mask.astype(np.uint8)
+
+        combined = np.clip(sat_mask + otsu_mask, 0, 1)
+
+        if combined.sum() == 0:
+            h, w = combined.shape
+            cx, cy = h // 2, w // 2
+            sz2 = max(1, min(h, w) // 20)
+            combined[cx - sz2 : cx + sz2, cy - sz2 : cy + sz2] = 1
+        return combined
+
+    def make_grid(shape, window, min_overlap):
+        """
+        Simple sliding‑window grid creator.
+        Returns list of (x1, x2, y1, y2) coordinates covering the image.
+        """
+        h, w = shape
+        stride = max(1, window - min_overlap)
+        grid = []
+        for x in range(0, h, stride):
+            x2 = min(x + window, h)
+            for y in range(0, w, stride):
+                y2 = min(y + window, w)
+                grid.append((x, x2, y, y2))
+        return grid
+
+    def img2tensor(img):
+        """Convert HWC uint8 image (0‑255) to C×H×W float tensor."""
+        tensor = torch.from_numpy(img.transpose(2, 0, 1)).float()
+        return tensor
+
+    def rle_encode_less_memory(mask):
+        """
+        Encode a binary mask (numpy 2‑D uint8) using run‑length encoding.
+        Pixels are ordered top‑to‑bottom then left‑to‑right (column‑major).
+        Returns an empty string for an empty mask.
+        """
+        if mask.sum() == 0:
+            return ""
+        flat = mask.T.ravel()
+        starts = np.where((flat == 1) & (np.concatenate(([0], flat[:-1])) == 0))[0] + 1
+        ends = np.where((flat == 1) & (np.concatenate((flat[1:], [0])) == 0))[0] + 1
+        lengths = ends - starts + 1
+        rle = " ".join(str(s) + " " + str(l) for s, l in zip(starts, lengths))
+        return rle
+
+    class HuBMAPDataset(Dataset):
+        def __init__(self, idx, sz=sz, reduce=reduce):
+            self.idx = idx
+            self.path = os.path.join(DATA, idx + ".tiff")
+            try:
+                self.full_img = tiff.imread(self.path)  # H,W,3 (uint8)
+            except Exception:
+                self.full_img = np.zeros((sz, sz, 3), dtype=np.uint8)
+            if self.full_img.ndim == 2:
+                self.full_img = np.expand_dims(self.full_img, -1)
+            self.shape = self.full_img.shape[:2]  # (H, W)
+            self.reduce = reduce
+            self.sz = reduce * sz  # tile size after up‑sampling
+            self.mask_grid = make_grid(
+                self.shape, window=self.sz, min_overlap=minoverlap
+            )
+
+        def __len__(self):
+            return len(self.mask_grid)
+
+        def __getitem__(self, idx):
+            x1, x2, y1, y2 = self.mask_grid[idx]
+            img = self.full_img[x1:x2, y1:y2].copy()
+            target_h = self.sz // self.reduce
+            target_w = self.sz // self.reduce
+            if img.shape[0] == 0 or img.shape[1] == 0:
+                img = np.zeros((target_h, target_w, 3), dtype=np.uint8)
+            if self.reduce != 1 and img.shape[0] > 0 and img.shape[1] > 0:
+                img = cv2.resize(
+                    img,
+                    (target_w, target_h),
+                    interpolation=cv2.INTER_AREA,
+                )
+            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            s = hsv[:, :, 1]  # not used directly but kept for parity
+            vertices = torch.tensor([x1, x2, y1, y2], dtype=torch.int64)
+            return img2tensor((img / 255.0 - mean) / std), vertices, idx
+
+    class Model_pred:
+        def __init__(self, models, dl, tta: bool = False, half: bool = False):
+            self.models = models
+            self.dl = dl
+            self.tta = tta
+            self.half = half
+
+        def __iter__(self):
+            with torch.no_grad():
+                for x, z, y in iter(self.dl):
+                    x = x.to(device)
+                    if self.half:
+                        x = x.half()
+                    py = None
+                    for model in self.models:
+                        p = torch.sigmoid(model(x)).detach()
+                        py = p if py is None else py + p
+                    if self.tta:
+                        flips = [[-1], [-2], [-2, -1]]
+                        for f in flips:
+                            xf = torch.flip(x, f)
+                            for model in self.models:
+                                p = torch.sigmoid(model(xf)).detach()
+                                py += torch.sigmoid(torch.flip(p, f))
+                        py /= 1 + len(flips)
+                    py /= len(self.models)
+                    py = F.interpolate(
+                        py,
+                        scale_factor=reduce,
+                        mode="bilinear",
+                        align_corners=False,
+                    )
+                    py = py.permute(0, 2, 3, 1).float().cpu().numpy().squeeze(-1)
+                    z = z.numpy()
+                    for i in range(len(py)):
+                        yield py[i], z[i], y[i]
+
+        def __len__(self):
+            return len(self.dl.dataset)
+
+    models = []
+    for path in MODELS:
+        try:
+            state_dict = torch.load(path, map_location="cpu")
+            model = smp.Unet(model_name, encoder_weights=None, classes=1)
+            model.load_state_dict(state_dict)
+            model.eval().to(device)
+            models.append(model)
+        except Exception as e:
+            print(f"Warning: could not load model {path}: {e}")
+    if not models:
+        models.append(
+            smp.Unet(model_name, encoder_weights=None, classes=1).eval().to(device)
+        )
+
+    names, preds = [], []
+    for _, row in tqdm(df_sample.iterrows(), total=len(df_sample)):
+        idx = row["id"]
+        try:
+            ds = HuBMAPDataset(idx)
+            dl = DataLoader(
+                ds, batch_size=bs, pin_memory=True, shuffle=False, num_workers=0
+            )
+            mp = Model_pred(models, dl)
+            mask = np.zeros(ds.shape, dtype=np.uint8)
+            any_tile = False
+            for pred, vert, _ in mp:
+                any_tile = True
+                x1, x2, y1, y2 = vert
+                mask[x1:x2, y1:y2] += (pred > TH).astype(np.uint8)
+
+            if not any_tile or mask.sum() == 0:
+                mask = fallback_mask(ds.full_img)
+
+            mask = (mask > 0.5).astype(np.uint8)
+            rle = rle_encode_less_memory(mask)
+        except Exception as e:
+            print(f"Error processing {idx}: {e}")
+            rle = ""
+        names.append(idx)
+        preds.append(rle)
+        del mask, ds, dl
+        gc.collect()
+else:
+    names, preds = [], []
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3969963366.py in <cell line: 0>()
+----> 1 if shift:
+      2 
+      3     def fallback_mask(full_img):
+      4         """
+      5         Produce a simple mask when the model yields no foreground.
+
+NameError: name 'shift' is not defined
+
+## === cell 2
+submission = pd.DataFrame({"id": names, "predicted": preds})
+submission.to_csv("submission.csv", index=False)
+display(submission)
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1558914831.py in <cell line: 0>()
+----> 1 submission = pd.DataFrame({"id": names, "predicted": preds})
+      2 submission.to_csv("submission.csv", index=False)
+      3 display(submission)
+
+NameError: name 'names' is not defined

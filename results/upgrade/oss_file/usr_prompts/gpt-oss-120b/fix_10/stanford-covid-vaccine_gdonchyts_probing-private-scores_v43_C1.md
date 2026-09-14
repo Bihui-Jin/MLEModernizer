@@ -1,0 +1,585 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Overview
+Predict likely degradation rates at each base of an RNA molecule.
+
+## Metric
+Mean columnwise root mean squared error:
+
+$\textrm{MCRMSE} = \frac{1}{N_{t}}\sum_{j=1}^{N_{t}}\sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_{ij} - \hat{y}_{ij})^2}$
+
+where $N_{t}$ is the number of scored ground truth target columns, and $y$ and $\hat{y}$ are the actual and predicted values, respectively.
+
+There are multiple ground truth values provided in the training data. While the submission format requires all 5 to be predicted, only the following are scored: reactivity, deg_Mg_pH10, and deg_Mg_50C.
+
+## Submission Formats
+For each sample `id` in the test set, you must predict targets for *each* sequence position (`seqpos`), one per row. If the length of the `sequence` of an `id` is, e.g., 107, then you should make 107 predictions. Positions greater than the `seq_scored` value of a sample are not scored, but still need a value in the solution file.
+
+```csv
+id_seqpos,reactivity,deg_Mg_pH10,deg_pH10,deg_Mg_50C,deg_50C
+id_d190610e8_0,0.1,0.3,0.2,0.5,0.4
+id_d190610e8_1,0.3,0.2,0.5,0.4,0.2
+id_d190610e8_2,0.5,0.4,0.2,0.1,0.2
+etc.
+```
+
+## Dataset 
+- **train.json** - the training data
+- **test.json** - the test set, without any columns associated with the ground truth.
+- **sample_submission.csv** - a sample submission file in the correct format
+
+#### Columns
+- `id` - An arbitrary identifier for each sample.
+- `seq_scored` - (68 in Train and Public Test, 68 in Private Test) Integer value denoting the number of positions used in scoring with predicted values. This should match the length of `reactivity`, `deg_*` and `*_error_*` columns.
+- `seq_length` - (107 in Train and Public Test, 107 in Private Test) Integer values, denotes the length of `sequence`.
+- `sequence` - (1x107 string in Train and Public Test, 107 in Private Test) Describes the RNA sequence, a combination of `A`, `G`, `U`, and `C` for each sample. Should be 107 characters long, and the first 68 bases should correspond to the 68 positions specified in `seq_scored` (note: indexed starting at 0).
+- `structure` - (1x107 string in Train and Public Test, 107 in Private Test) An array of `(`, `)`, and `.` characters that describe whether a base is estimated to be paired or unpaired. Paired bases are denoted by opening and closing parentheses e.g. (....) means that base 0 is paired to base 5, and bases 1-4 are unpaired.
+- `reactivity` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likely secondary structure of the RNA sample.
+- `deg_pH10` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating without magnesium at high pH (pH 10).
+- `deg_Mg_pH10` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating with magnesium in high pH (pH 10).
+- `deg_50C` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating without magnesium at high temperature (50 degrees Celsius).
+- `deg_Mg_50C` - (1x68 vector in Train and Public Test, 1x68 in Private Test) An array of floating point numbers, should have the same length as `seq_scored`. These numbers are reactivity values for the first 68 bases as denoted in `sequence`, and used to determine the likelihood of degradation at the base/linkage after incubating with magnesium at high temperature (50 degrees Celsius).
+- `*_error_*` - An array of floating point numbers, should have the same length as the corresponding `reactivity` or `deg_*` columns, calculated errors in experimental values obtained in `reactivity` and `deg_*` columns.
+- `predicted_loop_type` - (1x107 string) Describes the structural context (also referred to as 'loop type')of each character in `sequence`. Loop types assigned by bpRNA from Vienna RNAfold 2 structure. From the bpRNA_documentation: S: paired "Stem" M: Multiloop I: Internal loop B: Bulge H: Hairpin loop E: dangling End X: eXternal loop
+    - `S/N filter` Indicates if the sample passed filters described below in `Additional Notes`.
+
+#### Additional Notes
+At the beginning of the competition, Stanford scientists have data on 2400 RNA sequences of length 107. For technical reasons, measurements cannot be carried out on the final bases of these RNA sequences, so we have experimental data (ground truth) in 5 conditions for the first 68 bases.
+
+We have split out 240 of these 2400 sequences for a public test set to allow for continuous evaluation through the competition, on the public leaderboard. These sequences, in `test.json`, have been additionally filtered based on three criteria detailed below to ensure that this subset is not dominated by any large cluster of RNA molecules with poor data, which might bias the public leaderboard. The remaining 2160 sequences for which we have data are in `train.json`.
+
+For our final and most important scoring (the Private Leaderbooard), Stanford scientists are carrying out measurements on 240 new RNAs. For these data, we expect to have measurements for the first 68 bases, again missing the ends of the RNA. These sequences constitute the 240 sequences in `test.json`.
+
+For those interested in how the sequences in `test.json` were filtered, here were the steps to ensure a diverse and high quality test set for public leaderboard scoring:
+
+1. Minimum value across all 5 conditions must be greater than -0.5.
+2. Mean signal/noise across all 5 conditions must be greater than 1.0. [Signal/noise is defined as mean( measurement value over 68 nts )/mean( statistical error in measurement value over 68 nts)]
+3. To help ensure sequence diversity, the resulting sequences were clustered into clusters with less than 50% sequence similarity, and the 240 test set sequences were chosen from clusters with 3 or fewer members. That is, any sequence in the test set should be sequence similar to at most 2 other sequences.
+
+Note that these filters have not been applied to the 2160 RNAs in the public training data `train.json` -- some of those measurements have negative values or poor signal-to-noise, or some RNA sequences have near-identical sequences in that set. But we are providing all those data in case competitors can squeeze out more signal.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        input/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        working/
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+```
+
+-> data/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/stanford-covid-vaccine/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> input/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.3518779703353691
+
+# 6. Current score
+
+0.39083
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.42418) has done: 'I replace the missing baseline file with a simple, deterministic prediction: the per‑position average of each target from the training set (and the overall average for positions beyond the scored region). This fixes the file‑not‑found and undefined‑variable errors, guarantees a valid `submission.csv` with the correct columns, and provides a reasonable baseline that should move the score toward the target without altering any core modeling logic.'
+- What this solution (achieved 0.3944) has done: 'I keep the overall structure but replace the simple per‑position averages with a slightly richer baseline: for each target I compute the mean value for every loop‑type character (`S,M,I,B,H,E,X`) at each scored position. During prediction the model uses the loop‑type‑specific mean when it exists, otherwise falls back to the original position mean. This small, deterministic tweak should lower the MCRMSE toward the target without altering the core pipeline.'
+- What this solution (achieved 0.39112) has done: 'I add a lightweight per‑position, per‑loop‑type + nucleotide average (combo_means) and use it as the first fallback when predicting, then fall back to the existing loop‑type mean, then the position mean, and finally the overall mean. This small enrichment keeps the original deterministic baseline while giving a modest, targeted improvement toward the lower target MCRMSE.'
+- What this solution (achieved 0.39112) has done: 'I add a per‑position, per‑nucleotide mean (ntn_means) and use it as an additional fallback when predicting values: after trying the combo (loop‑type + nucleotide) and the loop‑type mean, the code look for a plain nucleotide mean before falling back to the position mean. This adds a tiny amount of extra signal without changing the overall modeling approach, and should lower the MCRMSE toward the target score.'
+- What this solution (achieved 0.39356) has done: 'I add a small deterministic smoothing step: each specific mean (combo, loop‑type or nucleotide) is blended with the generic per‑position mean using a fixed weight (e.g., 0.7 × specific + 0.3 × position). This keeps the original logic but reduces over‑fitting to rare patterns, which should lower the MCRMSE toward the target without changing the core model.'
+- What this solution (achieved 0.39112) has done: 'I adjust the blending weights so that the model uses the most specific deterministic means (combo, loop‑type, nucleotide) directly instead of smoothing them with the generic per‑position mean. Setting the alphas to 1.0 removes the extra smoothing that was increasing the error, moving the validation metric closer to the target while preserving the overall deterministic pipeline.'
+- What this solution (achieved 0.39153) has done: 'The fix introduces modest smoothing by lowering the blending weights for the most specific deterministic means (combo, loop‑type, nucleotide) from 1.0 to 0.7. This reduces over‑fitting to rare patterns and is expected to lower the MCRMSE toward the target while keeping the original deterministic pipeline unchanged.'
+- What this solution (achieved 0.39512) has done: 'I smooth the per‑position means by mixing each position with its neighbours and lower the blending weights for the specific means (combo, loop‑type, nucleotide) so predictions rely more on these smoothed generic values, which should reduce variance and move the MCRMSE closer to the target. The core deterministic pipeline and feature calculations remain unchanged.'
+- What this solution (achieved 0.39083) has done: 'I keep the overall deterministic pipeline but give more weight to the specific per‑position, loop‑type, and nucleotide statistics, which are the most informative signals. By increasing the blending factors (COMBO_ALPHA, LOOP_ALPHA, NTN_ALPHA) from 0.6 to 0.8 we rely more on these detailed means while still preserving the smoothed generic position values, which should lower the MCRMSE toward the target without altering the core logic.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+from collections import defaultdict
+
+train_path = os.path.join("..", "input", "stanford-covid-vaccine", "train.json")
+test_path = os.path.join("..", "input", "stanford-covid-vaccine", "test.json")
+
+df_train = pd.read_json(train_path, lines=True)
+df_test = pd.read_json(test_path, lines=True)
+
+targets = ["reactivity", "deg_Mg_pH10", "deg_pH10", "deg_Mg_50C", "deg_50C"]
+
+pos_means = {}
+overall_means = {}
+for t in targets:
+    stacked = np.stack(df_train[t].values)  # (n_samples, 68)
+    pos_means[t] = stacked.mean(axis=0)  # length 68
+    overall_means[t] = stacked.ravel().mean()  # scalar for positions > 68
+
+smoothed_pos_means = {}
+for t in targets:
+    arr = pos_means[t]
+    smooth = np.empty_like(arr)
+    for i in range(len(arr)):
+        if i == 0:
+            smooth[i] = 0.75 * arr[i] + 0.25 * arr[i + 1]
+        elif i == len(arr) - 1:
+            smooth[i] = 0.75 * arr[i] + 0.25 * arr[i - 1]
+        else:
+            smooth[i] = 0.5 * arr[i] + 0.25 * arr[i - 1] + 0.25 * arr[i + 1]
+    smoothed_pos_means[t] = smooth
+
+loop_means = {t: [defaultdict(list) for _ in range(68)] for t in targets}
+combo_means = {t: [defaultdict(list) for _ in range(68)] for t in targets}
+ntn_means = {t: [defaultdict(list) for _ in range(68)] for t in targets}
+
+for _, row in df_train.iterrows():
+    seq_scored = int(row["seq_scored"])
+    loop_str = row["predicted_loop_type"]
+    seq_str = row["sequence"]
+    for t in targets:
+        values = row[t]  # length seq_scored
+        for pos in range(seq_scored):
+            lt = loop_str[pos]
+            nt = seq_str[pos]
+            combo_means[t][pos][(lt, nt)].append(values[pos])
+            loop_means[t][pos][lt].append(values[pos])
+            ntn_means[t][pos][nt].append(values[pos])
+
+for t in targets:
+    for pos in range(68):
+        for key, lst in list(combo_means[t][pos].items()):
+            combo_means[t][pos][key] = np.mean(lst)
+        for lt, lst in list(loop_means[t][pos].items()):
+            loop_means[t][pos][lt] = np.mean(lst)
+        for nt, lst in list(ntn_means[t][pos].items()):
+            ntn_means[t][pos][nt] = np.mean(lst)
+
+COMBO_ALPHA = 0.8
+LOOP_ALPHA = 0.8
+NTN_ALPHA = 0.8
+
+
+
+
+## === cell 1
+rows = []
+for _, row in df_test.iterrows():
+    uid = row["id"]
+    seq_len = int(row["seq_length"])  # total length (107)
+    seq_scored = int(row["seq_scored"])  # scored length (68)
+    loop_str = row["predicted_loop_type"]
+    seq_str = row["sequence"]
+    for pos in range(seq_len):
+        id_seqpos = f"{uid}_{pos}"
+        vals = []
+        for t in targets:
+            if pos < seq_scored:
+                lt = loop_str[pos]
+                nt = seq_str[pos]
+                if (lt, nt) in combo_means[t][pos]:
+                    combo_val = combo_means[t][pos][(lt, nt)]
+                    blended = (
+                        COMBO_ALPHA * combo_val
+                        + (1 - COMBO_ALPHA) * smoothed_pos_means[t][pos]
+                    )
+                elif lt in loop_means[t][pos]:
+                    loop_val = loop_means[t][pos][lt]
+                    blended = (
+                        LOOP_ALPHA * loop_val
+                        + (1 - LOOP_ALPHA) * smoothed_pos_means[t][pos]
+                    )
+                elif nt in ntn_means[t][pos]:
+                    ntn_val = ntn_means[t][pos][nt]
+                    blended = (
+                        NTN_ALPHA * ntn_val
+                        + (1 - NTN_ALPHA) * smoothed_pos_means[t][pos]
+                    )
+                else:
+                    blended = smoothed_pos_means[t][pos]
+                vals.append(blended)
+            else:
+                vals.append(overall_means[t])
+        rows.append([id_seqpos] + vals)
+
+submission = pd.DataFrame(rows, columns=["id_seqpos"] + targets)
+
+
+
+
+## === cell 2
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path} with shape {submission.shape}")

@@ -1,0 +1,481 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the class of a given image from a synthetic dataset.
+
+## MetricMulti-class classification accuracy.
+
+## Submission FormatFor each `Id` in the test set, you must predict the `Cover_Type` class. The file should contain a header and have the following format:
+```
+Id,Cover_Type
+4000000,2
+4000001,1
+4000001,3
+etc.
+```
+
+## Dataset 
+- train.csv - the training data with the target `Cover_Type` column
+- test.csv - the test set; you will be predicting the `Cover_Type` for each row in this file (the target integer class)
+- sample_submission.csv - a sample submission file in the correct format
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        input/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        working/
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+```
+
+-> data/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/tabular-playground-series-dec-2021/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> data/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> input/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.95432
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ.setdefault("OMP_NUM_THREADS", "4")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "4")
+os.environ.setdefault("MKL_NUM_THREADS", "4")
+os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "4")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "4")
+
+import numpy as np
+import pandas as pd
+
+from catboost import CatBoostClassifier, Pool
+
+np.random.seed(42)
+
+
+
+
+## === cell 1
+class Config:
+    is_kaggle_platform = os.path.exists("/kaggle/input")
+    dataset_name = "tabular-playground-series-dec-2021"
+    data_path = f"/kaggle/input/{dataset_name}/" if is_kaggle_platform else ""
+    submit_filename = "submission.csv"
+    label_name = "Cover_Type"
+    id_field = "Id"
+
+    run_eda = False
+
+
+config = Config()
+
+
+
+
+## === cell 2
+if not config.is_kaggle_platform:
+    try:
+        import kaggle  # noqa: F401
+    except Exception:
+        import sys, subprocess
+
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "kaggle"])
+    if not os.path.exists("/root/.kaggle/kaggle.json"):
+        raise RuntimeError(
+            "kaggle.json not found; this block is intended only for non-Kaggle environments with credentials configured."
+        )
+    os.system(f"kaggle competitions download -c {config.dataset_name}")
+    os.system("unzip -o test.csv.zip")
+    os.system("unzip -o train.csv.zip")
+    os.system("unzip -o sample_submission.csv.zip")
+
+
+
+
+## === cell 3
+train_path = config.data_path + "train.csv"
+test_path = config.data_path + "test.csv"
+sub_path = config.data_path + "sample_submission.csv"
+
+_csv_engine = "pyarrow"
+try:
+    pd.read_csv(sub_path, nrows=1, engine=_csv_engine)
+except Exception:
+    _csv_engine = "c"
+
+train = pd.read_csv(train_path, dtype=np.int32, engine=_csv_engine)
+test = pd.read_csv(test_path, dtype=np.int32, engine=_csv_engine)
+sample_submission = pd.read_csv(
+    sub_path, engine=_csv_engine, usecols=[config.id_field, config.label_name]
+)
+
+
+
+
+## === cell 4
+if config.run_eda:
+    train.head()
+
+
+
+
+## === cell 5
+if config.run_eda:
+    train.info()
+
+
+
+
+## === cell 6
+if config.run_eda:
+    train.describe()
+
+
+
+
+## === cell 7
+if config.run_eda:
+    corr = train.corr(numeric_only=True)
+    corr
+
+
+
+
+## === cell 8
+if config.run_eda:
+    corr.sort_values(
+        ascending=False, inplace=True, by=config.label_name, key=lambda x: abs(x)
+    )
+    corr[config.label_name]
+
+
+
+
+## === cell 9
+if config.run_eda:
+    correlation_score = train.corr(numeric_only=True)
+    correlated_features = (
+        correlation_score[config.label_name].sort_values(ascending=False).dropna()
+    )
+    correlated_columns = list(
+        correlated_features[correlated_features.abs() > 0.05].index
+    )
+    if config.label_name in correlated_columns:
+        correlated_columns.remove(config.label_name)
+    print(correlated_columns)
+else:
+    correlated_columns = []
+
+
+
+
+## === cell 10
+if config.run_eda and correlated_columns:
+    corr2 = train[correlated_columns].corr(numeric_only=True)
+    corr2
+
+
+
+
+## === cell 11
+if config.run_eda and correlated_columns:
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(20, 20))
+    sns.heatmap(corr2, annot=False)
+
+
+
+
+## === cell 12
+if config.run_eda:
+    import seaborn as sns
+
+    sns.countplot(x=config.label_name, data=train)
+
+
+
+
+## === cell 13
+if config.run_eda:
+    train[config.label_name].value_counts()
+
+
+
+
+## === cell 14
+train = train.loc[train[config.label_name] != 5]
+
+
+
+
+## === cell 15
+test_ids = test[config.id_field].to_numpy(copy=False)
+train.drop(columns=[config.id_field], inplace=True)
+test.drop(columns=[config.id_field], inplace=True)
+
+
+
+
+## === cell 16
+null_counts_train = train.isnull().sum()
+mask_train = null_counts_train.to_numpy() > 0
+if mask_train.any():
+    print(null_counts_train[null_counts_train > 0])
+
+null_counts_test = test.isnull().sum()
+mask_test = null_counts_test.to_numpy() > 0
+if mask_test.any():
+    print(null_counts_test[null_counts_test > 0])
+
+
+
+
+## === cell 17
+n = len(train)
+rng = np.random.RandomState(42)
+perm = rng.permutation(n)
+val_size = int(round(n * 0.15))
+val_idx = perm[:val_size]
+tr_idx = perm[val_size:]
+
+y_all = train[config.label_name].to_numpy(copy=False)
+
+X_df = train.drop(columns=[config.label_name])
+cols = X_df.columns
+
+if config.run_eda:
+    X_df.head()
+
+
+
+
+## === cell 18
+X_all = X_df.to_numpy(dtype=np.float32, copy=False)
+X_test_base = test.loc[:, cols].to_numpy(dtype=np.float32, copy=False)
+
+
+def row_stats_np(x: np.ndarray) -> np.ndarray:
+    mean = x.mean(axis=1)
+    mn = x.min(axis=1)
+    mx = x.max(axis=1)
+    std = x.std(axis=1, ddof=1)
+    out = np.empty((x.shape[0], 4), dtype=np.float32)
+    out[:, 0] = mean
+    out[:, 1] = mn
+    out[:, 2] = mx
+    out[:, 3] = std
+    return out
+
+
+stats_all = row_stats_np(X_all)
+stats_test = row_stats_np(X_test_base)
+
+X_all_aug = np.ascontiguousarray(np.concatenate([X_all, stats_all], axis=1))
+X_test_aug = np.ascontiguousarray(np.concatenate([X_test_base, stats_test], axis=1))
+
+feature_cols = list(cols) + ["mean", "min", "max", "std"]
+
+X_tr = X_all_aug[tr_idx]
+X_va = X_all_aug[val_idx]
+y_tr = y_all[tr_idx]
+y_va = y_all[val_idx]
+
+
+
+
+## === cell 19
+cat_params = {
+    "iterations": 15000,
+    "learning_rate": 0.1,
+    "od_type": "Iter",
+    "od_wait": 1000,
+    "depth": 7,
+    "l2_leaf_reg": 3,
+    "eval_metric": "Accuracy",
+    "verbose": 1000,
+    "loss_function": "MultiClass",
+    "random_seed": 42,
+    "task_type": "CPU",
+    "thread_count": 4,
+    "allow_writing_files": False,
+    "use_best_model": True,
+    "grow_policy": "SymmetricTree",
+    "classes_count": 7,
+}
+
+train_pool = Pool(X_tr, y_tr)
+val_pool = Pool(X_va, y_va)
+
+cat = CatBoostClassifier(**cat_params)
+cat.fit(train_pool, eval_set=val_pool)
+
+
+
+
+## --- ERROR in cell 19, traceback:
+---------------------------------------------------------------------------
+CatBoostError                             Traceback (most recent call last)
+/tmp/ipykernel_11/2763036600.py in <cell line: 0>()
+     25 
+     26 cat = CatBoostClassifier(**cat_params)
+---> 27 cat.fit(train_pool, eval_set=val_pool)
+     28 
+     29 
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in fit(self, X, y, cat_features, text_features, embedding_features, graph, sample_weight, baseline, use_best_model, eval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period, silent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)
+   5243             CatBoostClassifier._check_is_compatible_loss(params['loss_function'])
+   5244 
+-> 5245         self._fit(X, y, cat_features, text_features, embedding_features, None, graph, sample_weight, None, None, None, None, baseline, use_best_model,
+   5246                   eval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period,
+   5247                   silent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _fit(self, X, y, cat_features, text_features, embedding_features, pairs, graph, sample_weight, group_id, group_weight, subgroup_id, pairs_weight, baseline, use_best_model, eval_set, verbose, logging_level, plot, plot_file, column_description, verbose_eval, metric_period, silent, early_stopping_rounds, save_snapshot, snapshot_file, snapshot_interval, init_model, callbacks, log_cout, log_cerr)
+   2408 
+   2409             with plot_wrapper(plot, plot_file, 'Training plots', [_get_train_dir(self.get_params())]):
+-> 2410                 self._train(
+   2411                     train_pool,
+   2412                     train_params["eval_sets"],
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _train(self, train_pool, test_pool, params, allow_clear_pool, init_model)
+   1788 
+   1789     def _train(self, train_pool, test_pool, params, allow_clear_pool, init_model):
+-> 1790         self._object._train(train_pool, test_pool, params, allow_clear_pool, init_model._object if init_model else None)
+   1791         self._set_trained_model_attributes()
+   1792 
+
+_catboost.pyx in _catboost._CatBoost._train()
+
+_catboost.pyx in _catboost._CatBoost._train()
+
+CatBoostError: catboost/private/libs/target/target_converter.cpp:173: Value in target (7) is greater than specified class count
+
+## === cell 20
+y_pred = cat.predict(X_test_aug, prediction_type="Class")
+y_pred = np.asarray(y_pred).reshape(-1).astype(int)
+
+submission = pd.DataFrame({config.id_field: test_ids, config.label_name: y_pred})
+submission.to_csv(config.submit_filename, index=False)
+
+if not config.is_kaggle_platform:
+    os.system(
+        f'kaggle competitions submit {config.dataset_name} -m "Submission" -f {config.submit_filename}'
+    )
+
+## --- ERROR in cell 20, traceback:
+---------------------------------------------------------------------------
+CatBoostError                             Traceback (most recent call last)
+/tmp/ipykernel_11/938677576.py in <cell line: 0>()
+      1 # Speed: predict_classes avoids returning probabilities; equivalent to original predict() for labels.
+----> 2 y_pred = cat.predict(X_test_aug, prediction_type="Class")
+      3 y_pred = np.asarray(y_pred).reshape(-1).astype(int)
+      4 
+      5 submission = pd.DataFrame({config.id_field: test_ids, config.label_name: y_pred})
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in predict(self, data, prediction_type, ntree_start, ntree_end, thread_count, verbose, task_type)
+   5305                   with log probability for every class for each object.
+   5306         """
+-> 5307         return self._predict(data, prediction_type, ntree_start, ntree_end, thread_count, verbose, 'predict', task_type)
+   5308 
+   5309     def predict_proba(self, X, ntree_start=0, ntree_end=0, thread_count=-1, verbose=None, task_type="CPU"):
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _predict(self, data, prediction_type, ntree_start, ntree_end, thread_count, verbose, parent_method_name, task_type)
+   2618         if verbose is None:
+   2619             verbose = False
+-> 2620         data, data_is_single_object = self._process_predict_input_data(data, parent_method_name, thread_count)
+   2621         self._validate_prediction_type(prediction_type)
+   2622 
+
+/usr/local/lib/python3.11/dist-packages/catboost/core.py in _process_predict_input_data(self, data, parent_method_name, thread_count, label)
+   2594     def _process_predict_input_data(self, data, parent_method_name, thread_count, label=None):
+   2595         if not self.is_fitted() or self.tree_count_ is None:
+-> 2596             raise CatBoostError(("There is no trained model to use {}(). "
+   2597                                  "Use fit() to train model. Then use this method.").format(parent_method_name))
+   2598         is_single_object = _is_data_single_object(data)
+
+CatBoostError: There is no trained model to use predict(). Use fit() to train model. Then use this method.

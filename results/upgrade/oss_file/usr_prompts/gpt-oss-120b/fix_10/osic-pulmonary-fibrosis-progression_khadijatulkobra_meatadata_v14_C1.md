@@ -1,0 +1,526 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pydicom==3.0.1
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-image==0.25.2
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-7.148920623049749
+
+# 6. Current score
+
+-9.15562
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -10.81761) has done: 'I fixed the deprecated `DataFrame.append` call, replaced the missing model loading with a simple baseline prediction (using the baseline FVC and a confidence of 70), and ensured the `test` dataframe is created before it is used. This eliminates the runtime errors and produces a valid `submission.csv` that follows the required format.'
+- What this solution (achieved nan) has done: 'I adjust the CSV‑search helper to look through the whole project directory (instead of only “./data”) so the training, test and sample files are correctly located. This eliminates the FileNotFoundError, allowing the dataframe variables to be defined and the linear‑regression model to train and predict. The rest of the logic is unchanged, so the script now runs end‑to‑end and writes a valid `submission.csv` file.'
+- What this solution (achieved -9.00913) has done: 'I fix the NaN issue that prevents the linear model from predicting by supplying the required baseline FVC values directly in the test‑set dataframe and by adjusting `prepare_features` to keep those baseline columns (and to guarantee all one‑hot columns exist). This eliminates the validation error, lets the script create a proper `submission.csv`, and keeps the original modeling logic unchanged.'
+- What this solution (achieved -9.17506) has done: 'I keep the overall linear‑regression pipeline but add a tiny post‑processing step that adds a globally‑averaged week‑wise FVC change (computed from the training set) to the model’s raw predictions. This small bias correction is expected to reduce the absolute error Δ on the test weeks, moving the Laplace Log Likelihood score closer to the target –7.15 without altering the core model or feature engineering. The script still write a proper `submission.csv` file.'
+- What this solution (achieved -9.15562) has done: 'I add a simple quadratic “Week_sq” feature to the linear‑regression inputs, which often captures the non‑linear progression of FVC over time while keeping the original model unchanged. This tiny feature expansion is expected to reduce the absolute errors Δ and therefore raise the Laplace Log‑Likelihood score toward the target –7.1489. No other logic is altered, and the script still writes a correct `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import pydicom  # this one is to read the dicom files
+import os
+import scipy.ndimage
+import matplotlib.pyplot as plt
+import sklearn
+from sklearn.preprocessing import normalize
+from tqdm.auto import tqdm
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from skimage import measure, morphology
+from sklearn.preprocessing import normalize
+
+from torch.utils.data import DataLoader
+from torch.utils.data import TensorDataset
+
+
+
+
+## === cell 1
+def csv_preprocess(data):
+    data["Healthy-FVC"] = round((data["FVC"] * 100) / data["Percent"])
+    FE = []
+    FE.append("Healthy-FVC")
+
+    COLS = ["Sex", "SmokingStatus"]
+    for col in COLS:
+        for mod in data[col].unique():
+            FE.append(mod)
+            data[mod] = (data[col] == mod).astype(int)
+
+    data = data[["Patient", "Weeks", "FVC", "Age"] + FE]
+    data = data.sort_values(["Patient", "Weeks"], ascending=True).reset_index(drop=True)
+
+    FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+    rename_col = {"Weeks": "base_Weeks", "FVC": "base_FVC"}
+    data = data.rename(columns=rename_col)
+
+    npData = pd.DataFrame(
+        columns=["Patient", "base_Weeks", "base_FVC", "Age"]
+        + FE1
+        + ["Week", "Healthy-FVC", "actual_FVC"]
+    )
+
+    for pid in data["Patient"].unique():
+        weeks = data.loc[data["Patient"] == pid].base_Weeks
+        fvc = data.loc[data["Patient"] == pid].base_FVC
+        index = data.loc[data["Patient"] == pid].index
+        weeks.reset_index(inplace=True, drop=True)
+        fvc.reset_index(inplace=True, drop=True)
+        for k in range(len(weeks)):
+            npData = pd.concat([npData, data.loc[data.index == index[0]]], sort=False)
+            npData.iloc[-1, npData.columns.get_loc("Week")] = weeks[k]
+            npData.iloc[-1, npData.columns.get_loc("actual_FVC")] = fvc[k]
+    npData.reset_index(inplace=True, drop=True)
+    npData = npData.fillna(0)
+
+    return npData
+
+
+
+
+## === cell 2
+from pathlib import Path
+
+
+def find_csv(filename):
+    """
+    Search for `filename` anywhere under the current working directory.
+    Returns the first matching path as a string.
+    """
+    for p in Path(".").rglob(filename):
+        return str(p)
+    raise FileNotFoundError(f"{filename} not found in the project directory")
+
+
+train_path = find_csv("train.csv")
+test_path = find_csv("test.csv")
+sample_path = find_csv("sample_submission.csv")
+
+data_train = pd.read_csv(train_path)
+data_test = pd.read_csv(test_path)
+submission_template = pd.read_csv(sample_path)
+
+
+
+
+## === cell 3
+from sklearn.linear_model import LinearRegression
+
+
+def prepare_features(df):
+    """
+    Convert the raw dataframe into model features.
+    Returns X (features), y (target FVC), and the list of feature column names.
+    """
+    df = df.copy()
+    df["Healthy-FVC"] = round((df["FVC"] * 100) / df["Percent"])
+    df["Week"] = df["Weeks"]
+
+    for col in ["Sex", "SmokingStatus"]:
+        for mod in df[col].unique():
+            df[mod] = (df[col] == mod).astype(int)
+
+    for col in ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]:
+        if col not in df:
+            df[col] = 0
+
+    if "base_FVC" not in df.columns:
+        baseline = df[df["Weeks"] == 0][["Patient", "FVC"]].rename(
+            columns={"FVC": "base_FVC"}
+        )
+        missing_patients = set(df["Patient"].unique()) - set(baseline["Patient"])
+        if missing_patients:
+            earliest = (
+                df.loc[df.groupby("Patient")["Weeks"].idxmin()][["Patient", "FVC"]]
+                .rename(columns={"FVC": "base_FVC"})
+                .loc[lambda x: x["Patient"].isin(missing_patients)]
+            )
+            baseline = pd.concat([baseline, earliest], ignore_index=True)
+
+        df = df.merge(baseline, on="Patient", how="left")
+        df["base_Weeks"] = 0  # baseline week is always 0
+    else:
+        if "base_Weeks" not in df:
+            df["base_Weeks"] = 0
+
+    df["Week_sq"] = df["Week"] ** 2
+
+    feature_cols = [
+        "base_Weeks",
+        "base_FVC",
+        "Age",
+        "Male",
+        "Female",
+        "Ex-smoker",
+        "Never smoked",
+        "Currently smokes",
+        "Week",
+        "Week_sq",  # <-- added feature
+        "Healthy-FVC",
+    ]
+
+    X = df[feature_cols].astype(float).fillna(0)
+    y = df["FVC"].astype(float)
+    return X, y, feature_cols
+
+
+X_train, y_train, feature_cols = prepare_features(data_train)
+
+linreg = LinearRegression()
+linreg.fit(X_train, y_train)
+
+
+
+
+## === cell 4
+pred_rows = []
+for pw in submission_template["Patient_Week"]:
+    patient, week_str = pw.rsplit("_", 1)
+    week = int(week_str)
+    base_rec = data_test[data_test["Patient"] == patient].iloc[0]
+    pred_rows.append(
+        {
+            "Patient": patient,
+            "Weeks": week,
+            "FVC": np.nan,  # placeholder – will be predicted
+            "Percent": base_rec["Percent"],
+            "Age": base_rec["Age"],
+            "Sex": base_rec["Sex"],
+            "SmokingStatus": base_rec["SmokingStatus"],
+        }
+    )
+
+df_pred = pd.DataFrame(pred_rows)
+
+baseline_fvc_map = data_test.set_index("Patient")["FVC"]
+df_pred["base_FVC"] = df_pred["Patient"].map(baseline_fvc_map)
+df_pred["base_Weeks"] = 0  # baseline week is always 0
+
+X_test, _, _ = prepare_features(df_pred)
+test_pred = linreg.predict(X_test)
+
+baseline_train = data_train[data_train["Weeks"] == 0][["Patient", "FVC"]].rename(
+    columns={"FVC": "base_FVC"}
+)
+missing_patients = set(data_train["Patient"].unique()) - set(baseline_train["Patient"])
+if missing_patients:
+    earliest = (
+        data_train.loc[data_train.groupby("Patient")["Weeks"].idxmin()][
+            ["Patient", "FVC"]
+        ]
+        .rename(columns={"FVC": "base_FVC"})
+        .loc[lambda x: x["Patient"].isin(missing_patients)]
+    )
+    baseline_train = pd.concat([baseline_train, earliest], ignore_index=True)
+
+train_merged = data_train.merge(baseline_train, on="Patient", how="left")
+train_merged["delta"] = train_merged["FVC"] - train_merged["base_FVC"]
+avg_delta_per_week = train_merged.groupby("Weeks")["delta"].mean().to_dict()
+
+week_adjustments = df_pred["Weeks"].map(avg_delta_per_week).fillna(0).values
+test_pred = test_pred + week_adjustments
+
+confidence = np.full_like(test_pred, 70.0)
+
+submission = (
+    pd.DataFrame(
+        {
+            "Patient_Week": submission_template["Patient_Week"],
+            "FVC": test_pred,
+            "Confidence": confidence,
+        }
+    )
+    .sort_values("Patient_Week")
+    .reset_index(drop=True)
+)
+
+
+
+
+## === cell 5
+submission.to_csv("submission.csv", index=False)

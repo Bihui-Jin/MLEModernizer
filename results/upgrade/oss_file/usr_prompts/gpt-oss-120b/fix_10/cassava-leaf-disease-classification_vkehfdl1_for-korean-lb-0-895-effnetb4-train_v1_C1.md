@@ -1,0 +1,805 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.0507
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O
+from PIL import Image
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tqdm import tqdm
+from sklearn.utils import shuffle
+import random
+import cv2
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import tensorflow as tf
+
+tf.config.threading.set_inter_op_parallelism_threads(4)
+tf.config.threading.set_intra_op_parallelism_threads(4)
+
+tf.config.optimizer.set_jit(True)
+
+from tensorflow.keras.mixed_precision import Policy, set_global_policy
+
+set_global_policy(Policy("mixed_float16"))
+
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, Input, GlobalAveragePooling2D, Dropout
+from tensorflow.keras import layers
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers.schedules import CosineDecay
+from tensorflow.keras.applications import EfficientNetB0
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+training_folder = "../input/cassava-leaf-disease-classification/train_images/"
+
+
+
+
+## === cell 2
+samples_df = pd.read_csv("../input/cassava-leaf-disease-classification/train.csv")
+samples_df = shuffle(samples_df, random_state=42)
+samples_df["filepath"] = training_folder + samples_df["image_id"]
+samples_df.head()
+
+
+
+
+## === cell 3
+training_df = samples_df[:1000]
+validation_df = samples_df[1000:1200]
+
+
+
+
+## === cell 4
+batch_size = 64  # was 32
+image_size = 512
+input_shape = (image_size, image_size, 3)
+dropout_rate = 0.4
+classes_to_predict = list(range(5))
+
+
+
+
+## === cell 5
+training_data = tf.data.Dataset.from_tensor_slices(
+    (training_df.filepath.values, training_df.label.values.astype(np.int32))
+)
+validation_data = tf.data.Dataset.from_tensor_slices(
+    (validation_df.filepath.values, validation_df.label.values.astype(np.int32))
+)
+
+
+def load_image_and_label_from_path(image_path, label):
+    img = tf.io.read_file(image_path)
+    img = tf.image.decode_jpeg(img, channels=3)
+    img = tf.image.resize(img, [image_size, image_size])
+    img = tf.cast(img, tf.float32) / 255.0
+    return img, label
+
+
+AUTOTUNE = tf.data.AUTOTUNE
+
+training_data = (
+    training_data.map(load_image_and_label_from_path, num_parallel_calls=AUTOTUNE)
+    .cache()
+    .prefetch(AUTOTUNE)
+)
+
+validation_data = (
+    validation_data.map(load_image_and_label_from_path, num_parallel_calls=AUTOTUNE)
+    .cache()
+    .prefetch(AUTOTUNE)
+)
+
+
+
+
+## === cell 6
+training_data_batches = (
+    training_data.shuffle(buffer_size=len(training_df), reshuffle_each_iteration=True)
+    .batch(batch_size)
+    .prefetch(buffer_size=AUTOTUNE)
+)
+validation_data_batches = validation_data.batch(batch_size).prefetch(
+    buffer_size=AUTOTUNE
+)
+
+
+
+
+## === cell 7
+data_augmentation_layers = tf.keras.Sequential(
+    [
+        layers.RandomCrop(height=image_size, width=image_size),
+        layers.RandomFlip(mode="horizontal_and_vertical"),
+        layers.RandomRotation(factor=0.25),
+        layers.RandomZoom(height_factor=(-0.2, 0.0), width_factor=(-0.2, 0.0)),
+        layers.RandomContrast(factor=0.2),
+    ]
+)
+
+
+
+
+## === cell 8
+efficientnet_base = EfficientNetB0(
+    weights="imagenet",
+    include_top=False,
+    input_shape=input_shape,
+)
+efficientnet_base.trainable = False
+
+inputs = Input(shape=input_shape)
+x = data_augmentation_layers(inputs)
+x = efficientnet_base(x)
+x = GlobalAveragePooling2D()(x)
+x = Dropout(dropout_rate)(x)
+outputs = Dense(len(classes_to_predict), activation="softmax", dtype="float32")(x)
+
+model = Model(inputs=inputs, outputs=outputs)
+model.summary()
+
+
+
+
+## === cell 9
+epochs = 15
+steps_per_epoch = int(round(len(training_df) / batch_size))
+decay_steps = steps_per_epoch * epochs
+cosine_decay = CosineDecay(
+    initial_learning_rate=1e-4, decay_steps=decay_steps, alpha=0.3
+)
+
+callbacks = [
+    ModelCheckpoint(filepath="best_model.h5", monitor="val_loss", save_best_only=True)
+]
+
+model.compile(
+    loss="sparse_categorical_crossentropy",
+    optimizer=Adam(learning_rate=cosine_decay),
+    metrics=["accuracy"],
+)
+
+
+
+
+## === cell 10
+history = model.fit(
+    training_data_batches,
+    epochs=epochs,
+    validation_data=validation_data_batches,
+    callbacks=callbacks,
+)
+
+if os.path.exists("best_model.h5"):
+    model = tf.keras.models.load_model("best_model.h5")
+
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/3931517534.py in <cell line: 0>()
+      7 
+      8 if os.path.exists("best_model.h5"):
+----> 9     model = tf.keras.models.load_model("best_model.h5")
+     10 
+     11 
+
+/usr/local/lib/python3.11/dist-packages/keras/src/saving/saving_api.py in load_model(filepath, custom_objects, compile, safe_mode)
+    194         )
+    195     if str(filepath).endswith((".h5", ".hdf5")):
+--> 196         return legacy_h5_format.load_model_from_hdf5(
+    197             filepath, custom_objects=custom_objects, compile=compile
+    198         )
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/saving/legacy_h5_format.py in load_model_from_hdf5(filepath, custom_objects, compile)
+    131 
+    132         with saving_options.keras_option_scope(use_legacy_config=True):
+--> 133             model = saving_utils.model_from_config(
+    134                 model_config, custom_objects=custom_objects
+    135             )
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/saving/saving_utils.py in model_from_config(config, custom_objects)
+     83     config = _find_replace_nested_dict(config, "keras.", "keras.")
+     84 
+---> 85     return serialization.deserialize_keras_object(
+     86         config,
+     87         module_objects=MODULE_OBJECTS.ALL_OBJECTS,
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/saving/serialization.py in deserialize_keras_object(identifier, module_objects, custom_objects, printable_module_name)
+    493 
+    494             if "custom_objects" in arg_spec.args:
+--> 495                 deserialized_obj = cls.from_config(
+    496                     cls_config,
+    497                     custom_objects={
+
+/usr/local/lib/python3.11/dist-packages/keras/src/models/model.py in from_config(cls, config, custom_objects)
+    580             from keras.src.models.functional import functional_from_config
+    581 
+--> 582             return functional_from_config(
+    583                 cls, config, custom_objects=custom_objects
+    584             )
+
+/usr/local/lib/python3.11/dist-packages/keras/src/models/functional.py in functional_from_config(cls, config, custom_objects)
+    549     # First, we create all layers and enqueue nodes to be processed
+    550     for layer_data in functional_config["layers"]:
+--> 551         process_layer(layer_data)
+    552 
+    553     # Then we process nodes in order of layer depth.
+
+/usr/local/lib/python3.11/dist-packages/keras/src/models/functional.py in process_layer(layer_data)
+    517             # Legacy format deserialization (no "module" key)
+    518             # used for H5 and SavedModel formats
+--> 519             layer = saving_utils.model_from_config(
+    520                 layer_data, custom_objects=custom_objects
+    521             )
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/saving/saving_utils.py in model_from_config(config, custom_objects)
+     83     config = _find_replace_nested_dict(config, "keras.", "keras.")
+     84 
+---> 85     return serialization.deserialize_keras_object(
+     86         config,
+     87         module_objects=MODULE_OBJECTS.ALL_OBJECTS,
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/saving/serialization.py in deserialize_keras_object(identifier, module_objects, custom_objects, printable_module_name)
+    471         # In this case we are dealing with a Keras config dictionary.
+    472         config = identifier
+--> 473         (cls, cls_config) = class_and_config_for_serialized_keras_object(
+    474             config, module_objects, custom_objects, printable_module_name
+    475         )
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/saving/serialization.py in class_and_config_for_serialized_keras_object(config, module_objects, custom_objects, printable_module_name)
+    352     )
+    353     if cls is None:
+--> 354         raise ValueError(
+    355             f"Unknown {printable_module_name}: '{class_name}'. "
+    356             "Please ensure you are using a `keras.utils.custom_object_scope` "
+
+ValueError: Unknown layer: 'Cast'. Please ensure you are using a `keras.utils.custom_object_scope` and that this object is included in the scope. See https://www.tensorflow.org/guide/keras/save_and_serialize#registering_the_custom_object for details.
+
+## === cell 11
+def scan_over_image(img_path, crop_size=512):
+    """
+    Extract up to four overlapping crops of size `crop_size` from the image.
+    Faster image loading using OpenCV.
+    """
+    img_np = cv2.cvtColor(cv2.imread(img_path, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+
+    if img_np is None:
+        raise FileNotFoundError(f"Image not found: {img_path}")
+
+    h, w, _ = img_np.shape
+    if h < crop_size or w < crop_size:
+        pad_h = max(crop_size - h, 0)
+        pad_w = max(crop_size - w, 0)
+        img_np = np.pad(
+            img_np,
+            ((0, pad_h), (0, pad_w), (0, 0)),
+            mode="constant",
+            constant_values=0,
+        )
+        h, w, _ = img_np.shape
+
+    x_origins = [0, max(w - crop_size, 0)]
+    y_origins = [0, max(h - crop_size, 0)]
+    crops = []
+    for x in x_origins:
+        for y in y_origins:
+            crop = img_np[y : y + crop_size, x : x + crop_size, :]
+            crops.append(crop)
+    return np.array(crops)
+
+
+
+
+## === cell 12
+test_time_augmentation_layers = tf.keras.Sequential(
+    [
+        layers.RandomFlip(mode="horizontal_and_vertical"),
+        layers.RandomZoom(height_factor=(-0.2, 0.2), width_factor=(-0.2, 0.2)),
+        layers.RandomContrast(factor=0.2),
+    ]
+)
+
+
+
+
+## === cell 13
+def predict_and_vote(image_filename, folder, TTA_runs=4):
+    """
+    Predict the class for a single image using TTA and multiple crops.
+    (Kept unchanged – not used after optimisation of run_predictions_over_image_list.)
+    """
+    localised_predictions = []
+    local_image_list = scan_over_image(os.path.join(folder, image_filename))
+    for local_image in local_image_list:
+        local_image = tf.convert_to_tensor(local_image, dtype=tf.float32) / 255.0
+        local_image = tf.expand_dims(local_image, 0)  # (1, H, W, 3)
+        tta_batch = tf.concat(
+            [test_time_augmentation_layers(local_image) for _ in range(TTA_runs)],
+            axis=0,
+        )
+        preds = model.predict(tta_batch, verbose=0)  # (TTA_runs, num_classes)
+        avg_pred = np.mean(preds, axis=0)  # (num_classes,)
+        localised_predictions.append(avg_pred)
+
+    global_pred = np.mean(localised_predictions, axis=0)
+    final_prediction = int(np.argmax(global_pred))
+    return final_prediction
+
+
+
+
+## === cell 14
+def run_predictions_over_image_list(image_list, folder, TTA_runs=4):
+    """
+    Efficiently predict over many images in a single batched pass.
+    Preserves the exact crop + TTA voting logic while removing thread‑pool overhead.
+    """
+    tta_batches = []
+    counts_per_image = []  # total number of (crop * TTA) predictions for each image
+
+    for fname in image_list:
+        crops = scan_over_image(os.path.join(folder, fname))
+        num_crops = len(crops)
+        counts_per_image.append(num_crops * TTA_runs)
+
+        for crop in crops:
+            tensor = tf.convert_to_tensor(crop, dtype=tf.float32) / 255.0
+            tensor = tf.expand_dims(tensor, 0)  # (1, H, W, 3)
+            tta_batch = tf.concat(
+                [test_time_augmentation_layers(tensor) for _ in range(TTA_runs)], axis=0
+            )
+            tta_batches.append(tta_batch)
+
+    if not tta_batches:
+        return [0] * len(image_list)  # fallback, should not happen
+
+    big_batch = tf.concat(tta_batches, axis=0)
+    predictions = model.predict(big_batch, verbose=0)
+
+    final_predictions = []
+    start = 0
+    for cnt in counts_per_image:
+        segment = predictions[start : start + cnt]
+        avg = np.mean(segment, axis=0)
+        final_predictions.append(int(np.argmax(avg)))
+        start += cnt
+
+    return final_predictions
+
+
+
+
+## === cell 15
+with open(
+    "../input/cassava-leaf-disease-classification/label_num_to_disease_map.json"
+) as f:
+    label_map = f.read()
+print(label_map[:200])
+
+
+
+
+## === cell 16
+test_folder = "../input/cassava-leaf-disease-classification/test_images/"
+submission_df = pd.DataFrame(columns=["image_id", "label"])
+submission_df["image_id"] = sorted(os.listdir(test_folder))
+
+
+
+
+## === cell 17
+submission_df["label"] = run_predictions_over_image_list(
+    submission_df["image_id"], test_folder
+)
+
+
+
+
+## --- ERROR in cell 17, traceback:
+---------------------------------------------------------------------------
+ResourceExhaustedError                    Traceback (most recent call last)
+/tmp/ipykernel_55/2495927425.py in <cell line: 0>()
+----> 1 submission_df["label"] = run_predictions_over_image_list(
+      2     submission_df["image_id"], test_folder
+      3 )
+      4 
+      5 
+
+/tmp/ipykernel_55/353305612.py in run_predictions_over_image_list(image_list, folder, TTA_runs)
+     17             tensor = tf.expand_dims(tensor, 0)  # (1, H, W, 3)
+     18             # Apply TTA TTA_runs times and concatenate
+---> 19             tta_batch = tf.concat(
+     20                 [test_time_augmentation_layers(tensor) for _ in range(TTA_runs)], axis=0
+     21             )
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/util/traceback_utils.py in error_handler(*args, **kwargs)
+    151     except Exception as e:
+    152       filtered_tb = _process_traceback_frames(e.__traceback__)
+--> 153       raise e.with_traceback(filtered_tb) from None
+    154     finally:
+    155       del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/framework/ops.py in raise_from_not_ok_status(e, name)
+   6000 def raise_from_not_ok_status(e, name) -> NoReturn:
+   6001   e.message += (" name: " + str(name if name is not None else ""))
+-> 6002   raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+   6003 
+   6004 
+
+ResourceExhaustedError: {{function_node __wrapped__ConcatV2_N_4_device_/job:localhost/replica:0/task:0/device:GPU:0}} OOM when allocating tensor with shape[4,512,512,3] and type half on /job:localhost/replica:0/task:0/device:GPU:0 by allocator GPU_0_bfc [Op:ConcatV2] name: concat
+
+## === cell 18
+submission_path = "submission.csv"
+submission_df.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")
+
+## --- ERROR in outputing the csv:
+Invalid submission: Submission must have the same length as the answers.

@@ -1,0 +1,391 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the class of a given image from a synthetic dataset.
+
+## MetricMulti-class classification accuracy.
+
+## Submission FormatFor each `Id` in the test set, you must predict the `Cover_Type` class. The file should contain a header and have the following format:
+```
+Id,Cover_Type
+4000000,2
+4000001,1
+4000001,3
+etc.
+```
+
+## Dataset 
+- train.csv - the training data with the target `Cover_Type` column
+- test.csv - the test set; you will be predicting the `Cover_Type` for each row in this file (the target integer class)
+- sample_submission.csv - a sample submission file in the correct format
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+plotly==5.24.1
+plotly-express==0.4.1
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        input/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        working/
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+```
+
+-> data/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/tabular-playground-series-dec-2021/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> data/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> input/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.95365
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_style('whitegrid')
+
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 1
+sample=pd.read_csv('/kaggle/input/tabular-playground-series-dec-2021/sample_submission.csv')
+train=pd.read_csv('/kaggle/input/tabular-playground-series-dec-2021/train.csv')
+test=pd.read_csv('/kaggle/input/tabular-playground-series-dec-2021/test.csv')
+
+
+## === cell 2
+train.describe().T[1:].sort_values(by='mean',ascending=False).style.background_gradient()
+
+
+## === cell 3
+train=train.drop('Id',axis=True)
+
+
+## === cell 4
+train.info()
+
+
+## === cell 5
+train.isnull().sum()
+
+
+## === cell 6
+def reduce_mem_usage(df, verbose=True):
+    numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    start_mem = df.memory_usage().sum() / 1024**2
+    for col in df.columns:
+        col_type = df[col].dtypes
+        if col_type in numerics:
+            c_min = df[col].min()
+            c_max = df[col].max()
+            if str(col_type)[:3] == 'int':
+                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+                    df[col] = df[col].astype(np.int8)
+                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
+                    df[col] = df[col].astype(np.int16)
+                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                    df[col] = df[col].astype(np.int32)
+                elif c_min > np.iinfo(np.int64).min and c_max < np.iinfo(np.int64).max:
+                    df[col] = df[col].astype(np.int64)
+            else:
+                if c_min > np.finfo(np.float16).min and c_max < np.finfo(np.float16).max:
+                    df[col] = df[col].astype(np.float16)
+                elif c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
+                    df[col] = df[col].astype(np.float32)
+                else:
+                    df[col] = df[col].astype(np.float64)
+
+    end_mem = df.memory_usage().sum() / 1024**2
+    print('Memory usage after optimization is:{:.1f} MB'.format(end_mem))
+    print('Decreased by {:.1f}%'.format(100 * (start_mem - end_mem) / start_mem))
+    return df
+
+
+## === cell 7
+train=reduce_mem_usage(train)
+test=reduce_mem_usage(test)
+
+
+## === cell 8
+train.info()
+
+
+## === cell 9
+train
+
+
+## === cell 10
+import plotly.express as px
+px.pie(names=train['Cover_Type'],title='Cover_Type Distributions')
+
+
+## === cell 12
+
+fig, ax = plt.subplots(5,2 ,figsize=(20,20))
+for i,feature in enumerate(train.columns[:10]):
+    plt.subplot(5,2,i+1)
+    sns.histplot(data=train,x=train[feature],color='green')
+    plt.xlabel(feature,color='green')
+    
+   
+plt.show();
+
+
+## === cell 18
+from xgboost import XGBClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+
+## === cell 19
+ 
+xgb=XGBClassifier(n_estimators=200,n_jobs=-1,booster='gbtree',predictor='gpu_predictor',tree_method='gpu_hist')
+
+xgb
+
+
+## === cell 20
+X=train.drop('Cover_Type',axis=True)
+Y=train['Cover_Type']
+
+
+## === cell 21
+X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.4)
+
+
+## === cell 22
+xgb.fit(X_train,Y_train)
+
+
+## --- ERROR in cell 22, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/584133164.py in <cell line: 0>()
+----> 1 xgb.fit(X_train,Y_train)
+
+/usr/local/lib/python3.11/dist-packages/xgboost/core.py in inner_f(*args, **kwargs)
+    728             for k, arg in zip(sig.parameters, args):
+    729                 kwargs[k] = arg
+--> 730             return func(**kwargs)
+    731 
+    732         return inner_f
+
+/usr/local/lib/python3.11/dist-packages/xgboost/sklearn.py in fit(self, X, y, sample_weight, base_margin, eval_set, eval_metric, early_stopping_rounds, verbose, xgb_model, sample_weight_eval_set, base_margin_eval_set, feature_weights, callbacks)
+   1469                 or not (classes == expected_classes).all()
+   1470             ):
+-> 1471                 raise ValueError(
+   1472                     f"Invalid classes inferred from unique values of `y`.  "
+   1473                     f"Expected: {expected_classes}, got {classes}"
+
+ValueError: Invalid classes inferred from unique values of `y`.  Expected: [0 1 2 3 4 5 6], got [1 2 3 4 5 6 7]
+
+## === cell 23
+pred=xgb.predict(X_test)
+
+
+## --- ERROR in cell 23, traceback:
+---------------------------------------------------------------------------
+NotFittedError                            Traceback (most recent call last)
+/tmp/ipykernel_11/454470734.py in <cell line: 0>()
+----> 1 pred=xgb.predict(X_test)
+
+/usr/local/lib/python3.11/dist-packages/xgboost/sklearn.py in predict(self, X, output_margin, validate_features, base_margin, iteration_range)
+   1551     ) -> ArrayLike:
+   1552         with config_context(verbosity=self.verbosity):
+-> 1553             class_probs = super().predict(
+   1554                 X=X,
+   1555                 output_margin=output_margin,
+
+/usr/local/lib/python3.11/dist-packages/xgboost/sklearn.py in predict(self, X, output_margin, validate_features, base_margin, iteration_range)
+   1166             if self._can_use_inplace_predict():
+   1167                 try:
+-> 1168                     predts = self.get_booster().inplace_predict(
+   1169                         data=X,
+   1170                         iteration_range=iteration_range,
+
+/usr/local/lib/python3.11/dist-packages/xgboost/sklearn.py in get_booster(self)
+    723             from sklearn.exceptions import NotFittedError
+    724 
+--> 725             raise NotFittedError("need to call fit or load_model beforehand")
+    726         return self._Booster
+    727 
+
+NotFittedError: need to call fit or load_model beforehand
+
+## === cell 24
+accuracy_score(Y_test,pred)
+
+
+## --- ERROR in cell 24, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1584005317.py in <cell line: 0>()
+----> 1 accuracy_score(Y_test,pred)
+
+NameError: name 'pred' is not defined
+
+## === cell 25
+test=test.drop('Id',axis=True)
+
+
+## === cell 27
+testpredict=xgb.predict(test)
+
+
+## --- ERROR in cell 27, traceback:
+---------------------------------------------------------------------------
+NotFittedError                            Traceback (most recent call last)
+/tmp/ipykernel_11/450485656.py in <cell line: 0>()
+----> 1 testpredict=xgb.predict(test)
+
+/usr/local/lib/python3.11/dist-packages/xgboost/sklearn.py in predict(self, X, output_margin, validate_features, base_margin, iteration_range)
+   1551     ) -> ArrayLike:
+   1552         with config_context(verbosity=self.verbosity):
+-> 1553             class_probs = super().predict(
+   1554                 X=X,
+   1555                 output_margin=output_margin,
+
+/usr/local/lib/python3.11/dist-packages/xgboost/sklearn.py in predict(self, X, output_margin, validate_features, base_margin, iteration_range)
+   1166             if self._can_use_inplace_predict():
+   1167                 try:
+-> 1168                     predts = self.get_booster().inplace_predict(
+   1169                         data=X,
+   1170                         iteration_range=iteration_range,
+
+/usr/local/lib/python3.11/dist-packages/xgboost/sklearn.py in get_booster(self)
+    723             from sklearn.exceptions import NotFittedError
+    724 
+--> 725             raise NotFittedError("need to call fit or load_model beforehand")
+    726         return self._Booster
+    727 
+
+NotFittedError: need to call fit or load_model beforehand
+
+## === cell 28
+submission=pd.DataFrame({'Id':sample['Id'],'Cover_Type':testpredict})
+
+
+## --- ERROR in cell 28, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/2631300966.py in <cell line: 0>()
+----> 1 submission=pd.DataFrame({'Id':sample['Id'],'Cover_Type':testpredict})
+
+NameError: name 'testpredict' is not defined
+
+## === cell 29
+submission=submission.to_csv('submission.csv',index=False)
+
+
+## --- ERROR in cell 29, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/336295495.py in <cell line: 0>()
+----> 1 submission=submission.to_csv('submission.csv',index=False)
+
+NameError: name 'submission' is not defined

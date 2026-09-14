@@ -1,0 +1,531 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean column-wise ROC AUC.
+
+## Submission Format
+For each image_id in the test set, you must predict a probability for each target variable. The file should contain a header and have the following format:
+
+```
+image_id,
+test_0,0.25,0.25,0.25,0.25
+test_1,0.25,0.25,0.25,0.25
+test_2,0.25,0.25,0.25,0.25
+etc.
+```
+
+## Dataset
+Given a photo of an apple leaf, can you accurately assess its health? This competition will challenge you to distinguish between leaves which are healthy, those which are infected with apple rust, those that have apple scab, and those with more than one disease.
+
+**train.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+**images**
+
+A folder containing the train and test images, in jpg format.
+
+**test.csv**
+
+- `image_id`: the foreign key
+
+**sample_submission.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        input/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        working/
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+```
+
+-> data/plant-pathology-2020-fgvc7/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/plant-pathology-2020-fgvc7/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/plant-pathology-2020-fgvc7/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9699976501828376
+
+# 6. Current score
+
+0.6246
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.49317) has done: 'I fix the runtime error by removing the hard dependency on a non-existent `/kaggle/input/submissions/submissions/` dataset and instead generate a valid prediction file directly from the provided competition data. To preserve the “ensemble submissions” core logic, the script still average/weight multiple “submissions”, but when none are available it create two simple baseline submissions (image-based brightness heuristics) and ensemble them. This guarantees an end-to-end run that writes `submission.csv` with the exact required columns and row alignment to `test.csv`. The approach is fully self-contained in the given environment and avoids changing the competition’s evaluation semantics (still outputs probabilities per class).'
+- What this solution (achieved 0.64415) has done: 'The timeout is dominated by repeatedly opening and decoding ~1.8k JPEGs in pure Python during feature extraction; the logistic regression itself is cheap. I keep the exact same features and modeling logic, but speed up I/O and per-image compute by (1) using `PIL.ImageStat` for mean/std and grayscale stats without materializing full float arrays, (2) computing percentiles and ExG/ExR on a single grayscale/float array only once per image, and (3) parallelizing feature extraction with a deterministic thread pool (JPEG decode releases the GIL) while preserving row order. I also cache resolved image paths to avoid repeated filesystem checks. These changes are provably equivalent in semantics (same features, same training/prediction), with only negligible floating-point differences.'
+- What this solution (achieved 0.63738) has done: 'Your current score (0.64415) is far below the target (0.96999), so we should improve AUC with minimal, metric-aligned changes while keeping the same overall pipeline (handcrafted image features → one-vs-rest LogisticRegression → average two modes). The biggest low-risk gain is to handle class imbalance correctly: `multiple_diseases` is rare, and plain logistic regression under-predicts it, hurting mean per-class AUC; adding `class_weight="balanced"` keeps the same model/loop but improves ranking for minority classes. I also increase `max_iter` slightly to ensure convergence with the same solver and features (no early stopping), and keep everything else (features, ensemble, submission writing) identical. These changes should move the score upward toward the target without changing the core approach.'
+- What this solution (achieved 0.63738) has done: 'We keep the exact same pipeline (handcrafted image stats → per-class StandardScaler + LogisticRegression → average two modes) but make two minimal, metric-aligned fixes that typically improve mean column-wise ROC AUC substantially. First, we correct the label imbalance handling: `class_weight="balanced"` inside a per-class one-vs-rest loop can overcompensate; instead we use explicit `sample_weight` per class computed from that class’s positives/negatives, which preserves the same model and training loop but gives better ranking calibration. Second, we switch the logistic loss to `penalty="l2"` explicitly and increase `max_iter` modestly for stable convergence (no early stopping), keeping everything else identical and still writing a valid `submission.csv`.'
+- What this solution (achieved 0.6246) has done: 'Your current score (0.63738) is far below the target (0.96999), so we need a meaningful AUC lift while keeping the same core pipeline (handcrafted features → per-class StandardScaler+LogisticRegression → 2-mode average). The most score-relevant minimal change is to add a few additional, cheap color/texture statistics per image (still simple global stats; no architecture/training loop change) and keep the exact same one-vs-rest LR training/prediction flow. This tends to improve separability for rust/scab vs healthy and helps the rare `multiple_diseases` class without changing the evaluation semantics. I also keep determinism and submission alignment intact.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+
+os.environ.setdefault("PYTHONHASHSEED", "0")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
+
+np.random.seed(0)
+
+
+
+## === cell 1
+BASE_CANDIDATES = [
+    "/kaggle/input/plant-pathology-2020-fgvc7",
+    "/kaggle/input",
+    "/kaggle/data/plant-pathology-2020-fgvc7",
+    "/kaggle/data",
+]
+
+_FOUND_CACHE = {}
+
+
+def _find_file(filename):
+    if filename in _FOUND_CACHE:
+        return _FOUND_CACHE[filename]
+
+    for base in BASE_CANDIDATES:
+        path = os.path.join(base, filename)
+        if os.path.exists(path):
+            _FOUND_CACHE[filename] = path
+            return path
+
+    for base in BASE_CANDIDATES:
+        cand = os.path.join(base, "plant-pathology-2020-fgvc7", filename)
+        if os.path.exists(cand):
+            _FOUND_CACHE[filename] = cand
+            return cand
+
+    raise FileNotFoundError(f"Could not locate {filename} in known Kaggle input paths.")
+
+
+TRAIN_CSV = _find_file("train.csv")
+TEST_CSV = _find_file("test.csv")
+SAMPLE_SUB = _find_file("sample_submission.csv")
+
+
+_IMAGES_DIR_CACHE = None
+
+
+def _find_images_dir():
+    global _IMAGES_DIR_CACHE
+    if _IMAGES_DIR_CACHE is not None:
+        return _IMAGES_DIR_CACHE
+
+    candidates = []
+    for base in BASE_CANDIDATES:
+        candidates.extend(
+            [
+                os.path.join(base, "images"),
+                os.path.join(base, "plant-pathology-2020-fgvc7", "images"),
+            ]
+        )
+    for c in candidates:
+        if os.path.isdir(c):
+            _IMAGES_DIR_CACHE = c
+            return c
+
+    raise FileNotFoundError("Could not locate images directory.")
+
+
+IMAGES_DIR = _find_images_dir()
+
+print("Using:")
+print("TRAIN_CSV:", TRAIN_CSV)
+print("TEST_CSV :", TEST_CSV)
+print("SAMPLE   :", SAMPLE_SUB)
+print("IMAGES   :", IMAGES_DIR)
+
+
+
+## === cell 2
+SUBMISSIONS_PATH = "/kaggle/input/submissions/submissions/"
+submissions_all = []
+if os.path.isdir(SUBMISSIONS_PATH):
+    for dirname, _, filenames in os.walk(SUBMISSIONS_PATH):
+        for filename in filenames:
+            if filename.endswith(".csv") or filename.endswith(".CSV"):
+                submissions_all.append(os.path.join(dirname, filename))
+submissions_all.sort()
+print("Found submission files:", submissions_all)
+
+
+
+
+## === cell 3
+def ensemble(submissions_all, sub_idx, weights=None):
+    if weights is None:
+        weights = [1.0] * len(sub_idx)
+    if len(sub_idx) != len(weights):
+        raise ValueError("sub_idx and weights must have the same length.")
+
+    cols = ["healthy", "multiple_diseases", "rust", "scab"]
+    acc = None
+    wsum = 0.0
+    for i, (idx, w) in enumerate(zip(sub_idx, weights)):
+        path = submissions_all[idx]
+        w = float(w)
+        print(f"I'm taking submission {path} with weight {w}")
+        arr = pd.read_csv(path, usecols=cols).to_numpy(dtype=np.float64, copy=False)
+        if acc is None:
+            acc = np.zeros_like(arr, dtype=np.float64)
+        acc += arr * w
+        wsum += w
+    if wsum != 0.0:
+        acc /= wsum
+    return acc
+
+
+def make_submission_file(submission_avg, template_csv_path, out_path="submission.csv"):
+    submission_df = pd.read_csv(template_csv_path)
+    if "image_id" in submission_df.columns:
+        submission_df["image_id"] = submission_df["image_id"].astype(str)
+    submission_df[["healthy", "multiple_diseases", "rust", "scab"]] = submission_avg
+    submission_df[["healthy", "multiple_diseases", "rust", "scab"]] = submission_df[
+        ["healthy", "multiple_diseases", "rust", "scab"]
+    ].clip(0.0, 1.0)
+    submission_df.to_csv(out_path, index=False)
+    print(
+        f"Wrote {out_path} with shape {submission_df.shape} and columns {list(submission_df.columns)}"
+    )
+
+
+
+
+## === cell 4
+test_df = pd.read_csv(TEST_CSV)
+train_df = pd.read_csv(TRAIN_CSV)
+sample_df = pd.read_csv(SAMPLE_SUB)
+
+test_ids = test_df["image_id"].astype(str).tolist()
+train_ids = train_df["image_id"].astype(str).tolist()
+
+sample_df["image_id"] = sample_df["image_id"].astype(str)
+sample_df = sample_df.set_index("image_id").loc[test_ids].reset_index()
+
+from PIL import Image, ImageStat
+
+
+def _build_image_map(images_dir):
+    mp = {}
+    for fn in os.listdir(images_dir):
+        mp[fn.lower()] = fn
+    return mp
+
+
+_IMAGE_MAP = _build_image_map(IMAGES_DIR)
+
+_IMG_PATH_CACHE = {}
+
+
+def _safe_img_path(image_id):
+    image_id = str(image_id)
+    p = _IMG_PATH_CACHE.get(image_id)
+    if p is not None:
+        return p
+
+    p1 = os.path.join(IMAGES_DIR, f"{image_id}.jpg")
+    if os.path.exists(p1):
+        _IMG_PATH_CACHE[image_id] = p1
+        return p1
+    p2 = os.path.join(IMAGES_DIR, image_id)
+    if os.path.exists(p2):
+        _IMG_PATH_CACHE[image_id] = p2
+        return p2
+
+    key1 = f"{image_id}.jpg".lower()
+    key2 = image_id.lower()
+    fn = _IMAGE_MAP.get(key1) or _IMAGE_MAP.get(key2)
+    if fn is not None:
+        p = os.path.join(IMAGES_DIR, fn)
+        _IMG_PATH_CACHE[image_id] = p
+        return p
+
+    raise FileNotFoundError(f"Image not found for id={image_id} in {IMAGES_DIR}")
+
+
+def _extract_one(image_id):
+    path = _safe_img_path(image_id)
+    with Image.open(path) as img:
+        img = img.convert("RGB")
+
+        st = ImageStat.Stat(img)
+        m = np.asarray(st.mean, dtype=np.float32) / 255.0
+        s = np.asarray(st.stddev, dtype=np.float32) / 255.0
+
+        gimg = img.convert("L")
+        gst = ImageStat.Stat(gimg)
+        gm = float(gst.mean[0]) / 255.0
+        gs = float(gst.stddev[0]) / 255.0
+
+        gray = (np.asarray(gimg, dtype=np.float32) / 255.0).reshape(-1)
+        p10, p50, p90 = np.percentile(gray, [10, 50, 90])
+        gmin = float(gray.min())
+        gmax = float(gray.max())
+
+        arr = np.asarray(img, dtype=np.float32) / 255.0
+        r = arr[..., 0]
+        g = arr[..., 1]
+        b = arr[..., 2]
+        exg = float((2.0 * g - r - b).mean())
+        exr = float((2.0 * r - g - b).mean())
+
+        denom = (r + g + b) + 1e-6
+        r_ratio = float((r / denom).mean())
+        g_ratio = float((g / denom).mean())
+        b_ratio = float((b / denom).mean())
+        y_proxy = float(((r + g) * 0.5 - b).mean())
+
+        row = np.empty((18,), dtype=np.float32)
+        row[0] = m[0]
+        row[1] = m[1]
+        row[2] = m[2]
+        row[3] = s[0]
+        row[4] = s[1]
+        row[5] = s[2]
+        row[6] = gm
+        row[7] = gs
+        row[8] = float(p10)
+        row[9] = float(p50)
+        row[10] = float(p90)
+        row[11] = exg + 0.25 * exr
+        row[12] = gmin
+        row[13] = gmax
+        row[14] = r_ratio
+        row[15] = g_ratio
+        row[16] = b_ratio
+        row[17] = y_proxy
+        return row
+
+
+def extract_features_for_ids(ids):
+    from concurrent.futures import ThreadPoolExecutor
+
+    n = len(ids)
+    X = np.empty((n, 18), dtype=np.float32)
+
+    max_workers = min(8, (os.cpu_count() or 2))
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        for i, row in enumerate(ex.map(_extract_one, ids, chunksize=16)):
+            X[i] = row
+    return X
+
+
+def _binary_balanced_sample_weight(y_bin: np.ndarray) -> np.ndarray:
+    y_bin = np.asarray(y_bin).astype(np.int32).ravel()
+    n = y_bin.shape[0]
+    pos = int(y_bin.sum())
+    neg = n - pos
+    pos = max(pos, 1)
+    neg = max(neg, 1)
+    w_pos = n / (2.0 * pos)
+    w_neg = n / (2.0 * neg)
+    return np.where(y_bin == 1, w_pos, w_neg).astype(np.float64)
+
+
+def build_baseline_submission(mode=1, X_train=None, y_train=None, X_test=None):
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.linear_model import LogisticRegression
+
+    targets = ["healthy", "multiple_diseases", "rust", "scab"]
+
+    if X_train is None or y_train is None or X_test is None:
+        X_train = extract_features_for_ids(train_ids)
+        y_train = train_df[targets].values.astype(np.int32)
+        X_test = extract_features_for_ids(test_ids)
+
+    C = 2.0 if mode == 1 else 0.7
+
+    probs = np.zeros((len(test_ids), len(targets)), dtype=np.float64)
+    for j in range(len(targets)):
+        model = Pipeline(
+            steps=[
+                ("scaler", StandardScaler(with_mean=True, with_std=True)),
+                (
+                    "clf",
+                    LogisticRegression(
+                        C=C,
+                        solver="lbfgs",
+                        penalty="l2",
+                        max_iter=1200,
+                        n_jobs=None,
+                        random_state=42,
+                        class_weight=None,
+                    ),
+                ),
+            ]
+        )
+        sw = _binary_balanced_sample_weight(y_train[:, j])
+        model.fit(X_train, y_train[:, j], clf__sample_weight=sw)
+        probs[:, j] = model.predict_proba(X_test)[:, 1].astype(np.float64)
+
+    probs = np.clip(probs, 1e-6, 1.0 - 1e-6)
+    return probs
+
+
+if len(submissions_all) >= 2:
+    submission_avg = ensemble(submissions_all, [0, 1], [0.2, 0.8])
+    make_submission_file(submission_avg, submissions_all[0], out_path="submission.csv")
+elif len(submissions_all) == 1:
+    one = pd.read_csv(submissions_all[0])
+    submission_avg = one[
+        ["healthy", "multiple_diseases", "rust", "scab"]
+    ].values.astype(np.float64)
+    make_submission_file(submission_avg, submissions_all[0], out_path="submission.csv")
+else:
+    targets = ["healthy", "multiple_diseases", "rust", "scab"]
+
+    X_train = extract_features_for_ids(train_ids)
+    y_train = train_df[targets].values.astype(np.int32)
+    X_test = extract_features_for_ids(test_ids)
+
+    sub1 = build_baseline_submission(
+        mode=1, X_train=X_train, y_train=y_train, X_test=X_test
+    )
+    sub2 = build_baseline_submission(
+        mode=2, X_train=X_train, y_train=y_train, X_test=X_test
+    )
+    w1, w2 = 0.5, 0.5
+    submission_avg = (sub1 * w1 + sub2 * w2) / (w1 + w2)
+
+    make_submission_file(submission_avg, SAMPLE_SUB, out_path="submission.csv")
+
+out = pd.read_csv("submission.csv")
+assert out.shape[0] == len(test_df), "Submission row count must match test.csv"
+assert list(out.columns) == [
+    "image_id",
+    "healthy",
+    "multiple_diseases",
+    "rust",
+    "scab",
+], "Wrong submission columns/order"
+
+out["image_id"] = out["image_id"].astype(str)
+out = out.set_index("image_id").loc[test_ids].reset_index()
+out.to_csv("submission.csv", index=False)
+
+print(out.head())
+print("submission.csv ready.")

@@ -1,0 +1,425 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+fastai==2.8.5
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7708402585410896
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+from fastai.vision.all import *
+import os, glob
+import pandas as pd
+import numpy as np
+import random
+import torch
+
+defaults.use_progress_bar = False
+os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+
+def seed_everything(seed=42):
+    set_seed(seed, reproducible=True)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+seed_everything(42)
+
+BASE = Path("../input/plant-pathology-2021-fgvc8")
+if not BASE.exists():
+    BASE = Path("/kaggle/input/plant-pathology-2021-fgvc8")
+
+TRAIN_CSV_PATH = BASE / "train.csv"
+TRAIN_IMG_DIR = BASE / "train_images"
+TEST_IMG_DIR = BASE / "test_images"
+SAMPLE_SUB_PATH = BASE / "sample_submission.csv"
+
+assert TRAIN_CSV_PATH.exists(), f"Missing {TRAIN_CSV_PATH}"
+assert TRAIN_IMG_DIR.exists(), f"Missing {TRAIN_IMG_DIR}"
+assert TEST_IMG_DIR.exists(), f"Missing {TEST_IMG_DIR}"
+assert SAMPLE_SUB_PATH.exists(), f"Missing {SAMPLE_SUB_PATH}"
+
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+test_df = sample_sub[["image"]].copy()
+
+
+def get_x_test(row):
+    return str(TEST_IMG_DIR / row["image"])
+
+
+def get_x_train(row):
+    return str(TRAIN_IMG_DIR / row["image"])
+
+
+def get_y_train(row):
+    return row["labels"].split(" ")
+
+
+def f1_multi(inp, targ, thresh=0.5, eps=1e-9):
+    inp = inp.float()
+    targ = targ.float()
+    pred = (inp > thresh).float()
+    tp = (pred * targ).sum(dim=0)
+    fp = (pred * (1 - targ)).sum(dim=0)
+    fn = ((1 - pred) * targ).sum(dim=0)
+    f1 = (2 * tp) / (2 * tp + fp + fn + eps)
+    return f1.mean()
+
+
+
+
+## === cell 1
+preferred_roots = [
+    Path("../input/fgvc8-fastai"),
+    Path("/kaggle/input/fgvc8-fastai"),
+    Path("../input"),
+    Path("/kaggle/input"),
+]
+found_models = []
+for r in preferred_roots:
+    if r.exists():
+        found_models += sorted(
+            [Path(p) for p in glob.glob(str(r / "**/*.pkl"), recursive=True)]
+        )
+
+models = [str(p) for p in found_models]
+print(f"Found exported models: {len(models)}")
+
+if len(models) == 0:
+    raise RuntimeError(
+        "No exported .pkl models were found under ../input or /kaggle/input. "
+        "The fallback training branch is disabled to guarantee the 600s timeout. "
+        "Please attach an input dataset containing one or more exported fastai Learner .pkl files."
+    )
+
+print(f"Number of models to use: {len(models)}")
+print("First models:", models[:3])
+
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+RuntimeError                              Traceback (most recent call last)
+/tmp/ipykernel_55/2370701114.py in <cell line: 0>()
+     20 # timeouts, we fail fast if no exported models are present instead of training a new one.
+     21 if len(models) == 0:
+---> 22     raise RuntimeError(
+     23         "No exported .pkl models were found under ../input or /kaggle/input. "
+     24         "The fallback training branch is disabled to guarantee the 600s timeout. "
+
+RuntimeError: No exported .pkl models were found under ../input or /kaggle/input. The fallback training branch is disabled to guarantee the 600s timeout. Please attach an input dataset containing one or more exported fastai Learner .pkl files.
+
+## === cell 2
+predictions = None
+learner = None
+
+ncpu = os.cpu_count() or 2
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
+test_dl = None
+
+for i, m in enumerate(models):
+    learner = load_learner(m).to_fp32()
+    learner.model.to(device)
+
+    if test_dl is None:
+        test_dl = learner.dls.test_dl(
+            test_df,
+            with_labels=False,
+            num_workers=min(4, ncpu),
+            pin_memory=torch.cuda.is_available(),
+            persistent_workers=True,
+            prefetch_factor=2,
+        )
+
+    with torch.inference_mode():
+        preds, _ = learner.get_preds(dl=test_dl)
+    preds = preds.float()  # keep on-device for accumulation
+    predictions = preds if predictions is None else (predictions + preds)
+
+if predictions is None:
+    raise RuntimeError(
+        "No predictions were generated; model list was unexpectedly empty."
+    )
+
+predictions = predictions / len(models)
+
+vocabs = list(learner.dls.vocab)
+thr = 0.5
+
+pred_np = predictions.detach().cpu().numpy()
+
+mask = pred_np >= thr
+any_pos = mask.any(axis=1)
+argmax_idx = pred_np.argmax(axis=1)
+
+decoded = np.empty(pred_np.shape[0], dtype=object)
+
+pos_rows = np.flatnonzero(any_pos)
+if pos_rows.size:
+    vocab_arr = np.array(vocabs, dtype=object)
+    decoded[pos_rows] = [" ".join(vocab_arr[mask[r]]) for r in pos_rows]
+
+neg_rows = np.flatnonzero(~any_pos)
+if neg_rows.size:
+    vocab_arr = np.array(vocabs, dtype=object)
+    decoded[neg_rows] = vocab_arr[argmax_idx[neg_rows]]
+
+test_df["labels"] = decoded.tolist()
+
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+RuntimeError                              Traceback (most recent call last)
+/tmp/ipykernel_55/3748923787.py in <cell line: 0>()
+     30 
+     31 if predictions is None:
+---> 32     raise RuntimeError(
+     33         "No predictions were generated; model list was unexpectedly empty."
+     34     )
+
+RuntimeError: No predictions were generated; model list was unexpectedly empty.
+
+## === cell 3
+sub = test_df[["image", "labels"]].copy()
+sub.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv")
+print(sub.head())
+print(f"Models used ({len(models)}):", models[:5], "..." if len(models) > 5 else "")
+print("submission.csv rows:", len(sub))
+assert Path("submission.csv").exists() and Path("submission.csv").suffix == ".csv"
+assert list(sub.columns) == ["image", "labels"]
+assert sub["labels"].isna().sum() == 0
+assert len(sub) == len(
+    sample_sub
+), "Submission row count mismatch vs sample_submission.csv"
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_55/996708716.py in <cell line: 0>()
+----> 1 sub = test_df[["image", "labels"]].copy()
+      2 sub.to_csv("submission.csv", index=False)
+      3 
+      4 print("Wrote submission.csv")
+      5 print(sub.head())
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4106             if is_iterator(key):
+   4107                 key = list(key)
+-> 4108             indexer = self.columns._get_indexer_strict(key, "columns")[1]
+   4109 
+   4110         # take() does not accept boolean indexers
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in _get_indexer_strict(self, key, axis_name)
+   6198             keyarr, indexer, new_indexer = self._reindex_non_unique(keyarr)
+   6199 
+-> 6200         self._raise_if_missing(keyarr, indexer, axis_name)
+   6201 
+   6202         keyarr = self.take(indexer)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in _raise_if_missing(self, key, indexer, axis_name)
+   6250 
+   6251             not_found = list(ensure_index(key)[missing_mask.nonzero()[0]].unique())
+-> 6252             raise KeyError(f"{not_found} not in index")
+   6253 
+   6254     @overload
+
+KeyError: "['labels'] not in index"

@@ -1,0 +1,1056 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8902991840435177
+
+# 6. Current score
+
+0.11584
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.11584) has done: 'I fix the missing `efficientnet_pytorch` dependency by gracefully falling back to `torchvision`’s EfficientNet when needed, keeping the same “load pretrained .pth then do TTA inference” core logic. I also fix the environment/path detection so it always finds the Kaggle dataset under `/kaggle/input/...` and constructs `df_test` from `sample_submission.csv` to guarantee correct image ordering. The Albumentations v2 `RandomResizedCrop` API has changed, so I update those calls to the new signature while preserving the same augmentation intent. Finally, I make the probability aggregation robust (avoid the axis error when no models are found / empty probability list) and ensure a valid `submission.csv` is always written.'
+- What this solution (achieved 0.11584) has done: 'Your current score (0.11584) is far below the target (0.8903), and the biggest issue is that the script is almost certainly not loading any `.pth` models (so it falls back to essentially random/constant predictions). I make the smallest change that directly addresses this: robustly locate the checkpoint directory across common Kaggle paths (including your provided dataset name) and fail loudly if none are found (while still writing a valid CSV). I also fix the `cudnn` settings to be consistent (your code sets both deterministic and benchmark True, which can hurt reproducibility) without changing the model/inference logic. Finally, I ensure probability aggregation is always correct and uses float32 to avoid unnecessary numeric drift.'
+- What this solution (achieved 0.11584) has done: 'Your score is extremely low for this competition, which strongly suggests the model weights are not being loaded into the right module (so inference is effectively random) even though `.pth` files are found. I keep your exact model choices, TTA transforms, and inference loop, but make the checkpoint loading robust to common checkpoint formats (`state_dict`, `model_state_dict`, nested dicts) and to key mismatches (e.g., `fc.` vs `model._fc.` for EfficientNet wrappers). I also fix a silent but critical bug for torchvision EfficientNet: your `FinalLayerMixupModelEN` expects a `.model._fc` attribute, but the wrapper currently exposes `_fc` on the wrapper, not on the `.model`, which prevents correct head replacement and commonly breaks strict loading. These are minimal, directly score-relevant fixes that should move accuracy substantially toward the target by ensuring you are actually using the pretrained weights.'
+- What this solution (achieved 0.11584) has done: 'Your current score strongly suggests the pipeline is either (a) not loading the intended weights or (b) loading them into a model whose forward/head doesn’t match what the checkpoint expects, producing near-random predictions. I keep your exact “load .pth then multi-TTA softmax-average then argmax” core logic, but make the EfficientNet-B7 wrapper expose `_fc` and `.model` in the same way as `efficientnet_pytorch` so `FinalLayerMixupModelEN` and strict checkpoint loading align. I also make the EfficientNet key-remapping cover the most common torchvision-vs-efficientnet_pytorch naming differences (especially classifier vs `_fc`) while still failing loudly on true mismatches. These are minimal, directly score-relevant fixes aimed at moving accuracy upward toward your 0.8903 target.'
+- What this solution (achieved 0.11584) has done: 'Your score (0.11584) is far below the target (0.8903), which in this competition almost always means the test predictions are badly misaligned with the `image_id` order in `sample_submission.csv` or the model is producing near-constant outputs due to a subtle shape bug. I make two minimal, score-critical fixes without changing your model choices, checkpoints, TTA list, or averaging logic: (1) prevent `squeeze()` from accidentally dropping the batch dimension for batch_size=1 in ResNet/DenseNet wrappers, and (2) ensure the prediction rows are explicitly mapped back to `image_id` before writing the submission (guarding against any future reordering). These changes keep your core “load .pth → multi-TTA softmax avg → argmax” semantics identical, but remove two common causes of ~random leaderboard accuracy. The rest of the script is kept the same, including paths and submission filename.'
+- What this solution (achieved 0.11584) has done: 'Your score is far below the target, which in this competition most often happens when inference is run on the wrong images (path mismatch) or when loaded checkpoints don’t actually match the model wrapper (so predictions become near-random). I make two minimal, score-critical fixes while preserving your exact “load .pth → multi-TTA softmax-average → argmax” core logic: (1) robustly resolve `TEST_PATH` by checking the real dataset subfolder layout first, and (2) make EfficientNet checkpoint loading tolerant to common key-prefix differences between `efficientnet_pytorch` vs `torchvision` wrappers (including `backbone.` and `.model.` nesting) and ensure the wrapper’s `_fc` replacement is reflected in `backbone.classifier`. These changes should move accuracy substantially upward toward the target without changing architecture, transforms, or ensembling semantics. The script still writes a valid `submission.csv` in the required format.'
+- What this solution (achieved 0.11584) has done: 'Your score (0.11584) is so far below the target (0.8903) that the most likely cause is that the EfficientNet-B7 checkpoints are not actually being loaded into the correct module/keys, so inference is effectively random. I keep your exact “load .pth → multi-TTA softmax-average → argmax” pipeline, but make the EfficientNet key-remapping and load target robust for both backends (`efficientnet_pytorch` vs `torchvision`) by normalizing common prefixes and mapping `classifier.*` ↔ `_fc.*` correctly. I also make the load choose the correct object (`net.model` vs `net`) based on backend type (currently it can load into the wrong module when using `efficientnet_pytorch`). These are minimal, score-critical fixes that should move accuracy sharply upward toward the target without changing model architecture, transforms, or ensembling semantics.'
+- What this solution (achieved 0.11584) has done: 'Your current score is near-random, so the smallest likely score-critical fix is to ensure each architecture’s checkpoint keys actually match the wrapper you’re loading into (right now ResNet/DenseNet heads and EfficientNet wrapper attributes don’t align, so strict loading either fails or loads the wrong parts). I keep your exact “load .pth → multi-TTA softmax-average → argmax” pipeline, but (1) correctly attach the replaced classification head back onto the underlying torchvision ResNet/DenseNet modules, (2) make the torchvision EfficientNet wrapper expose `.model` and keep `.backbone.classifier` synchronized with `._fc`, and (3) add minimal key-remapping for non-EfficientNet models (fc/classifier) so your checkpoints load as intended. These changes don’t alter model architecture choices, transforms, or ensembling semantics; they only make weight-loading consistent so predictions reflect the trained models, moving accuracy sharply upward toward your 0.8903 target. The script still writes a valid `submission.csv` in the required order.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import glob
+
+
+
+## === cell 1
+CANDIDATE_GLOBS = [
+    "../input/ebmls-seed70/*.pth",
+    "/kaggle/input/ebmls-seed70/*.pth",
+    "/kaggle/input/*ebmls*seed70*/*.pth",
+    "/kaggle/input/*seed70*/*.pth",
+    "/kaggle/input/*/*.pth",
+]
+
+pretrained_models = []
+for g in CANDIDATE_GLOBS:
+    pretrained_models.extend(glob.glob(g))
+
+pretrained_models = sorted(list(dict.fromkeys(pretrained_models)))
+
+print(f"{len(pretrained_models)} models found.")
+print("\n".join(np.sort(pretrained_models)[:50]))
+if len(pretrained_models) > 50:
+    print(f"... (showing 50/{len(pretrained_models)})")
+
+
+
+## === cell 2
+import pandas as pd
+
+import torch
+import torch.nn as nn
+import torch.utils.data as data
+
+import torchvision
+from torchvision import models
+
+import albumentations as A
+from albumentations import Compose
+from albumentations.pytorch import ToTensorV2
+
+import os
+from pathlib import Path
+import random
+import json
+import time
+import pickle
+import sys
+
+from tqdm import tqdm
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import cv2
+
+
+def seed_everything(seed=42):
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+SEED = 42
+seed_everything(seed=SEED)
+
+
+
+## === cell 3
+EfficientNet = None
+try:
+    sys.path.append("/kaggle/input/package/EfficientNet-PyTorch-1.0")
+    from efficientnet_pytorch import EfficientNet as _EfficientNet  # type: ignore
+
+    EfficientNet = _EfficientNet
+    EFFICIENTNET_BACKEND = "efficientnet_pytorch"
+except Exception as e:
+    EfficientNet = None
+    EFFICIENTNET_BACKEND = "torchvision"
+    print(
+        "efficientnet_pytorch not available; will use torchvision EfficientNet for any efficientnet models."
+    )
+
+
+
+## === cell 4
+SIZE = 512  # image size
+num_classes = 5
+
+
+
+## === cell 5
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"使用デバイス: {device}")
+
+
+
+## === cell 6
+KAGGLE_BASE = "/kaggle/input/cassava-leaf-disease-classification"
+LOCAL_BASE = "data/cassava-leaf-disease-classification"
+
+if os.path.isdir(KAGGLE_BASE):
+    BASE_DIR = KAGGLE_BASE
+else:
+    BASE_DIR = LOCAL_BASE
+
+sample_sub_path = os.path.join(BASE_DIR, "sample_submission.csv")
+if not os.path.exists(sample_sub_path):
+    sample_sub_path = (
+        "/kaggle/input/sample_submission.csv"
+        if os.path.exists("/kaggle/input/sample_submission.csv")
+        else "data/sample_submission.csv"
+    )
+
+df_test = pd.read_csv(sample_sub_path)
+
+candidate_test_paths = [
+    os.path.join(BASE_DIR, "test_images"),
+    os.path.join(BASE_DIR, "cassava-leaf-disease-classification", "test_images"),
+    "/kaggle/input/test_images",
+    os.path.join("data", "test_images"),
+]
+TEST_PATH = None
+for p in candidate_test_paths:
+    if os.path.isdir(p):
+        TEST_PATH = p
+        break
+if TEST_PATH is None:
+    TEST_PATH = os.path.join(BASE_DIR, "test_images")
+
+test_files = df_test["image_id"].tolist()
+print(f"BASE_DIR={BASE_DIR}")
+print(f"TEST_PATH={TEST_PATH}")
+print(f"Number of test images: {len(test_files)}")
+
+
+
+## === cell 7
+if "label" not in df_test.columns:
+    df_test["label"] = 0
+df_test["label"] = df_test["label"].fillna(0).astype(int)
+
+
+
+## === cell 8
+if len(df_test) == 1:
+    df_test.loc[1] = df_test.loc[0]
+    print(df_test)
+
+
+
+## === cell 9
+mean = [0.485, 0.456, 0.406]
+std = [0.229, 0.224, 0.225]
+
+transform = {
+    "test": [
+        Compose(
+            [
+                A.CenterCrop(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.HorizontalFlip(p=1),
+                A.CenterCrop(height=SIZE, width=SIZE),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.RandomResizedCrop(
+                    size=(SIZE, SIZE),
+                    scale=(0.8, 1.0),
+                    ratio=(0.75, 1.3333333333),
+                    p=1.0,
+                ),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.RandomResizedCrop(
+                    size=(SIZE, SIZE),
+                    scale=(0.8, 1.0),
+                    ratio=(0.75, 1.3333333333),
+                    p=1.0,
+                ),
+                A.HorizontalFlip(p=1.0),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.RandomResizedCrop(
+                    size=(SIZE, SIZE),
+                    scale=(0.8, 1.0),
+                    ratio=(0.75, 1.3333333333),
+                    p=1.0,
+                ),
+                A.VerticalFlip(p=1),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+        Compose(
+            [
+                A.Rotate(limit=30, p=1.0),
+                A.RandomResizedCrop(
+                    size=(SIZE, SIZE),
+                    scale=(0.8, 1.0),
+                    ratio=(0.75, 1.3333333333),
+                    p=1.0,
+                ),
+                A.Normalize(mean=mean, std=std, max_pixel_value=255.0, p=1.0),
+                ToTensorV2(p=1.0),
+            ],
+            p=1.0,
+        ),
+    ]
+}
+
+
+
+
+## === cell 10
+class FinalLayerMixupModel(nn.Module):
+    def __init__(self, model, criterion, num_classes, alpha):
+        """
+        model: 学習済みモデルを指定
+        """
+        super(FinalLayerMixupModel, self).__init__()
+        self.convlayer = torch.nn.Sequential(*(list(model.children())[:-1]))
+        num_ftrs = model.fc.in_features
+        self.fc = nn.Linear(num_ftrs, num_classes)
+        model.fc = self.fc
+        self.model = model
+
+        self.criterion = criterion
+        self.alpha = alpha
+
+    def forward(self, inputs, labels, phase):
+        if phase == "val":
+            x = self.convlayer(inputs)
+            x = torch.flatten(x, 1)
+            outputs = self.fc(x)
+            loss = self.criterion(outputs, labels)
+            return outputs, loss
+
+        if phase == "test":
+            x = self.convlayer(inputs)
+            x = torch.flatten(x, 1)
+            outputs = self.fc(x)
+            return outputs
+
+        alpha = self.alpha
+        if alpha > 0:
+            lam = np.random.beta(alpha, alpha)
+        else:
+            lam = 1
+
+        index = torch.randperm(len(labels))
+
+        x1 = inputs
+        x2 = inputs[index]
+
+        x1 = self.convlayer(x1)
+        x2 = self.convlayer(x2)
+
+        mixed_x = lam * x1 + (1 - lam) * x2
+        mixed_x = torch.flatten(mixed_x, 1)
+        outputs = self.fc(mixed_x)
+
+        labels_a = labels
+        labels_b = labels[index]
+
+        pred = outputs
+        loss = lam * self.criterion(pred, labels_a) + (1 - lam) * self.criterion(
+            pred, labels_b
+        )
+
+        return outputs, loss, labels_a, labels_b, lam
+
+
+
+
+## === cell 11
+class FinalLayerMixupModelDenseNet(nn.Module):
+    def __init__(self, model, criterion, num_classes, alpha):
+        """
+        model: 学習済みモデルを指定
+        """
+        super(FinalLayerMixupModelDenseNet, self).__init__()
+        self.convlayer = model.features
+        self.AdaptiveAvgPool2d = nn.AdaptiveAvgPool2d(output_size=(1, 1))
+        num_ftrs = model.classifier.in_features
+        self.fc = nn.Linear(num_ftrs, num_classes)
+        model.classifier = self.fc
+        self.model = model
+
+        self.criterion = criterion
+        self.alpha = alpha
+
+    def forward(self, inputs, labels, phase):
+        if phase == "val":
+            x = self.convlayer(inputs)
+            x = self.AdaptiveAvgPool2d(x)
+            x = torch.flatten(x, 1)
+            outputs = self.fc(x)
+            loss = self.criterion(outputs, labels)
+            return outputs, loss
+
+        if phase == "test":
+            x = self.convlayer(inputs)
+            x = self.AdaptiveAvgPool2d(x)
+            x = torch.flatten(x, 1)
+            outputs = self.fc(x)
+            return outputs
+
+        alpha = self.alpha
+        if alpha > 0:
+            lam = np.random.beta(alpha, alpha)
+        else:
+            lam = 1
+
+        index = torch.randperm(len(labels))
+
+        x1 = inputs
+        x2 = inputs[index]
+
+        x1 = self.convlayer(x1)
+        x2 = self.convlayer(x2)
+
+        x1 = self.AdaptiveAvgPool2d(x1)
+        x2 = self.AdaptiveAvgPool2d(x2)
+
+        mixed_x = lam * x1 + (1 - lam) * x2
+        mixed_x = torch.flatten(mixed_x, 1)
+        outputs = self.fc(mixed_x)
+
+        labels_a = labels
+        labels_b = labels[index]
+
+        pred = outputs
+        loss = lam * self.criterion(pred, labels_a) + (1 - lam) * self.criterion(
+            pred, labels_b
+        )
+
+        return outputs, loss, labels_a, labels_b, lam
+
+
+
+
+## === cell 12
+class FinalLayerMixupModelEN(nn.Module):
+    def __init__(self, model, criterion, num_classes, alpha):
+        super(FinalLayerMixupModelEN, self).__init__()
+        num_ftrs = model._fc.in_features
+        model._fc = nn.Linear(num_ftrs, num_classes)
+        self.model = model
+        self.criterion = criterion
+
+    def forward(self, inputs, labels, phase):
+        if phase == "val":
+            outputs = self.model(inputs)
+            loss = self.criterion(outputs, labels)
+            return outputs, loss
+
+        if phase == "test":
+            outputs = self.model(inputs)
+            return outputs
+
+        print("ここにきてはいけない")
+        sys.exit()
+
+
+
+
+## === cell 13
+class TorchvisionEffNetWrapper(nn.Module):
+    """
+    Expose ._fc and ensure forward uses that head, matching efficientnet_pytorch expectations.
+    """
+
+    def __init__(self, backbone: nn.Module):
+        super().__init__()
+        self.backbone = backbone
+        self.model = backbone
+
+        if isinstance(self.backbone.classifier, nn.Sequential):
+            self._fc = self.backbone.classifier[-1]
+        else:
+            self._fc = self.backbone.classifier
+
+    def _sync_classifier(self):
+        if isinstance(self.backbone.classifier, nn.Sequential):
+            self.backbone.classifier[-1] = self._fc
+        else:
+            self.backbone.classifier = self._fc
+
+    def forward(self, x):
+        self._sync_classifier()
+        x = self.backbone.features(x)
+        x = self.backbone.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self._fc(x)
+        return x
+
+
+
+
+## === cell 14
+class TestDataset(data.Dataset):
+    def __init__(self, df, transform=None):
+        super().__init__()
+        self.image_ids = df.image_id.tolist()
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_ids)
+
+    def load_image(self, image_id):
+        img_path = f"{TEST_PATH}/{image_id}"
+        img = cv2.imread(img_path)
+        if img is None:
+            raise FileNotFoundError(f"Could not read image: {img_path}")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        return img
+
+    def __getitem__(self, index):
+        image_id = self.image_ids[index]
+        img = self.load_image(image_id)
+        if self.transform:
+            img = self.transform(image=img)["image"]
+        return img, image_id
+
+
+
+
+## === cell 15
+def predict_model(basename, net, dataloader):
+    """
+    basename: 学習済みモデル名
+    net     : 学習済みモデル
+    """
+    model_start_time = time.time()
+
+    net.to(device)
+    net.eval()
+    torch.set_grad_enabled(False)
+
+    probability = []
+
+    for phase in ["test"]:
+        progress = tqdm(dataloader[phase], desc=f"{basename}: ")
+        for inputs, image_ids in progress:
+            inputs = inputs.to(device)
+            outputs = net(inputs, False, "test")
+            probability.append(
+                torch.softmax(outputs, dim=1).cpu().numpy().astype(np.float32)
+            )
+
+    print(f"{basename} time: {time.time() - model_start_time:.2f}[sec]")
+    return np.concatenate(probability, axis=0)
+
+
+
+
+## === cell 16
+def extract_state_dict(ckpt):
+    if isinstance(ckpt, dict):
+        for k in ["state_dict", "model_state_dict", "model", "net", "weights"]:
+            if k in ckpt and isinstance(ckpt[k], dict):
+                return ckpt[k]
+    return ckpt
+
+
+def strip_module_prefix(sd):
+    return {
+        k.replace("module.", "", 1) if k.startswith("module.") else k: v
+        for k, v in sd.items()
+    }
+
+
+def remap_effnet_keys(sd):
+    """
+    Change (score-critical, minimal): normalize common checkpoint key layouts so the intended
+    EfficientNet weights actually load (prevents near-random predictions).
+    We keep the same model/TTA/averaging semantics; only key alignment is adjusted.
+    """
+    remapped = {}
+    for k, v in sd.items():
+        nk = k
+
+        for pfx in ["model.", "backbone.", "net.", "module."]:
+            if nk.startswith(pfx):
+                nk = nk.replace(pfx, "", 1)
+
+        if nk.startswith("model._fc."):
+            nk = nk.replace("model._fc.", "_fc.", 1)
+
+        if nk.startswith("classifier.1."):
+            nk = nk.replace("classifier.1.", "_fc.", 1)
+        elif nk.startswith("classifier.0."):
+            pass
+        elif nk.startswith("classifier."):
+            nk = nk.replace("classifier.", "_fc.", 1)
+
+        remapped[nk] = v
+    return remapped
+
+
+def remap_non_effnet_keys(sd):
+    """
+    Change (score-critical, minimal): some training code saves the underlying torchvision model
+    (keys like 'fc.*' or 'classifier.*'), while this script wraps it. We map those keys to the
+    wrapper's expected names so strict loading uses the trained head.
+    """
+    remapped = {}
+    for k, v in sd.items():
+        nk = k
+        for pfx in ["model.", "backbone.", "net.", "module."]:
+            if nk.startswith(pfx):
+                nk = nk.replace(pfx, "", 1)
+
+        if nk.startswith("classifier."):
+            nk = nk.replace("classifier.", "fc.", 1)
+
+        remapped[nk] = v
+    return remapped
+
+
+def load_effnet_checkpoint_strict(net, state, basename):
+    """
+    Change (score-critical, minimal): load into the correct module depending on backend.
+    - efficientnet_pytorch: state_dict typically matches the EfficientNet instance itself.
+    - torchvision wrapper: state_dict typically matches wrapper keys (features/backbone or _fc).
+    """
+    if EFFICIENTNET_BACKEND == "efficientnet_pytorch" and EfficientNet is not None:
+        try:
+            net.model.load_state_dict(state, strict=True)
+            return
+        except RuntimeError:
+            state2 = {
+                k.replace("model.", "", 1) if k.startswith("model.") else k: v
+                for k, v in state.items()
+            }
+            net.model.load_state_dict(state2, strict=True)
+            return
+
+    if hasattr(net, "model") and isinstance(
+        getattr(net, "model"), TorchvisionEffNetWrapper
+    ):
+        net.model._sync_classifier()
+
+    net.model.load_state_dict(state, strict=True)
+
+
+
+
+## === cell 17
+probability = []
+start_time = time.time()
+
+if len(pretrained_models) == 0:
+    print(
+        "No pretrained models found; will output a valid baseline submission using sample_submission labels."
+    )
+else:
+    for pretrained_model in pretrained_models:
+        basename = os.path.splitext(os.path.basename(pretrained_model))[0]
+        criterion = nn.CrossEntropyLoss()
+
+        if "resnet18" in basename:
+            MODEL_NAME = "resnet18"
+            net = models.resnet18(weights=None)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 64
+        elif "resnet50" in basename:
+            MODEL_NAME = "resnet50"
+            net = models.resnet50(weights=None)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 32
+        elif "resnet152" in basename:
+            MODEL_NAME = "resnet152"
+            net = models.resnet152(weights=None)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 16
+        elif "resnext101" in basename:
+            MODEL_NAME = "resnext101"
+            net = models.resnext101_32x8d(weights=None)
+            net = FinalLayerMixupModel(net, criterion, num_classes, False)
+            BATCH_SIZE = 12
+        elif "densenet201" in basename:
+            MODEL_NAME = "densenet201"
+            net = models.densenet201(weights=None)
+            net = FinalLayerMixupModelDenseNet(net, criterion, num_classes, False)
+            BATCH_SIZE = 12
+        elif "efficientnet-b7" in basename:
+            MODEL_NAME = "efficientnet-b7"
+            if (
+                EFFICIENTNET_BACKEND == "efficientnet_pytorch"
+                and EfficientNet is not None
+            ):
+                en = EfficientNet.from_name(MODEL_NAME)
+                net = FinalLayerMixupModelEN(en, criterion, num_classes, False)
+            else:
+                en_tv = torchvision.models.efficientnet_b7(weights=None)
+                wrapped = TorchvisionEffNetWrapper(en_tv)
+                net = FinalLayerMixupModelEN(wrapped, criterion, num_classes, False)
+            BATCH_SIZE = 10
+        else:
+            print(f"{basename} is not supported.")
+            sys.exit()
+
+        print(f"{basename}: {MODEL_NAME}")
+
+        state_raw = torch.load(pretrained_model, map_location="cpu")
+        state = extract_state_dict(state_raw)
+        state = strip_module_prefix(state)
+        if MODEL_NAME == "efficientnet-b7":
+            state = remap_effnet_keys(state)
+        else:
+            state = remap_non_effnet_keys(state)
+
+        try:
+            if MODEL_NAME == "efficientnet-b7":
+                load_effnet_checkpoint_strict(net, state, basename)
+            else:
+                net.load_state_dict(state, strict=True)
+        except RuntimeError as e:
+            print(
+                f"[FATAL] Failed to load checkpoint strictly for {basename}. Error:\n{e}"
+            )
+            raise
+
+        for param in net.parameters():
+            param.requires_grad = False
+
+        for tid, transform_ in enumerate(transform["test"]):
+            print(f"transform loop={tid}")
+            dataset = {"test": TestDataset(df_test, transform=transform_)}
+            dataloader = {
+                "test": torch.utils.data.DataLoader(
+                    dataset["test"],
+                    batch_size=BATCH_SIZE,
+                    shuffle=False,
+                    num_workers=2,
+                    pin_memory=True,
+                ),
+            }
+            proba = predict_model(basename, net, dataloader)
+            probability.append(proba)
+
+        del net
+        torch.cuda.empty_cache()
+
+    if len(probability) > 0:
+        probs = np.stack(probability, axis=0)
+        df_test["mean"] = probs.mean(axis=0).argmax(axis=1).astype(int)
+    else:
+        print("All model predictions failed; falling back to sample_submission labels.")
+
+print(f"total time: {time.time() - start_time:.2f}[sec]")
+
+
+
+## === cell 18
+if "mean" in df_test.columns:
+    df_test["label"] = df_test["mean"].astype(int)
+
+
+
+## === cell 19
+sub = df_test[["image_id", "label"]].copy()
+sub = (
+    sub.set_index("image_id")
+    .reindex(pd.read_csv(sample_sub_path)["image_id"])
+    .reset_index()
+)
+sub.columns = ["image_id", "label"]
+
+sub.to_csv("submission.csv", index=False)
+print("Wrote submission.csv with shape:", sub.shape)
+print(sub.head())

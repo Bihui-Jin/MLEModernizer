@@ -1,0 +1,580 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+4.38819
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 5.9123) has done: 'I fixed the XGBoost usage by updating the objective name, removing the deprecated `best_ntree_limit` attribute, and using the Booster’s built‑in prediction (which automatically uses the best iteration from early stopping). I also removed the Jupyter‑specific magic command and ensured the script writes a proper `submission.csv` with the required columns, so the pipeline runs end‑to‑end and produces a valid Kaggle submission file.'
+- What this solution (achieved 5.83436) has done: 'I add simple time‑based features (pickup hour and weekday) to capture temporal patterns in fares, and tune the XGBoost parameters slightly (learning rate, max depth, subsample, colsample) which usually improves RMSE without changing the overall model structure. These minimal changes keep the core logic intact while helping the model move closer to the target score.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import gc
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_style("whitegrid")
+
+
+def locate_file(fname):
+    """
+    Return the absolute path to *fname* by searching common Kaggle input locations.
+    """
+    possible_dirs = [
+        "/kaggle/input/new-york-city-taxi-fare-prediction",
+        "/kaggle/input",
+        os.path.abspath(os.path.join(os.getcwd(), "..", "..", "input")),
+    ]
+    for d in possible_dirs:
+        p = os.path.join(d, fname)
+        if os.path.isfile(p):
+            return p
+    raise FileNotFoundError(f"Could not locate {fname} in any known input directories.")
+
+
+
+
+## === cell 1
+train_usecols = [
+    "fare_amount",
+    "pickup_datetime",
+    "pickup_longitude",
+    "pickup_latitude",
+    "dropoff_longitude",
+    "dropoff_latitude",
+    "passenger_count",
+]
+dtype_map = {
+    "fare_amount": "float32",
+    "pickup_longitude": "float32",
+    "pickup_latitude": "float32",
+    "dropoff_longitude": "float32",
+    "dropoff_latitude": "float32",
+    "passenger_count": "int8",
+}
+_read_kwargs = dict(
+    usecols=train_usecols,
+    dtype=dtype_map,
+    parse_dates=False,
+    low_memory=False,
+)
+try:
+    import pyarrow  # noqa: F401
+
+    _read_kwargs["engine"] = "pyarrow"
+    _read_kwargs.pop("low_memory", None)
+except Exception:
+    pass
+
+train_path = locate_file("train.csv")
+train_df = pd.read_csv(train_path, **_read_kwargs)
+print("Train shape:", train_df.shape)
+
+
+
+
+## === cell 2
+test_usecols = [
+    "key",
+    "pickup_datetime",
+    "pickup_longitude",
+    "pickup_latitude",
+    "dropoff_longitude",
+    "dropoff_latitude",
+    "passenger_count",
+]
+test_dtype_map = {
+    "pickup_longitude": "float32",
+    "pickup_latitude": "float32",
+    "dropoff_longitude": "float32",
+    "dropoff_latitude": "float32",
+    "passenger_count": "int8",
+}
+test_kwargs = dict(
+    usecols=test_usecols,
+    dtype=test_dtype_map,
+    parse_dates=False,
+    low_memory=False,
+)
+try:
+    import pyarrow  # noqa: F401
+
+    test_kwargs["engine"] = "pyarrow"
+    test_kwargs.pop("low_memory", None)
+except Exception:
+    pass
+
+test_path = locate_file("test.csv")
+test_df = pd.read_csv(test_path, **test_kwargs)
+print("Test shape:", test_df.shape)
+
+
+
+
+## === cell 3
+print("Missing values per column:\n", train_df.isnull().sum())
+
+
+
+
+## === cell 4
+train_df.dropna(inplace=True)
+
+
+
+
+## === cell 5
+print(train_df.describe())
+
+
+
+
+## === cell 6
+train_df = train_df[train_df["fare_amount"] > 0]
+
+
+
+
+## === cell 7
+print("After fare filter:", train_df.shape)
+
+
+
+
+## === cell 8
+def distance(lat1, lon1, lat2, lon2):
+    lat1_r, lon1_r, lat2_r, lon2_r = map(np.radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2_r - lat1_r
+    dlon = lon2_r - lon1_r
+    a = (
+        np.sin(dlat / 2.0) ** 2
+        + np.cos(lat1_r) * np.cos(lat2_r) * np.sin(dlon / 2.0) ** 2
+    )
+    return 2 * 3958.8 * np.arcsin(np.sqrt(a))
+
+
+
+
+## === cell 9
+train_df["distance"] = distance(
+    train_df["pickup_latitude"],
+    train_df["pickup_longitude"],
+    train_df["dropoff_latitude"],
+    train_df["dropoff_longitude"],
+)
+
+
+
+
+## === cell 10
+test_df["distance"] = distance(
+    test_df["pickup_latitude"],
+    test_df["pickup_longitude"],
+    test_df["dropoff_latitude"],
+    test_df["dropoff_longitude"],
+)
+
+
+
+
+## === cell 11
+train_df = train_df[train_df["distance"] < 15]
+
+
+
+
+## === cell 12
+print(train_df.describe())
+
+
+
+
+## === cell 13
+train_df = train_df[
+    (train_df["passenger_count"] != 0) & (train_df["passenger_count"] < 10)
+]
+
+
+
+
+## === cell 14
+dt_format = "%Y-%m-%d %H:%M:%S"
+train_df["pickup_datetime"] = pd.to_datetime(
+    train_df["pickup_datetime"], format=dt_format, cache=True
+)
+test_df["pickup_datetime"] = pd.to_datetime(
+    test_df["pickup_datetime"], format=dt_format, cache=True
+)
+
+train_df["pickup_hour"] = train_df["pickup_datetime"].dt.hour.astype("int8")
+train_df["pickup_weekday"] = train_df["pickup_datetime"].dt.weekday.astype("int8")
+train_df["pickup_month"] = train_df["pickup_datetime"].dt.month.astype("int8")
+train_df["is_weekend"] = (train_df["pickup_weekday"] >= 5).astype("int8")
+
+test_df["pickup_hour"] = test_df["pickup_datetime"].dt.hour.astype("int8")
+test_df["pickup_weekday"] = test_df["pickup_datetime"].dt.weekday.astype("int8")
+test_df["pickup_month"] = test_df["pickup_datetime"].dt.month.astype("int8")
+test_df["is_weekend"] = (test_df["pickup_weekday"] >= 5).astype("int8")
+
+train_df.drop(columns=["pickup_datetime"], inplace=True)
+test_df.drop(columns=["pickup_datetime"], inplace=True)
+
+gc.collect()
+
+
+
+
+## --- ERROR in cell 14, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/3836220004.py in <cell line: 0>()
+      1 # Fast datetime parsing with a known format; drop the raw column immediately to free memory
+      2 dt_format = "%Y-%m-%d %H:%M:%S"
+----> 3 train_df["pickup_datetime"] = pd.to_datetime(
+      4     train_df["pickup_datetime"], format=dt_format, cache=True
+      5 )
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/tools/datetimes.py in to_datetime(arg, errors, dayfirst, yearfirst, utc, format, exact, unit, infer_datetime_format, origin, cache)
+   1065             result = arg.map(cache_array)
+   1066         else:
+-> 1067             values = convert_listlike(arg._values, format)
+   1068             result = arg._constructor(values, index=arg.index, name=arg.name)
+   1069     elif isinstance(arg, (ABCDataFrame, abc.MutableMapping)):
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/tools/datetimes.py in _convert_listlike_datetimes(arg, format, name, utc, unit, errors, dayfirst, yearfirst, exact)
+    431     # `format` could be inferred, or user didn't ask for mixed-format parsing.
+    432     if format is not None and format != "mixed":
+--> 433         return _array_strptime_with_fallback(arg, name, utc, format, exact, errors)
+    434 
+    435     result, tz_parsed = objects_to_datetime64(
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/tools/datetimes.py in _array_strptime_with_fallback(arg, name, utc, fmt, exact, errors)
+    465     Call array_strptime, with fallback behavior depending on 'errors'.
+    466     """
+--> 467     result, tz_out = array_strptime(arg, fmt, exact=exact, errors=errors, utc=utc)
+    468     if tz_out is not None:
+    469         unit = np.datetime_data(result.dtype)[0]
+
+strptime.pyx in pandas._libs.tslibs.strptime.array_strptime()
+
+strptime.pyx in pandas._libs.tslibs.strptime.array_strptime()
+
+strptime.pyx in pandas._libs.tslibs.strptime._parse_with_format()
+
+ValueError: unconverted data remains when parsing with format "%Y-%m-%d %H:%M:%S": " UTC", at position 0. You might want to try:
+    - passing `format` if your strings have a consistent format;
+    - passing `format='ISO8601'` if your strings are all ISO8601 but not necessarily in exactly the same format;
+    - passing `format='mixed'`, and the format will be inferred for each element individually. You might want to use `dayfirst` alongside this.
+
+## === cell 15
+feat_cols = [
+    "distance",
+    "passenger_count",
+    "pickup_hour",
+    "pickup_weekday",
+    "pickup_month",
+    "is_weekend",
+]
+X = train_df[feat_cols].astype("float32")
+y = train_df["fare_amount"]
+
+
+
+
+## --- ERROR in cell 15, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_11/2952958502.py in <cell line: 0>()
+      7     "is_weekend",
+      8 ]
+----> 9 X = train_df[feat_cols].astype("float32")
+     10 y = train_df["fare_amount"]
+     11 
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4106             if is_iterator(key):
+   4107                 key = list(key)
+-> 4108             indexer = self.columns._get_indexer_strict(key, "columns")[1]
+   4109 
+   4110         # take() does not accept boolean indexers
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in _get_indexer_strict(self, key, axis_name)
+   6198             keyarr, indexer, new_indexer = self._reindex_non_unique(keyarr)
+   6199 
+-> 6200         self._raise_if_missing(keyarr, indexer, axis_name)
+   6201 
+   6202         keyarr = self.take(indexer)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in _raise_if_missing(self, key, indexer, axis_name)
+   6250 
+   6251             not_found = list(ensure_index(key)[missing_mask.nonzero()[0]].unique())
+-> 6252             raise KeyError(f"{not_found} not in index")
+   6253 
+   6254     @overload
+
+KeyError: "['pickup_hour', 'pickup_weekday', 'pickup_month', 'is_weekend'] not in index"
+
+## === cell 16
+from sklearn.model_selection import train_test_split
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
+
+
+
+
+## --- ERROR in cell 16, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/684273471.py in <cell line: 0>()
+      1 from sklearn.model_selection import train_test_split
+      2 
+----> 3 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
+      4 
+      5 
+
+NameError: name 'X' is not defined
+
+## === cell 17
+import xgboost as xgb
+
+
+def train_xgboost(X_tr, X_va, y_tr, y_va, num_rounds=800):
+    dtrain = xgb.DMatrix(X_tr, label=y_tr)
+    dval = xgb.DMatrix(X_va, label=y_va)
+    params = {
+        "objective": "reg:squarederror",
+        "eval_metric": "rmse",
+        "seed": 42,
+        "eta": 0.1,
+        "max_depth": 6,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "tree_method": "hist",
+        "max_bin": 128,
+        "nthread": -1,
+        "predictor": "cpu_predictor",
+    }
+    booster = xgb.train(
+        params=params,
+        dtrain=dtrain,
+        num_boost_round=num_rounds,
+        evals=[(dval, "validation")],
+        early_stopping_rounds=30,
+        verbose_eval=False,
+    )
+    return booster
+
+
+
+
+## === cell 18
+xgb_model = train_xgboost(X_train, X_val, y_train, y_val)
+
+
+
+
+## --- ERROR in cell 18, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/462529384.py in <cell line: 0>()
+----> 1 xgb_model = train_xgboost(X_train, X_val, y_train, y_val)
+      2 
+      3 
+
+NameError: name 'X_train' is not defined
+
+## === cell 19
+test_pred = xgb_model.predict(xgb.DMatrix(test_df[feat_cols].astype("float32")))
+
+
+
+
+## --- ERROR in cell 19, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1007860359.py in <cell line: 0>()
+----> 1 test_pred = xgb_model.predict(xgb.DMatrix(test_df[feat_cols].astype("float32")))
+      2 
+      3 
+
+NameError: name 'xgb_model' is not defined
+
+## === cell 20
+test_pred = np.clip(test_pred, a_min=0, a_max=None)
+submission = pd.DataFrame({"key": test_df["key"], "fare_amount": test_pred})
+submission.to_csv("submission.csv", index=False)
+print("Submission file saved as submission.csv")
+
+## --- ERROR in cell 20, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1402367978.py in <cell line: 0>()
+----> 1 test_pred = np.clip(test_pred, a_min=0, a_max=None)
+      2 submission = pd.DataFrame({"key": test_df["key"], "fare_amount": test_pred})
+      3 submission.to_csv("submission.csv", index=False)
+      4 print("Submission file saved as submission.csv")
+
+NameError: name 'test_pred' is not defined

@@ -1,0 +1,1482 @@
+{
+  "aerial-cactus-identification_ezzatt_cactus-competition-cnn_v6_C1.ipynb": {
+    "target": 0.9648333333333332,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aerial-cactus-identification_nikhil6991_cactus-cnn-model_v1_C1.ipynb": {
+    "target": 0.9798,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aerial-cactus-identification_maxwellshannonlevin_aerial-cactus-identification-with-keras_v4_C1.ipynb": {
+    "target": 0.9991726666666668,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aerial-cactus-identification_togawashota_notebookf8df456e63_v1_C1.ipynb": {
+    "target": 0.7414026666666667,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_haydenmuscat_dense-submission_v71_C1.ipynb": {
+    "target": 0.8924754745779371,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_wmloh98_notebook59b83e7ebf_v12_C1.ipynb": {
+    "target": 0.5332928807844208,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_haydenmuscat_dense-submission_v27_C1.ipynb": {
+    "target": 0.8878970240196542,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_haydenmuscat_dense-submission_v32_C1.ipynb": {
+    "target": 0.8726249846688257,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_haydenmuscat_dense-submission_v40_C1.ipynb": {
+    "target": 0.8912375928845857,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_haydenmuscat_dense-submission_v65_C1.ipynb": {
+    "target": 0.9016780557601428,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_wmloh98_notebook59b83e7ebf_v4_C1.ipynb": {
+    "target": 0.5341472935256788,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "aptos2019-blindness-detection_haydenmuscat_dense-submission_v61_C1.ipynb": {
+    "target": 0.9089048795530408,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_bitunsen_cassava-leaf-disease-pretrainined-model_v3_C1.ipynb": {
+    "target": 0.8570565125415534,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_zhongxinaa_cassava-submission_v2_C1.ipynb": {
+    "target": 0.8401329706860079,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_akashsdas_cassava-leaf-disease-classification-old-submission_v3_C1.ipynb": {
+    "target": 0.4188576609247507,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_daxinniu122_model-version-1-tfrec-submission_v26_C1.ipynb": {
+    "target": 0.8395285584768812,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v18_C1.ipynb": {
+    "target": 0.8792686612269568,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_nikitasuharev_cassava-predict_v1_C1.ipynb": {
+    "target": 0.080386823813841,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_ollievander_cassava-notebook-keras-multiple-pretrained-models_v23_C1.ipynb": {
+    "target": 0.8798730734360835,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_shubham219_experiment-with-models-in-keras-inference_v48_C1.ipynb": {
+    "target": 0.6533695980658809,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_shubham219_experiment-with-models-in-keras-inference_v58_C1.ipynb": {
+    "target": 0.8068902991840435,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_kabhinay_cassava-inference_v13_C1.ipynb": {
+    "target": 0.8824418253248716,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_kabhinay_cassava-inference_v17_C1.ipynb": {
+    "target": 0.6242067089755213,
+    "python_version": "2.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_shubham219_experiment-with-models-in-keras-inference_v51_C1.ipynb": {
+    "target": 0.6668177697189483,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_evansjh_ensemble-cassava_v15_C1.ipynb": {
+    "target": 0.8987609549712904,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_kabhinay_cassava-inference-v2_v11_C1.ipynb": {
+    "target": 0.8838017527954065,
+    "python_version": "2.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_kabhinay_cassava-inference-v2_v5_C1.ipynb": {
+    "target": 0.8819885161680266,
+    "python_version": "2.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_ollievander_cassava-notebook-keras-multiple-pretrained-models_v15_C1.ipynb": {
+    "target": 0.8674826231489876,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_shubham219_experiment-with-models-in-keras-inference_v50_C1.ipynb": {
+    "target": 0.6177092777274101,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_szhan192_real-submission_v12_C1.ipynb": {
+    "target": 0.1083408884859474,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_thanasisserntedakis_ml-project_v9_C1.ipynb": {
+    "target": 0.7561196736174071,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "champs-scalar-coupling_chechir_champs-ensemble_v8_C1.ipynb": {
+    "target": -2.1018426058695074,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "champs-scalar-coupling_prashantmahamuni_measuringmagneticinteractions_v6_C1.ipynb": {
+    "target": 0.66661,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "champs-scalar-coupling_priteshshrivastava_molecular-properties-blending-top-kernels_v13_C1.ipynb": {
+    "target": -1.666828640654786,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "champs-scalar-coupling_vaishvik25_blend_v15_C1.ipynb": {
+    "target": -1.3268705351930474,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "dogs-vs-cats-redux-kernels-edition_1133423_cats-vs-dogs-classification-with-cnn-keras_v13_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers have different id's",
+    "target": 0.6932735585117457,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "dogs-vs-cats-redux-kernels-edition_1133423_cats-vs-dogs-classification-with-cnn-keras_v12_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers have different id's",
+    "target": 2.023719278173949,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "dogs-vs-cats-redux-kernels-edition_vinaydoshi_dogs-vs-cats-using-resnet50-imagenet-features_v5_C1.ipynb": {
+    "target": 4.024022731709933,
+    "python_version": "3.8",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nh5py==3.14.0\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "dogs-vs-cats-redux-kernels-edition_1133423_cats-vs-dogs-classification-with-cnn-keras_v11_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers have different id's",
+    "target": 2.3080746506218226,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "dogs-vs-cats-redux-kernels-edition_1133423_cats-vs-dogs-classification-with-cnn-keras_v10_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers have different id's",
+    "target": 1.9699000874811416,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "google-quest-challenge_2680666_google-competition_v61_C1.ipynb": {
+    "target": -0.0015711539026244,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "google-quest-challenge_varunsaproo_xlnet-based_v32_C1.ipynb": {
+    "target": 0.240912663400819,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "google-quest-challenge_tunguz_quest-ridge-regression-with-word-char-ngrams_v36_C1.ipynb": {
+    "score": "Invalid submission: Submission is missing the following columns: {'question_type_definition', 'question_fact_seeking', 'question_opinion_seeking', 'question_conversational', 'question_type_consequence', 'question_interestingness_others', 'question_body_critical', 'question_interestingness_self', 'answer_type_instructions', 'answer_satisfaction', 'answer_well_written', 'question_has_commonly_accepted_answer', 'question_type_entity', 'question_expect_short_answer', 'question_type_reason_explanation', 'question_type_instructions', 'answer_relevance', 'answer_type_procedure', 'answer_helpful', 'question_type_spelling', 'answer_plausible', 'question_well_written', 'question_type_compare', 'answer_level_of_information', 'question_multi_intent', 'answer_type_reason_explanation', 'question_asker_intent_understanding', 'question_not_really_a_question', 'question_type_choice', 'question_type_procedure'}",
+    "target": 0.29386,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntqdm==4.67.1"
+  },
+  "google-quest-challenge_mathayus1729_kernel7de774bc1a_v24_C1.ipynb": {
+    "target": 0.2961337385287022,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "google-quest-challenge_varunsaproo_xlnet-based_v29_C1.ipynb": {
+    "target": 0.2585599180325146,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "google-quest-challenge_mathayus1729_kernel7de774bc1a_v23_C1.ipynb": {
+    "target": 0.2742426069204381,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "hotel-id-2021-fgvc8_confirm_hotelid-kohei_v12_C1.ipynb": {
+    "target": 0.7445482866043589,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "hotel-id-2021-fgvc8_confirm_hotelid-kohei_v11_C1.ipynb": {
+    "target": 0.7607266144649304,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "hotel-id-2021-fgvc8_confirm_hotelid-kohei_v13_C1.ipynb": {
+    "target": 0.7698703376273452,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "hotel-id-2021-fgvc8_confirm_hotelid-kohei_v4_C1.ipynb": {
+    "target": 0.7110676096657378,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-cnn-modeling-single_v7_C1.ipynb": {
+    "target": 0.9615426202729558,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_imjh99_toxic-comment_v1_C1.ipynb": {
+    "target": 0.9733942342179,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_asrsaiteja_toxic-comments-eda-baselines_v10_C1.ipynb": {
+    "target": 0.90828,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "jigsaw-toxic-comment-classification-challenge_samarthsarin_lstm-and-convolution1d-ensemble-with-glove_v8_C1.ipynb": {
+    "target": 0.9630160751892012,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_thec03u5_ensamble-and-max-nbsvm-and-tfidflr_v3_C1.ipynb": {
+    "target": 0.9813460050965214,
+    "python_version": "3.6",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-cnn-modeling-single_v4_C1.ipynb": {
+    "target": 0.9654614520289568,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_anandvidvat_lstm-gpu_v7_C1.ipynb": {
+    "target": 0.9706243556146232,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_thec03u5_ensamble-and-max-nbsvm-and-tfidflr_v2_C1.ipynb": {
+    "target": 0.9770069683965568,
+    "python_version": "3.6",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v34_C1.ipynb": {
+    "target": 0.9612273619104004,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "gensim==4.4.0\ngeopandas==0.14.4\njoblib==1.5.2\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-cnn-modeling-single_v3_C1.ipynb": {
+    "target": 0.959812062291402,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-cnn-modeling-single_v8_C1.ipynb": {
+    "target": 0.965819443845645,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_amir78pgd_ensemble-3-blend_v6_C1.ipynb": {
+    "target": 0.9863197044121592,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "movie-review-sentiment-analysis-kernels-only_1266564_my-sentiment_v6_C1.ipynb": {
+    "target": 0.6405901164544742,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "movie-review-sentiment-analysis-kernels-only_jeremiahharmsen_tensorflow-hub-for-text-classification_v27_C1.ipynb": {
+    "target": 0.65223,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "movie-review-sentiment-analysis-kernels-only_dahouda_movie-reviews_v12_C1.ipynb": {
+    "target": 0.6511796295178905,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "movie-review-sentiment-analysis-kernels-only_vuppala_simple-eda-logistic-svc_v4_C1.ipynb": {
+    "score": "Invalid submission: Submission must have a `Sentiment` column",
+    "target": 0.60829,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nspacy==3.8.7\nspacy-legacy==3.0.12\nspacy-loggers==1.0.5\nwordcloud==1.9.4"
+  },
+  "movie-review-sentiment-analysis-kernels-only_pantherpanther_simple-1d-cnn-with-glove-twitter-embeddings_v19_C1.ipynb": {
+    "target": 0.6389157062692331,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "new-york-city-taxi-fare-prediction_ishizawanaoki_newyorktaxi-lgbm_v8_C1.ipynb": {
+    "score": "Invalid submission: Submission should have a fare_amount column",
+    "target": 3.40781,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "new-york-city-taxi-fare-prediction_amitamb_using-rf_v3_C1.ipynb": {
+    "score": 4.78177,
+    "target": 3.74165,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "new-york-city-taxi-fare-prediction_upperdomain_ml-spark-alpha-group_v12_C1.ipynb": {
+    "target": 4.20958,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0"
+  },
+  "new-york-city-taxi-fare-prediction_harsh22_taxi-fare-prediction-regression_v5_C1.ipynb": {
+    "target": 3.47816,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "new-york-city-taxi-fare-prediction_sunnets_taxi-fare-prediction-try-3_v123_C1.ipynb": {
+    "target": 7.657941173557325,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v19_C1.ipynb": {
+    "target": 0.06949,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v24_C1.ipynb": {
+    "target": 0.08849,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v28_C1.ipynb": {
+    "target": 0.06934,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v18_C1.ipynb": {
+    "target": 0.0728,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v23_C1.ipynb": {
+    "target": 0.13896,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v27_C1.ipynb": {
+    "target": 0.07108,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v16_C1.ipynb": {
+    "target": 0.06936,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v22_C1.ipynb": {
+    "target": 0.06924,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v26_C1.ipynb": {
+    "target": 0.06919,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_burn874_nomad-clustering-fe_v18_C1.ipynb": {
+    "target": 0.0684946517249166,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v10_C1.ipynb": {
+    "target": 0.07034,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v25_C1.ipynb": {
+    "target": 0.13896,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v29_C1.ipynb": {
+    "target": 0.06917,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v32_C1.ipynb": {
+    "target": 0.06949,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "osic-pulmonary-fibrosis-progression_gunesevitan_osic-pulmonary-fibrosis-progression-3-cv-3-model_v140_C1.ipynb": {
+    "target": -6.932888415138517,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "osic-pulmonary-fibrosis-progression_gunesevitan_osic-pulmonary-fibrosis-progression-3-cv-3-model_v154_C1.ipynb": {
+    "target": -6.958414209545982,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "osic-pulmonary-fibrosis-progression_gunesevitan_osic-pulmonary-fibrosis-progression-3-cv-3-model_v94_C1.ipynb": {
+    "target": -6.852611468474312,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "osic-pulmonary-fibrosis-progression_gunesevitan_osic-pulmonary-fibrosis-progression-3-cv-3-model_v98_C1.ipynb": {
+    "target": -6.924256046366523,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "osic-pulmonary-fibrosis-progression_lsllee_notebook0f1f2942a7_v18_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame must have a 'Patient_Week' column.",
+    "target": -12.250279187279803,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "osic-pulmonary-fibrosis-progression_ozoozo_osic-simple-eda-and-basic-lightgbm_v7_C1.ipynb": {
+    "target": -6.998,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "osic-pulmonary-fibrosis-progression_archimedus_osic-competition_v2_C1.ipynb": {
+    "target": -7.8097,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npydicom==3.0.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "osic-pulmonary-fibrosis-progression_sambhavsg_3d-osic-inference_v3_C1.ipynb": {
+    "target": -6.873693639104417,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v17_C1.ipynb": {
+    "score": -8.76216,
+    "target": -7.0516470200451,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "paddy-disease-classification_asheniranga_ensemble-for-paddy-doctor-majority-vote_v2_C1.ipynb": {
+    "target": 0.976958525345622,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "paddy-disease-classification_asheniranga_ensemble-for-paddy-doctor-majority-vote_v12_C1.ipynb": {
+    "target": 0.9815668202764976,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "petfinder-pawpularity-score_dardodel_petfinder-keras-inceptionv3-use-images-only_v14_C1.ipynb": {
+    "target": 18.723703656991344,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "petfinder-pawpularity-score_tanmay111999_submission-file-transfer-learning-pickle-files_v4_C1.ipynb": {
+    "target": 21.14140099168177,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "petfinder-pawpularity-score_diazmath_pet-finder_v10_C1.ipynb": {
+    "target": 20.55526364747815,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "petfinder-pawpularity-score_leventelippenszky_lgbm-meta-features-only_v4_C1.ipynb": {
+    "score": "Invalid submission: Pawpularity in submission should be between 1 and 100",
+    "target": 20.45681,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "petfinder-pawpularity-score_tanmay111999_submission-file-transfer-learning-pickle-files_v15_C1.ipynb": {
+    "target": 20.542787679796984,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "petfinder-pawpularity-score_venkatkumar001_pawpularity-contest-baseline_v12_C1.ipynb": {
+    "target": 20.47168,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "catboost==1.2.8\ngeopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "plant-pathology-2020-fgvc7_stardust87_plant-pathology-2020-ensemble_v12_C1.ipynb": {
+    "target": 0.9711824920467708,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "plant-pathology-2020-fgvc7_stardust87_plant-pathology-2020-ensemble_v6_C1.ipynb": {
+    "target": 0.9628698141306518,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "plant-pathology-2020-fgvc7_truonghoang_ensemble-top-submit_v10_C1.ipynb": {
+    "target": 0.9704488894833836,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "plant-pathology-2020-fgvc7_stardust87_plant-pathology-2020-ensemble_v15_C1.ipynb": {
+    "target": 0.9700013841179632,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "plant-pathology-2020-fgvc7_truonghoang_ensemble-top-submit_v12_C1.ipynb": {
+    "target": 0.9697842817939653,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "plant-pathology-2020-fgvc7_truonghoang_ensemble-top-submit_v2_C1.ipynb": {
+    "target": 0.959855568552444,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscipy==1.15.3\nsklearn-pandas==2.2.0"
+  },
+  "plant-pathology-2021-fgvc8_bimdeptrai_predict-notebook_v21_C1.ipynb": {
+    "target": 0.807700831024933,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "plant-pathology-2021-fgvc8_flsantna_plant-pathology_v34_C1.ipynb": {
+    "target": 0.8015697137580817,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "plant-pathology-2021-fgvc8_flsantna_plant-pathology_v56_C1.ipynb": {
+    "target": 0.3914655058699362,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "plant-pathology-2021-fgvc8_flsantna_plant-pathology_v55_C1.ipynb": {
+    "target": 0.3558448753462597,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "plant-pathology-2021-fgvc8_flsantna_plant-pathology_v32_C1.ipynb": {
+    "target": 0.8075715604801497,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "plant-pathology-2021-fgvc8_flsantna_plant-pathology_v54_C1.ipynb": {
+    "target": 0.7917820867959388,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "plant-pathology-2021-fgvc8_tracychui_resnet50-customized1_v7_C1.ipynb": {
+    "target": 0.4426223453370249,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "plant-pathology-2021-fgvc8_tringuyenminh1204_pp-2021-new_v42_C1.ipynb": {
+    "target": 0.7461311172668512,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_ammarnassanalhajali_brain-tumor-3d-inference_v20_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v110_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v78_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_ammarnassanalhajali_brain-tumor-3d-inference_v28_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v117_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v181_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v196_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v47_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v52_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v99_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_juliojuse_single-model-0-747-2dcnn-inference_v4_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v125_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v135_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v148_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_yannicksteph_cnn-cv-brain-prediction_v39_C1.ipynb": {
+    "target": 0.5615332313445521,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_ammarnassanalhajali_brain-tumor-3d-inference_v30_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v194_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_trinayanbharadwaj_rsna-miccai-competition-0-57385-private_v66_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-miccai-brain-tumor-radiogenomic-classification_yutongkai_rsna-resnet50-inference_v4_C1.ipynb": {
+    "target": -1.0,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "seti-breakthrough-listen_saurabhbagchi_ensemble-for-seti-competition_v1_C1.ipynb": {
+    "target": 0.7277666482882906,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_swimmy_ensemble-for-seti-competition_v10_C1.ipynb": {
+    "target": 0.7570391264032398,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_swimmy_ensemble-for-seti-competition_v33_C1.ipynb": {
+    "target": 0.7569879613171004,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_daicongxmu_smart-ensemble_v2_C1.ipynb": {
+    "target": 0.7563403755987789,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_saurabhbagchi_ensemble-for-seti-competition_v10_C1.ipynb": {
+    "target": 0.7563564198819381,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_saurabhbagchi_ensemble-for-seti-competition_v5_C1.ipynb": {
+    "target": 0.7480686684378159,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_swimmy_ensemble-for-seti-competition_v32_C1.ipynb": {
+    "target": 0.7571715757510159,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_vineethakkinapalli_seti-final-ensemble_v2_C1.ipynb": {
+    "target": 0.7616417998512798,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_liuhaixu_ensemble-for-seti-competition-score-0-766_v17_C1.ipynb": {
+    "target": 0.7630592962475681,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_saurabhbagchi_ensemble-for-seti-competition_v13_C1.ipynb": {
+    "target": 0.7568881827563422,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_saurabhbagchi_ensemble-for-seti-competition_v18_C1.ipynb": {
+    "target": 0.7556746902410042,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_swimmy_ensemble-for-seti-competition_v1_C1.ipynb": {
+    "target": 0.7571323872181847,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_swimmy_ensemble-for-seti-competition_v7_C1.ipynb": {
+    "target": 0.7568636630591126,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_liuhaixu_ensemble-for-seti-competition-score-0-766_v8_C1.ipynb": {
+    "target": 0.7626591269737379,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_saurabhbagchi_ensemble-for-seti-competition_v12_C1.ipynb": {
+    "target": 0.7571658004342819,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_saurabhbagchi_ensemble-for-seti-competition_v20_C1.ipynb": {
+    "target": 0.7565577900934172,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_swimmy_ensemble-for-seti-competition_v12_C1.ipynb": {
+    "target": 0.7571477203324363,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "seti-breakthrough-listen_swimmy_ensemble-for-seti-competition_v22_C1.ipynb": {
+    "target": 0.75718,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "siim-isic-melanoma-classification_elbanan_clinical-imaging-features-pipeline-poc-w-radtorch_v5_C1.ipynb": {
+    "target": 0.817750643469017,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "scikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0"
+  },
+  "siim-isic-melanoma-classification_ziliwang_stack-models_v1_C1.ipynb": {
+    "score": "Invalid submission: Submission should have an image_name column",
+    "target": 0.924664431362698,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "siim-isic-melanoma-classification_ipythonx_optimizing-metrics-out-of-fold-weights-ensemble_v2_C1.ipynb": {
+    "target": 0.925558552950128,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0"
+  },
+  "siim-isic-melanoma-classification_redwankarimsony_siim-scic-melanoma-classification-ensemble_v28_C1.ipynb": {
+    "target": 0.9332,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "siim-isic-melanoma-classification_vatsalparsaniya_oof-pseudo-labeling-stacking-with-metadata_v4_C1.ipynb": {
+    "target": 0.940525624083034,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "siim-isic-melanoma-classification_yasufuminakama_tpu-siim-isic-efficientnetb3-inference_v1_C1.ipynb": {
+    "target": 0.8271057910391251,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "siim-isic-melanoma-classification_rajnishe_fork-of-siim-inference-ensemble-v1_v6_C1.ipynb": {
+    "target": 0.9366105656338396,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "siim-isic-melanoma-classification_redwankarimsony_siim-scic-melanoma-classification-ensemble_v11_C1.ipynb": {
+    "target": 0.9083387031596422,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "spooky-author-identification_defeater_baseline-horror-what-is-word2vec_v29_C1.ipynb": {
+    "target": 0.61281,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "gensim==4.4.0\ngeopandas==0.14.4\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "spooky-author-identification_defeater_baseline-horror-what-is-word2vec_v5_C1.ipynb": {
+    "target": 6.37006,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "gensim==4.4.0\ngeopandas==0.14.4\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "spooky-author-identification_jaymanvirk_fine-tuning-logreg-rf-nb-svm-and-xgboost_v7_C1.ipynb": {
+    "target": 0.4013,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nspacy==3.8.7\nspacy-legacy==3.0.12\nspacy-loggers==1.0.5\nxgboost==2.0.3"
+  },
+  "spooky-author-identification_defeater_baseline-horror-what-is-word2vec_v10_C1.ipynb": {
+    "target": 0.86216,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "gensim==4.4.0\ngeopandas==0.14.4\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "spooky-author-identification_jaymanvirk_fine-tuning-logreg-rf-nb-svm-and-xgboost_v5_C1.ipynb": {
+    "target": 0.4013,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nspacy==3.8.7\nspacy-legacy==3.0.12\nspacy-loggers==1.0.5\nxgboost==2.0.3"
+  },
+  "statoil-iceberg-classifier-challenge_twhitehurst3_fcn-keras-iceberg_v1_C1.ipynb": {
+    "target": 0.27455,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "tabular-playground-series-dec-2021_376354_blend-of-blend-of-blend-of-blend-of-blend-of-ble_v14_C1.ipynb": {
+    "target": 0.9565828571428572,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_kavehshahhosseini_tps-dec-2021-simple-ensemble-public-notebooks_v2_C1.ipynb": {
+    "target": 0.9564785714285714,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_maunilshah_tabular-playground-part2_v1_C1.ipynb": {
+    "score": "Invalid submission: Submission must have a `Cover_Type` column",
+    "target": 0.9540314285714284,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "tabular-playground-series-dec-2021_omkarborikar_handling-imbalanced-data-and-xgboost-optuna-tuning_v15_C1.ipynb": {
+    "target": 0.90687,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimbalanced-learn==0.13.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\noptuna==4.5.0\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "tabular-playground-series-dec-2021_376354_blend-of-blend-of-blend-of-blend-of-blend-of-ble_v13_C1.ipynb": {
+    "target": 0.9565842857142856,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_datarohitingole_tps-dec-2021-eda-catboostclassifier_v5_C1.ipynb": {
+    "target": 0.91534,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "catboost==1.2.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_sfktrkl_tps-dec-2021-hyperparameters-tuning_v6_C1.ipynb": {
+    "target": 0.95456,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "tabular-playground-series-dec-2021_376354_blend-of-blend-of-blend-of-blend-of-blend-of-ble_v11_C1.ipynb": {
+    "target": 0.9565742857142856,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_datarohitingole_tps-dec-2021-eda-catboostclassifier_v2_C1.ipynb": {
+    "target": 0.91516,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "catboost==1.2.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_zhangcheche_tps-12-simple-xgboost-baseline-20-lines-code_v2_C1.ipynb": {
+    "target": 0.95257,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "tabular-playground-series-dec-2021_aditya01233_ensembling-public-notebooks_v1_C1.ipynb": {
+    "target": 0.9565842857142856,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscipy==1.15.3\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_hamzaghanmi_tps-dec-step-by-step_v1_C1.ipynb": {
+    "target": 0.95301,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\noptuna==4.5.0\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nplotly==5.24.1\nplotly-express==0.4.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-dec-2021_zhangcheche_tps-12-simple-xgboost-baseline-20-lines-code_v1_C1.ipynb": {
+    "target": 0.95224,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "tabular-playground-series-may-2022_jiprud_tps-may22-xgb-classsifier_v8_C1.ipynb": {
+    "target": 0.50004,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "tabular-playground-series-may-2022_cv13j0_tps-may22-ensemble-nn-gbdt-grv-vsn_v1_C1.ipynb": {
+    "target": 0.9971247973944528,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "tabular-playground-series-may-2022_masatomurakawamm_tps-may22-1d-cnn-for-f-27-n-gram-tabtransformer_v2_C1.ipynb": {
+    "target": 0.93653,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nplotly==5.24.1\nplotly-express==0.4.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "tabular-playground-series-may-2022_nikhilsharma24_tps-may-python-f-27-only_v1_C1.ipynb": {
+    "target": 0.63094,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "tgs-salt-identification-challenge_dingdiego_kernel497c4f3124_v12_C1.ipynb": {
+    "target": 0.772669839896148,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "tgs-salt-identification-challenge_timsonrisa_using-pre-trained-model-to-predict-and-submit_v2_C1.ipynb": {
+    "target": 0.5795153613154457,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "tweet-sentiment-extraction_ayoubsandali_twitter-sentiment-extraction_v3_C1.ipynb": {
+    "target": 0.65537,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nspacy==3.8.7\nspacy-legacy==3.0.12\nspacy-loggers==1.0.5\ntqdm==4.67.1"
+  },
+  "tweet-sentiment-extraction_sakshammangal_tweet-sentiment-extraction-saksham_v3_C1.ipynb": {
+    "target": 0.54158,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "tweet-sentiment-extraction_sevashasla_try-tweet-sentiment_v2_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame must have a 'textID' column.",
+    "target": 0.19017,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntqdm==4.67.1"
+  },
+  "tweet-sentiment-extraction_swapnilagashe_tweet-sentiment-extraction-spacy-custom-ner-model_v6_C1.ipynb": {
+    "target": 0.62535,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\nspacy==3.8.7\nspacy-legacy==3.0.12\nspacy-loggers==1.0.5\ntqdm==4.67.1"
+  },
+  "ventilator-pressure-prediction_msafi04_google-brain-ventilator-pressure-prediction-gpu_v4_C1.ipynb": {
+    "target": 4.6069,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "cufflinks==0.17.3\ngeopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nplotly==5.24.1\nplotly-express==0.4.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "ventilator-pressure-prediction_syerwin_update-version-ensemble-without-overfitting_v10_C1.ipynb": {
+    "target": 0.1381750237826189,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_tracyporter_ventilator-pytorch-av-linear-regression_v3_C1.ipynb": {
+    "target": 14.6572,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "ventilator-pressure-prediction_yasuosuzuki_various-feature-and-lightgbm_v6_C1.ipynb": {
+    "score": 4.46069,
+    "target": 1.2625,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "ventilator-pressure-prediction_zekun98_fork-of-pulp-fiction-lstm-fold5_v1_C1.ipynb": {
+    "target": 0.148543004919559,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_danielbruintjies_gbvp-prediction_v40_C1.ipynb": {
+    "target": 0.1490965840003578,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "ventilator-pressure-prediction_sudipg411_eda-with-feature-engineering_v5_C1.ipynb": {
+    "target": 1.4514,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "ventilator-pressure-prediction_tracyporter_ventilator-pytorch-av-linear-regression_v2_C1.ipynb": {
+    "target": 15.452,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "ventilator-pressure-prediction_zekun98_fork-of-pulp-fiction-lstm-fold5_v4_C1.ipynb": {
+    "target": 0.1485422921312373,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_syerwin_update-version-ensemble-without-overfitting_v16_C1.ipynb": {
+    "target": 0.1384407073718896,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_tracyporter_ventilator-pytorch-av-linear-regression_v5_C1.ipynb": {
+    "target": 11.0996,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "ventilator-pressure-prediction_vineethakkinapalli_random-weights-blending-tool-ventilator-pressure_v4_C1.ipynb": {
+    "target": 0.1391530842025668,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_yus002_gb-blend_v18_C1.ipynb": {
+    "target": 0.2873555354677188,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_yus002_random-weights-blending-tool-ventilator-pressure_v4_C1.ipynb": {
+    "target": 0.1513939814206466,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_rizkykiky_ensemble-of-lstm-notebook_v1_C1.ipynb": {
+    "target": 2.893034360980532,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_tracyporter_ventilator-pytorch-av-linear-regression_v4_C1.ipynb": {
+    "target": 13.5676,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "ventilator-pressure-prediction_yus002_gb-blend_v143_C1.ipynb": {
+    "target": 0.1375885537614762,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "ventilator-pressure-prediction_zekun98_fork-of-pulp-fiction-lstm-fold5_v2_C1.ipynb": {
+    "target": 0.1541162141101488,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "vinbigdata-chest-xray-abnormalities-detection_darshanpatel11_2class-filter-on-yolo-v5-post-processing_v1_C1.ipynb": {
+    "target": 0.2177142085841383,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "AI4Code_xodeum_google-al4code_v1_C1.ipynb": {
+    "target": 0.5918,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "catboost==1.2.8\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nplotly==5.24.1\nplotly-express==0.4.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "AI4Code_corneliuskristianto_google-ai4code-reconstruct-the-order_v9_C1.ipynb": {
+    "target": 0.591,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nplotly==5.24.1\nplotly-express==0.4.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "dog-breed-identification_kennych_dog-breed-identification_v2_C1.ipynb": {
+    "target": 5.15761,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "dog-breed-identification_mehulgupta2016154_dog-breed-cnn_v8_C1.ipynb": {
+    "target": 4.98843,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "h-and-m-personalized-fashion-recommendations_marcogorelli_radek-s-lgbmranker-starter-pack_v1_C1.ipynb": {
+    "target": 0.0204628930615779,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "histopathologic-cancer-detection_terripietka_tap-cbam-submission-v3_v5_C1.ipynb": {
+    "target": 0.753736212726282,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "histopathologic-cancer-detection_1009029_cancer-detection-model-using-keras_v2_C1.ipynb": {
+    "target": 0.7793147687630658,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "histopathologic-cancer-detection_terripietka_tap-cbam-submission-v3_v1_C1.ipynb": {
+    "target": 0.7704608760998947,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v24_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers must have the same length",
+    "target": 1.735898,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npyarrow==19.0.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "hms-harmful-brain-activity-classification_tomooinubushi_lb-probing-notebook-for-hms_v14_C1.ipynb": {
+    "score": "Invalid submission: Submission probabilities must add to 1 for each row",
+    "target": 0.989084,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntqdm==4.67.1"
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v23_C1.ipynb": {
+    "score": "Invalid submission: Submission must contain eeg_id column",
+    "target": 1.68843,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npyarrow==19.0.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v21_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers must have the same length",
+    "target": 1.833731,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npyarrow==19.0.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v64_C1.ipynb": {
+    "target": 1.0116395317562643,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npyarrow==19.0.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "icecube-neutrinos-in-deep-ice_oldjerry_is-machine-learning-method-work-lgb-lr_v1_C1.ipynb": {
+    "target": 1.568163,
+    "python_version": "3.11",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "icecube-neutrinos-in-deep-ice_solverworld_icecube-neutrino-path-least-squares-1-214_v5_C1.ipynb": {
+    "target": 1.216252391764335,
+    "python_version": "3.11",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "icecube-neutrinos-in-deep-ice_ayrgthonsoraca_neutrinos-s-telescope-principal-component_v5_C1.ipynb": {
+    "target": 1.549813,
+    "python_version": "3.11",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nplotly==5.24.1\nplotly-express==0.4.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0"
+  },
+  "iwildcam-2019-fgvc6_khiwila_kernelb5c64454eb_v2_C1.ipynb": {
+    "target": 0.0808795909190302,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "leaf-classification_rafarodrigues33_leaf-classification-v1_v4_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame must have an 'id' column and a column for each class.",
+    "target": 0.83891,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "leaf-classification_ypargaien_keras-convnet-lb-0-0052-w-visualization_v4_C1.ipynb": {
+    "target": 4.60832,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "learning-agency-lab-automated-essay-scoring-2_hashidoyuto_deberta-5fold-infer-aes2-0_v4_C1.ipynb": {
+    "target": 0.8053301059475746,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "datasets==4.4.1\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsentence-transformers==4.1.0\nsklearn-pandas==2.2.0\ntensorflow-datasets==4.9.9\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntransformers==4.53.3\nvega-datasets==0.9.0"
+  },
+  "rsna-breast-cancer-detection_niralpdesai_rsna-screening-mammography-npd-dk-predictions_v27_C1.ipynb": {
+    "target": 0.0387540746106483,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "rsna-breast-cancer-detection_shameinew_rsna-bc-prediction_v7_C1.ipynb": {
+    "score": "Invalid submission: prediction_id not in submission",
+    "target": 0.04,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npydicom==3.0.1\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "stanford-covid-vaccine_arunamenon_openvaccine-lstm-gru-overall-features_v32_C1.ipynb": {
+    "target": 0.3763091623635361,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "stanford-covid-vaccine_hirazawahiroshi_openvaccine-simple-lgb-use-of-error-information_v1_C1.ipynb": {
+    "score": "Invalid submission: Expected submission to be the same length as answers, but got 146880 instead of 25680.",
+    "target": 0.41876,
+    "python_version": "3.8",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v3_C1.ipynb": {
+    "target": 0.65138,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "catboost==1.2.8\ngeopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\noptuna==4.5.0\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscikit-multilearn==0.2.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "playground-series-s3e18_onepabs_ps3e18-eda-ensemble-adasyn_v8_C1.ipynb": {
+    "target": 0.60019,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimbalanced-learn==0.13.0\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v2_C1.ipynb": {
+    "target": 0.64882,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\noptuna==4.5.0\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscikit-multilearn==0.2.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  },
+  "ranzcr-clip-catheter-line-classification_venkat555_ranzcr-clip-tpu-densenet-with-kfold-inference_v4_C1.ipynb": {
+    "target": 0.6294664873796718,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "tensorflow2-question-answering_opanichev_text-similarity-baseline_v8_C1.ipynb": {
+    "target": 0.00805,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntqdm==4.67.1"
+  },
+  "uw-madison-gi-tract-image-segmentation_ammarnassanalhajali_uwmgi-unet-keras-inference_v19_C1.ipynb": {
+    "target": 0.0959253414910035,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "uw-madison-gi-tract-image-segmentation_shrutimurarka_uw-infer-keras_v13_C1.ipynb": {
+    "target": 0.8099985307671078,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "lmsys-chatbot-arena_hemkeshkantawala_lmsys-hemkesh-10040-inference_v9_C1.ipynb": {
+    "target": 1.092333390084535,
+    "python_version": "3.14",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "predict-volcanic-eruptions-ingv-oe_carlmcbrideellis_volcanic-feature-importance-using-boruta-shap_v1_C1.ipynb": {
+    "target": 6440405.451713717,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nrgf-python==3.12.0\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  }
+}

@@ -1,0 +1,333 @@
+{
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0598087310791,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v45/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7306118011474609,
+    "process_time": 604.9666867256165,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2347729206085,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v55/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8009958267211914,
+    "process_time": 603.806070804596,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1215131282806,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v34/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.6821238994598389,
+    "process_time": 603.6982858181,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0784397125244,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v49/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.957141637802124,
+    "process_time": 604.8273265361786,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.224666595459,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v53/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8313562870025635,
+    "process_time": 606.7624061107635,
+    "target": 1.5600078198717884,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1313846111298,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v48/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7856743335723877,
+    "process_time": 607.0236821174622,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1050083637238,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v42/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.0679872035980225,
+    "process_time": 622.039436340332,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2030386924744,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v39/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.9476275444030762,
+    "process_time": 605.3339304924011,
+    "target": 1.593925161860797,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1594066619873,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v46/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8913440704345703,
+    "process_time": 622.5441267490387,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1227564811707,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v36/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7681760787963867,
+    "process_time": 607.2356741428375,
+    "target": 1.593925161860797,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2116136550903,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v41/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8512632846832275,
+    "process_time": 606.7907226085663,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1110081672668,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v43/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.282270908355713,
+    "process_time": 604.4962177276611,
+    "target": 1.5600078198717884,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.140355348587,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v52/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.0221328735351562,
+    "process_time": 607.2964415550232,
+    "target": 1.5600078198717884,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1919448375702,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v31/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.9855391979217529,
+    "process_time": 607.5148177146912,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0404839515686,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v29/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.6329333782196045,
+    "process_time": 610.9246759414673,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2006244659424,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v54/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7821636199951172,
+    "process_time": 607.2889089584351,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2784307003021,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v40/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.756690502166748,
+    "process_time": 603.8175239562988,
+    "target": 1.593925161860797,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1400938034058,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v35/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.3077692985534668,
+    "process_time": 619.6761183738708,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0124893188477,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v33/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.653554916381836,
+    "process_time": 619.2217643260956,
+    "target": 1.6076979939249665,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1333260536194,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v47/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.0246636867523193,
+    "process_time": 622.5590348243713,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.105311870575,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v37/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8302149772644043,
+    "process_time": 621.8133211135864,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0865461826324,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v30/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7906057834625244,
+    "process_time": 606.6775720119476,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.ipynb": {
+    "execution_time": 572.9289770126343,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 16:21:59.151950: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 16:21:59.163403: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777393319.175305      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777393319.178743      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 16:21:59.192031: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 16:22:06.062450: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[ WARN:0@7.444] global loadsave.cpp:275 findDecoder imread_('../input/cassava-leaf-disease-classification/test_images/2216849948.jpg'): can't open/read file: check file path/integrity\n[NbConvertApp] Writing 6011211 bytes to cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/dipeshkurasau_cassava-leaf-disease-classification/v4/cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13776159286499023,
+    "process_time": 575.2282252311707,
+    "score": 0.11883,
+    "target": 0.7845270474463584,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.ipynb": {
+    "execution_time": 574.0688481330872,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:13:31.057027: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:13:31.074317: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777342411.096504      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777342411.103029      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:13:31.128070: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:13:42.758081: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 351374 bytes to cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/funky15_5-fold-tpu-inference-res50-res101-effb4/v5/cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13610005378723145,
+    "process_time": 578.300449848175,
+    "score": 0.10762,
+    "target": 0.0959504381988516,
+    "lower_is_better": false
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v7_C1.ipynb": {
+    "target": 0.65244
+  },
+  "spaceship-titanic_sergeypolivin_spaceship-prediction-using-catboostclassifier_v2_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_rayenghali023_simple-preprocessing-smote-le-ohe-gridsearch_v31_C1.ipynb": {
+    "target": 0.8078
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v21_C1.ipynb": {
+    "target": 0.80874
+  },
+  "spaceship-titanic_jiwonkng_spaceship-titanic-eda-preprocessing-modeling_v22_C1.ipynb": {
+    "target": 0.79284
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v19_C1.ipynb": {
+    "target": 0.8043
+  },
+  "spaceship-titanic_rayenghali023_simple-preprocessing-smote-le-ohe-gridsearch_v8_C1.ipynb": {
+    "target": 0.80453
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v25_C1.ipynb": {
+    "target": 0.80991
+  },
+  "spaceship-titanic_mustafakeser4_simple-pipeline-cv-boost_v2_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v5_C1.ipynb": {
+    "target": 0.80383
+  },
+  "movie-review-sentiment-analysis-kernels-only_colsen_starter-classifiers-with-data-prep-commentary_v4_C1.ipynb": {
+    "target": 0.60769
+  },
+  "new-york-city-taxi-fare-prediction_yekahaaagayeham_new-york-city-taxi-fare-prediction-eda-baseline_v1_C1.ipynb": {
+    "target": 3.15471
+  },
+  "uw-madison-gi-tract-image-segmentation_jirkaborovec_tract-segm-statistic-predictions_v10_C1.ipynb": {
+    "target": 0.55248
+  },
+  "uw-madison-gi-tract-image-segmentation_jirkaborovec_tract-segm-statistic-predictions_v8_C1.ipynb": {
+    "target": 0.5519
+  },
+  "spooky-author-identification_jeru666_my-spooky-notebook_v4_C1.ipynb": {
+    "target": 0.88827
+  }
+}

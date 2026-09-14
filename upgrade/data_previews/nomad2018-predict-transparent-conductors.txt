@@ -1,0 +1,120 @@
+```
+/
+    kaggle/
+        data/
+            description.md (89 lines)
+            sample_submission.csv (241 lines)
+            sample_submission.csv.zip (765 Bytes)
+            test.csv (241 lines)
+            test.csv.zip (6.0 kB)
+            test.zip (505.0 kB)
+            train.csv (2161 lines)
+            train.csv.zip (56.7 kB)
+            train.zip (4.5 MB)
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+            test/
+                1/
+                    geometry.xyz (3.0 kB)
+                10/
+                    geometry.xyz (3.0 kB)
+                ... and 239 other folders
+            train/
+                1/
+                    geometry.xyz (5.5 kB)
+                10/
+                    geometry.xyz (2.3 kB)
+                ... and 2159 other folders
+        input/
+            description.md (89 lines)
+            sample_submission.csv (241 lines)
+            sample_submission.csv.zip (765 Bytes)
+            test.csv (241 lines)
+            test.csv.zip (6.0 kB)
+            test.zip (505.0 kB)
+            train.csv (2161 lines)
+            train.csv.zip (56.7 kB)
+            train.zip (4.5 MB)
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+            test/
+                1/
+                    geometry.xyz (3.0 kB)
+                10/
+                    geometry.xyz (3.0 kB)
+                ... and 239 other folders
+            train/
+                1/
+                    geometry.xyz (5.5 kB)
+                10/
+                    geometry.xyz (2.3 kB)
+                ... and 2159 other folders
+        working/
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+```
+
+-> data/nomad2018-predict-transparent-conductors/sample_submission.csv has 240 rows and 3 columns.
+The columns are: id, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/nomad2018-predict-transparent-conductors/test.csv has 240 rows and 12 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree
+
+-> data/nomad2018-predict-transparent-conductors/train.csv has 2160 rows and 14 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/sample_submission.csv has 240 rows and 3 columns.
+The columns are: id, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/test.csv has 240 rows and 12 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree
+
+-> data/train.csv has 2160 rows and 14 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree, formation_energy_ev_natom, bandgap_energy_ev
+
+-> (stopped after 10 files for performance)

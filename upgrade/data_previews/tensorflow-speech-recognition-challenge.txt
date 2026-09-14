@@ -1,0 +1,137 @@
+```
+/
+    kaggle/
+        data/
+            description.md (328 lines)
+            sample_submission.csv (6474 lines)
+            sample_submission.csv.zip (16.6 kB)
+            test.zip (149.1 MB)
+            train.zip (1.3 GB)
+            tensorflow-speech-recognition-challenge/
+                description.md (328 lines)
+                sample_submission.csv (6474 lines)
+                ... and 3 other files
+                tensorflow-speech-recognition-challenge/
+                test/
+                    audio/
+                        clip_00000000.wav (32.0 kB)
+                        clip_00000001.wav (32.0 kB)
+                        ... and 6471 other files
+                    test/
+                train/
+                    audio/
+                        _background_noise_/
+                            ... (max depth reached)
+                        bed/
+                            ... (max depth reached)
+                        ... and 29 other folders
+                    train/
+            test/
+                audio/
+                    clip_00000000.wav (32.0 kB)
+                    clip_00000001.wav (32.0 kB)
+                    ... and 6471 other files
+                test/
+            train/
+                audio/
+                    _background_noise_/
+                        doing_the_dishes.wav (3.0 MB)
+                        dude_miaowing.wav (2.0 MB)
+                        ... and 3 other files
+                    bed/
+                        00176480_nohash_0.wav (32.0 kB)
+                        004ae714_nohash_0.wav (32.0 kB)
+                        ... and 1534 other files
+                    ... and 29 other folders
+                train/
+        input/
+            description.md (328 lines)
+            sample_submission.csv (6474 lines)
+            sample_submission.csv.zip (16.6 kB)
+            test.zip (149.1 MB)
+            train.zip (1.3 GB)
+            tensorflow-speech-recognition-challenge/
+                description.md (328 lines)
+                sample_submission.csv (6474 lines)
+                ... and 3 other files
+                tensorflow-speech-recognition-challenge/
+                test/
+                    audio/
+                        clip_00000000.wav (32.0 kB)
+                        clip_00000001.wav (32.0 kB)
+                        ... and 6471 other files
+                    test/
+                train/
+                    audio/
+                        _background_noise_/
+                            ... (max depth reached)
+                        bed/
+                            ... (max depth reached)
+                        ... and 29 other folders
+                    train/
+            test/
+                audio/
+                    clip_00000000.wav (32.0 kB)
+                    clip_00000001.wav (32.0 kB)
+                    ... and 6471 other files
+                test/
+                    audio/
+                        clip_00000000.wav (32.0 kB)
+                        clip_00000001.wav (32.0 kB)
+                        ... and 6471 other files
+                    test/
+            train/
+                audio/
+                    _background_noise_/
+                        doing_the_dishes.wav (3.0 MB)
+                        dude_miaowing.wav (2.0 MB)
+                        ... and 3 other files
+                    bed/
+                        00176480_nohash_0.wav (32.0 kB)
+                        004ae714_nohash_0.wav (32.0 kB)
+                        ... and 1534 other files
+                    ... and 29 other folders
+                train/
+                    audio/
+                        _background_noise_/
+                            ... (max depth reached)
+                        bed/
+                            ... (max depth reached)
+                        ... and 29 other folders
+                    train/
+        working/
+            tensorflow-speech-recognition-challenge/
+                description.md (328 lines)
+                sample_submission.csv (6474 lines)
+                ... and 3 other files
+                tensorflow-speech-recognition-challenge/
+                test/
+                    audio/
+                        clip_00000000.wav (32.0 kB)
+                        clip_00000001.wav (32.0 kB)
+                        ... and 6471 other files
+                    test/
+                train/
+                    audio/
+                        _background_noise_/
+                            ... (max depth reached)
+                        bed/
+                            ... (max depth reached)
+                        ... and 29 other folders
+                    train/
+```
+
+-> data/sample_submission.csv has 6473 rows and 2 columns.
+The columns are: fname, label
+
+-> data/tensorflow-speech-recognition-challenge/sample_submission.csv has 6473 rows and 2 columns.
+The columns are: fname, label
+
+-> input/sample_submission.csv has 6473 rows and 2 columns.
+The columns are: fname, label
+
+-> input/tensorflow-speech-recognition-challenge/sample_submission.csv has 6473 rows and 2 columns.
+The columns are: fname, label
+
+-> working/tensorflow-speech-recognition-challenge/sample_submission.csv has 6473 rows and 2 columns.
+The columns are: fname, label

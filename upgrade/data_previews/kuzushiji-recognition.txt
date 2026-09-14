@@ -1,0 +1,144 @@
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            sample_submission.csv (362 lines)
+            sample_submission.csv.zip (2.0 kB)
+            test.zip (160 Bytes)
+            test_images.zip (307.5 MB)
+            train.csv (3245 lines)
+            train.csv.zip (5.5 MB)
+            train.zip (162 Bytes)
+            train_images.zip (2.7 GB)
+            unicode_translation.csv (4782 lines)
+            unicode_translation.csv.zip (24.0 kB)
+            kuzushiji-recognition/
+                description.md (124 lines)
+                sample_submission.csv (362 lines)
+                ... and 9 other files
+                kuzushiji-recognition/
+                test/
+                    test/
+                test_images/
+                    200021851_00016_2.jpg (828.6 kB)
+                    200005598_00022_1.jpg (665.9 kB)
+                    ... and 359 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    umgy008-015.jpg (673.0 kB)
+                    100249376_00007_1.jpg (677.5 kB)
+                    ... and 3242 other files
+                    train_images/
+            test/
+                test/
+            test_images/
+                200021851_00016_2.jpg (828.6 kB)
+                200005598_00022_1.jpg (665.9 kB)
+                ... and 359 other files
+                test_images/
+            train/
+                train/
+            train_images/
+                umgy008-015.jpg (673.0 kB)
+                100249376_00007_1.jpg (677.5 kB)
+                ... and 3242 other files
+                train_images/
+        input/
+            description.md (124 lines)
+            sample_submission.csv (362 lines)
+            sample_submission.csv.zip (2.0 kB)
+            test.zip (160 Bytes)
+            test_images.zip (307.5 MB)
+            train.csv (3245 lines)
+            train.csv.zip (5.5 MB)
+            train.zip (162 Bytes)
+            train_images.zip (2.7 GB)
+            unicode_translation.csv (4782 lines)
+            unicode_translation.csv.zip (24.0 kB)
+            kuzushiji-recognition/
+                description.md (124 lines)
+                sample_submission.csv (362 lines)
+                ... and 9 other files
+                kuzushiji-recognition/
+                test/
+                    test/
+                test_images/
+                    200021851_00016_2.jpg (828.6 kB)
+                    200005598_00022_1.jpg (665.9 kB)
+                    ... and 359 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    umgy008-015.jpg (673.0 kB)
+                    100249376_00007_1.jpg (677.5 kB)
+                    ... and 3242 other files
+                    train_images/
+            test/
+                test/
+                    test/
+            test_images/
+                200021851_00016_2.jpg (828.6 kB)
+                200005598_00022_1.jpg (665.9 kB)
+                ... and 359 other files
+                test_images/
+                    200021851_00016_2.jpg (828.6 kB)
+                    200005598_00022_1.jpg (665.9 kB)
+                    ... and 359 other files
+                    test_images/
+            train/
+                train/
+                    train/
+            train_images/
+                umgy008-015.jpg (673.0 kB)
+                100249376_00007_1.jpg (677.5 kB)
+                ... and 3242 other files
+                train_images/
+                    umgy008-015.jpg (673.0 kB)
+                    100249376_00007_1.jpg (677.5 kB)
+                    ... and 3242 other files
+                    train_images/
+        working/
+            kuzushiji-recognition/
+                description.md (124 lines)
+                sample_submission.csv (362 lines)
+                ... and 9 other files
+                kuzushiji-recognition/
+                test/
+                    test/
+                test_images/
+                    200021851_00016_2.jpg (828.6 kB)
+                    200005598_00022_1.jpg (665.9 kB)
+                    ... and 359 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    umgy008-015.jpg (673.0 kB)
+                    100249376_00007_1.jpg (677.5 kB)
+                    ... and 3242 other files
+                    train_images/
+```
+
+-> data/kuzushiji-recognition/sample_submission.csv has 361 rows and 2 columns.
+The columns are: image_id, labels
+
+-> data/kuzushiji-recognition/train.csv has 3244 rows and 2 columns.
+The columns are: image_id, labels
+
+-> data/kuzushiji-recognition/unicode_translation.csv has 4781 rows and 2 columns.
+The columns are: Unicode, char
+
+-> data/sample_submission.csv has 361 rows and 2 columns.
+The columns are: image_id, labels
+
+-> data/train.csv has 3244 rows and 2 columns.
+The columns are: image_id, labels
+
+-> data/unicode_translation.csv has 4781 rows and 2 columns.
+The columns are: Unicode, char
+
+-> (stopped after 10 files for performance)

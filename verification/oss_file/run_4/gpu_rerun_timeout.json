@@ -1,0 +1,58 @@
+{
+  "aptos2019-blindness-detection_bohau0856095_notebooka4cf7f3c4d_v131_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame should not be empty",
+    "target": 0.9184567493500784,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_pratt3000_cassava-submission-notebook_v9_C1.ipynb": {
+    "target": 0.8874282260501662,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "histopathologic-cancer-detection_giniya_hist-cap2-3_v16_C1.ipynb": {
+    "target": 0.6759,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "plant-pathology-2021-fgvc8_jeremynadal_plantpathology2021-trained_v4_C1.ipynb": {
+    "target": 0.7155493998153282,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "hms-harmful-brain-activity-classification_anrenk_hms-spectrogram-pytorch_v7_C1.ipynb": {
+    "score": 1.40938,
+    "target": 1.1274117538279391,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v1_C1.ipynb": {
+    "target": 0.9158986175115208,
+    "python_version": "3.14",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "uw-madison-gi-tract-image-segmentation_abhivij_gi-tract-image-segmentation_v28_C1.ipynb": {
+    "target": 0.8077588400405604,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "ranzcr-clip-catheter-line-classification_jackstapleton_rccl-384-inference_v2_C1.ipynb": {
+    "target": 0.75525,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "hotel-id-2021-fgvc8_joatom_fgvc8-hotel-ensemble-inference_v6_C1.ipynb": {
+    "target": 0.6125957733434361,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "dill==0.4.0\nfastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  }
+}

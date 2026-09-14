@@ -1,0 +1,143 @@
+```
+/
+    kaggle/
+        data/
+            description.md (345 lines)
+            sample_submission.csv (1245 lines)
+            sample_submission.csv.zip (10.7 kB)
+            test.zip (7.6 GB)
+            train.zip (67.7 GB)
+            train_image_level.csv (5697 lines)
+            train_image_level.csv.zip (405.9 kB)
+            train_study_level.csv (5449 lines)
+            train_study_level.csv.zip (45.4 kB)
+            siim-covid19-detection/
+                description.md (345 lines)
+                sample_submission.csv (1245 lines)
+                ... and 7 other files
+                siim-covid19-detection/
+                test/
+                    000c9c05fd14/
+                        e555410bd2cd/
+                            ... (max depth reached)
+                    00c74279c5b7/
+                        ca867739fd1b/
+                            ... (max depth reached)
+                    ... and 605 other folders
+                train/
+                    00086460a852/
+                        9e8302230c91/
+                            ... (max depth reached)
+                    00292f8c37bd/
+                        73120b4a13cb/
+                            ... (max depth reached)
+                    ... and 5447 other folders
+            test/
+                000c9c05fd14/
+                    e555410bd2cd/
+                        51759b5579bc.dcm (17.6 MB)
+                00c74279c5b7/
+                    ca867739fd1b/
+                        136af218f8df.dcm (15.7 MB)
+                ... and 605 other folders
+            train/
+                00086460a852/
+                    9e8302230c91/
+                        65761e66de9f.dcm (13.0 MB)
+                00292f8c37bd/
+                    73120b4a13cb/
+                        f6293b1c49e2.dcm (15.5 MB)
+                ... and 5447 other folders
+        input/
+            description.md (345 lines)
+            sample_submission.csv (1245 lines)
+            sample_submission.csv.zip (10.7 kB)
+            test.zip (7.6 GB)
+            train.zip (67.7 GB)
+            train_image_level.csv (5697 lines)
+            train_image_level.csv.zip (405.9 kB)
+            train_study_level.csv (5449 lines)
+            train_study_level.csv.zip (45.4 kB)
+            siim-covid19-detection/
+                description.md (345 lines)
+                sample_submission.csv (1245 lines)
+                ... and 7 other files
+                siim-covid19-detection/
+                test/
+                    000c9c05fd14/
+                        e555410bd2cd/
+                            ... (max depth reached)
+                    00c74279c5b7/
+                        ca867739fd1b/
+                            ... (max depth reached)
+                    ... and 605 other folders
+                train/
+                    00086460a852/
+                        9e8302230c91/
+                            ... (max depth reached)
+                    00292f8c37bd/
+                        73120b4a13cb/
+                            ... (max depth reached)
+                    ... and 5447 other folders
+            test/
+                000c9c05fd14/
+                    e555410bd2cd/
+                        51759b5579bc.dcm (17.6 MB)
+                00c74279c5b7/
+                    ca867739fd1b/
+                        136af218f8df.dcm (15.7 MB)
+                ... and 605 other folders
+            train/
+                00086460a852/
+                    9e8302230c91/
+                        65761e66de9f.dcm (13.0 MB)
+                00292f8c37bd/
+                    73120b4a13cb/
+                        f6293b1c49e2.dcm (15.5 MB)
+                ... and 5447 other folders
+        working/
+            siim-covid19-detection/
+                description.md (345 lines)
+                sample_submission.csv (1245 lines)
+                ... and 7 other files
+                siim-covid19-detection/
+                test/
+                    000c9c05fd14/
+                        e555410bd2cd/
+                            ... (max depth reached)
+                    00c74279c5b7/
+                        ca867739fd1b/
+                            ... (max depth reached)
+                    ... and 605 other folders
+                train/
+                    00086460a852/
+                        9e8302230c91/
+                            ... (max depth reached)
+                    00292f8c37bd/
+                        73120b4a13cb/
+                            ... (max depth reached)
+                    ... and 5447 other folders
+```
+
+-> data/sample_submission.csv has 1244 rows and 2 columns.
+The columns are: id, PredictionString
+
+-> data/siim-covid19-detection/sample_submission.csv has 1244 rows and 2 columns.
+The columns are: id, PredictionString
+
+-> data/siim-covid19-detection/train_image_level.csv has 5696 rows and 4 columns.
+The columns are: id, boxes, label, StudyInstanceUID
+
+-> data/siim-covid19-detection/train_study_level.csv has 5448 rows and 5 columns.
+The columns are: id, Negative for Pneumonia, Typical Appearance, Indeterminate Appearance, Atypical Appearance
+
+-> data/train_image_level.csv has 5696 rows and 4 columns.
+The columns are: id, boxes, label, StudyInstanceUID
+
+-> data/train_study_level.csv has 5448 rows and 5 columns.
+The columns are: id, Negative for Pneumonia, Typical Appearance, Indeterminate Appearance, Atypical Appearance
+
+-> input/sample_submission.csv has 1244 rows and 2 columns.
+The columns are: id, PredictionString
+
+-> (stopped after 10 files for performance)

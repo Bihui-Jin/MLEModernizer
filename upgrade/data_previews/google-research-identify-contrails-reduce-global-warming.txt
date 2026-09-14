@@ -1,0 +1,360 @@
+```
+/
+    kaggle/
+        data/
+            description.md (129 lines)
+            sample_submission.csv (1857 lines)
+            sample_submission.csv.zip (21.4 kB)
+            test.zip (26.9 GB)
+            train.zip (270.6 GB)
+            train_metadata.json (1 lines)
+            validation.zip (27.0 GB)
+            validation_metadata.json (1 lines)
+            google-research-identify-contrails-reduce-global-warming/
+                description.md (129 lines)
+                sample_submission.csv (1857 lines)
+                ... and 6 other files
+                google-research-identify-contrails-reduce-global-warming/
+                test/
+                    1006714073984511039/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 7 other files
+                    1011991214639847439/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 7 other files
+                    ... and 1855 other folders
+                train/
+                    1000216489776414077/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 9 other files
+                    1000603527582775543/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 9 other files
+                    ... and 18672 other folders
+                validation/
+                    1000834164244036115/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 8 other files
+                    1002653297254493116/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 8 other files
+                    ... and 1854 other folders
+            test/
+                1006714073984511039/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 7 other files
+                1011991214639847439/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 7 other files
+                ... and 1855 other folders
+            train/
+                1000216489776414077/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 9 other files
+                1000603527582775543/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 9 other files
+                ... and 18672 other folders
+            validation/
+                1000834164244036115/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 8 other files
+                1002653297254493116/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 8 other files
+                ... and 1854 other folders
+        input/
+            description.md (129 lines)
+            sample_submission.csv (1857 lines)
+            sample_submission.csv.zip (21.4 kB)
+            test.zip (26.9 GB)
+            train.zip (270.6 GB)
+            train_metadata.json (1 lines)
+            validation.zip (27.0 GB)
+            validation_metadata.json (1 lines)
+            google-research-identify-contrails-reduce-global-warming/
+                description.md (129 lines)
+                sample_submission.csv (1857 lines)
+                ... and 6 other files
+                google-research-identify-contrails-reduce-global-warming/
+                test/
+                    1006714073984511039/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 7 other files
+                    1011991214639847439/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 7 other files
+                    ... and 1855 other folders
+                train/
+                    1000216489776414077/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 9 other files
+                    1000603527582775543/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 9 other files
+                    ... and 18672 other folders
+                validation/
+                    1000834164244036115/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 8 other files
+                    1002653297254493116/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 8 other files
+                    ... and 1854 other folders
+            test/
+                1006714073984511039/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 7 other files
+                1011991214639847439/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 7 other files
+                ... and 1855 other folders
+            train/
+                1000216489776414077/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 9 other files
+                1000603527582775543/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 9 other files
+                ... and 18672 other folders
+            validation/
+                1000834164244036115/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 8 other files
+                1002653297254493116/
+                    band_08.npy (2.1 MB)
+                    band_09.npy (2.1 MB)
+                    ... and 8 other files
+                ... and 1854 other folders
+        working/
+            google-research-identify-contrails-reduce-global-warming/
+                description.md (129 lines)
+                sample_submission.csv (1857 lines)
+                ... and 6 other files
+                google-research-identify-contrails-reduce-global-warming/
+                test/
+                    1006714073984511039/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 7 other files
+                    1011991214639847439/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 7 other files
+                    ... and 1855 other folders
+                train/
+                    1000216489776414077/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 9 other files
+                    1000603527582775543/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 9 other files
+                    ... and 18672 other folders
+                validation/
+                    1000834164244036115/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 8 other files
+                    1002653297254493116/
+                        band_08.npy (2.1 MB)
+                        band_09.npy (2.1 MB)
+                        ... and 8 other files
+                    ... and 1854 other folders
+```
+
+-> data/google-research-identify-contrails-reduce-global-warming/sample_submission.csv has 1856 rows and 4 columns.
+The columns are: record_id, encoded_pixels, height, width
+
+-> data/google-research-identify-contrails-reduce-global-warming/train_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "record_id": {
+        "type": "string"
+      },
+      "projection_wkt": {
+        "type": "string"
+      },
+      "row_min": {
+        "type": "number"
+      },
+      "row_size": {
+        "type": "number"
+      },
+      "col_min": {
+        "type": "number"
+      },
+      "col_size": {
+        "type": "number"
+      },
+      "timestamp": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "col_min",
+      "col_size",
+      "projection_wkt",
+      "record_id",
+      "row_min",
+      "row_size",
+      "timestamp"
+    ]
+  }
+}
+
+-> data/google-research-identify-contrails-reduce-global-warming/validation_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "record_id": {
+        "type": "string"
+      },
+      "projection_wkt": {
+        "type": "string"
+      },
+      "row_min": {
+        "type": "number"
+      },
+      "row_size": {
+        "type": "number"
+      },
+      "col_min": {
+        "type": "number"
+      },
+      "col_size": {
+        "type": "number"
+      },
+      "timestamp": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "col_min",
+      "col_size",
+      "projection_wkt",
+      "record_id",
+      "row_min",
+      "row_size",
+      "timestamp"
+    ]
+  }
+}
+
+-> data/sample_submission.csv has 1856 rows and 4 columns.
+The columns are: record_id, encoded_pixels, height, width
+
+-> data/train_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "record_id": {
+        "type": "string"
+      },
+      "projection_wkt": {
+        "type": "string"
+      },
+      "row_min": {
+        "type": "number"
+      },
+      "row_size": {
+        "type": "number"
+      },
+      "col_min": {
+        "type": "number"
+      },
+      "col_size": {
+        "type": "number"
+      },
+      "timestamp": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "col_min",
+      "col_size",
+      "projection_wkt",
+      "record_id",
+      "row_min",
+      "row_size",
+      "timestamp"
+    ]
+  }
+}
+
+-> data/validation_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "record_id": {
+        "type": "string"
+      },
+      "projection_wkt": {
+        "type": "string"
+      },
+      "row_min": {
+        "type": "number"
+      },
+      "row_size": {
+        "type": "number"
+      },
+      "col_min": {
+        "type": "number"
+      },
+      "col_size": {
+        "type": "number"
+      },
+      "timestamp": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "col_min",
+      "col_size",
+      "projection_wkt",
+      "record_id",
+      "row_min",
+      "row_size",
+      "timestamp"
+    ]
+  }
+}
+
+-> (stopped after 10 files for performance)

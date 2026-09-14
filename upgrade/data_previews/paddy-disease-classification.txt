@@ -1,0 +1,139 @@
+```
+/
+    kaggle/
+        data/
+            description.md (72 lines)
+            sample_submission.csv (2603 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (205.2 MB)
+            train.csv (7806 lines)
+            train.csv.zip (40.1 kB)
+            train.zip (162 Bytes)
+            train_images.zip (614.5 MB)
+            paddy-disease-classification/
+                description.md (72 lines)
+                sample_submission.csv (2603 lines)
+                ... and 7 other files
+                paddy-disease-classification/
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+                train_images/
+                    bacterial_leaf_blight/
+                        109831.jpg (91.1 kB)
+                        109785.jpg (81.8 kB)
+                        ... and 356 other files
+                    bacterial_leaf_streak/
+                        100394.jpg (99.7 kB)
+                        103308.jpg (104.3 kB)
+                        ... and 295 other files
+                    ... and 9 other folders
+            test_images/
+                102916.jpg (92.1 kB)
+                100596.jpg (83.9 kB)
+                ... and 2600 other files
+                test_images/
+            train_images/
+                bacterial_leaf_blight/
+                    109831.jpg (91.1 kB)
+                    109785.jpg (81.8 kB)
+                    ... and 356 other files
+                bacterial_leaf_streak/
+                    100394.jpg (99.7 kB)
+                    103308.jpg (104.3 kB)
+                    ... and 295 other files
+                ... and 9 other folders
+        input/
+            description.md (72 lines)
+            sample_submission.csv (2603 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (205.2 MB)
+            train.csv (7806 lines)
+            train.csv.zip (40.1 kB)
+            train.zip (162 Bytes)
+            train_images.zip (614.5 MB)
+            paddy-disease-classification/
+                description.md (72 lines)
+                sample_submission.csv (2603 lines)
+                ... and 7 other files
+                paddy-disease-classification/
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+                train_images/
+                    bacterial_leaf_blight/
+                        109831.jpg (91.1 kB)
+                        109785.jpg (81.8 kB)
+                        ... and 356 other files
+                    bacterial_leaf_streak/
+                        100394.jpg (99.7 kB)
+                        103308.jpg (104.3 kB)
+                        ... and 295 other files
+                    ... and 9 other folders
+            test_images/
+                102916.jpg (92.1 kB)
+                100596.jpg (83.9 kB)
+                ... and 2600 other files
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+            train_images/
+                bacterial_leaf_blight/
+                    109831.jpg (91.1 kB)
+                    109785.jpg (81.8 kB)
+                    ... and 356 other files
+                bacterial_leaf_streak/
+                    100394.jpg (99.7 kB)
+                    103308.jpg (104.3 kB)
+                    ... and 295 other files
+                ... and 9 other folders
+        working/
+            paddy-disease-classification/
+                description.md (72 lines)
+                sample_submission.csv (2603 lines)
+                ... and 7 other files
+                paddy-disease-classification/
+                test_images/
+                    102916.jpg (92.1 kB)
+                    100596.jpg (83.9 kB)
+                    ... and 2600 other files
+                    test_images/
+                train_images/
+                    bacterial_leaf_blight/
+                        109831.jpg (91.1 kB)
+                        109785.jpg (81.8 kB)
+                        ... and 356 other files
+                    bacterial_leaf_streak/
+                        100394.jpg (99.7 kB)
+                        103308.jpg (104.3 kB)
+                        ... and 295 other files
+                    ... and 9 other folders
+```
+
+-> data/paddy-disease-classification/sample_submission.csv has 2602 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/paddy-disease-classification/train.csv has 7805 rows and 4 columns.
+The columns are: image_id, label, variety, age
+
+-> data/sample_submission.csv has 2602 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 7805 rows and 4 columns.
+The columns are: image_id, label, variety, age
+
+-> input/paddy-disease-classification/sample_submission.csv has 2602 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/paddy-disease-classification/train.csv has 7805 rows and 4 columns.
+The columns are: image_id, label, variety, age
+
+-> (stopped after 10 files for performance)

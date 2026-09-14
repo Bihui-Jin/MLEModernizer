@@ -1,0 +1,375 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.4687277362086465
+
+# 6. Current score
+
+0.76823
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.48867) has done: 'I remove the heavyweight TensorFlow/ EfficientNet parts that cause the protobuf error and replace the inference with a simple baseline that uses the average class probabilities from the training data. This fixes the runtime crash, ensures a valid submission.csv is written, and provides a reasonable score without altering the core modeling approach when training is disabled.'
+- What this solution (achieved 1.67064) has done: 'I keep the overall structure but replace the single global class‑mean baseline with a patient‑specific baseline: for each patient present in the training data we compute the average vote distribution and use it for test rows of the same patient, falling back to the overall class mean when the patient is unseen. This modest personalization is expected to reduce the KL divergence and move the score closer to the target while preserving the existing pipeline.'
+- What this solution (achieved 0.96709) has done: 'I add a simple Bayesian shrinkage that blends each patient’s observed class distribution with the overall class mean, using the patient’s sample count as a weight. This keeps the same patient‑level baseline ideas while reducing noise from patients with few samples, which should lower the KL‑divergence and move the score closer to the target. The rest of the pipeline and file writing remain unchanged.'
+- What this solution (achieved 1.1691) has done: 'I increase the shrinkage strength (alpha) so predictions rely more on the stable overall class distribution, and add a tiny epsilon before normalising to avoid exact zeros. This small change keeps the original patient‑baseline logic but should lower the KL‑divergence, moving the score closer to the target while still producing a valid submission.csv.'
+- What this solution (achieved 0.89076) has done: 'I lower the shrinkage strength (reduce `alpha` from 50 to 5) so the predictions rely more on the patient‑specific averages, which should bring the KL‑divergence down toward the target score while keeping the same pipeline intact.'
+- What this solution (achieved 0.76823) has done: 'I reduce the shrinkage strength `alpha` from 5.0 to 0.5 so the predictions rely more on the patient‑specific vote distributions while still falling back to the overall class mean for unseen patients. This modest change is expected to lower the KL‑divergence, moving the score toward the target 0.4687 without altering the core pipeline.'
+
+# 9. Code solution
+
+## === cell 0
+import os, pandas as pd, numpy as np
+
+PLATFORM = "kaggle"  # or 'local' if running locally
+NEEDTRAIN = False  # keep training disabled for now
+
+
+def get_path(local_path, kaggle_path):
+    return local_path if PLATFORM == "local" else kaggle_path
+
+
+train_path = get_path(
+    "./input/hms-harmful-brain-activity-classification/train.csv",
+    "/kaggle/input/hms-harmful-brain-activity-classification/train.csv",
+)
+df = pd.read_csv(train_path)
+TARGETS = df.columns[-6:]  # seizure, lpd, gpd, lrda, grda, other
+print("Train shape:", df.shape, "Targets:", list(TARGETS))
+
+train = (
+    df.groupby("eeg_id")[
+        [
+            "spectrogram_id",
+            "spectrogram_label_offset_seconds",
+            "eeg_label_offset_seconds",
+        ]
+    ]
+    .agg(
+        {
+            "spectrogram_id": "first",
+            "spectrogram_label_offset_seconds": "min",
+            "eeg_label_offset_seconds": "median",
+        }
+    )
+    .rename(
+        columns={
+            "spectrogram_id": "spec_id",
+            "spectrogram_label_offset_seconds": "min",
+            "eeg_label_offset_seconds": "eeg_median",
+        }
+    )
+)
+
+tmp = df.groupby("eeg_id")[["spectrogram_label_offset_seconds"]].agg("max")
+train["max"] = tmp
+
+train["patient_id"] = df.groupby("eeg_id")[["patient_id"]].agg("first")
+
+tmp = df.groupby("eeg_id")[TARGETS].agg("sum")
+for t in TARGETS:
+    train[t] = tmp[t].values
+
+y_data = train[TARGETS].values
+y_data = y_data / y_data.sum(axis=1, keepdims=True)
+train[TARGETS] = y_data
+
+train["target"] = df.groupby("eeg_id")[["expert_consensus"]].agg("first")
+train = train.reset_index()
+print("Aggregated train shape:", train.shape)
+
+class_means = train[TARGETS].mean().values
+print("Overall class mean probabilities:", class_means)
+
+patient_means = train.groupby("patient_id")[TARGETS].mean().reset_index()
+patient_counts = train.groupby("patient_id").size().reset_index(name="cnt")
+patient_means = patient_means.merge(patient_counts, on="patient_id", how="left")
+print(
+    "Computed patient‑level mean probabilities for",
+    patient_means.shape[0],
+    "patients",
+)
+
+
+
+
+## === cell 1
+test_path = get_path(
+    "./input/hms-harmful-brain-activity-classification/test.csv",
+    "/kaggle/input/hms-harmful-brain-activity-classification/test.csv",
+)
+test = pd.read_csv(test_path)
+print("Test shape:", test.shape)
+
+test_merged = test.merge(patient_means, on="patient_id", how="left")
+
+alpha = 0.5
+
+patient_pred = test_merged[TARGETS].fillna(0).values
+cnt = test_merged["cnt"].fillna(0).values[:, None]  # column vector
+
+preds = (cnt * patient_pred + alpha * class_means) / (cnt + alpha)
+
+epsilon = 1e-8
+preds = preds + epsilon
+
+row_sums = preds.sum(axis=1, keepdims=True)
+preds = preds / row_sums
+
+sub = pd.DataFrame({"eeg_id": test["eeg_id"].values})
+sub[TARGETS] = preds
+
+submission_path = "submission.csv"
+sub.to_csv(submission_path, index=False)
+print("Submission written to", submission_path)
+print("Submission shape:", sub.shape)
+print("Row‑wise sum check (first 5 rows):")
+print(sub[TARGETS].sum(axis=1).head())

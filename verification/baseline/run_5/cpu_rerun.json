@@ -1,0 +1,738 @@
+{
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.ipynb": {
+    "execution_time": 96.72409009933472,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 172797 bytes to jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/abhishek2195_toxic-comment-classification-project/v18/jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.2724604606628418,
+    "process_time": 102.10310816764832,
+    "score": 0.19445,
+    "target": 0.5,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.ipynb": {
+    "execution_time": 82.6277596950531,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 27393 bytes to jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/ogummaduabuchi_toxic-comment/v1/jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.08687782287597656,
+    "process_time": 86.0525553226471,
+    "score": 0.97004,
+    "target": 0.970426501920438,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.ipynb": {
+    "execution_time": 94.60085868835449,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 10226 bytes to jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/sho1194_kaggle-doi/v11/jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.12170529365539551,
+    "process_time": 100.8489899635315,
+    "score": 0.97239,
+    "target": 0.9726792121058794,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.ipynb": {
+    "execution_time": 65.63653993606567,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 10226 bytes to jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/sho1194_kaggle-doi/v12/jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.2279801368713379,
+    "process_time": 69.40630507469177,
+    "score": null,
+    "target": 0.9726792121058794,
+    "lower_is_better": false
+  },
+  "siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.ipynb": {
+    "execution_time": 4.137918710708618,
+    "detail": "[NbConvertApp] Converting notebook siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 4716 bytes to siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.ipynb",
+    "output": "results/baseline/script_out/siim-isic-melanoma-classification/amneves_random-classifier-because-why-not/v2/siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.17001128196716309,
+    "process_time": 6.495929479598999,
+    "score": 0.49172,
+    "target": 0.4936282915214993,
+    "lower_is_better": false
+  },
+  "AI4Code_readoc_ai4code-lb-prober_v8_C1.ipynb": {
+    "target": 0.0146
+  },
+  "alaska2-image-steganalysis_akashsuper2000_jpeg-compression-rate_v3_C1.ipynb": {
+    "target": 0.594
+  },
+  "champs-scalar-coupling_mittalh_predicting-mol-prop_v4_C1.ipynb": {
+    "target": 1.27785
+  },
+  "google-quest-challenge_carlolepelaars_understanding-the-metric-spearman-s-rho_v5_C1.ipynb": {
+    "target": 0.00022
+  },
+  "herbarium-2020-fgvc7_khotijahs1_identify-plant-species-from-herbarium-specimens_v3_C1.ipynb": {
+    "target": 2e-05
+  },
+  "jigsaw-toxic-comment-classification-challenge_drkaggle22_toxic-comments-classification-tf-idf-nltk_v20_C1.ipynb": {
+    "target": 0.6436
+  },
+  "jigsaw-toxic-comment-classification-challenge_drkaggle22_toxic-comments-classification-tf-idf-nltk_v22_C1.ipynb": {
+    "target": 0.66533
+  },
+  "jigsaw-toxic-comment-classification-challenge_drkaggle22_toxic-comments-classification-tf-idf-nltk_v33_C1.ipynb": {
+    "target": 0.91778
+  },
+  "jigsaw-toxic-comment-classification-challenge_keshavbalivada_toxic-comment-classification_v4_C1.ipynb": {
+    "target": 0.95526
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v34_C1.ipynb": {
+    "target": 0.97463
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v35_C1.ipynb": {
+    "target": 0.96877
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v36_C1.ipynb": {
+    "target": 0.95063
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v37_C1.ipynb": {
+    "target": 0.97319
+  },
+  "jigsaw-toxic-comment-classification-challenge_sergeypolivin_toxicity-clf_v2_C1.ipynb": {
+    "target": 0.97502
+  },
+  "lmsys-chatbot-arena_leetolo_random-binary-output-submission_v3_C1.ipynb": {
+    "target": 24.03704
+  },
+  "lmsys-chatbot-arena_nileshely_unveiling-human-preferences_v3_C1.ipynb": {
+    "target": 1.33488
+  },
+  "movie-review-sentiment-analysis-kernels-only_snehithatiger_movie-review-sentiment-analysis_v5_C1.ipynb": {
+    "target": 0.61411
+  },
+  "movie-review-sentiment-analysis-kernels-only_toraaglobal_sentiment-analysis-mnb_v4_C1.ipynb": {
+    "target": 0.59283
+  },
+  "movie-review-sentiment-analysis-kernels-only_up201204722_movie-sentiment-analysis_v6_C1.ipynb": {
+    "target": 0.47817
+  },
+  "new-york-city-taxi-fare-prediction_kaibaur_taxi-fare-simplerandomforest-score-3-99_v3_C1.ipynb": {
+    "target": 10.78623
+  },
+  "petfinder-pawpularity-score_jzjamie_notebookfe84f155f2_v2_C1.ipynb": {
+    "target": 25.6957
+  },
+  "petfinder-pawpularity-score_lokeshsaipureddi_eda-transfer-learning-using-pretrained-weights_v6_C1.ipynb": {
+    "target": 22.5021
+  },
+  "plant-pathology-2020-fgvc7_ooo256_decision-tree2_v3_C1.ipynb": {
+    "target": 0.53499
+  },
+  "playground-series-s3e18_aman7kumar_multi-class_v2_C1.ipynb": {
+    "target": 0.56327
+  },
+  "playground-series-s3e18_amarloni_pgs3-e18-multiabel-classification_v2_C1.ipynb": {
+    "target": 0.56448
+  },
+  "playground-series-s3e18_cybersimar08_enzyme-gradient-xgb-ada-cat-lgbm-ensemble_v23_C1.ipynb": {
+    "target": 0.64554
+  },
+  "playground-series-s3e18_cybersimar08_enzyme-gradient-xgb-ada-cat-lgbm-ensemble_v24_C1.ipynb": {
+    "target": 0.64585
+  },
+  "playground-series-s3e18_ibrahimallabbad_eda-multi-classification-gradientboost-catboost_v2_C1.ipynb": {
+    "target": 0.4664
+  },
+  "playground-series-s3e18_keerthi4701_enzyme-multi-class-simple-model_v1_C1.ipynb": {
+    "target": 0.64028
+  },
+  "playground-series-s3e18_piyushjoshi01_s3e18-2nd-try_v1_C1.ipynb": {
+    "target": 0.54916
+  },
+  "playground-series-s3e18_tracyporter_play-3-18-tf-class-weights_v1_C1.ipynb": {
+    "target": 0.64212
+  },
+  "playground-series-s3e18_tracyporter_play-3-18-tf_v1_C1.ipynb": {
+    "target": 0.64622
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v7_C1.ipynb": {
+    "target": 0.65244
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v9_C1.ipynb": {
+    "target": 0.64197
+  },
+  "siim-isic-melanoma-classification_annasofielunde_xgboost-on-metadata-for-ml_v12_C1.ipynb": {
+    "target": 0.6082
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v16_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v21_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v24_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v25_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v26_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v1_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v2_C1.ipynb": {
+    "target": 0.7905
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v3_C1.ipynb": {
+    "target": 0.79658
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v4_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_abrmichael_spaceship-titanic-first-view-on-data-and-modeling_v1_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v13_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v14_C1.ipynb": {
+    "target": 0.80243
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v15_C1.ipynb": {
+    "target": 0.80032
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v24_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_alekseyandrianov_spaceship-titanic_v22_C1.ipynb": {
+    "target": 0.80476
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v11_C1.ipynb": {
+    "target": 0.80687
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v12_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v13_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v14_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v15_C1.ipynb": {
+    "target": 0.79144
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v17_C1.ipynb": {
+    "target": 0.8036
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v22_C1.ipynb": {
+    "target": 0.79985
+  },
+  "spaceship-titanic_bvvkarthik_spaceship-titanic-0-80-beginner-friendly_v11_C1.ipynb": {
+    "target": 0.74842
+  },
+  "spaceship-titanic_bvvkarthik_spaceship-titanic-0-80-beginner-friendly_v12_C1.ipynb": {
+    "target": 0.75169
+  },
+  "spaceship-titanic_bvvkarthik_spaceship-titanic-0-80-beginner-friendly_v6_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v12_C1.ipynb": {
+    "target": 0.72995
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v16_C1.ipynb": {
+    "target": 0.73065
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v29_C1.ipynb": {
+    "target": 0.74374
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v37_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_cezarr_spaceshiptitanic-tutorial-beginner-80-accuracy_v3_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_cezarr_spaceshiptitanic-tutorial-beginner-80-accuracy_v4_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v11_C1.ipynb": {
+    "target": 0.68459
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v8_C1.ipynb": {
+    "target": 0.69838
+  },
+  "spaceship-titanic_cir2001_spaceship-titanic-80-5-fast-easy_v5_C1.ipynb": {
+    "target": 0.80406
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v16_C1.ipynb": {
+    "target": 0.27612
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v17_C1.ipynb": {
+    "target": 0.74304
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v21_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v23_C1.ipynb": {
+    "target": 0.75146
+  },
+  "spaceship-titanic_deva0703_spaceship-version-2_v3_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_dillondalton15_spaceship-titanic_v2_C1.ipynb": {
+    "target": 0.78279
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v10_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v11_C1.ipynb": {
+    "target": 0.79167
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v1_C1.ipynb": {
+    "target": 0.77343
+  },
+  "spaceship-titanic_ebryhl_0-80173-spaceship-titanic-beginner-walkthrough_v17_C1.ipynb": {
+    "target": 0.80173
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v15_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v20_C1.ipynb": {
+    "target": 0.79097
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v22_C1.ipynb": {
+    "target": 0.78185
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v2_C1.ipynb": {
+    "target": 0.78723
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v3_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v9_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v16_C1.ipynb": {
+    "target": 0.78489
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v18_C1.ipynb": {
+    "target": 0.7912
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v21_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v22_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v25_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v29_C1.ipynb": {
+    "target": 0.79261
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v30_C1.ipynb": {
+    "target": 0.78232
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v10_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v11_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v15_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v4_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v7_C1.ipynb": {
+    "target": 0.805
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v8_C1.ipynb": {
+    "target": 0.80079
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v59_C1.ipynb": {
+    "target": 0.50035
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v61_C1.ipynb": {
+    "target": 0.48819
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v89_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_flaviocavalcante_spaceship-predict-voting-classifier_v5_C1.ipynb": {
+    "target": 0.80991
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v10_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v11_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v5_C1.ipynb": {
+    "target": 0.70423
+  },
+  "spaceship-titanic_guanlintao_spaceship-titanic-tpotclassifier_v10_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_harshsoni2001_spaceship-titanic-with-lightgbm_v3_C1.ipynb": {
+    "target": 0.8071
+  },
+  "spaceship-titanic_himanshubarange_spaceship-passenger-survival_v3_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_hishamparveez_polynomial-regression-random-forest-xgb_v4_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v12_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v14_C1.ipynb": {
+    "target": 0.79097
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v25_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v2_C1.ipynb": {
+    "target": 0.78279
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v24_C1.ipynb": {
+    "target": 0.80687
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v25_C1.ipynb": {
+    "target": 0.8064
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v27_C1.ipynb": {
+    "target": 0.80874
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v5_C1.ipynb": {
+    "target": 0.79354
+  },
+  "spaceship-titanic_kartik2khandelwal_ensemble-model-xgboost-catboost-lgbm_v24_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_kunrittyhe_spaceship-titanic-competition_v9_C1.ipynb": {
+    "target": 0.76572
+  },
+  "spaceship-titanic_laparicio_spaceship-titanic-easy-approach_v7_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_laparicio_spaceship-titanic-easy-approach_v8_C1.ipynb": {
+    "target": 0.8043
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v4_C1.ipynb": {
+    "target": 0.80196
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v5_C1.ipynb": {
+    "target": 0.80383
+  },
+  "spaceship-titanic_limeorannge_legendspaceship_v1_C1.ipynb": {
+    "target": 0.79985
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v27_C1.ipynb": {
+    "target": 0.79261
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v29_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v34_C1.ipynb": {
+    "target": 0.79167
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v35_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v38_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v39_C1.ipynb": {
+    "target": 0.78933
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v44_C1.ipynb": {
+    "target": 0.79074
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v46_C1.ipynb": {
+    "target": 0.79378
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v47_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v53_C1.ipynb": {
+    "target": 0.78676
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v73_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_madmax2003_spaceship-best-random-forest-solution-score-0-8_v2_C1.ipynb": {
+    "target": 0.7877
+  },
+  "spaceship-titanic_madmax2003_spaceship-best-random-forest-solution-score-0-8_v5_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_mahdeemushfiquekamal_top-12-ensemble-model-of-xgb-lgbm-rf_v7_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_manas28_spaceship-titanic-pytorch-ann_v1_C1.ipynb": {
+    "target": 0.80289
+  },
+  "spaceship-titanic_marioshadjiantonis_spaceship-titanic_v1_C1.ipynb": {
+    "target": 0.7891
+  },
+  "spaceship-titanic_marioshadjiantonis_spaceship-titanic_v6_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_matteosilla_spaceship-easy-80_v4_C1.ipynb": {
+    "target": 0.71942
+  },
+  "spaceship-titanic_matteosilla_spaceship-easy-80_v5_C1.ipynb": {
+    "target": 0.71732
+  },
+  "spaceship-titanic_mcpenguin_spaceship-titanic-eda-and-prediction_v3_C1.ipynb": {
+    "target": 0.72784
+  },
+  "spaceship-titanic_mikedelong_gbm-classifier-score-0-8_v2_C1.ipynb": {
+    "target": 0.77227
+  },
+  "spaceship-titanic_mohammadrazeghi_spaceship-titanic-eda-intro_v18_C1.ipynb": {
+    "target": 0.69604
+  },
+  "spaceship-titanic_mrjouh4_spaceship-titanic-random-forest_v7_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_muratdura_spaceship-titanic_v4_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_muratdura_spaceship-titanic_v5_C1.ipynb": {
+    "target": 0.80523
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v10_C1.ipynb": {
+    "target": 0.1971
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v11_C1.ipynb": {
+    "target": 0.2006
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v13_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v14_C1.ipynb": {
+    "target": 0.73836
+  },
+  "spaceship-titanic_namsen_newspaceship_v6_C1.ipynb": {
+    "target": 0.55342
+  },
+  "spaceship-titanic_nathanrichard_quick-view-spaceship-titanic-scikit-learn-80_v14_C1.ipynb": {
+    "target": 0.79074
+  },
+  "spaceship-titanic_nathanrichard_quick-view-spaceship-titanic-scikit-learn-80_v16_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_naveenkonam1985_spaceship-titanic-passenger-transport-prediction_v18_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_naveenkonam1985_spaceship-titanic-passenger-transport-prediction_v19_C1.ipynb": {
+    "target": 0.79845
+  },
+  "spaceship-titanic_nicktedesco_simple-model-stacking-workflow_v4_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_nokichien_hw-spaceship-titanic_v5_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_nonsouris_p3-t4-submission_v15_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_o2ka03_space-ship-titanic-prediction_v4_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_pavankumar20_filling-nan-feature-eng-xgboost_v16_C1.ipynb": {
+    "target": 0.7877
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v11_C1.ipynb": {
+    "target": 0.77764
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v12_C1.ipynb": {
+    "target": 0.78396
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v19_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v2_C1.ipynb": {
+    "target": 0.78863
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v6_C1.ipynb": {
+    "target": 0.78653
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v7_C1.ipynb": {
+    "target": 0.79378
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v14_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v6_C1.ipynb": {
+    "target": 0.79261
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v7_C1.ipynb": {
+    "target": 0.79144
+  },
+  "spaceship-titanic_prashantoza_using-only-random-forest_v5_C1.ipynb": {
+    "target": 0.78606
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v21_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_quezaltendes_spaceship-titanic-0-80032_v19_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_quezaltendes_spaceship-titanic-0-80032_v20_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_quezaltendes_spaceship-titanic-0-80032_v22_C1.ipynb": {
+    "target": 0.79191
+  },
+  "spaceship-titanic_raffiardhi_79-acc-lightgbm_v2_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v53_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v56_C1.ipynb": {
+    "target": 0.7912
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v57_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v59_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_ravesandstorm_space-titanic-xgboost-feature-analysis_v2_C1.ipynb": {
+    "target": 0.79448
+  },
+  "spaceship-titanic_raymagic_notebook7cec2a01eb_v2_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v20_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_rinichristy_spaceship-titanic-passenger-destiny-prediction_v1_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_shazelp_spaceship-titanic-xgboost_v1_C1.ipynb": {
+    "target": 0.74842
+  },
+  "spaceship-titanic_tharun369_spaceship-titanic_v3_C1.ipynb": {
+    "target": 0.7711
+  },
+  "spaceship-titanic_tilhi98_xgboost-feature-engineering-spaceship-titanic_v32_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_tphaterp_a-concise-pipeline-ml-approach-to-titanic-dataset_v11_C1.ipynb": {
+    "target": 0.80944
+  },
+  "spaceship-titanic_trietp1253201581_spaceship-titanic_v2_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_vasilistimoudas_spaceship-titanic_v4_C1.ipynb": {
+    "target": 0.80056
+  },
+  "spaceship-titanic_victornuez_spaceship-practice-notebook_v14_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_victornuez_spaceship-practice-notebook_v18_C1.ipynb": {
+    "target": 0.80266
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v23_C1.ipynb": {
+    "target": 0.78162
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v26_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v29_C1.ipynb": {
+    "target": 0.79003
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v30_C1.ipynb": {
+    "target": 0.74772
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v31_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v34_C1.ipynb": {
+    "target": 0.8036
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v41_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v43_C1.ipynb": {
+    "target": 0.80523
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v46_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v49_C1.ipynb": {
+    "target": 0.80243
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v51_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v58_C1.ipynb": {
+    "target": 0.8071
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v67_C1.ipynb": {
+    "target": 0.80476
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v76_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v77_C1.ipynb": {
+    "target": 0.80079
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v12_C1.ipynb": {
+    "target": 0.7877
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v3_C1.ipynb": {
+    "target": 0.80032
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v6_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v7_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v9_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_willfeeney_dealing-with-missing-data-spaceship-titanic_v2_C1.ipynb": {
+    "target": 0.805
+  },
+  "spaceship-titanic_willfeeney_dealing-with-missing-data-spaceship-titanic_v7_C1.ipynb": {
+    "target": 0.80383
+  },
+  "spaceship-titanic_ximader_spaceship-titanic-catboost-acc-80-8_v7_C1.ipynb": {
+    "target": 0.78536
+  },
+  "spooky-author-identification_sudhirnl7_simple-naive-bayes-xgboost_v5_C1.ipynb": {
+    "target": 2.50269
+  },
+  "tabular-playground-series-dec-2021_namanbansalcodes_playground-dec2021-naman-svm_v11_C1.ipynb": {
+    "target": 0.47529
+  },
+  "tabular-playground-series-dec-2021_tariqchhussain_lightgbm-oversampling-tps-dec-2021_v1_C1.ipynb": {
+    "target": 0.93199
+  },
+  "tabular-playground-series-may-2022_utkarshshukla2912_random-forest-baseline-classification_v1_C1.ipynb": {
+    "target": 0.82432
+  },
+  "tabular-playground-series-may-2022_zhangcheche_tabular-202205-baseline_v1_C1.ipynb": {
+    "target": 0.92477
+  },
+  "tweet-sentiment-extraction_josefelixramos_frankoceanfanclub_v5_C1.ipynb": {
+    "target": 0.52638
+  },
+  "tweet-sentiment-extraction_myho63_test-version2_v7_C1.ipynb": {
+    "target": 0.48789
+  },
+  "ventilator-pressure-prediction_drastamat_lgbm-starter_v2_C1.ipynb": {
+    "target": 7.0596
+  },
+  "ventilator-pressure-prediction_yasuosuzuki_various-feature-and-lightgbm_v4_C1.ipynb": {
+    "target": 1.4451
+  },
+  "ventilator-pressure-prediction_yasuosuzuki_various-feature-and-lightgbm_v6_C1.ipynb": {
+    "target": 1.2625
+  }
+}

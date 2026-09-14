@@ -1,0 +1,209 @@
+```
+/
+    kaggle/
+        data/
+            description.md (99 lines)
+            sample_submission.csv (322 lines)
+            sample_submission.csv.7z (2.0 kB)
+            sample_submission.csv.zip (2.0 kB)
+            test.json (1 lines)
+            test.json.7z (8.9 MB)
+            train.json (1 lines)
+            train.json.7z (35.8 MB)
+            statoil-iceberg-classifier-challenge/
+                description.md (99 lines)
+                sample_submission.csv (322 lines)
+                ... and 6 other files
+                statoil-iceberg-classifier-challenge/
+        input/
+            description.md (99 lines)
+            sample_submission.csv (322 lines)
+            sample_submission.csv.7z (2.0 kB)
+            sample_submission.csv.zip (2.0 kB)
+            test.json (1 lines)
+            test.json.7z (8.9 MB)
+            train.json (1 lines)
+            train.json.7z (35.8 MB)
+            statoil-iceberg-classifier-challenge/
+                description.md (99 lines)
+                sample_submission.csv (322 lines)
+                ... and 6 other files
+                statoil-iceberg-classifier-challenge/
+        working/
+            statoil-iceberg-classifier-challenge/
+                description.md (99 lines)
+                sample_submission.csv (322 lines)
+                ... and 6 other files
+                statoil-iceberg-classifier-challenge/
+```
+
+-> data/sample_submission.csv has 321 rows and 2 columns.
+The columns are: id, is_iceberg
+
+-> data/statoil-iceberg-classifier-challenge/sample_submission.csv has 321 rows and 2 columns.
+The columns are: id, is_iceberg
+
+-> data/statoil-iceberg-classifier-challenge/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle"
+    ]
+  }
+}
+
+-> data/statoil-iceberg-classifier-challenge/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "is_iceberg": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle",
+      "is_iceberg"
+    ]
+  }
+}
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle"
+    ]
+  }
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "band_1": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "band_2": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "inc_angle": {
+        "type": [
+          "number",
+          "string"
+        ]
+      },
+      "is_iceberg": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "band_1",
+      "band_2",
+      "id",
+      "inc_angle",
+      "is_iceberg"
+    ]
+  }
+}
+
+-> input/sample_submission.csv has 321 rows and 2 columns.
+The columns are: id, is_iceberg
+
+-> (stopped after 10 files for performance)

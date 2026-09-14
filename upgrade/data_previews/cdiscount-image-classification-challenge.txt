@@ -1,0 +1,61 @@
+```
+/
+    kaggle/
+        data/
+            category_names.csv (5271 lines)
+            category_names.csv.zip (84.6 kB)
+            description.md (100 lines)
+            sample_submission.csv (706991 lines)
+            sample_submission.csv.zip (2.2 MB)
+            test.bson (6.2 GB)
+            train.bson (56.2 GB)
+            train_example.bson (793.9 kB)
+            cdiscount-image-classification-challenge/
+                category_names.csv (5271 lines)
+                category_names.csv.zip (84.6 kB)
+                ... and 6 other files
+                cdiscount-image-classification-challenge/
+        input/
+            category_names.csv (5271 lines)
+            category_names.csv.zip (84.6 kB)
+            description.md (100 lines)
+            sample_submission.csv (706991 lines)
+            sample_submission.csv.zip (2.2 MB)
+            test.bson (6.2 GB)
+            train.bson (56.2 GB)
+            train_example.bson (793.9 kB)
+            cdiscount-image-classification-challenge/
+                category_names.csv (5271 lines)
+                category_names.csv.zip (84.6 kB)
+                ... and 6 other files
+                cdiscount-image-classification-challenge/
+        working/
+            cdiscount-image-classification-challenge/
+                category_names.csv (5271 lines)
+                category_names.csv.zip (84.6 kB)
+                ... and 6 other files
+                cdiscount-image-classification-challenge/
+```
+
+-> data/category_names.csv has 5270 rows and 4 columns.
+The columns are: category_id, category_level1, category_level2, category_level3
+
+-> data/cdiscount-image-classification-challenge/category_names.csv has 5270 rows and 4 columns.
+The columns are: category_id, category_level1, category_level2, category_level3
+
+-> data/cdiscount-image-classification-challenge/sample_submission.csv has 706990 rows and 2 columns.
+The columns are: _id, category_id
+
+-> data/sample_submission.csv has 706990 rows and 2 columns.
+The columns are: _id, category_id
+
+-> input/category_names.csv has 5270 rows and 4 columns.
+The columns are: category_id, category_level1, category_level2, category_level3
+
+-> input/cdiscount-image-classification-challenge/category_names.csv has 5270 rows and 4 columns.
+The columns are: category_id, category_level1, category_level2, category_level3
+
+-> input/cdiscount-image-classification-challenge/sample_submission.csv has 706990 rows and 2 columns.
+The columns are: _id, category_id
+
+-> (stopped after 10 files for performance)

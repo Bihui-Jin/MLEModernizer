@@ -1,0 +1,14 @@
+{
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v47_C1.ipynb": {
+    "target": 0.6047050755475034,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v18_C1.ipynb": {
+    "target": 0.2411250728487901,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  }
+}

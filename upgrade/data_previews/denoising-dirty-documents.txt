@@ -1,0 +1,127 @@
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sampleSubmission.csv (5789881 lines)
+            sampleSubmission.csv.zip (12.0 MB)
+            test.zip (4.0 MB)
+            train.zip (15.5 MB)
+            train_cleaned.zip (5.2 MB)
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+            test/
+                110.png (149.2 kB)
+                111.png (146.9 kB)
+                ... and 27 other files
+                test/
+            train/
+                116.png (152.2 kB)
+                201.png (156.1 kB)
+                ... and 113 other files
+                train/
+            train_cleaned/
+                173.png (60.4 kB)
+                47.png (35.5 kB)
+                ... and 113 other files
+        input/
+            description.md (59 lines)
+            sampleSubmission.csv (5789881 lines)
+            sampleSubmission.csv.zip (12.0 MB)
+            test.zip (4.0 MB)
+            train.zip (15.5 MB)
+            train_cleaned.zip (5.2 MB)
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+            test/
+                110.png (149.2 kB)
+                111.png (146.9 kB)
+                ... and 27 other files
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+            train/
+                116.png (152.2 kB)
+                201.png (156.1 kB)
+                ... and 113 other files
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+            train_cleaned/
+                173.png (60.4 kB)
+                47.png (35.5 kB)
+                ... and 113 other files
+        working/
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+```
+
+-> data/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> data/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> input/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> input/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> working/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value

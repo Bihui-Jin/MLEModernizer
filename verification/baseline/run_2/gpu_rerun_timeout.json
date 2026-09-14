@@ -1,0 +1,710 @@
+{
+  "hms-harmful-brain-activity-classification_nursentore_brainactivity-nursen_v11_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1236720085144,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_nursentore_brainactivity-nursen_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 03:41:44.855133: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777347704.871512      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777347704.875853      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 03:41:44.893053: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_nursentore_brainactivity-nursen_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 03:41:44.855133: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777347704.871512      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777347704.875853      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 03:41:44.893053: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.",
+    "cleanup_time": 2.1853253841400146,
+    "process_time": 604.9655773639679,
+    "target": 2.8741575140755264,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v9_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2821426391602,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.659315824508667,
+    "process_time": 603.3911199569702,
+    "target": 0.5187618658270732,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v35_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2972433567047,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v35_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v35_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6154253482818604,
+    "process_time": 603.3595833778381,
+    "target": 0.5112580402541783,
+    "lower_is_better": true
+  },
+  "lmsys-chatbot-arena_mehranshafique_notebookdebertav3_v4_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1633911132812,
+    "detail": "[NbConvertApp] Converting notebook lmsys-chatbot-arena_mehranshafique_notebookdebertav3_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 07:12:25.583436: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777360345.597875      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777360345.602376      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 07:12:25.622268: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 07:13:11.501882: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)",
+    "error": "[NbConvertApp] Converting notebook lmsys-chatbot-arena_mehranshafique_notebookdebertav3_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 07:12:25.583436: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777360345.597875      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777360345.602376      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 07:12:25.622268: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 07:13:11.501882: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)",
+    "cleanup_time": 1.2202703952789307,
+    "process_time": 603.9964945316315,
+    "target": 1.0974237506670184,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0514070987701,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8375227451324463,
+    "process_time": 603.4911262989044,
+    "target": 0.5128751740847269,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v8_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1171505451202,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.1943869590759277,
+    "process_time": 603.863832950592,
+    "target": 0.8636098792976403,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v29_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2629454135895,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v29_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v29_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6420464515686035,
+    "process_time": 603.4012067317963,
+    "target": 0.510524666923118,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v19_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2041273117065,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v19_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v19_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.1478087902069092,
+    "process_time": 604.2100563049316,
+    "target": 0.5171087811235748,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v3_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0610899925232,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.711414098739624,
+    "process_time": 603.3744122982025,
+    "target": 0.5146949013548735,
+    "lower_is_better": true
+  },
+  "cassava-leaf-disease-classification_ababino_cutmix-with-fastai-and-efficientnet_v6_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0358572006226,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_ababino_cutmix-with-fastai-and-efficientnet_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_ababino_cutmix-with-fastai-and-efficientnet_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.5174005031585693,
+    "process_time": 603.9459202289581,
+    "target": 0.1403747355696585,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v34_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0827445983887,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v34_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v34_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8199963569641113,
+    "process_time": 603.3240909576416,
+    "target": 0.5099711636566505,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v7_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0648896694183,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8680570125579834,
+    "process_time": 603.3657839298248,
+    "target": 0.5163410483711773,
+    "lower_is_better": true
+  },
+  "dogs-vs-cats-redux-kernels-edition_slothfulwave612_pytorch-dogs-and-cats-classifier_v3_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2241041660309,
+    "detail": "[NbConvertApp] Converting notebook dogs-vs-cats-redux-kernels-edition_slothfulwave612_pytorch-dogs-and-cats-classifier_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook dogs-vs-cats-redux-kernels-edition_slothfulwave612_pytorch-dogs-and-cats-classifier_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7128045558929443,
+    "process_time": 603.3338606357574,
+    "target": 0.106542781291464,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v18_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1608006954193,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v18_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v18_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7970778942108154,
+    "process_time": 603.7898933887482,
+    "target": 0.5130972318700957,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2351937294006,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6941046714782715,
+    "process_time": 603.5896003246307,
+    "target": 0.538301501140972,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v37_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1037361621857,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v37_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v37_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6500699520111084,
+    "process_time": 603.3338136672974,
+    "target": 0.5102396887992884,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v20_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2057807445526,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v20_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v20_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6864361763000488,
+    "process_time": 603.4685204029083,
+    "target": 0.5130613986552549,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_jillanisofttech_hms-baseline-resnet34d-v2-1_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2963547706604,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_jillanisofttech_hms-baseline-resnet34d-v2-1_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_jillanisofttech_hms-baseline-resnet34d-v2-1_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.322343349456787,
+    "process_time": 604.2513680458069,
+    "target": 0.5295964001842607,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v8_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.056334733963,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.4726243019104004,
+    "process_time": 604.1644492149353,
+    "target": 1.2163448095789036,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v5_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.19251537323,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7302205562591553,
+    "process_time": 603.4716420173645,
+    "target": 0.538301501140972,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v11_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 599.9482388496399,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7895348072052002,
+    "process_time": 603.316367149353,
+    "target": 0.5155567659446177,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v10_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.082615852356,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v10_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v10_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6549913883209229,
+    "process_time": 603.592449426651,
+    "target": 0.521884758520694,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v4_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2032713890076,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.6080338954925537,
+    "process_time": 604.3810656070709,
+    "target": 0.5128751734806815,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_yunsuxiaozi_hms-eegs-resnet34d-512-512-inference-5-folds_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1334772109985,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-eegs-resnet34d-512-512-inference-5-folds_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-eegs-resnet34d-512-512-inference-5-folds_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8282861709594727,
+    "process_time": 603.3914968967438,
+    "target": 0.6291099588440723,
+    "lower_is_better": true
+  },
+  "nfl-player-contact-detection_selvakumarperumal_pcd-test-a-kaggle-kernel-solution_v15_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1001973152161,
+    "detail": "[NbConvertApp] Converting notebook nfl-player-contact-detection_selvakumarperumal_pcd-test-a-kaggle-kernel-solution_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook nfl-player-contact-detection_selvakumarperumal_pcd-test-a-kaggle-kernel-solution_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7963588237762451,
+    "process_time": 603.2583343982697,
+    "target": 0.5644854822097375,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_mariaglushanina_resnet-inference_v10_C1.ipynb": {
+    "execution_time": 17.950426816940308,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_mariaglushanina_resnet-inference_v10_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 59084 bytes to hms-harmful-brain-activity-classification_mariaglushanina_resnet-inference_v10_C1.ipynb",
+    "cleanup_time": 0.340914249420166,
+    "process_time": 20.752249479293823,
+    "target": 0.6468365502458543,
+    "lower_is_better": true
+  },
+  "learning-agency-lab-automated-essay-scoring-2_cckhai_debertav3-kaggle-competition_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2143046855927,
+    "detail": "[NbConvertApp] Converting notebook learning-agency-lab-automated-essay-scoring-2_cckhai_debertav3-kaggle-competition_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 08:26:19.041932: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777364779.056629      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777364779.061144      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 08:26:19.081032: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 08:26:28.591751: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nI0000 00:00:1777364845.931775      58 service.cc:148] XLA service 0x7f485409bd40 initialized for platform Host (this does not guarantee that XLA will be used). Devices:\nI0000 00:00:1777364845.931839      58 service.cc:156]   StreamExecutor device (0): Host, Default Version\n2026-04-28 08:27:27.146470: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:268] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\nI0000 00:00:1777364868.038440      58 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.",
+    "error": "[NbConvertApp] Converting notebook learning-agency-lab-automated-essay-scoring-2_cckhai_debertav3-kaggle-competition_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 08:26:19.041932: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777364779.056629      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777364779.061144      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 08:26:19.081032: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 08:26:28.591751: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nI0000 00:00:1777364845.931775      58 service.cc:148] XLA service 0x7f485409bd40 initialized for platform Host (this does not guarantee that XLA will be used). Devices:\nI0000 00:00:1777364845.931839      58 service.cc:156]   StreamExecutor device (0): Host, Default Version\n2026-04-28 08:27:27.146470: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:268] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\nI0000 00:00:1777364868.038440      58 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.",
+    "cleanup_time": 1.4118924140930176,
+    "process_time": 604.1744954586029,
+    "target": 0.7781697300684843,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v40_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2685205936432,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v40_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v40_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.687568187713623,
+    "process_time": 603.5928077697754,
+    "target": 0.5097131280174304,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v25_C1.ipynb": {
+    "execution_time": 568.9622473716736,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v25_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 137440 bytes to hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v25_C1.ipynb",
+    "cleanup_time": 0.18122172355651855,
+    "process_time": 571.6300520896912,
+    "target": 0.2834285966083781,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1085722446442,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8511664867401123,
+    "process_time": 603.5292890071869,
+    "target": 0.538301501140972,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v23_C1.ipynb": {
+    "execution_time": 557.1932988166809,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v23_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 137433 bytes to hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v23_C1.ipynb",
+    "cleanup_time": 0.19737482070922852,
+    "process_time": 559.9013826847076,
+    "target": 0.2833895888339998,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_yunsuxiaozi_hms-fusion-notebook-0125_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.3029227256775,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-fusion-notebook-0125_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-fusion-notebook-0125_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7191381454467773,
+    "process_time": 603.4356591701508,
+    "target": 0.4978533342914887,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v36_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1599159240723,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v36_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v36_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7710373401641846,
+    "process_time": 603.4902458190918,
+    "target": 0.5117064111047122,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v13_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1428787708282,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v13_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v13_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.9100549221038818,
+    "process_time": 603.6254510879517,
+    "target": 0.5145694709622632,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v30_C1.ipynb": {
+    "execution_time": 599.6768860816956,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v30_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 152330 bytes to hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v30_C1.ipynb",
+    "cleanup_time": 0.13421297073364258,
+    "process_time": 602.5677478313446,
+    "target": 0.2831150245742998,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v34_C1.ipynb": {
+    "execution_time": 550.7176465988159,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v34_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 137715 bytes to hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v34_C1.ipynb",
+    "cleanup_time": 0.21108198165893555,
+    "process_time": 553.3914141654968,
+    "target": 0.283269022703436,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v9_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2968857288361,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.4903039932250977,
+    "process_time": 604.2697715759277,
+    "target": 1.2213479097069964,
+    "lower_is_better": true
+  },
+  "learning-agency-lab-automated-essay-scoring-2_cckhai_debertav3-kaggle-competition_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2128140926361,
+    "detail": "[NbConvertApp] Converting notebook learning-agency-lab-automated-essay-scoring-2_cckhai_debertav3-kaggle-competition_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 08:07:35.123668: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777363655.136388      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777363655.140387      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 08:07:35.155006: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 08:07:45.231961: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nI0000 00:00:1777363724.626630      58 service.cc:148] XLA service 0x7f5f100041e0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:\nI0000 00:00:1777363724.626846      58 service.cc:156]   StreamExecutor device (0): Host, Default Version\n2026-04-28 08:08:45.889618: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:268] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\nI0000 00:00:1777363747.623582      58 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.",
+    "error": "[NbConvertApp] Converting notebook learning-agency-lab-automated-essay-scoring-2_cckhai_debertav3-kaggle-competition_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 08:07:35.123668: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777363655.136388      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777363655.140387      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 08:07:35.155006: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 08:07:45.231961: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nI0000 00:00:1777363724.626630      58 service.cc:148] XLA service 0x7f5f100041e0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:\nI0000 00:00:1777363724.626846      58 service.cc:156]   StreamExecutor device (0): Host, Default Version\n2026-04-28 08:08:45.889618: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:268] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\nI0000 00:00:1777363747.623582      58 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.",
+    "cleanup_time": 1.8788223266601562,
+    "process_time": 605.0357959270477,
+    "target": 0.7775775979349691,
+    "lower_is_better": false
+  },
+  "icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v5_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1177687644958,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.4755451679229736,
+    "process_time": 603.9870049953461,
+    "target": 1.584347721837486,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v17_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2105519771576,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v17_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v17_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6855406761169434,
+    "process_time": 603.3617258071899,
+    "target": 0.5139698355360698,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v3_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0442101955414,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_13631958_explained-hms-baseline-resourced_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7978787422180176,
+    "process_time": 603.6202285289764,
+    "target": 0.538301501140972,
+    "lower_is_better": true
+  },
+  "cassava-leaf-disease-classification_teudepdzai_first-cv_v17_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0770988464355,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_teudepdzai_first-cv_v17_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_teudepdzai_first-cv_v17_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 2.699739456176758,
+    "process_time": 605.7111852169037,
+    "target": 0.7524932003626473,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v16_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0802519321442,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v16_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v16_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7056667804718018,
+    "process_time": 603.4257338047028,
+    "target": 0.5802477579004649,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v26_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.224983215332,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v26_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v26_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6727306842803955,
+    "process_time": 603.6804375648499,
+    "target": 0.5119885379460548,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v30_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1792597770691,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v30_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v30_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8186211585998535,
+    "process_time": 603.8294370174408,
+    "target": 0.5099355682882105,
+    "lower_is_better": true
+  },
+  "AI4Code_cafelatte1_catboost-ranker-inference_v26_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.282674074173,
+    "detail": "[NbConvertApp] Converting notebook AI4Code_cafelatte1_catboost-ranker-inference_v26_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook AI4Code_cafelatte1_catboost-ranker-inference_v26_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.9969930648803711,
+    "process_time": 603.6932327747345,
+    "target": 0.7224212427571658,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_krishagrawal_model-category-1-inference_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1695013046265,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_krishagrawal_model-category-1-inference_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_krishagrawal_model-category-1-inference_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.4255297183990479,
+    "process_time": 604.6175081729889,
+    "target": 0.7628642965048275,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v15_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1669387817383,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7985191345214844,
+    "process_time": 603.4253585338593,
+    "target": 0.5134128924249795,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v25_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0280404090881,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v25_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v25_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8785452842712402,
+    "process_time": 603.5027794837952,
+    "target": 0.5118002269595313,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v5_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1690757274628,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.3597793579101562,
+    "process_time": 604.0921499729156,
+    "target": 0.5146949013548735,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_yunsuxiaozi_hms-baseline-resnet34d-512-512-inference-6-models_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1558902263641,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-baseline-resnet34d-512-512-inference-6-models_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-baseline-resnet34d-512-512-inference-6-models_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7750647068023682,
+    "process_time": 603.4926428794861,
+    "target": 0.5295964001842607,
+    "lower_is_better": true
+  },
+  "AI4Code_cafelatte1_catboost-ranker-inference_v24_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0578496456146,
+    "detail": "[NbConvertApp] Converting notebook AI4Code_cafelatte1_catboost-ranker-inference_v24_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook AI4Code_cafelatte1_catboost-ranker-inference_v24_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8138511180877686,
+    "process_time": 603.4381682872772,
+    "target": 0.713908727043286,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v14_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1370542049408,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v14_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v14_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8234484195709229,
+    "process_time": 603.4062995910645,
+    "target": 0.5163410483711773,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v38_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0939195156097,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v38_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v38_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.9056687355041504,
+    "process_time": 603.411298751831,
+    "target": 0.532349875985319,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v6_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1747567653656,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6943626403808594,
+    "process_time": 603.4208805561066,
+    "target": 0.5190089209042569,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v6_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1408858299255,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.124560832977295,
+    "process_time": 604.13791680336,
+    "target": 1.0472121267665069,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v24_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2734985351562,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v24_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v24_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7265641689300537,
+    "process_time": 603.6425240039825,
+    "target": 0.5122723686423966,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_yunsuxiaozi_hms-fusion-notebook-0125_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1192569732666,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-fusion-notebook-0125_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-fusion-notebook-0125_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.2688186168670654,
+    "process_time": 603.9926075935364,
+    "target": 0.4966443749098318,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_ryanirl_hms-baseline-sub_v15_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0832550525665,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_ryanirl_hms-baseline-sub_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_ryanirl_hms-baseline-sub_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.6266002655029297,
+    "process_time": 603.4571435451508,
+    "target": 0.5044090297981082,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0601172447205,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7187404632568359,
+    "process_time": 603.3612506389618,
+    "target": 0.5444382964408644,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v6_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2603189945221,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.1586153507232666,
+    "process_time": 604.2825703620911,
+    "target": 1.5787870720653867,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v31_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2304747104645,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v31_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v31_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8272097110748291,
+    "process_time": 603.5020887851715,
+    "target": 0.5094031098964176,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v9_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1024279594421,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_1d-inference_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.1806912422180176,
+    "process_time": 603.700457572937,
+    "target": 0.96065688326259,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v22_C1.ipynb": {
+    "execution_time": 584.5295782089233,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v22_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 148210 bytes to hms-harmful-brain-activity-classification_quan0095_hms-best-public-final_v22_C1.ipynb",
+    "cleanup_time": 0.3432614803314209,
+    "process_time": 587.7738375663757,
+    "target": 0.2840680019994838,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v7_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0599863529205,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_simonedegasperis_eda-baseline-with-polars_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.6091022491455078,
+    "process_time": 604.321097612381,
+    "target": 1.4813690402296342,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v8_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2000713348389,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_andreasbis_hms-inference-lb-0-41_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.645066499710083,
+    "process_time": 603.4262337684631,
+    "target": 0.5163410483711773,
+    "lower_is_better": true
+  },
+  "cassava-leaf-disease-classification_bruno2siqueira_notebook0557b79a42_v12_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0149965286255,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_bruno2siqueira_notebook0557b79a42_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_bruno2siqueira_notebook0557b79a42_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.3152265548706055,
+    "process_time": 603.8880953788757,
+    "target": 0.1403747355696585,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_yunsuxiaozi_hms-baseline-resnet34d-512-512-inference-6-models_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2065436840057,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-baseline-resnet34d-512-512-inference-6-models_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_yunsuxiaozi_hms-baseline-resnet34d-512-512-inference-6-models_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.0054230690002441,
+    "process_time": 603.7784538269043,
+    "target": 0.538301501140972,
+    "lower_is_better": true
+  },
+  "nfl-player-contact-detection_selvakumarperumal_pcd-test-a-kaggle-kernel-solution_v16_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1318399906158,
+    "detail": "[NbConvertApp] Converting notebook nfl-player-contact-detection_selvakumarperumal_pcd-test-a-kaggle-kernel-solution_v16_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook nfl-player-contact-detection_selvakumarperumal_pcd-test-a-kaggle-kernel-solution_v16_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7594640254974365,
+    "process_time": 603.3510129451752,
+    "target": 0.5237147584914293,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_ryanirl_hms-baseline-sub_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.027914762497,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_ryanirl_hms-baseline-sub_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_ryanirl_hms-baseline-sub_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 2.320801258087158,
+    "process_time": 605.4185917377472,
+    "target": 0.7589419650423289,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_nimararora_pytorch-lightning-starter-with-wandb-visualization_v20_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1720025539398,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_nimararora_pytorch-lightning-starter-with-wandb-visualization_v20_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_nimararora_pytorch-lightning-starter-with-wandb-visualization_v20_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 2.9039077758789062,
+    "process_time": 605.8443212509155,
+    "target": 0.8884738274865326,
+    "lower_is_better": true
+  },
+  "learning-agency-lab-automated-essay-scoring-2_hrushikeshdongre_notebook2317ed9232_v7_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0881435871124,
+    "detail": "[NbConvertApp] Converting notebook learning-agency-lab-automated-essay-scoring-2_hrushikeshdongre_notebook2317ed9232_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook learning-agency-lab-automated-essay-scoring-2_hrushikeshdongre_notebook2317ed9232_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.606931209564209,
+    "process_time": 604.274395942688,
+    "target": 0.7972998552335998,
+    "lower_is_better": false
+  }
+}

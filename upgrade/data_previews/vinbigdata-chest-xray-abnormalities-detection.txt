@@ -1,0 +1,114 @@
+```
+/
+    kaggle/
+        data/
+            description.md (132 lines)
+            sample_submission.csv (1501 lines)
+            sample_submission.csv.zip (30.9 kB)
+            test.zip (12.7 GB)
+            train.csv (61172 lines)
+            train.csv.zip (1.7 MB)
+            train.zip (114.6 GB)
+            test/
+                00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                ... and 1498 other files
+                test/
+            train/
+                000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                ... and 13498 other files
+                train/
+            vinbigdata-chest-xray-abnormalities-detection/
+                description.md (132 lines)
+                sample_submission.csv (1501 lines)
+                ... and 5 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+                vinbigdata-chest-xray-abnormalities-detection/
+        input/
+            description.md (132 lines)
+            sample_submission.csv (1501 lines)
+            sample_submission.csv.zip (30.9 kB)
+            test.zip (12.7 GB)
+            train.csv (61172 lines)
+            train.csv.zip (1.7 MB)
+            train.zip (114.6 GB)
+            test/
+                00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                ... and 1498 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+            train/
+                000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                ... and 13498 other files
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+            vinbigdata-chest-xray-abnormalities-detection/
+                description.md (132 lines)
+                sample_submission.csv (1501 lines)
+                ... and 5 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+                vinbigdata-chest-xray-abnormalities-detection/
+        working/
+            vinbigdata-chest-xray-abnormalities-detection/
+                description.md (132 lines)
+                sample_submission.csv (1501 lines)
+                ... and 5 other files
+                test/
+                    00575e3846ebd05a909d97ba59c53d30.dicom (12.9 MB)
+                    0059d21bef1793fa9522e4ec8cae1a1a.dicom (9.3 MB)
+                    ... and 1498 other files
+                    test/
+                train/
+                    000434271f63a053c4128a0ba6352c7f.dicom (13.3 MB)
+                    00053190460d56c53cc3e57321387478.dicom (9.7 MB)
+                    ... and 13498 other files
+                    train/
+                vinbigdata-chest-xray-abnormalities-detection/
+```
+
+-> data/sample_submission.csv has 1500 rows and 2 columns.
+The columns are: image_id, PredictionString
+
+-> data/train.csv has 61171 rows and 8 columns.
+The columns are: image_id, class_name, class_id, rad_id, x_min, y_min, x_max, y_max
+
+-> data/vinbigdata-chest-xray-abnormalities-detection/sample_submission.csv has 1500 rows and 2 columns.
+The columns are: image_id, PredictionString
+
+-> data/vinbigdata-chest-xray-abnormalities-detection/train.csv has 61171 rows and 8 columns.
+The columns are: image_id, class_name, class_id, rad_id, x_min, y_min, x_max, y_max
+
+-> input/sample_submission.csv has 1500 rows and 2 columns.
+The columns are: image_id, PredictionString
+
+-> input/train.csv has 61171 rows and 8 columns.
+The columns are: image_id, class_name, class_id, rad_id, x_min, y_min, x_max, y_max
+
+-> (stopped after 10 files for performance)

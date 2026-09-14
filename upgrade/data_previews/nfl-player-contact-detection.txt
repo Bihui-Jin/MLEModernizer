@@ -1,0 +1,144 @@
+```
+/
+    kaggle/
+        data/
+            description.md (165 lines)
+            sample_submission.csv (463244 lines)
+            sample_submission.csv.zip (1.4 MB)
+            test.zip (381.3 MB)
+            test_baseline_helmets.csv (371409 lines)
+            test_baseline_helmets.csv.zip (2.9 MB)
+            test_player_tracking.csv (127755 lines)
+            test_player_tracking.csv.zip (2.9 MB)
+            test_video_metadata.csv (49 lines)
+            test_video_metadata.csv.zip (1.2 kB)
+            train.zip (3.6 GB)
+            train_baseline_helmets.csv (3412209 lines)
+            train_baseline_helmets.csv.zip (26.1 MB)
+            train_labels.csv (4258376 lines)
+            train_labels.csv.zip (30.1 MB)
+            train_player_tracking.csv (1225300 lines)
+            train_player_tracking.csv.zip (28.0 MB)
+            train_video_metadata.csv (433 lines)
+            train_video_metadata.csv.zip (7.7 kB)
+            nfl-player-contact-detection/
+                description.md (165 lines)
+                sample_submission.csv (463244 lines)
+                ... and 17 other files
+                nfl-player-contact-detection/
+                test/
+                    58187_001341_All29.mp4 (4.0 MB)
+                    58187_001341_Endzone.mp4 (6.9 MB)
+                    ... and 70 other files
+                    test/
+                train/
+                    58168_003392_All29.mp4 (3.6 MB)
+                    58168_003392_Endzone.mp4 (6.1 MB)
+                    ... and 646 other files
+                    train/
+            test/
+                58187_001341_All29.mp4 (4.0 MB)
+                58187_001341_Endzone.mp4 (6.9 MB)
+                ... and 70 other files
+                test/
+            train/
+                58168_003392_All29.mp4 (3.6 MB)
+                58168_003392_Endzone.mp4 (6.1 MB)
+                ... and 646 other files
+                train/
+        input/
+            description.md (165 lines)
+            sample_submission.csv (463244 lines)
+            sample_submission.csv.zip (1.4 MB)
+            test.zip (381.3 MB)
+            test_baseline_helmets.csv (371409 lines)
+            test_baseline_helmets.csv.zip (2.9 MB)
+            test_player_tracking.csv (127755 lines)
+            test_player_tracking.csv.zip (2.9 MB)
+            test_video_metadata.csv (49 lines)
+            test_video_metadata.csv.zip (1.2 kB)
+            train.zip (3.6 GB)
+            train_baseline_helmets.csv (3412209 lines)
+            train_baseline_helmets.csv.zip (26.1 MB)
+            train_labels.csv (4258376 lines)
+            train_labels.csv.zip (30.1 MB)
+            train_player_tracking.csv (1225300 lines)
+            train_player_tracking.csv.zip (28.0 MB)
+            train_video_metadata.csv (433 lines)
+            train_video_metadata.csv.zip (7.7 kB)
+            nfl-player-contact-detection/
+                description.md (165 lines)
+                sample_submission.csv (463244 lines)
+                ... and 17 other files
+                nfl-player-contact-detection/
+                test/
+                    58187_001341_All29.mp4 (4.0 MB)
+                    58187_001341_Endzone.mp4 (6.9 MB)
+                    ... and 70 other files
+                    test/
+                train/
+                    58168_003392_All29.mp4 (3.6 MB)
+                    58168_003392_Endzone.mp4 (6.1 MB)
+                    ... and 646 other files
+                    train/
+            test/
+                58187_001341_All29.mp4 (4.0 MB)
+                58187_001341_Endzone.mp4 (6.9 MB)
+                ... and 70 other files
+                test/
+                    58187_001341_All29.mp4 (4.0 MB)
+                    58187_001341_Endzone.mp4 (6.9 MB)
+                    ... and 70 other files
+                    test/
+            train/
+                58168_003392_All29.mp4 (3.6 MB)
+                58168_003392_Endzone.mp4 (6.1 MB)
+                ... and 646 other files
+                train/
+                    58168_003392_All29.mp4 (3.6 MB)
+                    58168_003392_Endzone.mp4 (6.1 MB)
+                    ... and 646 other files
+                    train/
+        working/
+            nfl-player-contact-detection/
+                description.md (165 lines)
+                sample_submission.csv (463244 lines)
+                ... and 17 other files
+                nfl-player-contact-detection/
+                test/
+                    58187_001341_All29.mp4 (4.0 MB)
+                    58187_001341_Endzone.mp4 (6.9 MB)
+                    ... and 70 other files
+                    test/
+                train/
+                    58168_003392_All29.mp4 (3.6 MB)
+                    58168_003392_Endzone.mp4 (6.1 MB)
+                    ... and 646 other files
+                    train/
+```
+
+-> data/nfl-player-contact-detection/sample_submission.csv has 463243 rows and 2 columns.
+The columns are: contact_id, contact
+
+-> data/nfl-player-contact-detection/test_baseline_helmets.csv has 371408 rows and 12 columns.
+The columns are: game_play, game_key, play_id, view, video, frame, nfl_player_id, player_label, left, width, top, height
+
+-> data/nfl-player-contact-detection/test_player_tracking.csv has 127754 rows and 17 columns.
+The columns are: game_play, game_key, play_id, nfl_player_id, datetime, step, team, position, jersey_number, x_position, y_position, speed, distance, direction, orientation... and 2 more columns
+
+-> data/nfl-player-contact-detection/test_video_metadata.csv has 48 rows and 7 columns.
+The columns are: game_play, game_key, play_id, view, start_time, end_time, snap_time
+
+-> data/nfl-player-contact-detection/train_baseline_helmets.csv has 3412208 rows and 12 columns.
+The columns are: game_play, game_key, play_id, view, video, frame, nfl_player_id, player_label, left, width, top, height
+
+-> data/nfl-player-contact-detection/train_labels.csv has 4258375 rows and 7 columns.
+The columns are: contact_id, game_play, datetime, step, nfl_player_id_1, nfl_player_id_2, contact
+
+-> data/nfl-player-contact-detection/train_player_tracking.csv has 1225299 rows and 17 columns.
+The columns are: game_play, game_key, play_id, nfl_player_id, datetime, step, team, position, jersey_number, x_position, y_position, speed, distance, direction, orientation... and 2 more columns
+
+-> data/nfl-player-contact-detection/train_video_metadata.csv has 432 rows and 7 columns.
+The columns are: game_play, game_key, play_id, view, start_time, end_time, snap_time
+
+-> (stopped after 10 files for performance)

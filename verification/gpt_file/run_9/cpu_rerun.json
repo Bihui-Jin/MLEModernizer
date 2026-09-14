@@ -1,0 +1,93 @@
+{
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-cnn-modeling-single_v4_C1.ipynb": {
+    "target": 0.9654614520289568,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-cnn-modeling-single_v3_C1.ipynb": {
+    "target": 0.959812062291402,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "leaf-classification_ypargaien_keras-convnet-lb-0-0052-w-visualization_v4_C1.ipynb": {
+    "target": 4.60832,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v28_C1.ipynb": {
+    "target": 0.06934,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v10_C1.ipynb": {
+    "target": 0.07034,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v32_C1.ipynb": {
+    "target": 0.06949,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v18_C1.ipynb": {
+    "target": 0.0728,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v27_C1.ipynb": {
+    "target": 0.07108,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "nomad2018-predict-transparent-conductors_xagor1_nomad-competition-base-models_v16_C1.ipynb": {
+    "target": 0.06936,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\nxgboost==2.0.3"
+  },
+  "ventilator-pressure-prediction_tracyporter_ventilator-pytorch-av-linear-regression_v3_C1.ipynb": {
+    "target": 14.6572,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "ventilator-pressure-prediction_sudipg411_eda-with-feature-engineering_v5_C1.ipynb": {
+    "target": 1.4514,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntqdm==4.67.1\nxgboost==2.0.3"
+  },
+  "ventilator-pressure-prediction_tracyporter_ventilator-pytorch-av-linear-regression_v4_C1.ipynb": {
+    "target": 13.5676,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "dogs-vs-cats-redux-kernels-edition_1133423_cats-vs-dogs-classification-with-cnn-keras_v10_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers have different id's",
+    "target": 1.9699000874811416,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "histopathologic-cancer-detection_1009029_cancer-detection-model-using-keras_v2_C1.ipynb": {
+    "target": 0.7793147687630658,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v2_C1.ipynb": {
+    "target": 0.64882,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nlightgbm==4.6.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\noptuna==4.5.0\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscikit-multilearn==0.2.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0"
+  }
+}

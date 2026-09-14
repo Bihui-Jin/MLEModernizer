@@ -1,0 +1,309 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean column-wise ROC AUC.
+
+## Submission Format
+For each image_id in the test set, you must predict a probability for each target variable. The file should contain a header and have the following format:
+
+```
+image_id,
+test_0,0.25,0.25,0.25,0.25
+test_1,0.25,0.25,0.25,0.25
+test_2,0.25,0.25,0.25,0.25
+etc.
+```
+
+## Dataset
+Given a photo of an apple leaf, can you accurately assess its health? This competition will challenge you to distinguish between leaves which are healthy, those which are infected with apple rust, those that have apple scab, and those with more than one disease.
+
+**train.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+**images**
+
+A folder containing the train and test images, in jpg format.
+
+**test.csv**
+
+- `image_id`: the foreign key
+
+**sample_submission.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        input/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        working/
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+```
+
+-> data/plant-pathology-2020-fgvc7/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/plant-pathology-2020-fgvc7/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/plant-pathology-2020-fgvc7/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import pandas as pd
+import numpy as np
+from pathlib import Path
+from PIL import Image
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+
+import concurrent.futures
+
+
+
+
+## === cell 1
+path = Path("/kaggle/input/plant-pathology-2020-fgvc7")
+
+
+
+
+## === cell 2
+train_df = pd.read_csv(path / "train.csv")
+LABEL_COLS = ["healthy", "multiple_diseases", "rust", "scab"]
+assert all(col in train_df.columns for col in LABEL_COLS)
+
+
+
+
+## === cell 3
+def extract_features(img_path, size=(224, 224), rgb_bins=128, hsv_bins=64):
+    """
+    Resize image, compute per‑channel RGB histograms (rgb_bins) and HSV histograms (hsv_bins),
+    plus basic RGB statistics.
+    Returns a 1‑D array:
+    [RGB_hist_R, RGB_hist_G, RGB_hist_B,
+     HSV_hist_H, HSV_hist_S, HSV_hist_V,
+     mean_R, std_R, mean_G, std_G, mean_B, std_B]
+    """
+    img = Image.open(img_path).convert("RGB")
+    img = img.resize(size)
+    arr_rgb = np.asarray(img, dtype=np.float32) / 255.0  # (H, W, 3)
+
+    hist_r, _ = np.histogram(arr_rgb[..., 0], bins=rgb_bins, range=(0, 1), density=True)
+    hist_g, _ = np.histogram(arr_rgb[..., 1], bins=rgb_bins, range=(0, 1), density=True)
+    hist_b, _ = np.histogram(arr_rgb[..., 2], bins=rgb_bins, range=(0, 1), density=True)
+
+    img_hsv = img.convert("HSV")
+    arr_hsv = np.asarray(img_hsv, dtype=np.float32) / 255.0  # (H, W, 3)
+    hist_h, _ = np.histogram(arr_hsv[..., 0], bins=hsv_bins, range=(0, 1), density=True)
+    hist_s, _ = np.histogram(arr_hsv[..., 1], bins=hsv_bins, range=(0, 1), density=True)
+    hist_v, _ = np.histogram(arr_hsv[..., 2], bins=hsv_bins, range=(0, 1), density=True)
+
+    mean_r = arr_rgb[..., 0].mean()
+    std_r = arr_rgb[..., 0].std()
+    mean_g = arr_rgb[..., 1].mean()
+    std_g = arr_rgb[..., 1].std()
+    mean_b = arr_rgb[..., 2].mean()
+    std_b = arr_rgb[..., 2].std()
+
+    features = np.concatenate(
+        [
+            hist_r,
+            hist_g,
+            hist_b,
+            hist_h,
+            hist_s,
+            hist_v,
+            [mean_r, std_r, mean_g, std_g, mean_b, std_b],
+        ]
+    )
+    return features
+
+
+
+
+## === cell 4
+train_image_paths = [
+    path / "images" / f"{img_id}.jpg" for img_id in train_df["image_id"]
+]
+
+
+def extract_features_batch(paths):
+    """Extract features for a list of image paths using a thread pool."""
+    first_feat = extract_features(paths[0])
+    n_samples = len(paths)
+    feat_len = first_feat.shape[0]
+    X = np.empty((n_samples, feat_len), dtype=np.float32)
+    X[0] = first_feat
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for idx, feats in enumerate(executor.map(extract_features, paths[1:]), start=1):
+            X[idx] = feats
+    return X
+
+
+X = extract_features_batch(train_image_paths)
+y = train_df[LABEL_COLS].values
+
+
+
+
+## === cell 5
+X_train, X_val, y_train, y_val = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y.argmax(axis=1)
+)
+
+base_clf = GradientBoostingClassifier(
+    random_state=42, n_estimators=800, learning_rate=0.04, max_depth=6
+)
+clf = OneVsRestClassifier(base_clf)
+clf.fit(X_train, y_train)
+
+val_preds = clf.predict_proba(X_val)
+val_auc = np.mean([roc_auc_score(y_val[:, i], val_preds[:, i]) for i in range(4)])
+print(f"Validation mean ROC‑AUC: {val_auc:.5f}")
+
+
+
+
+## === cell 6
+test_df = pd.read_csv(path / "test.csv")
+
+
+
+
+## === cell 7
+test_image_paths = [path / "images" / f"{img_id}.jpg" for img_id in test_df["image_id"]]
+X_test = extract_features_batch(test_image_paths)
+
+
+
+
+## === cell 8
+test_preds = clf.predict_proba(X_test)  # shape (n_test, 4)
+
+
+
+
+## === cell 9
+submission = pd.read_csv(path / "sample_submission.csv")
+submission = submission.set_index("image_id").loc[test_df["image_id"]].reset_index()
+submission[LABEL_COLS] = test_preds
+submission.head()
+
+
+
+
+## === cell 10
+submission.to_csv("submission.csv", index=False, float_format="%.8f")
+print("Submission saved to submission.csv")

@@ -1,0 +1,161 @@
+```
+/
+    kaggle/
+        data/
+            description.md (120 lines)
+            sample_submission.csv (9757 lines)
+            sample_submission.csv.zip (106.8 kB)
+            test.zip (160 Bytes)
+            test_images.zip (2.6 GB)
+            train.csv (87799 lines)
+            train.csv.zip (1.9 MB)
+            train.zip (162 Bytes)
+            train_images.zip (23.5 GB)
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+            test/
+                test/
+            test_images/
+                ccc436fc41bf402f.jpg (72.8 kB)
+                fb9d48b39c614c32.jpg (91.3 kB)
+                ... and 9754 other files
+                test_images/
+            train/
+                train/
+            train_images/
+                0/
+                    b5bd0a0a2de05bb5.jpg (73.8 kB)
+                    c242bcf0719f9d61.jpg (71.9 kB)
+                    ... and 18211 other files
+                1/
+                    a7ad6a44813b77c8.jpg (81.1 kB)
+                    9b89db65b496490d.jpg (630.0 kB)
+                    ... and 1116 other files
+                ... and 87 other folders
+        input/
+            description.md (120 lines)
+            sample_submission.csv (9757 lines)
+            sample_submission.csv.zip (106.8 kB)
+            test.zip (160 Bytes)
+            test_images.zip (2.6 GB)
+            train.csv (87799 lines)
+            train.csv.zip (1.9 MB)
+            train.zip (162 Bytes)
+            train_images.zip (23.5 GB)
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+            test/
+                test/
+                    test/
+            test_images/
+                ccc436fc41bf402f.jpg (72.8 kB)
+                fb9d48b39c614c32.jpg (91.3 kB)
+                ... and 9754 other files
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+            train/
+                train/
+                    train/
+            train_images/
+                0/
+                    b5bd0a0a2de05bb5.jpg (73.8 kB)
+                    c242bcf0719f9d61.jpg (71.9 kB)
+                    ... and 18211 other files
+                1/
+                    a7ad6a44813b77c8.jpg (81.1 kB)
+                    9b89db65b496490d.jpg (630.0 kB)
+                    ... and 1116 other files
+                ... and 87 other folders
+        working/
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+```
+
+-> data/hotel-id-2021-fgvc8/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> data/hotel-id-2021-fgvc8/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> data/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> data/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> input/hotel-id-2021-fgvc8/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> input/hotel-id-2021-fgvc8/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> (stopped after 10 files for performance)

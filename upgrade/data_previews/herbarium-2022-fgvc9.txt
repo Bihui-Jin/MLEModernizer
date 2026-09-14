@@ -1,0 +1,620 @@
+```
+/
+    kaggle/
+        data/
+            description.md (154 lines)
+            sample_submission.csv (174053 lines)
+            sample_submission.csv.zip (393.3 kB)
+            test.zip (160 Bytes)
+            test_images.zip (27.2 GB)
+            test_metadata.json (870262 lines)
+            train.zip (162 Bytes)
+            train_images.zip (100.6 GB)
+            train_metadata.json (24156555 lines)
+            herbarium-2022-fgvc9/
+                description.md (154 lines)
+                sample_submission.csv (174053 lines)
+                ... and 7 other files
+                herbarium-2022-fgvc9/
+                test/
+                    test/
+                test_images/
+                    000/
+                        test-000919.jpg (27.4 kB)
+                        test-000083.jpg (43.1 kB)
+                        ... and 998 other files
+                    001/
+                        test-001154.jpg (164.9 kB)
+                        test-001292.jpg (158.2 kB)
+                        ... and 998 other files
+                    ... and 174 other folders
+                train/
+                    train/
+                train_images/
+                    000/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 98 other folders
+                    001/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 97 other folders
+                    ... and 155 other folders
+            test/
+                test/
+            test_images/
+                000/
+                    test-000919.jpg (27.4 kB)
+                    test-000083.jpg (43.1 kB)
+                    ... and 998 other files
+                001/
+                    test-001154.jpg (164.9 kB)
+                    test-001292.jpg (158.2 kB)
+                    ... and 998 other files
+                ... and 174 other folders
+            train/
+                train/
+            train_images/
+                000/
+                    00/
+                        00000__001.jpg (297.1 kB)
+                        00000__002.jpg (272.3 kB)
+                        ... and 43 other files
+                    01/
+                        00001__047.jpg (91.3 kB)
+                        00001__040.jpg (212.9 kB)
+                        ... and 58 other files
+                    ... and 98 other folders
+                001/
+                    00/
+                        00100__001.jpg (134.8 kB)
+                        00100__002.jpg (188.9 kB)
+                        ... and 12 other files
+                    01/
+                        00101__021.jpg (292.6 kB)
+                        00101__026.jpg (241.2 kB)
+                        ... and 54 other files
+                    ... and 97 other folders
+                ... and 155 other folders
+        input/
+            description.md (154 lines)
+            sample_submission.csv (174053 lines)
+            sample_submission.csv.zip (393.3 kB)
+            test.zip (160 Bytes)
+            test_images.zip (27.2 GB)
+            test_metadata.json (870262 lines)
+            train.zip (162 Bytes)
+            train_images.zip (100.6 GB)
+            train_metadata.json (24156555 lines)
+            herbarium-2022-fgvc9/
+                description.md (154 lines)
+                sample_submission.csv (174053 lines)
+                ... and 7 other files
+                herbarium-2022-fgvc9/
+                test/
+                    test/
+                test_images/
+                    000/
+                        test-000919.jpg (27.4 kB)
+                        test-000083.jpg (43.1 kB)
+                        ... and 998 other files
+                    001/
+                        test-001154.jpg (164.9 kB)
+                        test-001292.jpg (158.2 kB)
+                        ... and 998 other files
+                    ... and 174 other folders
+                train/
+                    train/
+                train_images/
+                    000/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 98 other folders
+                    001/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 97 other folders
+                    ... and 155 other folders
+            test/
+                test/
+                    test/
+            test_images/
+                000/
+                    test-000919.jpg (27.4 kB)
+                    test-000083.jpg (43.1 kB)
+                    ... and 998 other files
+                001/
+                    test-001154.jpg (164.9 kB)
+                    test-001292.jpg (158.2 kB)
+                    ... and 998 other files
+                ... and 174 other folders
+            train/
+                train/
+                    train/
+            train_images/
+                000/
+                    00/
+                        00000__001.jpg (297.1 kB)
+                        00000__002.jpg (272.3 kB)
+                        ... and 43 other files
+                    01/
+                        00001__047.jpg (91.3 kB)
+                        00001__040.jpg (212.9 kB)
+                        ... and 58 other files
+                    ... and 98 other folders
+                001/
+                    00/
+                        00100__001.jpg (134.8 kB)
+                        00100__002.jpg (188.9 kB)
+                        ... and 12 other files
+                    01/
+                        00101__021.jpg (292.6 kB)
+                        00101__026.jpg (241.2 kB)
+                        ... and 54 other files
+                    ... and 97 other folders
+                ... and 155 other folders
+        working/
+            herbarium-2022-fgvc9/
+                description.md (154 lines)
+                sample_submission.csv (174053 lines)
+                ... and 7 other files
+                herbarium-2022-fgvc9/
+                test/
+                    test/
+                test_images/
+                    000/
+                        test-000919.jpg (27.4 kB)
+                        test-000083.jpg (43.1 kB)
+                        ... and 998 other files
+                    001/
+                        test-001154.jpg (164.9 kB)
+                        test-001292.jpg (158.2 kB)
+                        ... and 998 other files
+                    ... and 174 other folders
+                train/
+                    train/
+                train_images/
+                    000/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 98 other folders
+                    001/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 97 other folders
+                    ... and 155 other folders
+```
+
+-> data/herbarium-2022-fgvc9/sample_submission.csv has 174052 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/herbarium-2022-fgvc9/test_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "file_name": {
+        "type": "string"
+      },
+      "image_id": {
+        "type": "string"
+      },
+      "license": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "file_name",
+      "image_id",
+      "license"
+    ]
+  }
+}
+
+-> data/herbarium-2022-fgvc9/train_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "genus_id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "string"
+          },
+          "institution_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "genus_id",
+          "image_id",
+          "institution_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "authors": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "scientificName": {
+            "type": "string"
+          },
+          "species": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "authors",
+          "category_id",
+          "family",
+          "genus",
+          "scientificName",
+          "species"
+        ]
+      }
+    },
+    "distances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "distance": {
+            "type": "number"
+          },
+          "genus_id_x": {
+            "type": "integer"
+          },
+          "genus_id_y": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "distance",
+          "genus_id_x",
+          "genus_id_y"
+        ]
+      }
+    },
+    "genera": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "genus": {
+            "type": "string"
+          },
+          "genus_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "genus",
+          "genus_id"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "image_id": {
+            "type": "string"
+          },
+          "license": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "image_id",
+          "license"
+        ]
+      }
+    },
+    "institutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "collectionCode": {
+            "type": "string"
+          },
+          "institution_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "collectionCode",
+          "institution_id"
+        ]
+      }
+    },
+    "license": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "distances",
+    "genera",
+    "images",
+    "institutions",
+    "license"
+  ]
+}
+
+-> data/sample_submission.csv has 174052 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/test_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "file_name": {
+        "type": "string"
+      },
+      "image_id": {
+        "type": "string"
+      },
+      "license": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "file_name",
+      "image_id",
+      "license"
+    ]
+  }
+}
+
+-> data/train_metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "genus_id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "string"
+          },
+          "institution_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "genus_id",
+          "image_id",
+          "institution_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "authors": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "scientificName": {
+            "type": "string"
+          },
+          "species": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "authors",
+          "category_id",
+          "family",
+          "genus",
+          "scientificName",
+          "species"
+        ]
+      }
+    },
+    "distances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "distance": {
+            "type": "number"
+          },
+          "genus_id_x": {
+            "type": "integer"
+          },
+          "genus_id_y": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "distance",
+          "genus_id_x",
+          "genus_id_y"
+        ]
+      }
+    },
+    "genera": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "genus": {
+            "type": "string"
+          },
+          "genus_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "genus",
+          "genus_id"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "image_id": {
+            "type": "string"
+          },
+          "license": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "image_id",
+          "license"
+        ]
+      }
+    },
+    "institutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "collectionCode": {
+            "type": "string"
+          },
+          "institution_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "collectionCode",
+          "institution_id"
+        ]
+      }
+    },
+    "license": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "distances",
+    "genera",
+    "images",
+    "institutions",
+    "license"
+  ]
+}
+
+-> (stopped after 10 files for performance)

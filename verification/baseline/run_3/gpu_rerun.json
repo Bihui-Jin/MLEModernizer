@@ -1,0 +1,699 @@
+{
+  "cassava-leaf-disease-classification_nordicy_using-resnet_v3_C1.ipynb": {
+    "execution_time": 353.4565806388855,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_nordicy_using-resnet_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 4446029 bytes to cassava-leaf-disease-classification_nordicy_using-resnet_v3_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/nordicy_using-resnet/v3/cassava-leaf-disease-classification_nordicy_using-resnet_v3_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.3533961772918701,
+    "process_time": 356.53263449668884,
+    "score": 0.10613,
+    "target": 0.7550619522514355,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_noelmat_tta-submission-kernel-resnet18-0-866-public_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2876887321472,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_noelmat_tta-submission-kernel-resnet18-0-866-public_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_noelmat_tta-submission-kernel-resnet18-0-866-public_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.0570509433746338,
+    "process_time": 604.0099864006042,
+    "target": 0.8644605621033545,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_user123454321_pytorch-densenet121-starter-inference_v3_C1.ipynb": {
+    "execution_time": 10.198000431060791,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_user123454321_pytorch-densenet121-starter-inference_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 22941 bytes to cassava-leaf-disease-classification_user123454321_pytorch-densenet121-starter-inference_v3_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/user123454321_pytorch-densenet121-starter-inference/v3/cassava-leaf-disease-classification_user123454321_pytorch-densenet121-starter-inference_v3_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13713502883911133,
+    "process_time": 12.810171127319336,
+    "score": 0.11584,
+    "target": 0.838773043215473,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v19_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2749395370483,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v19_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v19_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.4807744026184082,
+    "process_time": 604.5429351329803,
+    "target": 0.3331822302810516,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v13_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1961793899536,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v13_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v13_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.914212703704834,
+    "process_time": 603.9210407733917,
+    "target": 0.844061650045331,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_kylecloud_cassava-leaf-disease-top11percent_v7_C1.ipynb": {
+    "execution_time": 10.59598183631897,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_kylecloud_cassava-leaf-disease-top11percent_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 28941 bytes to cassava-leaf-disease-classification_kylecloud_cassava-leaf-disease-top11percent_v7_C1.ipynb",
+    "cleanup_time": 0.5057697296142578,
+    "process_time": 13.904952764511108,
+    "target": 0.8469326080386824,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_kylecloud_cassava-leaf-disease-top11percent_v9_C1.ipynb": {
+    "execution_time": 10.143387794494629,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_kylecloud_cassava-leaf-disease-top11percent_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 27052 bytes to cassava-leaf-disease-classification_kylecloud_cassava-leaf-disease-top11percent_v9_C1.ipynb",
+    "cleanup_time": 0.15118980407714844,
+    "process_time": 12.798145532608032,
+    "target": 0.8077969174977334,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_nordicy_using-resnet_v2_C1.ipynb": {
+    "execution_time": 274.24522137641907,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_nordicy_using-resnet_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 4445850 bytes to cassava-leaf-disease-classification_nordicy_using-resnet_v2_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/nordicy_using-resnet/v2/cassava-leaf-disease-classification_nordicy_using-resnet_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.49056124687194824,
+    "process_time": 277.21032881736755,
+    "score": 0.11771,
+    "target": 0.7630704140223632,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v12_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2337236404419,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_andrcaruso_vgg11-bn-primeira_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.1010596752166748,
+    "process_time": 603.812224149704,
+    "target": 0.844061650045331,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_ricardoaraujo_cassava-submission-template_v4_C1.ipynb": {
+    "execution_time": 47.59921097755432,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_ricardoaraujo_cassava-submission-template_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 4448214 bytes to cassava-leaf-disease-classification_ricardoaraujo_cassava-submission-template_v4_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/ricardoaraujo_cassava-submission-template/v4/cassava-leaf-disease-classification_ricardoaraujo_cassava-submission-template_v4_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.5232827663421631,
+    "process_time": 50.888607025146484,
+    "score": 0.61099,
+    "target": 0.5855243275914174,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v10_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 599.9949443340302,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v10_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v10_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.3452584743499756,
+    "process_time": 604.5585451126099,
+    "target": 0.8839528558476881,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_sunjbs98_cassava-leaf-disease-classification_v15_C1.ipynb": {
+    "execution_time": 505.6760835647583,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_sunjbs98_cassava-leaf-disease-classification_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 3706116 bytes to cassava-leaf-disease-classification_sunjbs98_cassava-leaf-disease-classification_v15_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/sunjbs98_cassava-leaf-disease-classification/v15/cassava-leaf-disease-classification_sunjbs98_cassava-leaf-disease-classification_v15_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.16431093215942383,
+    "process_time": 508.3261902332306,
+    "score": 0.11584,
+    "target": 0.1403747355696585,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v6_C1.ipynb": {
+    "execution_time": 259.9402792453766,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 11108 bytes to cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v6_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/krutpatel2257_cassava-leaf-disease-classification-submission/v6/cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v6_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.16149592399597168,
+    "process_time": 263.04522228240967,
+    "score": 0.33109,
+    "target": 0.8404351767905711,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v4_C1.ipynb": {
+    "execution_time": 178.39269876480103,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 11073 bytes to cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v4_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/krutpatel2257_cassava-leaf-disease-classification-submission/v4/cassava-leaf-disease-classification_krutpatel2257_cassava-leaf-disease-classification-submission_v4_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1465599536895752,
+    "process_time": 181.43103075027466,
+    "score": 0.05568,
+    "target": 0.8559987911755818,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_noelmat_tta-submission-kernel-resnet18-0-866-public_v1_C1.ipynb": {
+    "execution_time": 241.60349297523499,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_noelmat_tta-submission-kernel-resnet18-0-866-public_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 19433 bytes to cassava-leaf-disease-classification_noelmat_tta-submission-kernel-resnet18-0-866-public_v1_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/noelmat_tta-submission-kernel-resnet18-0-866-public/v1/cassava-leaf-disease-classification_noelmat_tta-submission-kernel-resnet18-0-866-public_v1_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.24590158462524414,
+    "process_time": 244.3126711845398,
+    "score": 0.61099,
+    "target": 0.8643094590510728,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_anukool89_modelling-and-inference-with-pytorch-resnext_v6_C1.ipynb": {
+    "execution_time": 195.840571641922,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_anukool89_modelling-and-inference-with-pytorch-resnext_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 17716611 bytes to cassava-leaf-disease-classification_anukool89_modelling-and-inference-with-pytorch-resnext_v6_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/anukool89_modelling-and-inference-with-pytorch-resnext/v6/cassava-leaf-disease-classification_anukool89_modelling-and-inference-with-pytorch-resnext_v6_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.15696287155151367,
+    "process_time": 198.58706426620483,
+    "score": 0.11584,
+    "target": 0.0507706255666364,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_nordicy_using-resnet_v1_C1.ipynb": {
+    "execution_time": 309.90201020240784,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_nordicy_using-resnet_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 4445643 bytes to cassava-leaf-disease-classification_nordicy_using-resnet_v1_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/nordicy_using-resnet/v1/cassava-leaf-disease-classification_nordicy_using-resnet_v1_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.16869282722473145,
+    "process_time": 312.54694962501526,
+    "score": 0.28102,
+    "target": 0.7515865820489573,
+    "lower_is_better": false
+  },
+  "petfinder-pawpularity-score_djagatiya_pawpularity-pytorch-training_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1633923053741,
+    "detail": "[NbConvertApp] Converting notebook petfinder-pawpularity-score_djagatiya_pawpularity-pytorch-training_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook petfinder-pawpularity-score_djagatiya_pawpularity-pytorch-training_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.273073434829712,
+    "process_time": 604.1869122982025,
+    "target": 20.680791313491653,
+    "lower_is_better": true
+  },
+  "petfinder-pawpularity-score_coldfir3_petfinder-regression-baseline_v1_C1.ipynb": {
+    "execution_time": 35.46610617637634,
+    "detail": "[NbConvertApp] Converting notebook petfinder-pawpularity-score_coldfir3_petfinder-regression-baseline_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 902139 bytes to petfinder-pawpularity-score_coldfir3_petfinder-regression-baseline_v1_C1.ipynb",
+    "output": "results/baseline/script_out/petfinder-pawpularity-score/coldfir3_petfinder-regression-baseline/v1/petfinder-pawpularity-score_coldfir3_petfinder-regression-baseline_v1_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13097023963928223,
+    "process_time": 38.07180333137512,
+    "score": 38.1101,
+    "target": 21.759740481525046,
+    "lower_is_better": true
+  },
+  "paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v4_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1134569644928,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.0923588275909424,
+    "process_time": 603.7170307636261,
+    "target": 0.9447004608294932,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v7_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1341633796692,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.4640071392059326,
+    "process_time": 604.719908952713,
+    "target": 0.9504608294930876,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2596535682678,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8193359375,
+    "process_time": 604.1392402648926,
+    "target": 0.9158986175115208,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v5_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1090128421783,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.2781920433044434,
+    "process_time": 604.139776468277,
+    "target": 0.9527649769585254,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.3054971694946,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.0127167701721191,
+    "process_time": 604.1461026668549,
+    "target": 0.9527649769585254,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v3_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0802109241486,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_tatsuya2kawakami_260206-paddy-doctor-baseline_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.983095645904541,
+    "process_time": 603.6613402366638,
+    "target": 0.9182027649769584,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_suvamb_paddy-disease-classification_v3_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1606149673462,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_suvamb_paddy-disease-classification_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_suvamb_paddy-disease-classification_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.4856963157653809,
+    "process_time": 604.027304649353,
+    "target": 0.8847926267281107,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1990571022034,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.3400700092315674,
+    "process_time": 604.7787861824036,
+    "target": 0.8986175115207373,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v6_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1020543575287,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.0892665386199951,
+    "process_time": 604.4579145908356,
+    "target": 0.9089861751152074,
+    "lower_is_better": false
+  },
+  "paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v5_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1105403900146,
+    "detail": "[NbConvertApp] Converting notebook paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook paddy-disease-classification_hsmtta_260206-paddy-doctor-baseline_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.3954005241394043,
+    "process_time": 604.6886134147644,
+    "target": 0.9089861751152074,
+    "lower_is_better": false
+  },
+  "hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2687005996704,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.9235830307006836,
+    "process_time": 604.1198077201843,
+    "target": 1.0047043222323844,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v3_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.012140750885,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.0870335102081299,
+    "process_time": 603.9305245876312,
+    "target": 0.9764930065789634,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_muhammad4hmed_hms-inference-vit-on-spectrograms_v4_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1977558135986,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_muhammad4hmed_hms-inference-vit-on-spectrograms_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 03:31:46.642447: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_muhammad4hmed_hms-inference-vit-on-spectrograms_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 03:31:46.642447: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR",
+    "cleanup_time": 1.35262131690979,
+    "process_time": 604.3247492313385,
+    "target": 1.1101675291376314,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1283850669861,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_shunsukekikuchi_resnet-submit_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.1620097160339355,
+    "process_time": 604.2923641204834,
+    "target": 0.9546367098266386,
+    "lower_is_better": true
+  },
+  "hms-harmful-brain-activity-classification_vishalbakshi_hms-hbac-fastai-tta-submit_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1934795379639,
+    "detail": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_vishalbakshi_hms-hbac-fastai-tta-submit_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook hms-harmful-brain-activity-classification_vishalbakshi_hms-hbac-fastai-tta-submit_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8632516860961914,
+    "process_time": 603.4756808280945,
+    "target": 1.8536354903337964,
+    "lower_is_better": true
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v36_C1.ipynb": {
+    "execution_time": 25.856582164764404,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v36_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 851027 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v36_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v36/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v36_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.14216089248657227,
+    "process_time": 28.2680926322937,
+    "score": -7.61359,
+    "target": -8.187420132908686,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v28_C1.ipynb": {
+    "execution_time": 82.93908381462097,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v28_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 866496 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v28_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v28/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v28_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13409924507141113,
+    "process_time": 85.35580849647522,
+    "score": -10.25952,
+    "target": -9.123412199675954,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v23_C1.ipynb": {
+    "execution_time": 48.52824306488037,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v23_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 848713 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v23_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v23/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v23_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.12590861320495605,
+    "process_time": 50.96087980270386,
+    "score": -10.23924,
+    "target": -8.503854528803748,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v32_C1.ipynb": {
+    "execution_time": 192.14599466323853,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v32_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 907106 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v32_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v32/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v32_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11962676048278809,
+    "process_time": 194.96942591667175,
+    "score": -7.59586,
+    "target": -7.043339360445653,
+    "lower_is_better": false
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v7_C1.ipynb": {
+    "execution_time": 93.940185546875,
+    "detail": "[NbConvertApp] Converting notebook aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[ColabKernelApp] WARNING | WARNING: attempted to send message from fork\n{'header': {'msg_id': '5d83874b-6dace1adf277a300b13ed422_55_68', 'msg_type': 'comm_msg', 'username': 'username', 'session': '5d83874b-6dace1adf277a300b13ed422', 'date': datetime.datetime(2026, 4, 28, 7, 17, 48, 178902, tzinfo=datetime.timezone.utc), 'version': '5.3'}, 'msg_id': '5d83874b-6dace1adf277a300b13ed422_55_68', 'msg_type': 'comm_msg', 'parent_header': {'msg_id': '87f607a9-52476e8c78dfdd10fae8361d_9_8', 'msg_type': 'execute_request', 'username': 'username', 'session': '87f607a9-52476e8c78dfdd10fae8361d', 'date': datetime.datetime(2026, 4, 28, 7, 17, 48, 105777, tzinfo=tzutc()), 'version': '5.3'}, 'content': {'data': {'method': 'update', 'state': {'bar_style': 'success'}, 'buffer_paths': []}, 'comm_id': '74bd71b221bc4069bc18cbfd70382575'}, 'metadata': {}}\n[NbConvertApp] Writing 800998 bytes to aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v7_C1.ipynb",
+    "output": "results/baseline/script_out/aptos2019-blindness-detection/braindeadtheory_resnetpretrainedensemble/v7/aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v7_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13874602317810059,
+    "process_time": 96.41990113258362,
+    "score": 0.0,
+    "target": 0.8640688834780353,
+    "lower_is_better": false
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v6_C1.ipynb": {
+    "execution_time": 96.5998957157135,
+    "detail": "[NbConvertApp] Converting notebook aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 800990 bytes to aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v6_C1.ipynb",
+    "output": "results/baseline/script_out/aptos2019-blindness-detection/braindeadtheory_resnetpretrainedensemble/v6/aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v6_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13173484802246094,
+    "process_time": 99.04595756530762,
+    "score": -0.0066,
+    "target": 0.872404072348969,
+    "lower_is_better": false
+  },
+  "aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v7_C1.ipynb": {
+    "execution_time": 78.97766590118408,
+    "detail": "[NbConvertApp] Converting notebook aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 40285 bytes to aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v7_C1.ipynb",
+    "output": "results/baseline/script_out/aptos2019-blindness-detection/egerv256_notebook559a9ee3c2/v7/aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v7_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.41231274604797363,
+    "process_time": 81.6875410079956,
+    "score": 0.01241,
+    "target": 0.0125412398803615,
+    "lower_is_better": false
+  },
+  "aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v8_C1.ipynb": {
+    "execution_time": 97.79449987411499,
+    "detail": "[NbConvertApp] Converting notebook aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 40207 bytes to aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v8_C1.ipynb",
+    "output": "results/baseline/script_out/aptos2019-blindness-detection/egerv256_notebook559a9ee3c2/v8/aptos2019-blindness-detection_egerv256_notebook559a9ee3c2_v8_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1293642520904541,
+    "process_time": 100.62726998329163,
+    "score": 0.02895,
+    "target": 0.0542674972869088,
+    "lower_is_better": false
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v4_C1.ipynb": {
+    "execution_time": 102.93104124069214,
+    "detail": "[NbConvertApp] Converting notebook aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[ColabKernelApp] WARNING | WARNING: attempted to send message from fork\n{'header': {'msg_id': '61c22ebb-3c65f38c9bbebf6ca6a6eef7_56_68', 'msg_type': 'comm_msg', 'username': 'username', 'session': '61c22ebb-3c65f38c9bbebf6ca6a6eef7', 'date': datetime.datetime(2026, 4, 28, 7, 2, 13, 708103, tzinfo=datetime.timezone.utc), 'version': '5.3'}, 'msg_id': '61c22ebb-3c65f38c9bbebf6ca6a6eef7_56_68', 'msg_type': 'comm_msg', 'parent_header': {'msg_id': '38ed10e9-6e66c88ce3fde21d9c92b9b0_10_8', 'msg_type': 'execute_request', 'username': 'username', 'session': '38ed10e9-6e66c88ce3fde21d9c92b9b0', 'date': datetime.datetime(2026, 4, 28, 7, 2, 13, 621892, tzinfo=tzutc()), 'version': '5.3'}, 'content': {'data': {'method': 'update', 'state': {'bar_style': 'success'}, 'buffer_paths': []}, 'comm_id': '4afb85652e2d49a8bf2b2363966d25e9'}, 'metadata': {}}\n[NbConvertApp] Writing 800994 bytes to aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v4_C1.ipynb",
+    "output": "results/baseline/script_out/aptos2019-blindness-detection/braindeadtheory_resnetpretrainedensemble/v4/aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v4_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13023996353149414,
+    "process_time": 105.57836031913757,
+    "score": 0.0,
+    "target": 0.8705056502201469,
+    "lower_is_better": false
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v9_C1.ipynb": {
+    "execution_time": 131.3393909931183,
+    "detail": "[NbConvertApp] Converting notebook aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[ColabKernelApp] WARNING | WARNING: attempted to send message from fork\n{'header': {'msg_id': 'bd2772d0-5dfdb011430ee469eae5f0b9_55_68', 'msg_type': 'comm_msg', 'username': 'username', 'session': 'bd2772d0-5dfdb011430ee469eae5f0b9', 'date': datetime.datetime(2026, 4, 28, 7, 1, 14, 534157, tzinfo=datetime.timezone.utc), 'version': '5.3'}, 'msg_id': 'bd2772d0-5dfdb011430ee469eae5f0b9_55_68', 'msg_type': 'comm_msg', 'parent_header': {'msg_id': 'a65a886a-fc1bbe7903505052aa5b7d02_9_8', 'msg_type': 'execute_request', 'username': 'username', 'session': 'a65a886a-fc1bbe7903505052aa5b7d02', 'date': datetime.datetime(2026, 4, 28, 7, 1, 14, 440820, tzinfo=tzutc()), 'version': '5.3'}, 'content': {'data': {'method': 'update', 'state': {'bar_style': 'success'}, 'buffer_paths': []}, 'comm_id': 'd9d64830676c4b7e94816ef4bd50a728'}, 'metadata': {}}\n[NbConvertApp] Writing 801013 bytes to aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v9_C1.ipynb",
+    "output": "results/baseline/script_out/aptos2019-blindness-detection/braindeadtheory_resnetpretrainedensemble/v9/aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v9_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.26660680770874023,
+    "process_time": 133.89730525016785,
+    "score": 0.0,
+    "target": 0.8791714649727451,
+    "lower_is_better": false
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v1_C1.ipynb": {
+    "execution_time": 107.06083965301514,
+    "detail": "[NbConvertApp] Converting notebook aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[ColabKernelApp] WARNING | WARNING: attempted to send message from fork\n{'header': {'msg_id': '7c4d984d-2c5505ea7f9e2ece132a54b8_55_68', 'msg_type': 'comm_msg', 'username': 'username', 'session': '7c4d984d-2c5505ea7f9e2ece132a54b8', 'date': datetime.datetime(2026, 4, 28, 7, 4, 40, 789881, tzinfo=datetime.timezone.utc), 'version': '5.3'}, 'msg_id': '7c4d984d-2c5505ea7f9e2ece132a54b8_55_68', 'msg_type': 'comm_msg', 'parent_header': {'msg_id': 'c9e6082f-9c18bc47ca771716fa444cea_9_8', 'msg_type': 'execute_request', 'username': 'username', 'session': 'c9e6082f-9c18bc47ca771716fa444cea', 'date': datetime.datetime(2026, 4, 28, 7, 4, 40, 699425, tzinfo=tzutc()), 'version': '5.3'}, 'content': {'data': {'method': 'update', 'state': {'bar_style': 'success'}, 'buffer_paths': []}, 'comm_id': 'cb140110e90a4f02b814b8b5bb2cee17'}, 'metadata': {}}\n[NbConvertApp] Writing 800990 bytes to aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v1_C1.ipynb",
+    "output": "results/baseline/script_out/aptos2019-blindness-detection/braindeadtheory_resnetpretrainedensemble/v1/aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v1_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11922073364257812,
+    "process_time": 110.02211403846741,
+    "score": 0.0,
+    "target": 0.8545481310495799,
+    "lower_is_better": false
+  },
+  "alaska2-image-steganalysis_lemuellemuen_alaska2-training_v16_C1.ipynb": {
+    "execution_time": 81.59432744979858,
+    "detail": "[NbConvertApp] Converting notebook alaska2-image-steganalysis_lemuellemuen_alaska2-training_v16_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 94942 bytes to alaska2-image-steganalysis_lemuellemuen_alaska2-training_v16_C1.ipynb",
+    "cleanup_time": 0.1601858139038086,
+    "process_time": 84.23088645935059,
+    "target": 0.8876821205467409,
+    "lower_is_better": false
+  },
+  "alaska2-image-steganalysis_lemuellemuen_alaska2-training_v10_C1.ipynb": {
+    "execution_time": 69.91619062423706,
+    "detail": "[NbConvertApp] Converting notebook alaska2-image-steganalysis_lemuellemuen_alaska2-training_v10_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 87937 bytes to alaska2-image-steganalysis_lemuellemuen_alaska2-training_v10_C1.ipynb",
+    "cleanup_time": 0.15131235122680664,
+    "process_time": 72.420654296875,
+    "target": 0.8299244603974353,
+    "lower_is_better": false
+  },
+  "alaska2-image-steganalysis_lemuellemuen_alaska2-training_v18_C1.ipynb": {
+    "execution_time": 66.04455828666687,
+    "detail": "[NbConvertApp] Converting notebook alaska2-image-steganalysis_lemuellemuen_alaska2-training_v18_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 103862 bytes to alaska2-image-steganalysis_lemuellemuen_alaska2-training_v18_C1.ipynb",
+    "cleanup_time": 0.12164592742919922,
+    "process_time": 68.52458190917969,
+    "target": 0.8870092884880383,
+    "lower_is_better": false
+  },
+  "alaska2-image-steganalysis_lemuellemuen_alaska2-training_v13_C1.ipynb": {
+    "execution_time": 65.91578841209412,
+    "detail": "[NbConvertApp] Converting notebook alaska2-image-steganalysis_lemuellemuen_alaska2-training_v13_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 94174 bytes to alaska2-image-steganalysis_lemuellemuen_alaska2-training_v13_C1.ipynb",
+    "cleanup_time": 0.9983584880828857,
+    "process_time": 69.22869992256165,
+    "target": 0.8658498860537258,
+    "lower_is_better": false
+  },
+  "ventilator-pressure-prediction_arunamenon_google-brain-ventilator-pressure-prediction_v6_C1.ipynb": {
+    "execution_time": 69.61800122261047,
+    "detail": "[NbConvertApp] Converting notebook ventilator-pressure-prediction_arunamenon_google-brain-ventilator-pressure-prediction_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 08:53:47.278233: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777366427.291156      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777366427.295270      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 08:53:47.309949: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n[NbConvertApp] Writing 10667832 bytes to ventilator-pressure-prediction_arunamenon_google-brain-ventilator-pressure-prediction_v6_C1.ipynb",
+    "output": "results/baseline/script_out/ventilator-pressure-prediction/arunamenon_google-brain-ventilator-pressure-prediction/v6/ventilator-pressure-prediction_arunamenon_google-brain-ventilator-pressure-prediction_v6_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.12227916717529297,
+    "process_time": 72.18171572685242,
+    "score": 20.47632,
+    "target": 1.259755034154289,
+    "lower_is_better": true
+  },
+  "ventilator-pressure-prediction_luminiel_notebook8c9d56e0a3_v12_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1014022827148,
+    "detail": "[NbConvertApp] Converting notebook ventilator-pressure-prediction_luminiel_notebook8c9d56e0a3_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook ventilator-pressure-prediction_luminiel_notebook8c9d56e0a3_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/ventilator-pressure-prediction/luminiel_notebook8c9d56e0a3/v12/ventilator-pressure-prediction_luminiel_notebook8c9d56e0a3_v12_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.1979808807373047,
+    "process_time": 603.8710463047028,
+    "target": 1.391755329978957,
+    "lower_is_better": true
+  },
+  "plant-pathology-2020-fgvc7_stardust87_plant-pathology-2020-inference_v2_C1.ipynb": {
+    "execution_time": 20.02893090248108,
+    "detail": "[NbConvertApp] Converting notebook plant-pathology-2020-fgvc7_stardust87_plant-pathology-2020-inference_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 32737 bytes to plant-pathology-2020-fgvc7_stardust87_plant-pathology-2020-inference_v2_C1.ipynb",
+    "output": "results/baseline/script_out/plant-pathology-2020-fgvc7/stardust87_plant-pathology-2020-inference/v2/plant-pathology-2020-fgvc7_stardust87_plant-pathology-2020-inference_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.17880940437316895,
+    "process_time": 22.521480321884155,
+    "score": 0.537,
+    "target": 0.6335459772018843,
+    "lower_is_better": false
+  },
+  "plant-pathology-2020-fgvc7_mnnguynth_plant-d_v11_C1.ipynb": {
+    "execution_time": 83.26892828941345,
+    "detail": "[NbConvertApp] Converting notebook plant-pathology-2020-fgvc7_mnnguynth_plant-d_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 4353538 bytes to plant-pathology-2020-fgvc7_mnnguynth_plant-d_v11_C1.ipynb",
+    "output": "results/baseline/script_out/plant-pathology-2020-fgvc7/mnnguynth_plant-d/v11/plant-pathology-2020-fgvc7_mnnguynth_plant-d_v11_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.14159274101257324,
+    "process_time": 85.91494083404541,
+    "score": {
+      "error": "Invalid submission: Expected submission to have columns ['image_id', 'healthy', 'multiple_diseases', 'rust', 'scab'] but got Index(['color_hist_0', 'color_hist_1', 'color_hist_2', 'color_hist_3',"
+    },
+    "target": 0.7531873774606723,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v9-lstm_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1063849925995,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v9-lstm_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v9-lstm_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7676670551300049,
+    "process_time": 603.2827699184418,
+    "target": 0.9711663391036116,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v9-lstm_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0222654342651,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v9-lstm_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v9-lstm_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.8687138557434082,
+    "process_time": 603.5112524032593,
+    "target": 0.9665501295816344,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v8-gru_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2641775608063,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v8-gru_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v8-gru_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7693414688110352,
+    "process_time": 603.4200139045715,
+    "target": 0.9731171954652954,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v8-gru_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2965269088745,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v8-gru_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_toripee_toxic-torii-v8-gru_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7804200649261475,
+    "process_time": 603.4662318229675,
+    "target": 0.9720497852791602,
+    "lower_is_better": false
+  },
+  "rsna-breast-cancer-detection_conweezy_rsna-submission-test_v6_C1.ipynb": {
+    "execution_time": 9.572436571121216,
+    "detail": "[NbConvertApp] Converting notebook rsna-breast-cancer-detection_conweezy_rsna-submission-test_v6_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 24621 bytes to rsna-breast-cancer-detection_conweezy_rsna-submission-test_v6_C1.ipynb",
+    "output": "results/baseline/script_out/rsna-breast-cancer-detection/conweezy_rsna-submission-test/v6/rsna-breast-cancer-detection_conweezy_rsna-submission-test_v6_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1545565128326416,
+    "process_time": 12.073714971542358,
+    "score": 0.04243,
+    "target": 0.037966513167087,
+    "lower_is_better": false
+  },
+  "rsna-breast-cancer-detection_conweezy_rsna-submission-test_v16_C1.ipynb": {
+    "execution_time": 9.385831117630005,
+    "detail": "[NbConvertApp] Converting notebook rsna-breast-cancer-detection_conweezy_rsna-submission-test_v16_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 32887 bytes to rsna-breast-cancer-detection_conweezy_rsna-submission-test_v16_C1.ipynb",
+    "output": "results/baseline/script_out/rsna-breast-cancer-detection/conweezy_rsna-submission-test/v16/rsna-breast-cancer-detection_conweezy_rsna-submission-test_v16_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13204240798950195,
+    "process_time": 11.987681150436401,
+    "score": 0.05245,
+    "target": 0.0381532828111686,
+    "lower_is_better": false
+  },
+  "rsna-breast-cancer-detection_conweezy_rsna-submission-test_v12_C1.ipynb": {
+    "execution_time": 8.956228733062744,
+    "detail": "[NbConvertApp] Converting notebook rsna-breast-cancer-detection_conweezy_rsna-submission-test_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 30976 bytes to rsna-breast-cancer-detection_conweezy_rsna-submission-test_v12_C1.ipynb",
+    "output": "results/baseline/script_out/rsna-breast-cancer-detection/conweezy_rsna-submission-test/v12/rsna-breast-cancer-detection_conweezy_rsna-submission-test_v12_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11295866966247559,
+    "process_time": 11.332692623138428,
+    "score": 0.04693,
+    "target": 0.0421190355210599,
+    "lower_is_better": false
+  },
+  "rsna-breast-cancer-detection_conweezy_rsna-submission-test_v15_C1.ipynb": {
+    "execution_time": 9.0135178565979,
+    "detail": "[NbConvertApp] Converting notebook rsna-breast-cancer-detection_conweezy_rsna-submission-test_v15_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 30711 bytes to rsna-breast-cancer-detection_conweezy_rsna-submission-test_v15_C1.ipynb",
+    "output": "results/baseline/script_out/rsna-breast-cancer-detection/conweezy_rsna-submission-test/v15/rsna-breast-cancer-detection_conweezy_rsna-submission-test_v15_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.15046238899230957,
+    "process_time": 11.438090324401855,
+    "score": 0.05009,
+    "target": 0.0380308836827852,
+    "lower_is_better": false
+  },
+  "movie-review-sentiment-analysis-kernels-only_benicero_cs152sp21lab7-benjamin-saatvik-ipynb_v5_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0760297775269,
+    "detail": "[NbConvertApp] Converting notebook movie-review-sentiment-analysis-kernels-only_benicero_cs152sp21lab7-benjamin-saatvik-ipynb_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook movie-review-sentiment-analysis-kernels-only_benicero_cs152sp21lab7-benjamin-saatvik-ipynb_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.6955821514129639,
+    "process_time": 604.1988308429718,
+    "target": 0.5206510589513064,
+    "lower_is_better": false
+  },
+  "h-and-m-personalized-fashion-recommendations_zhaoxinpeng_h-m-recomendation-system-with-lightgbm_v24_C1.ipynb": {
+    "execution_time": 231.17270517349243,
+    "detail": "[NbConvertApp] Converting notebook h-and-m-personalized-fashion-recommendations_zhaoxinpeng_h-m-recomendation-system-with-lightgbm_v24_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 84488 bytes to h-and-m-personalized-fashion-recommendations_zhaoxinpeng_h-m-recomendation-system-with-lightgbm_v24_C1.ipynb",
+    "cleanup_time": 0.15737509727478027,
+    "process_time": 234.3825740814209,
+    "target": 0.0003571223077485,
+    "lower_is_better": false
+  },
+  "tensorflow2-question-answering_nh0123_s6-notebook4697ccac48-999_v2_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1057987213135,
+    "detail": "[NbConvertApp] Converting notebook tensorflow2-question-answering_nh0123_s6-notebook4697ccac48-999_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook tensorflow2-question-answering_nh0123_s6-notebook4697ccac48-999_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.7870194911956787,
+    "process_time": 603.3601286411285,
+    "target": 0.0006930006930006,
+    "lower_is_better": false
+  },
+  "tensorflow2-question-answering_nh0123_s6-notebook4697ccac48-999_v3_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2767717838287,
+    "detail": "[NbConvertApp] Converting notebook tensorflow2-question-answering_nh0123_s6-notebook4697ccac48-999_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook tensorflow2-question-answering_nh0123_s6-notebook4697ccac48-999_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.9519102573394775,
+    "process_time": 603.6181073188782,
+    "target": 0.1760379596678529,
+    "lower_is_better": false
+  },
+  "imet-2020-fgvc7_wtr850_imet-6-models-comparison-inference_v1_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2459173202515,
+    "detail": "[NbConvertApp] Converting notebook imet-2020-fgvc7_wtr850_imet-6-models-comparison-inference_v1_C1.ipynb to notebook\n[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count' was unexpected)\n\nFailed validating 'additionalProperties' in markdown_cell:\n\nOn instance['cells'][0]:\n{'cell_type': 'markdown',\n'execution_count': None,\n'metadata': {},\n'source': '## iMet ResNet50 Inference'}\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook imet-2020-fgvc7_wtr850_imet-6-models-comparison-inference_v1_C1.ipynb to notebook\n[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count' was unexpected)\n\nFailed validating 'additionalProperties' in markdown_cell:\n\nOn instance['cells'][0]:\n{'cell_type': 'markdown',\n'execution_count': None,\n'metadata': {},\n'source': '## iMet ResNet50 Inference'}\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 1.2787799835205078,
+    "process_time": 603.9458947181702,
+    "target": 0.4539213536862424,
+    "lower_is_better": false
+  },
+  "plant-pathology-2021-fgvc8_leeminwoo_pytorch-renet32_v11_C1.ipynb": {
+    "execution_time": 9.530839443206787,
+    "detail": "[NbConvertApp] Converting notebook plant-pathology-2021-fgvc8_leeminwoo_pytorch-renet32_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 28734 bytes to plant-pathology-2021-fgvc8_leeminwoo_pytorch-renet32_v11_C1.ipynb",
+    "cleanup_time": 0.24196410179138184,
+    "process_time": 12.227624416351318,
+    "target": 0.3843582640812544,
+    "lower_is_better": false
+  },
+  "vesuvius-challenge-ink-detection_jamesdavey_baseline-model-inkclassifier3dcnn-from-ink-id_v9_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0387501716614,
+    "detail": "[NbConvertApp] Converting notebook vesuvius-challenge-ink-detection_jamesdavey_baseline-model-inkclassifier3dcnn-from-ink-id_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook vesuvius-challenge-ink-detection_jamesdavey_baseline-model-inkclassifier3dcnn-from-ink-id_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "cleanup_time": 0.73968505859375,
+    "process_time": 603.1710913181305,
+    "target": 0.2394133722692947,
+    "lower_is_better": false
+  }
+}

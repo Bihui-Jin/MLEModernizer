@@ -1,0 +1,2857 @@
+{
+  "playground-series-s3e18_averma111_pss3e18-catboost-optuna_v2_C1.ipynb": {
+    "execution_time": 113.53050112724304,
+    "detail": "[NbConvertApp] Converting notebook playground-series-s3e18_averma111_pss3e18-catboost-optuna_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 179279 bytes to playground-series-s3e18_averma111_pss3e18-catboost-optuna_v2_C1.ipynb",
+    "output": "results/baseline/script_out/playground-series-s3e18/averma111_pss3e18-catboost-optuna/v2/playground-series-s3e18_averma111_pss3e18-catboost-optuna_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.24607229232788086,
+    "process_time": 118.90416598320007,
+    "score": 0.64496,
+    "target": 0.625389654511108,
+    "lower_is_better": false
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0598087310791,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v45/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v45_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7306118011474609,
+    "process_time": 604.9666867256165,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2347729206085,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v55/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v55_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8009958267211914,
+    "process_time": 603.806070804596,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1215131282806,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v34/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v34_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.6821238994598389,
+    "process_time": 603.6982858181,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0784397125244,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v49/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v49_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.957141637802124,
+    "process_time": 604.8273265361786,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.224666595459,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v53/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v53_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8313562870025635,
+    "process_time": 606.7624061107635,
+    "target": 1.5600078198717884,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1313846111298,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v48/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v48_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7856743335723877,
+    "process_time": 607.0236821174622,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1050083637238,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v42/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v42_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.0679872035980225,
+    "process_time": 622.039436340332,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2030386924744,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v39/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v39_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.9476275444030762,
+    "process_time": 605.3339304924011,
+    "target": 1.593925161860797,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1594066619873,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v46/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v46_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8913440704345703,
+    "process_time": 622.5441267490387,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1227564811707,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v36/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v36_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7681760787963867,
+    "process_time": 607.2356741428375,
+    "target": 1.593925161860797,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2116136550903,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v41/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v41_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8512632846832275,
+    "process_time": 606.7907226085663,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1110081672668,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v43/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v43_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.282270908355713,
+    "process_time": 604.4962177276611,
+    "target": 1.5600078198717884,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.140355348587,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v52/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v52_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.0221328735351562,
+    "process_time": 607.2964415550232,
+    "target": 1.5600078198717884,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1919448375702,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v31/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v31_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.9855391979217529,
+    "process_time": 607.5148177146912,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0404839515686,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v29/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v29_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.6329333782196045,
+    "process_time": 610.9246759414673,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2006244659424,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v54/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v54_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7821636199951172,
+    "process_time": 607.2889089584351,
+    "target": 1.5501553063652038,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.2784307003021,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v40/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v40_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.756690502166748,
+    "process_time": 603.8175239562988,
+    "target": 1.593925161860797,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1400938034058,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v35/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v35_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.3077692985534668,
+    "process_time": 619.6761183738708,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0124893188477,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v33/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v33_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.653554916381836,
+    "process_time": 619.2217643260956,
+    "target": 1.6076979939249665,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.1333260536194,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v47/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v47_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 1.0246636867523193,
+    "process_time": 622.5590348243713,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.105311870575,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v37/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v37_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.8302149772644043,
+    "process_time": 621.8133211135864,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.ipynb": {
+    "timeout": true,
+    "execution_time": 600.0865461826324,
+    "detail": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "error": "[NbConvertApp] Converting notebook icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may",
+    "output": "results/baseline/script_out/icecube-neutrinos-in-deep-ice/kaggleqrdl_probing-notebook/v30/icecube-neutrinos-in-deep-ice_kaggleqrdl_probing-notebook_v30_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.7906057834625244,
+    "process_time": 606.6775720119476,
+    "target": 1.5861997838310529,
+    "lower_is_better": true
+  },
+  "petfinder-pawpularity-score_izhaketayaharony_notebookec1fe5c704_v7_C1.ipynb": {
+    "execution_time": 565.5408108234406,
+    "detail": "[NbConvertApp] Converting notebook petfinder-pawpularity-score_izhaketayaharony_notebookec1fe5c704_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:15:44.023351: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:15:44.036156: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777342544.048955      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777342544.052502      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:15:44.068471: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:15:50.413149: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 791436 bytes to petfinder-pawpularity-score_izhaketayaharony_notebookec1fe5c704_v7_C1.ipynb",
+    "output": "results/baseline/script_out/petfinder-pawpularity-score/izhaketayaharony_notebookec1fe5c704/v7/petfinder-pawpularity-score_izhaketayaharony_notebookec1fe5c704_v7_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.12987470626831055,
+    "process_time": 567.8350999355316,
+    "score": 20.12429,
+    "target": 20.64637364749079,
+    "lower_is_better": true
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v17_C1.ipynb": {
+    "execution_time": 15.321760177612305,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v17_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834772 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v17_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v17/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v17_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.10242176055908203,
+    "process_time": 17.48414969444275,
+    "score": -8.03994,
+    "target": -7.887754602069454,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v17_C1.ipynb": {
+    "execution_time": 14.385937690734863,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v17_C1.ipynb to notebook\n[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count' was unexpected)\n\nFailed validating 'additionalProperties' in markdown_cell:\n\nOn instance['cells'][18]:\n{'cell_type': 'markdown',\n'execution_count': None,\n'metadata': {},\n'source': '### BASELINE NN '}\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:48:07.961994: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:48:07.973912: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777344487.985577      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777344487.989024      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:48:08.002823: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:48:13.858788: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 245198 bytes to osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v17_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/satnam007_osic-m-fine-tune/v17/osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v17_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1072382926940918,
+    "process_time": 16.447260856628418,
+    "score": -8.76216,
+    "target": -7.0516470200451,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v16_C1.ipynb": {
+    "execution_time": 15.516814947128296,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v16_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834786 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v16_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v16/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v16_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11807489395141602,
+    "process_time": 17.565345287322998,
+    "score": -9.79089,
+    "target": -9.39310832105701,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_5475742_histgradientboosting-randomforest-gradientboosting_v3_C1.ipynb": {
+    "execution_time": 57.295104026794434,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_5475742_histgradientboosting-randomforest-gradientboosting_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 376255 bytes to osic-pulmonary-fibrosis-progression_5475742_histgradientboosting-randomforest-gradientboosting_v3_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/5475742_histgradientboosting-randomforest-gradientboosting/v3/osic-pulmonary-fibrosis-progression_5475742_histgradientboosting-randomforest-gradientboosting_v3_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.09957623481750488,
+    "process_time": 59.6732394695282,
+    "score": -8.31497,
+    "target": -8.15473975612878,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v13_C1.ipynb": {
+    "execution_time": 26.587793588638306,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v13_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 835334 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v13_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v13/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v13_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13068032264709473,
+    "process_time": 28.833683729171753,
+    "score": -11.32167,
+    "target": -11.065428335454074,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v7_C1.ipynb": {
+    "execution_time": 14.419771432876587,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v7_C1.ipynb to notebook\n[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count' was unexpected)\n\nFailed validating 'additionalProperties' in markdown_cell:\n\nOn instance['cells'][17]:\n{'cell_type': 'markdown',\n'execution_count': None,\n'metadata': {},\n'source': '### BASELINE NN '}\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 03:15:34.771916: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 03:15:34.783474: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777346134.795222      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777346134.798522      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 03:15:34.811192: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 03:15:40.558864: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 242063 bytes to osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v7_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/satnam007_osic-m-fine-tune/v7/osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v7_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.10999178886413574,
+    "process_time": 16.478060483932495,
+    "score": {
+      "error": "Invalid submission: Submission DataFrame must have a 'Patient_Week' column."
+    },
+    "target": -6.951438224894861,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v14_C1.ipynb": {
+    "execution_time": 14.913574934005737,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v14_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834702 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v14_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v14/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v14_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.08625459671020508,
+    "process_time": 16.89263081550598,
+    "score": -10.24285,
+    "target": -9.9901926647227,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v12_C1.ipynb": {
+    "execution_time": 23.764315605163574,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834860 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v12_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v12/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v12_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1405792236328125,
+    "process_time": 26.377984523773193,
+    "score": -11.4469,
+    "target": -10.777539122503711,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v13_C1.ipynb": {
+    "execution_time": 14.53925371170044,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v13_C1.ipynb to notebook\n[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count' was unexpected)\n\nFailed validating 'additionalProperties' in markdown_cell:\n\nOn instance['cells'][19]:\n{'cell_type': 'markdown',\n'execution_count': None,\n'metadata': {},\n'source': '### BASELINE NN '}\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:46:28.375402: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:46:28.385845: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777344388.397441      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777344388.400640      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:46:28.412770: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:46:34.266220: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 246300 bytes to osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v13_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/satnam007_osic-m-fine-tune/v13/osic-pulmonary-fibrosis-progression_satnam007_osic-m-fine-tune_v13_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11054849624633789,
+    "process_time": 16.724801778793335,
+    "score": -8.76216,
+    "target": -6.957939087654187,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v18_C1.ipynb": {
+    "execution_time": 16.121472120285034,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v18_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834725 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v18_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v18/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v18_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11690258979797363,
+    "process_time": 18.293646097183228,
+    "score": -7.74114,
+    "target": -7.627048851601046,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v22_C1.ipynb": {
+    "execution_time": 21.840051412582397,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v22_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834960 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v22_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v22/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v22_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.16176629066467285,
+    "process_time": 24.284496068954468,
+    "score": -11.47858,
+    "target": -11.013271218628391,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v19_C1.ipynb": {
+    "execution_time": 15.113887071609497,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v19_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834740 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v19_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v19/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v19_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11240911483764648,
+    "process_time": 17.163898229599,
+    "score": -7.58677,
+    "target": -7.468707965798799,
+    "lower_is_better": false
+  },
+  "osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v21_C1.ipynb": {
+    "execution_time": 16.142662525177002,
+    "detail": "[NbConvertApp] Converting notebook osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v21_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 834777 bytes to osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v21_C1.ipynb",
+    "output": "results/baseline/script_out/osic-pulmonary-fibrosis-progression/abdelrahmanaladdin_competition/v21/osic-pulmonary-fibrosis-progression_abdelrahmanaladdin_competition_v21_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.0890955924987793,
+    "process_time": 18.191489934921265,
+    "score": -7.54086,
+    "target": -7.46880539145037,
+    "lower_is_better": false
+  },
+  "siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.ipynb": {
+    "execution_time": 4.137918710708618,
+    "detail": "[NbConvertApp] Converting notebook siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 4716 bytes to siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.ipynb",
+    "output": "results/baseline/script_out/siim-isic-melanoma-classification/amneves_random-classifier-because-why-not/v2/siim-isic-melanoma-classification_amneves_random-classifier-because-why-not_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.17001128196716309,
+    "process_time": 6.495929479598999,
+    "score": 0.49172,
+    "target": 0.4936282915214993,
+    "lower_is_better": false
+  },
+  "tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v2_C1.ipynb": {
+    "execution_time": 167.7205057144165,
+    "detail": "[NbConvertApp] Converting notebook tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 16:30:34.451019: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 16:30:34.461959: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777393834.474544      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777393834.478012      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 16:30:34.491150: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 16:30:44.881417: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 79830 bytes to tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v2_C1.ipynb",
+    "output": "results/baseline/script_out/tabular-playground-series-may-2022/muki2003_may-2022-tabular-playground-deep-learning/v2/tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1084296703338623,
+    "process_time": 170.1059000492096,
+    "score": 0.8925,
+    "target": 0.8951820124768484,
+    "lower_is_better": false
+  },
+  "tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v3_C1.ipynb": {
+    "execution_time": 238.9293417930603,
+    "detail": "[NbConvertApp] Converting notebook tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v3_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:15:02.497090: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:15:02.519378: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777342502.540715      12 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777342502.547131      12 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:15:02.570132: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:15:24.501940: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 86005 bytes to tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v3_C1.ipynb",
+    "output": "results/baseline/script_out/tabular-playground-series-may-2022/muki2003_may-2022-tabular-playground-deep-learning/v3/tabular-playground-series-may-2022_muki2003_may-2022-tabular-playground-deep-learning_v3_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13415074348449707,
+    "process_time": 242.02245259284973,
+    "score": 0.96146,
+    "target": 0.9628853995286256,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.ipynb": {
+    "execution_time": 96.72409009933472,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 172797 bytes to jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/abhishek2195_toxic-comment-classification-project/v18/jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v18_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.2724604606628418,
+    "process_time": 102.10310816764832,
+    "score": 0.19445,
+    "target": 0.5,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.ipynb": {
+    "execution_time": 94.60085868835449,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 10226 bytes to jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/sho1194_kaggle-doi/v11/jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v11_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.12170529365539551,
+    "process_time": 100.8489899635315,
+    "score": 0.97239,
+    "target": 0.9726792121058794,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.ipynb": {
+    "execution_time": 82.6277596950531,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 27393 bytes to jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/ogummaduabuchi_toxic-comment/v1/jigsaw-toxic-comment-classification-challenge_ogummaduabuchi_toxic-comment_v1_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.08687782287597656,
+    "process_time": 86.0525553226471,
+    "score": 0.97004,
+    "target": 0.970426501920438,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v10_C1.ipynb": {
+    "execution_time": 7.6647984981536865,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v10_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 98083 bytes to jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v10_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/abhishek2195_toxic-comment-classification-project/v10/jigsaw-toxic-comment-classification-challenge_abhishek2195_toxic-comment-classification-project_v10_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13449788093566895,
+    "process_time": 12.581911087036133,
+    "score": null,
+    "target": 0.0508228306890561,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_joovictorenomoto_notebook-toxicclassification_v2_C1.ipynb": {
+    "execution_time": 39.701820850372314,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_joovictorenomoto_notebook-toxicclassification_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:56:15.671584: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:56:15.682508: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777344975.694657      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777344975.698047      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:56:15.711045: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:56:38.775565: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 9702 bytes to jigsaw-toxic-comment-classification-challenge_joovictorenomoto_notebook-toxicclassification_v2_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/joovictorenomoto_notebook-toxicclassification/v2/jigsaw-toxic-comment-classification-challenge_joovictorenomoto_notebook-toxicclassification_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13721489906311035,
+    "process_time": 42.36765480041504,
+    "score": 0.95335,
+    "target": 0.958249997503161,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_rajeev064_toxic-comment_v2_C1.ipynb": {
+    "execution_time": 60.321163177490234,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_rajeev064_toxic-comment_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 56249 bytes to jigsaw-toxic-comment-classification-challenge_rajeev064_toxic-comment_v2_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/rajeev064_toxic-comment/v2/jigsaw-toxic-comment-classification-challenge_rajeev064_toxic-comment_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1720128059387207,
+    "process_time": 64.36178660392761,
+    "score": 0.95784,
+    "target": 0.958288824734791,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_karin1112_notebookaf863be22b_v1_C1.ipynb": {
+    "execution_time": 66.2318422794342,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_karin1112_notebookaf863be22b_v1_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 10121 bytes to jigsaw-toxic-comment-classification-challenge_karin1112_notebookaf863be22b_v1_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/karin1112_notebookaf863be22b/v1/jigsaw-toxic-comment-classification-challenge_karin1112_notebookaf863be22b_v1_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.1707007884979248,
+    "process_time": 71.61984920501709,
+    "score": null,
+    "target": 0.5,
+    "lower_is_better": false
+  },
+  "jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.ipynb": {
+    "execution_time": 65.63653993606567,
+    "detail": "[NbConvertApp] Converting notebook jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 10226 bytes to jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.ipynb",
+    "output": "results/baseline/script_out/jigsaw-toxic-comment-classification-challenge/sho1194_kaggle-doi/v12/jigsaw-toxic-comment-classification-challenge_sho1194_kaggle-doi_v12_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.2279801368713379,
+    "process_time": 69.40630507469177,
+    "score": null,
+    "target": 0.9726792121058794,
+    "lower_is_better": false
+  },
+  "new-york-city-taxi-fare-prediction_nikolozkhetsuriani_nikoloz-khetsuriani-solution_v9_C1.ipynb": {
+    "execution_time": 31.34573245048523,
+    "detail": "[NbConvertApp] Converting notebook new-york-city-taxi-fare-prediction_nikolozkhetsuriani_nikoloz-khetsuriani-solution_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 638173 bytes to new-york-city-taxi-fare-prediction_nikolozkhetsuriani_nikoloz-khetsuriani-solution_v9_C1.ipynb",
+    "output": "results/baseline/script_out/new-york-city-taxi-fare-prediction/nikolozkhetsuriani_nikoloz-khetsuriani-solution/v9/new-york-city-taxi-fare-prediction_nikolozkhetsuriani_nikoloz-khetsuriani-solution_v9_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.11262702941894531,
+    "process_time": 33.58826184272766,
+    "score": 7.75545,
+    "target": 4.330098025036998,
+    "lower_is_better": true
+  },
+  "cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v9_C1.ipynb": {
+    "execution_time": 517.6638326644897,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v9_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:06:00.332095: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:06:00.386393: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777341960.413787      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777341960.422045      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:06:00.472597: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:06:08.991996: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[ WARN:0@24.553] global loadsave.cpp:275 findDecoder imread_('../input/cassava-leaf-disease-classification/test_images/2216849948.jpg'): can't open/read file: check file path/integrity\n[NbConvertApp] Writing 1595167 bytes to cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v9_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/manojkumars00_casava-leaf-disease-simple-classification/v9/cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v9_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.19125843048095703,
+    "process_time": 520.7406029701233,
+    "score": 0.1435,
+    "target": 0.8637050468419462,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v8_C1.ipynb": {
+    "execution_time": 466.08689522743225,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v8_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 16:23:15.198902: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 16:23:15.211806: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777393395.225051      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777393395.228713      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 16:23:15.242570: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 16:23:22.698857: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[ WARN:0@15.055] global loadsave.cpp:275 findDecoder imread_('../input/cassava-leaf-disease-classification/test_images/2216849948.jpg'): can't open/read file: check file path/integrity\n[NbConvertApp] Writing 1611606 bytes to cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v8_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/manojkumars00_casava-leaf-disease-simple-classification/v8/cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v8_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.12032556533813477,
+    "process_time": 468.489248752594,
+    "score": 0.43722,
+    "target": 0.0018132366273798,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v7_C1.ipynb": {
+    "execution_time": 536.1279406547546,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v7_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 16:32:12.051645: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 16:32:12.067716: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777393932.087067      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777393932.092678      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 16:32:12.112064: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 16:32:24.333296: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[ WARN:0@60.510] global loadsave.cpp:275 findDecoder imread_('../input/cassava-leaf-disease-classification/test_images/2216849948.jpg'): can't open/read file: check file path/integrity\n[NbConvertApp] Writing 1029050 bytes to cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v7_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/manojkumars00_casava-leaf-disease-simple-classification/v7/cassava-leaf-disease-classification_manojkumars00_casava-leaf-disease-simple-classification_v7_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.09844779968261719,
+    "process_time": 539.3215959072113,
+    "score": 0.29895,
+    "target": 0.8637050468419462,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.ipynb": {
+    "execution_time": 572.9289770126343,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 16:21:59.151950: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 16:21:59.163403: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777393319.175305      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777393319.178743      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 16:21:59.192031: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 16:22:06.062450: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[ WARN:0@7.444] global loadsave.cpp:275 findDecoder imread_('../input/cassava-leaf-disease-classification/test_images/2216849948.jpg'): can't open/read file: check file path/integrity\n[NbConvertApp] Writing 6011211 bytes to cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/dipeshkurasau_cassava-leaf-disease-classification/v4/cassava-leaf-disease-classification_dipeshkurasau_cassava-leaf-disease-classification_v4_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13776159286499023,
+    "process_time": 575.2282252311707,
+    "score": 0.11883,
+    "target": 0.7845270474463584,
+    "lower_is_better": false
+  },
+  "cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.ipynb": {
+    "execution_time": 574.0688481330872,
+    "detail": "[NbConvertApp] Converting notebook cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n2026-04-28 02:13:31.057027: I tensorflow/core/util/port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.\n2026-04-28 02:13:31.074317: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:477] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\nWARNING: All log messages before absl::InitializeLog() is called are written to STDERR\nE0000 00:00:1777342411.096504      11 cuda_dnn.cc:8310] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\nE0000 00:00:1777342411.103029      11 cuda_blas.cc:1418] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n2026-04-28 02:13:31.128070: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\nTo enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n2026-04-28 02:13:42.758081: E external/local_xla/xla/stream_executor/cuda/cuda_driver.cc:152] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)\n[NbConvertApp] Writing 351374 bytes to cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.ipynb",
+    "output": "results/baseline/script_out/cassava-leaf-disease-classification/funky15_5-fold-tpu-inference-res50-res101-effb4/v5/cassava-leaf-disease-classification_funky15_5-fold-tpu-inference-res50-res101-effb4_v5_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.13610005378723145,
+    "process_time": 578.300449848175,
+    "score": 0.10762,
+    "target": 0.0959504381988516,
+    "lower_is_better": false
+  },
+  "us-patent-phrase-to-phrase-matching_pavelgorbachev1_nlp-u-s-patent-phrase-to-phrase-matching_v2_C1.ipynb": {
+    "execution_time": 31.366046905517578,
+    "detail": "[NbConvertApp] Converting notebook us-patent-phrase-to-phrase-matching_pavelgorbachev1_nlp-u-s-patent-phrase-to-phrase-matching_v2_C1.ipynb to notebook\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n0.00s - Debugger warning: It seems that frozen modules are being used, which may\n0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n0.00s - to python to disable frozen modules.\n0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n[NbConvertApp] Writing 18462 bytes to us-patent-phrase-to-phrase-matching_pavelgorbachev1_nlp-u-s-patent-phrase-to-phrase-matching_v2_C1.ipynb",
+    "output": "results/baseline/script_out/us-patent-phrase-to-phrase-matching/pavelgorbachev1_nlp-u-s-patent-phrase-to-phrase-matching/v2/us-patent-phrase-to-phrase-matching_pavelgorbachev1_nlp-u-s-patent-phrase-to-phrase-matching_v2_C1.csv",
+    "status": "csv_created",
+    "cleanup_time": 0.10879707336425781,
+    "process_time": 33.40933108329773,
+    "score": -0.05617,
+    "target": 0.1018038838623751,
+    "lower_is_better": false
+  },
+  "playground-series-s3e18_kishore3914_enzyme-substrate-classification_v4_C1.ipynb": {
+    "target": 0.61495
+  },
+  "playground-series-s3e18_shreyanshsinghks_eda-rf-easy-explaination-all-models_v1_C1.ipynb": {
+    "target": 0.56525
+  },
+  "playground-series-s3e18_cybersimar08_enzyme-gradient-xgb-ada-cat-lgbm-ensemble_v16_C1.ipynb": {
+    "target": 0.64021
+  },
+  "playground-series-s3e18_vaibhavprajapati22_gradient-boosting_v8_C1.ipynb": {
+    "target": 0.63859
+  },
+  "playground-series-s3e18_mridul2003_multi-label-classification_v4_C1.ipynb": {
+    "target": 0.54858
+  },
+  "playground-series-s3e18_ragaa5_notebook1e3ddf7892_v2_C1.ipynb": {
+    "target": 0.54532
+  },
+  "playground-series-s3e18_vaibhavprajapati22_gradient-boosting_v1_C1.ipynb": {
+    "target": 0.5634
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v7_C1.ipynb": {
+    "target": 0.65244
+  },
+  "playground-series-s3e18_tracyporter_play-3-18-tf_v1_C1.ipynb": {
+    "target": 0.64622
+  },
+  "playground-series-s3e18_cybersimar08_enzyme-gradient-xgb-ada-cat-lgbm-ensemble_v11_C1.ipynb": {
+    "target": 0.63024
+  },
+  "playground-series-s3e18_aman7kumar_multi-class_v2_C1.ipynb": {
+    "target": 0.56327
+  },
+  "playground-series-s3e18_amarloni_pgs3-e18-multiabel-classification_v2_C1.ipynb": {
+    "target": 0.56448
+  },
+  "playground-series-s3e18_cybersimar08_enzyme-gradient-xgb-ada-cat-lgbm-ensemble_v24_C1.ipynb": {
+    "target": 0.64585
+  },
+  "playground-series-s3e18_tracyporter_play-3-18-tf-class-weights_v1_C1.ipynb": {
+    "target": 0.64212
+  },
+  "playground-series-s3e18_satishpb_multilabel-enzyme-substrate-classification_v2_C1.ipynb": {
+    "target": 0.48184
+  },
+  "playground-series-s3e18_vaibhavprajapati22_gradient-boosting_v6_C1.ipynb": {
+    "target": 0.57407
+  },
+  "playground-series-s3e18_reymaster_ps3-18-ensemble-baseline-enzyme-classification_v1_C1.ipynb": {
+    "target": 0.6498
+  },
+  "playground-series-s3e18_kishore3914_enzyme-substrate-classification_v3_C1.ipynb": {
+    "target": 0.63238
+  },
+  "playground-series-s3e18_ibrahimallabbad_eda-multi-classification-gradientboost-catboost_v2_C1.ipynb": {
+    "target": 0.4664
+  },
+  "playground-series-s3e18_piyushjoshi01_s3e18-2nd-try_v1_C1.ipynb": {
+    "target": 0.54916
+  },
+  "playground-series-s3e18_saugatkafley_pss3e18-sweetviz-skewness-removal_v6_C1.ipynb": {
+    "target": 0.64128
+  },
+  "playground-series-s3e18_joebeachcapital_pss3e18-eda-models-ensemble-submission_v12_C1.ipynb": {
+    "target": 0.64501
+  },
+  "playground-series-s3e18_cybersimar08_enzyme-gradient-xgb-ada-cat-lgbm-ensemble_v17_C1.ipynb": {
+    "target": 0.64606
+  },
+  "playground-series-s3e18_dongjun819_pgs3-18-eda-basic-ensemble_v3_C1.ipynb": {
+    "target": 0.61704
+  },
+  "playground-series-s3e18_cybersimar08_enzyme-gradient-xgb-ada-cat-lgbm-ensemble_v23_C1.ipynb": {
+    "target": 0.64554
+  },
+  "playground-series-s3e18_ragaa5_notebook1e3ddf7892_v7_C1.ipynb": {
+    "target": 0.54513
+  },
+  "playground-series-s3e18_yogesh239_multi-label-classification-adab-catb-gb-rfc_v9_C1.ipynb": {
+    "target": 0.64197
+  },
+  "playground-series-s3e18_keerthi4701_enzyme-multi-class-simple-model_v1_C1.ipynb": {
+    "target": 0.64028
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v3_C1.ipynb": {
+    "target": 0.79658
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v3_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v14_C1.ipynb": {
+    "target": 0.80243
+  },
+  "spaceship-titanic_dumanmesut_spaceship-classification-and-eda-lgbm-xgb_v5_C1.ipynb": {
+    "target": 0.77975
+  },
+  "spaceship-titanic_ximader_spaceship-titanic-catboost-acc-80-8_v13_C1.ipynb": {
+    "target": 0.77975
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v62_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v15_C1.ipynb": {
+    "target": 0.80032
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v6_C1.ipynb": {
+    "target": 0.76946
+  },
+  "spaceship-titanic_vijaykumarphy068_spaceship-xgb_v27_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v29_C1.ipynb": {
+    "target": 0.79003
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v91_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v13_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v34_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v53_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_jipwulffele_pipeline-feature-engineering_v1_C1.ipynb": {
+    "target": 0.80336
+  },
+  "spaceship-titanic_dillondalton15_spaceship-titanic_v2_C1.ipynb": {
+    "target": 0.78279
+  },
+  "spaceship-titanic_sergeypolivin_spaceship-prediction-using-catboostclassifier_v2_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v9_C1.ipynb": {
+    "target": 0.75192
+  },
+  "spaceship-titanic_alexandrupicio_spaceship-optimization_v9_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_namsen_newspaceship_v3_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v3_C1.ipynb": {
+    "target": 0.79845
+  },
+  "spaceship-titanic_maksimbotsev_spaceship-titanic-simple-classifier_v2_C1.ipynb": {
+    "target": 0.77086
+  },
+  "spaceship-titanic_tilhi98_xgboost-feature-engineering-spaceship-titanic_v8_C1.ipynb": {
+    "target": 0.48351
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v44_C1.ipynb": {
+    "target": 0.8071
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v8_C1.ipynb": {
+    "target": 0.69838
+  },
+  "spaceship-titanic_mawadaalabri_rf-example_v1_C1.ipynb": {
+    "target": 0.7905
+  },
+  "spaceship-titanic_guirlp_notebook0450ac23b1_v4_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_vasilistimoudas_spaceship-titanic_v4_C1.ipynb": {
+    "target": 0.80056
+  },
+  "spaceship-titanic_takahashi1sei_space-titanic-survival-prediction-alt-approach_v33_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v17_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_willfeeney_dealing-with-missing-data-spaceship-titanic_v2_C1.ipynb": {
+    "target": 0.805
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v6_C1.ipynb": {
+    "target": 0.78653
+  },
+  "spaceship-titanic_kagstick_spaceship-titanic_v16_C1.ipynb": {
+    "target": 0.80243
+  },
+  "spaceship-titanic_namsen_newspaceship_v4_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_muratdura_spaceship-titanic_v3_C1.ipynb": {
+    "target": 0.79378
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v2_C1.ipynb": {
+    "target": 0.58405
+  },
+  "spaceship-titanic_ssy2017_spaceship-1_v1_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_quezaltendes_spaceship-titanic-0-80032_v23_C1.ipynb": {
+    "target": 0.80032
+  },
+  "spaceship-titanic_grigoriivinogradov_my-first-model-xgb-80-4_v25_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_o2ka03_space-ship-titanic-prediction_v4_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_nicktedesco_simple-model-stacking-workflow_v4_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_guanlintao_0-814-optuna-xgb-space-titanic_v4_C1.ipynb": {
+    "target": 0.81482
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v17_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v71_C1.ipynb": {
+    "target": 0.78045
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v8_C1.ipynb": {
+    "target": 0.78185
+  },
+  "spaceship-titanic_paviiiii_spaceship-titanic-randomforest_v1_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v98_C1.ipynb": {
+    "target": 0.78933
+  },
+  "spaceship-titanic_crayola_spaceship-titanic-boruta-demo_v2_C1.ipynb": {
+    "target": 0.80173
+  },
+  "spaceship-titanic_mykhailokaschiy_spaceship-titanic-80-2-accuracy_v1_C1.ipynb": {
+    "target": 0.72808
+  },
+  "spaceship-titanic_ivootero_spaceship-titanic-with-simple-randomforest-model_v5_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v22_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v90_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_pavankumar20_filling-nan-feature-eng-xgboost_v34_C1.ipynb": {
+    "target": 0.75192
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v22_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v66_C1.ipynb": {
+    "target": 0.80313
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v64_C1.ipynb": {
+    "target": 0.7905
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v21_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_xiefangchao_notebook0f7c12e038_v5_C1.ipynb": {
+    "target": 0.74748
+  },
+  "spaceship-titanic_landonwall_interpret-lightgbm-classifier-with-shap_v41_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_tharun369_spaceship-titanic_v3_C1.ipynb": {
+    "target": 0.7711
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v11_C1.ipynb": {
+    "target": 0.79845
+  },
+  "spaceship-titanic_prashantoza_using-only-random-forest_v5_C1.ipynb": {
+    "target": 0.78606
+  },
+  "spaceship-titanic_rayenghali023_simple-preprocessing-smote-le-ohe-gridsearch_v31_C1.ipynb": {
+    "target": 0.8078
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v46_C1.ipynb": {
+    "target": 0.79378
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v30_C1.ipynb": {
+    "target": 0.78232
+  },
+  "spaceship-titanic_laparicio_spaceship-titanic-easy-approach_v3_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v1_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v12_C1.ipynb": {
+    "target": 0.78396
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v15_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v11_C1.ipynb": {
+    "target": 0.80687
+  },
+  "spaceship-titanic_kagstick_spaceship-titanic_v20_C1.ipynb": {
+    "target": 0.80406
+  },
+  "spaceship-titanic_quezaltendes_spaceship-titanic-0-80032_v22_C1.ipynb": {
+    "target": 0.79191
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v10_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v14_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v10_C1.ipynb": {
+    "target": 0.77764
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v14_C1.ipynb": {
+    "target": 0.7912
+  },
+  "spaceship-titanic_pasuvulasaikiran_titanic-spaceship-catboost-optuna_v7_C1.ipynb": {
+    "target": 0.80476
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v17_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v10_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v2_C1.ipynb": {
+    "target": 0.78279
+  },
+  "spaceship-titanic_quezaltendes_spaceship-titanic-0-80032_v19_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v5_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v15_C1.ipynb": {
+    "target": 0.70727
+  },
+  "spaceship-titanic_wanko123_lightgbm-with-imputed-data_v3_C1.ipynb": {
+    "target": 0.8043
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v4_C1.ipynb": {
+    "target": 0.53986
+  },
+  "spaceship-titanic_vinnieb_spaceship-titanic-random-forest-practice_v2_C1.ipynb": {
+    "target": 0.71615
+  },
+  "spaceship-titanic_densivanov_spaceship-titanic-xgb-boost-81-score_v5_C1.ipynb": {
+    "target": 0.81014
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v35_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_mcpenguin_spaceship-titanic-eda-and-prediction_v4_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v10_C1.ipynb": {
+    "target": 0.77975
+  },
+  "spaceship-titanic_pavankumar20_filling-nan-feature-eng-xgboost_v16_C1.ipynb": {
+    "target": 0.7877
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v54_C1.ipynb": {
+    "target": 0.79003
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v29_C1.ipynb": {
+    "target": 0.74374
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v29_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v53_C1.ipynb": {
+    "target": 0.78676
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v11_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v21_C1.ipynb": {
+    "target": 0.80874
+  },
+  "spaceship-titanic_monkeflip_six-models-enseblme-genetic-algo-for-weight-opt_v46_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v1_C1.ipynb": {
+    "target": 0.77343
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v58_C1.ipynb": {
+    "target": 0.8071
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v14_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v36_C1.ipynb": {
+    "target": 0.77788
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v12_C1.ipynb": {
+    "target": 0.80383
+  },
+  "spaceship-titanic_willfeeney_dealing-with-missing-data-spaceship-titanic_v7_C1.ipynb": {
+    "target": 0.80383
+  },
+  "spaceship-titanic_stpeteishii_spaceship-titanic-lgbm-w-count-feature_v7_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v8_C1.ipynb": {
+    "target": 0.79191
+  },
+  "spaceship-titanic_bvvkarthik_spaceship-titanic-0-80-beginner-friendly_v11_C1.ipynb": {
+    "target": 0.74842
+  },
+  "spaceship-titanic_muratdura_spaceship-titanic_v7_C1.ipynb": {
+    "target": 0.80336
+  },
+  "spaceship-titanic_nokichien_hw-spaceship-titanic_v5_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v14_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v20_C1.ipynb": {
+    "target": 0.79097
+  },
+  "spaceship-titanic_takahashi1sei_space-titanic-survival-prediction-alt-approach_v15_C1.ipynb": {
+    "target": 0.80734
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v4_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v22_C1.ipynb": {
+    "target": 0.78021
+  },
+  "spaceship-titanic_cezarr_spaceshiptitanic-tutorial-beginner-80-accuracy_v6_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v13_C1.ipynb": {
+    "target": 0.78045
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v11_C1.ipynb": {
+    "target": 0.2006
+  },
+  "spaceship-titanic_himanshubarange_spaceship-passenger-survival_v3_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_kartik2khandelwal_ensemble-model-xgboost-catboost-lgbm_v18_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_vrenganathan_spaceship-top-5-accuracy-81-adv-ml-models_v23_C1.ipynb": {
+    "target": 0.77788
+  },
+  "spaceship-titanic_fourteenflames_spacetitanic_v4_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_takahashi1sei_space-titanic-survival-prediction-alt-approach_v45_C1.ipynb": {
+    "target": 0.80617
+  },
+  "spaceship-titanic_artempodmasko_rf-example_v1_C1.ipynb": {
+    "target": 0.78933
+  },
+  "spaceship-titanic_nooruddinqur_spaceship-titanic_v9_C1.ipynb": {
+    "target": 0.76923
+  },
+  "spaceship-titanic_victornuez_spaceship-practice-notebook_v18_C1.ipynb": {
+    "target": 0.80266
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v57_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_pavankumar20_filling-nan-feature-eng-xgboost_v15_C1.ipynb": {
+    "target": 0.79448
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v60_C1.ipynb": {
+    "target": 0.805
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v9_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_laparicio_spaceship-titanic-easy-approach_v4_C1.ipynb": {
+    "target": 0.80173
+  },
+  "spaceship-titanic_mahdeemushfiquekamal_top-12-ensemble-model-of-xgb-lgbm-rf_v7_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v17_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v37_C1.ipynb": {
+    "target": 0.78302
+  },
+  "spaceship-titanic_jedrix_spaceship-titanic-my-first-submission_v6_C1.ipynb": {
+    "target": 0.79284
+  },
+  "spaceship-titanic_nonsouris_p3-t4-submission_v15_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_cezarr_spaceshiptitanic-tutorial-beginner-80-accuracy_v4_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_moshebetaff_spaceship-titanic-final-zyf_v2_C1.ipynb": {
+    "target": 0.81155
+  },
+  "spaceship-titanic_moshebetaff_spaceship-titanic-final-zyf_v5_C1.ipynb": {
+    "target": 0.81318
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v20_C1.ipynb": {
+    "target": 0.79588
+  },
+  "spaceship-titanic_landonwall_interpret-lightgbm-classifier-with-shap_v48_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v17_C1.ipynb": {
+    "target": 0.7912
+  },
+  "spaceship-titanic_alekseyandrianov_spaceship-titanic_v24_C1.ipynb": {
+    "target": 0.8064
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v1_C1.ipynb": {
+    "target": 0.50689
+  },
+  "spaceship-titanic_arslanemed_ici-a-navigue_v3_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v38_C1.ipynb": {
+    "target": 0.80593
+  },
+  "spaceship-titanic_anantpandey29_spaceship-titanic-ensemble-approach_v10_C1.ipynb": {
+    "target": 0.80056
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v10_C1.ipynb": {
+    "target": 0.78723
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v30_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v5_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_hishamparveez_polynomial-regression-random-forest-xgb_v4_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v22_C1.ipynb": {
+    "target": 0.79985
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v23_C1.ipynb": {
+    "target": 0.78512
+  },
+  "spaceship-titanic_matteosilla_spaceship-easy-80_v4_C1.ipynb": {
+    "target": 0.71942
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v12_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v43_C1.ipynb": {
+    "target": 0.80523
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v8_C1.ipynb": {
+    "target": 0.2656
+  },
+  "spaceship-titanic_nathanrichard_quick-view-spaceship-titanic-scikit-learn-80_v14_C1.ipynb": {
+    "target": 0.79074
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v9_C1.ipynb": {
+    "target": 0.7891
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v52_C1.ipynb": {
+    "target": 0.79003
+  },
+  "spaceship-titanic_hadeux_simple-xgboost-baseline_v3_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_vrenganathan_spaceship-top-5-accuracy-81-adv-ml-models_v16_C1.ipynb": {
+    "target": 0.79167
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v3_C1.ipynb": {
+    "target": 0.787
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v24_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v13_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_hishamparveez_polynomial-regression-random-forest-xgb_v6_C1.ipynb": {
+    "target": 0.79378
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v76_C1.ipynb": {
+    "target": 0.67056
+  },
+  "spaceship-titanic_chevee_rf-example_v2_C1.ipynb": {
+    "target": 0.79658
+  },
+  "spaceship-titanic_saharalajmi_rf-example-sahar88_v5_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_novikovandrii_classification-training-spaceship-titanic_v23_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_cir2001_spaceship-titanic-80-5-fast-easy_v5_C1.ipynb": {
+    "target": 0.80406
+  },
+  "spaceship-titanic_takahashi1sei_space-titanic-survival-prediction-alt-approach_v28_C1.ipynb": {
+    "target": 0.80196
+  },
+  "spaceship-titanic_lizhecheng_kfold-spaceship-titanic-classification_v7_C1.ipynb": {
+    "target": 0.80173
+  },
+  "spaceship-titanic_ravesandstorm_space-titanic-xgboost-feature-analysis_v2_C1.ipynb": {
+    "target": 0.79448
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v61_C1.ipynb": {
+    "target": 0.48819
+  },
+  "spaceship-titanic_nobuhideito_top3-0-80991-jpn-kagglebeginner-with-catboost_v6_C1.ipynb": {
+    "target": 0.80453
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v26_C1.ipynb": {
+    "target": 0.76689
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v23_C1.ipynb": {
+    "target": 0.79588
+  },
+  "spaceship-titanic_singsinghi_spaceship-titanic_v6_C1.ipynb": {
+    "target": 0.7898
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v7_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v26_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_takahashi1sei_space-titanic-survival-prediction-alt-approach_v16_C1.ipynb": {
+    "target": 0.80874
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v7_C1.ipynb": {
+    "target": 0.20084
+  },
+  "spaceship-titanic_matteosilla_spaceship-easy-80_v5_C1.ipynb": {
+    "target": 0.71732
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v20_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_yiitate_spaceship_v27_C1.ipynb": {
+    "target": 0.78442
+  },
+  "spaceship-titanic_ximader_spaceship-titanic-catboost-acc-80-8_v20_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_tphaterp_a-concise-pipeline-ml-approach-to-titanic-dataset_v16_C1.ipynb": {
+    "target": 0.80196
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v7_C1.ipynb": {
+    "target": 0.805
+  },
+  "spaceship-titanic_madmax2003_spaceship-best-random-forest-solution-score-0-8_v4_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v43_C1.ipynb": {
+    "target": 0.76852
+  },
+  "spaceship-titanic_raymagic_notebook7cec2a01eb_v2_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v11_C1.ipynb": {
+    "target": 0.79167
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v1_C1.ipynb": {
+    "target": 0.25952
+  },
+  "spaceship-titanic_kunrittyhe_spaceship-titanic-competition_v8_C1.ipynb": {
+    "target": 0.78442
+  },
+  "spaceship-titanic_renadope_to-the-edge-of-the-universe-back_v55_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v2_C1.ipynb": {
+    "target": 0.78863
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v13_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v24_C1.ipynb": {
+    "target": 0.77928
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v9_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_rocklen_spaceship-titanic-2-0-80079_v6_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v25_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v38_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v3_C1.ipynb": {
+    "target": 0.80032
+  },
+  "spaceship-titanic_yubraj11_spaceship-titanic-gb-rf-score-0-80079_v2_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v1_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_madmax2003_spaceship-best-random-forest-solution-score-0-8_v1_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_tphaterp_a-concise-pipeline-ml-approach-to-titanic-dataset_v11_C1.ipynb": {
+    "target": 0.80944
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v73_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v15_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_alexandrupicio_spaceship-optimization_v6_C1.ipynb": {
+    "target": 0.79658
+  },
+  "spaceship-titanic_abrmichael_spaceship-titanic-first-view-on-data-and-modeling_v1_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_lemartinezm_spaceship-titanic-book_v1_C1.ipynb": {
+    "target": 0.78863
+  },
+  "spaceship-titanic_jipwulffele_ensemble-and-xgboost-2_v1_C1.ipynb": {
+    "target": 0.80266
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v62_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v5_C1.ipynb": {
+    "target": 0.70423
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v20_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v59_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v92_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v15_C1.ipynb": {
+    "target": 0.73579
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v21_C1.ipynb": {
+    "target": 0.80243
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v11_C1.ipynb": {
+    "target": 0.7877
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v78_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v6_C1.ipynb": {
+    "target": 0.79845
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v16_C1.ipynb": {
+    "target": 0.78466
+  },
+  "spaceship-titanic_jimmyyeung_spaceship-titanic-xgb-top5_v12_C1.ipynb": {
+    "target": 0.81038
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v25_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v44_C1.ipynb": {
+    "target": 0.79074
+  },
+  "spaceship-titanic_sec98b4e_spaceship-voting_v3_C1.ipynb": {
+    "target": 0.805
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v20_C1.ipynb": {
+    "target": 0.74514
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v19_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_qayyum453_spaceship-titanic-prediction-voting-classifier_v2_C1.ipynb": {
+    "target": 0.80196
+  },
+  "spaceship-titanic_saharalajmi_rf-example-sahar88_v2_C1.ipynb": {
+    "target": 0.78957
+  },
+  "spaceship-titanic_dumanmesut_spaceship-classification-and-eda-lgbm-xgb_v2_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_kagstick_spaceship-titanic_v23_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v55_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v16_C1.ipynb": {
+    "target": 0.27612
+  },
+  "spaceship-titanic_voidlessvoid01_0-80accuracy-spacetitanic_v12_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_kartik2khandelwal_ensemble-model-xgboost-catboost-lgbm_v16_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_sidhireddyaneesh_spaceship-titanic-submission-1_v2_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v23_C1.ipynb": {
+    "target": 0.75146
+  },
+  "spaceship-titanic_rocklen_spaceship-titanic-2-0-80079_v5_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v26_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v19_C1.ipynb": {
+    "target": 0.74561
+  },
+  "spaceship-titanic_hishamparveez_polynomial-regression-random-forest-xgb_v5_C1.ipynb": {
+    "target": 0.79401
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v22_C1.ipynb": {
+    "target": 0.71101
+  },
+  "spaceship-titanic_wanko123_lightgbm-baseline_v14_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v6_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_ebryhl_0-80173-spaceship-titanic-beginner-walkthrough_v17_C1.ipynb": {
+    "target": 0.80173
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v56_C1.ipynb": {
+    "target": 0.7912
+  },
+  "spaceship-titanic_alexandrupicio_spaceship-optimization_v11_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v11_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v12_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v4_C1.ipynb": {
+    "target": 0.76689
+  },
+  "spaceship-titanic_alexzvonarev_rf-example_v2_C1.ipynb": {
+    "target": 0.79401
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v26_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_muratdura_spaceship-titanic_v6_C1.ipynb": {
+    "target": 0.80547
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v76_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v33_C1.ipynb": {
+    "target": 0.80406
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v12_C1.ipynb": {
+    "target": 0.7877
+  },
+  "spaceship-titanic_jiwonkng_spaceship-titanic-eda-preprocessing-modeling_v22_C1.ipynb": {
+    "target": 0.79284
+  },
+  "spaceship-titanic_luchales_catboost-acc-score-80_v21_C1.ipynb": {
+    "target": 0.78442
+  },
+  "spaceship-titanic_tilhi98_xgboost-feature-engineering-spaceship-titanic_v32_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v15_C1.ipynb": {
+    "target": 0.78629
+  },
+  "spaceship-titanic_raffiardhi_79-acc-lightgbm_v2_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v3_C1.ipynb": {
+    "target": 0.79003
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v15_C1.ipynb": {
+    "target": 0.79144
+  },
+  "spaceship-titanic_mikhailnaumov_spaceship-titanic-classification-catboost_v28_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_kagstick_spaceship-titanic_v15_C1.ipynb": {
+    "target": 0.80056
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v14_C1.ipynb": {
+    "target": 0.77881
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v37_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_landonwall_interpret-lightgbm-classifier-with-shap_v46_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v4_C1.ipynb": {
+    "target": 0.80196
+  },
+  "spaceship-titanic_nooruddinqur_spaceship-titanic_v5_C1.ipynb": {
+    "target": 0.73509
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v25_C1.ipynb": {
+    "target": 0.8064
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v9_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_takahashi1sei_space-titanic-survival-prediction-alt-approach_v13_C1.ipynb": {
+    "target": 0.80944
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v22_C1.ipynb": {
+    "target": 0.79798
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v61_C1.ipynb": {
+    "target": 0.8064
+  },
+  "spaceship-titanic_atifsuhail_spaceship-titanic_v12_C1.ipynb": {
+    "target": 0.80032
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v22_C1.ipynb": {
+    "target": 0.78185
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v17_C1.ipynb": {
+    "target": 0.77998
+  },
+  "spaceship-titanic_xiefangchao_notebook0f7c12e038_v2_C1.ipynb": {
+    "target": 0.73532
+  },
+  "spaceship-titanic_willfeeney_dealing-with-missing-data-spaceship-titanic_v1_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v77_C1.ipynb": {
+    "target": 0.80079
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v14_C1.ipynb": {
+    "target": 0.78372
+  },
+  "spaceship-titanic_quezaltendes_spaceship-titanic-0-80032_v20_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_deva0703_spaceship-version-2_v2_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v4_C1.ipynb": {
+    "target": 0.79003
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v10_C1.ipynb": {
+    "target": 0.1971
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v47_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v27_C1.ipynb": {
+    "target": 0.79798
+  },
+  "spaceship-titanic_wanko123_lightgbm-with-imputed-data_v4_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v54_C1.ipynb": {
+    "target": 0.80687
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v13_C1.ipynb": {
+    "target": 0.78559
+  },
+  "spaceship-titanic_saharalajmi_rf-example-sahar88_v3_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_wesleyan_latestsub_v1_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_moshebetaff_spaceship-titanic-final-zyf_v4_C1.ipynb": {
+    "target": 0.81084
+  },
+  "spaceship-titanic_tilhi98_xgboost-feature-engineering-spaceship-titanic_v18_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_takahashi1sei_space-titanic-survival-prediction-alt-approach_v18_C1.ipynb": {
+    "target": 0.80757
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v15_C1.ipynb": {
+    "target": 0.78489
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v2_C1.ipynb": {
+    "target": 0.7905
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v70_C1.ipynb": {
+    "target": 0.77414
+  },
+  "spaceship-titanic_naveenkonam1985_spaceship-titanic-passenger-transport-prediction_v19_C1.ipynb": {
+    "target": 0.79845
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v22_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v14_C1.ipynb": {
+    "target": 0.73836
+  },
+  "spaceship-titanic_landonwall_interpret-lightgbm-classifier-with-shap_v35_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v11_C1.ipynb": {
+    "target": 0.77764
+  },
+  "spaceship-titanic_alekseyandrianov_spaceship-titanic_v26_C1.ipynb": {
+    "target": 0.81061
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v54_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v21_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v49_C1.ipynb": {
+    "target": 0.80243
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v17_C1.ipynb": {
+    "target": 0.74304
+  },
+  "spaceship-titanic_rolerik_ss-titanic-experiment_v17_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v24_C1.ipynb": {
+    "target": 0.80687
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v23_C1.ipynb": {
+    "target": 0.78162
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v39_C1.ipynb": {
+    "target": 0.78933
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v19_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_nazimcherpanov_spaceship-titanic-beginner-friendly-tutorial_v45_C1.ipynb": {
+    "target": 0.80944
+  },
+  "spaceship-titanic_kartik2khandelwal_ensemble-model-xgboost-catboost-lgbm_v26_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_sinjeongyeol_spaceshiptitanic-binaryclassification-2_v17_C1.ipynb": {
+    "target": 0.80313
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v10_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_vasilistimoudas_spaceship-titanic_v3_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_muratdura_spaceship-titanic_v5_C1.ipynb": {
+    "target": 0.80523
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v25_C1.ipynb": {
+    "target": 0.78396
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v18_C1.ipynb": {
+    "target": 0.7912
+  },
+  "spaceship-titanic_mrjouh4_spaceship-titanic-random-forest_v7_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_bvvkarthik_spaceship-titanic-0-80-beginner-friendly_v12_C1.ipynb": {
+    "target": 0.75169
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v2_C1.ipynb": {
+    "target": 0.79588
+  },
+  "spaceship-titanic_kartik2khandelwal_ensemble-model-xgboost-catboost-lgbm_v14_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_shazelp_spaceship-titanic-xgboost_v1_C1.ipynb": {
+    "target": 0.74842
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v13_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v75_C1.ipynb": {
+    "target": 0.8078
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v6_C1.ipynb": {
+    "target": 0.79331
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v27_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v45_C1.ipynb": {
+    "target": 0.7905
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v11_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v18_C1.ipynb": {
+    "target": 0.78302
+  },
+  "spaceship-titanic_voidlessvoid01_0-80accuracy-spacetitanic_v15_C1.ipynb": {
+    "target": 0.78957
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v15_C1.ipynb": {
+    "target": 0.79331
+  },
+  "spaceship-titanic_luchales_catboost-acc-score-80_v19_C1.ipynb": {
+    "target": 0.78115
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v2_C1.ipynb": {
+    "target": 0.787
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v7_C1.ipynb": {
+    "target": 0.79003
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v19_C1.ipynb": {
+    "target": 0.8043
+  },
+  "spaceship-titanic_cv13j0_spaceship-my-starter-model_v21_C1.ipynb": {
+    "target": 0.79915
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v30_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_kartik2khandelwal_ensemble-model-xgboost-catboost-lgbm_v15_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v67_C1.ipynb": {
+    "target": 0.80476
+  },
+  "spaceship-titanic_hscosta_sklearn-pipeline-columntransform_v1_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v21_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_realbensonboone_kaggle-newbie-xgbclassifer-optuna_v2_C1.ipynb": {
+    "target": 0.79588
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v60_C1.ipynb": {
+    "target": 0.79985
+  },
+  "spaceship-titanic_alehandro35_lgbm-with-small-eda_v9_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v28_C1.ipynb": {
+    "target": 0.79331
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v35_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v29_C1.ipynb": {
+    "target": 0.79261
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v16_C1.ipynb": {
+    "target": 0.78489
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v14_C1.ipynb": {
+    "target": 0.73158
+  },
+  "spaceship-titanic_adends_spaceship-titanic-competition-with-ensemble-models_v23_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_kartik2khandelwal_ensemble-model-xgboost-catboost-lgbm_v24_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v7_C1.ipynb": {
+    "target": 0.73977
+  },
+  "spaceship-titanic_rayenghali023_simple-preprocessing-smote-le-ohe-gridsearch_v4_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_rayenghali023_simple-preprocessing-smote-le-ohe-gridsearch_v8_C1.ipynb": {
+    "target": 0.80453
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v9_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v24_C1.ipynb": {
+    "target": 0.80991
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v8_C1.ipynb": {
+    "target": 0.79191
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v6_C1.ipynb": {
+    "target": 0.73486
+  },
+  "spaceship-titanic_yiitate_spaceship_v24_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_o2ka03_space-ship-titanic-prediction_v6_C1.ipynb": {
+    "target": 0.80593
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v27_C1.ipynb": {
+    "target": 0.79261
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v22_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_trietp1253201581_spaceship-titanic_v2_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v20_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v25_C1.ipynb": {
+    "target": 0.80991
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v34_C1.ipynb": {
+    "target": 0.79167
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v34_C1.ipynb": {
+    "target": 0.8036
+  },
+  "spaceship-titanic_naveenkonam1985_spaceship-titanic-passenger-transport-prediction_v18_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_victornuez_spaceship-practice-notebook_v15_C1.ipynb": {
+    "target": 0.79845
+  },
+  "spaceship-titanic_singsinghi_spaceship-titanic_v2_C1.ipynb": {
+    "target": 0.71685
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v12_C1.ipynb": {
+    "target": 0.77928
+  },
+  "spaceship-titanic_manas28_spaceship-titanic-pytorch-ann_v1_C1.ipynb": {
+    "target": 0.80289
+  },
+  "spaceship-titanic_ivootero_spaceship-titanic-with-simple-randomforest-model_v6_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v49_C1.ipynb": {
+    "target": 0.78489
+  },
+  "spaceship-titanic_cezarr_spaceshiptitanic-tutorial-beginner-80-accuracy_v3_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_victornuez_spaceship-practice-notebook_v14_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v11_C1.ipynb": {
+    "target": 0.68459
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v25_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v13_C1.ipynb": {
+    "target": 0.73111
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v11_C1.ipynb": {
+    "target": 0.72878
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v2_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v31_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v67_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v3_C1.ipynb": {
+    "target": 0.78606
+  },
+  "spaceship-titanic_nooruddinqur_spaceship-titanic_v7_C1.ipynb": {
+    "target": 0.72644
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v8_C1.ipynb": {
+    "target": 0.80079
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v46_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v3_C1.ipynb": {
+    "target": 0.71475
+  },
+  "spaceship-titanic_haileyko_spaceship-titanic-the-babystep_v4_C1.ipynb": {
+    "target": 0.80079
+  },
+  "spaceship-titanic_nagaeryotaro_notebook219500ba84_v12_C1.ipynb": {
+    "target": 0.77928
+  },
+  "spaceship-titanic_xiefangchao_notebook0f7c12e038_v3_C1.ipynb": {
+    "target": 0.68108
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v95_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v13_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v97_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v16_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v9_C1.ipynb": {
+    "target": 0.79518
+  },
+  "spaceship-titanic_scarfx_spaceship-titanic-ensemble-voting-model-acc-79-6_v41_C1.ipynb": {
+    "target": 0.78325
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v52_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v18_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v59_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v3_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_pasuvulasaikiran_titanic-spaceship-catboost-optuna_v8_C1.ipynb": {
+    "target": 0.80336
+  },
+  "spaceship-titanic_vijaykumarphy068_spaceship-xgb_v26_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v55_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v5_C1.ipynb": {
+    "target": 0.65559
+  },
+  "spaceship-titanic_ssarkar445_flying-machine-kfold-ensemble-starter-80-accuracy_v12_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_satyamsh_titanic-spaceship-visualisation_v3_C1.ipynb": {
+    "target": 0.79424
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v1_C1.ipynb": {
+    "target": 0.79284
+  },
+  "spaceship-titanic_shadesh_inf2008-project-galactic-explorer_v2_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v10_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_ximader_spaceship-titanic-catboost-acc-80-8_v8_C1.ipynb": {
+    "target": 0.78887
+  },
+  "spaceship-titanic_yashusinghal_catboost-classifier_v1_C1.ipynb": {
+    "target": 0.80664
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v25_C1.ipynb": {
+    "target": 0.7898
+  },
+  "spaceship-titanic_mcpenguin_spaceship-titanic-eda-and-prediction_v3_C1.ipynb": {
+    "target": 0.72784
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v6_C1.ipynb": {
+    "target": 0.79261
+  },
+  "spaceship-titanic_ratandeepgupta_ensemble-space_v61_C1.ipynb": {
+    "target": 0.79798
+  },
+  "spaceship-titanic_landonwall_interpret-lightgbm-classifier-with-shap_v42_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_tilhi98_xgboost-feature-engineering-spaceship-titanic_v34_C1.ipynb": {
+    "target": 0.79588
+  },
+  "spaceship-titanic_edilsoncastro_spaceship-titanic-with-pipeline_v2_C1.ipynb": {
+    "target": 0.78723
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v30_C1.ipynb": {
+    "target": 0.79541
+  },
+  "spaceship-titanic_dmtnikolaev_notebookb131db51f6_v9_C1.ipynb": {
+    "target": 0.7884
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v23_C1.ipynb": {
+    "target": 0.79191
+  },
+  "spaceship-titanic_mustafakeser4_simple-pipeline-cv-boost_v2_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_muratdura_spaceship-titanic_v4_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_pavankumar20_filling-nan-feature-eng-xgboost_v35_C1.ipynb": {
+    "target": 0.76385
+  },
+  "spaceship-titanic_tronrover_among-the-elite-top-100-spaceship-titanic_v8_C1.ipynb": {
+    "target": 0.81271
+  },
+  "spaceship-titanic_guanlintao_spaceship-titanic-tpotclassifier_v10_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_rocklen_spaceship-titanic-2-0-80079_v4_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v14_C1.ipynb": {
+    "target": 0.79097
+  },
+  "spaceship-titanic_marioshadjiantonis_spaceship-titanic_v1_C1.ipynb": {
+    "target": 0.7891
+  },
+  "spaceship-titanic_limeorannge_legendspaceship_v1_C1.ipynb": {
+    "target": 0.79985
+  },
+  "spaceship-titanic_willfeeney_dealing-with-missing-data-spaceship-titanic_v3_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_hobeomlee_spaceship-titanic-score-80-99-top-100_v22_C1.ipynb": {
+    "target": 0.80874
+  },
+  "spaceship-titanic_syerramilli_spaceship-titanic-lightgbm-optuna-shap_v1_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v6_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v17_C1.ipynb": {
+    "target": 0.8036
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v4_C1.ipynb": {
+    "target": 0.71709
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v16_C1.ipynb": {
+    "target": 0.78653
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v2_C1.ipynb": {
+    "target": 0.76993
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v15_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v30_C1.ipynb": {
+    "target": 0.74772
+  },
+  "spaceship-titanic_luchales_catboost-acc-score-80_v24_C1.ipynb": {
+    "target": 0.78466
+  },
+  "spaceship-titanic_chevee_rf-example_v1_C1.ipynb": {
+    "target": 0.79588
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v4_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v5_C1.ipynb": {
+    "target": 0.79354
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v2_C1.ipynb": {
+    "target": 0.79682
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v59_C1.ipynb": {
+    "target": 0.50035
+  },
+  "spaceship-titanic_landonwall_interpret-lightgbm-classifier-with-shap_v49_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v29_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v41_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_rinichristy_spaceship-titanic-passenger-destiny-prediction_v1_C1.ipynb": {
+    "target": 0.79775
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v7_C1.ipynb": {
+    "target": 0.79144
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v12_C1.ipynb": {
+    "target": 0.72995
+  },
+  "spaceship-titanic_sineer666_spaceship-titanic-catboost-feature-engineering_v3_C1.ipynb": {
+    "target": 0.79798
+  },
+  "spaceship-titanic_madmax2003_spaceship-best-random-forest-solution-score-0-8_v5_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_abhinandanreddy_spaceship-titanic-let-s-begin_v4_C1.ipynb": {
+    "target": 0.79822
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v16_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_mikedelong_gbm-classifier-score-0-8_v2_C1.ipynb": {
+    "target": 0.77227
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v89_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_akhilsangaonkar_spaceship-titanic-80-43-accuracy_v10_C1.ipynb": {
+    "target": 0.79985
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v33_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_sadoubarry1_spaceship-titanic-80-003_v3_C1.ipynb": {
+    "target": 0.80313
+  },
+  "spaceship-titanic_alekseyandrianov_spaceship-titanic_v21_C1.ipynb": {
+    "target": 0.80383
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v16_C1.ipynb": {
+    "target": 0.78162
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v18_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v24_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_laparicio_spaceship-titanic-easy-approach_v7_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_bvvkarthik_spaceship-titanic-0-80-beginner-friendly_v17_C1.ipynb": {
+    "target": 0.80056
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v18_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v17_C1.ipynb": {
+    "target": 0.79144
+  },
+  "spaceship-titanic_wanko123_lightgbm-baseline_v15_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v18_C1.ipynb": {
+    "target": 0.80173
+  },
+  "spaceship-titanic_flaviocavalcante_spaceship-predict-voting-classifier_v5_C1.ipynb": {
+    "target": 0.80991
+  },
+  "spaceship-titanic_luchales_catboost-acc-score-80_v22_C1.ipynb": {
+    "target": 0.78255
+  },
+  "spaceship-titanic_madmax2003_spaceship-best-random-forest-solution-score-0-8_v2_C1.ipynb": {
+    "target": 0.7877
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v20_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_furduisorinoctavian_spaceship-titanic-79-75-gradient-boosting_v11_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_harshsoni2001_spaceship-titanic-with-lightgbm_v3_C1.ipynb": {
+    "target": 0.8071
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v25_C1.ipynb": {
+    "target": 0.79869
+  },
+  "spaceship-titanic_alekseyandrianov_spaceship-titanic_v22_C1.ipynb": {
+    "target": 0.80476
+  },
+  "spaceship-titanic_shouvikdey21_spaceship-titanic-xgb-clf-80-beginner-friendly_v17_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_saharalajmi_rf-example-sahar88_v1_C1.ipynb": {
+    "target": 0.79307
+  },
+  "spaceship-titanic_pasuvulasaikiran_titanic-spaceship-catboost-optuna_v6_C1.ipynb": {
+    "target": 0.79494
+  },
+  "spaceship-titanic_namsen_newspaceship_v6_C1.ipynb": {
+    "target": 0.55342
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v23_C1.ipynb": {
+    "target": 0.77764
+  },
+  "spaceship-titanic_novikovandrii_classification-training-spaceship-titanic_v14_C1.ipynb": {
+    "target": 0.78793
+  },
+  "spaceship-titanic_laparicio_spaceship-titanic-easy-approach_v8_C1.ipynb": {
+    "target": 0.8043
+  },
+  "spaceship-titanic_harshsoni2001_spaceship-titanic-with-lightgbm_v2_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_bvvkarthik_spaceship-titanic-0-80-beginner-friendly_v6_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v60_C1.ipynb": {
+    "target": 0.50455
+  },
+  "spaceship-titanic_qayyum453_spaceship-titanic-prediction-voting-classifier_v3_C1.ipynb": {
+    "target": 0.80406
+  },
+  "spaceship-titanic_gappfill_filling-nan-eda-featureengineering_v4_C1.ipynb": {
+    "target": 0.7884
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v14_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v16_C1.ipynb": {
+    "target": 0.73065
+  },
+  "spaceship-titanic_fourteenflames_spacetitanic_v5_C1.ipynb": {
+    "target": 0.79027
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v9_C1.ipynb": {
+    "target": 0.74514
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v27_C1.ipynb": {
+    "target": 0.80874
+  },
+  "spaceship-titanic_charunumesh_spaceship-titanic-xg-boost-cat-boost_v18_C1.ipynb": {
+    "target": 0.79448
+  },
+  "spaceship-titanic_kalpanadevig21csr074_randomforest-spaceshiptitanic_v12_C1.ipynb": {
+    "target": 0.79214
+  },
+  "spaceship-titanic_madmax2003_spaceship-best-random-forest-solution-score-0-8_v3_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_deva0703_spaceship-version-2_v3_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v12_C1.ipynb": {
+    "target": 0.79962
+  },
+  "spaceship-titanic_barbagrande007_bbg007-space-titanic_v12_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v10_C1.ipynb": {
+    "target": 0.74257
+  },
+  "spaceship-titanic_ximader_spaceship-titanic-catboost-acc-80-8_v7_C1.ipynb": {
+    "target": 0.78536
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v7_C1.ipynb": {
+    "target": 0.79378
+  },
+  "spaceship-titanic_kagstick_spaceship-titanic_v10_C1.ipynb": {
+    "target": 0.80196
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v6_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_moshebetaff_spaceship-titanic-final-zyf_v1_C1.ipynb": {
+    "target": 0.80734
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v21_C1.ipynb": {
+    "target": 0.73275
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v51_C1.ipynb": {
+    "target": 0.80126
+  },
+  "spaceship-titanic_nooruddinqur_spaceship-titanic_v6_C1.ipynb": {
+    "target": 0.79752
+  },
+  "spaceship-titanic_laparicio_spaceship-titanic-easy-approach_v2_C1.ipynb": {
+    "target": 0.78933
+  },
+  "spaceship-titanic_emish8_spaceship-titanic-feature-extraction_v13_C1.ipynb": {
+    "target": 0.78746
+  },
+  "spaceship-titanic_rolerik_ss-titanic-experiment_v19_C1.ipynb": {
+    "target": 0.79448
+  },
+  "spaceship-titanic_vinnieb_spaceship-titanic-random-forest-practice_v7_C1.ipynb": {
+    "target": 0.7255
+  },
+  "spaceship-titanic_ssarkar445_flying-machine-kfold-ensemble-starter-80-accuracy_v9_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_donghyeokkoh_ustclass-ai-0-2424-0-hwassign_v21_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_philippebillet_spaceship-titanic_v13_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_caesarx_spaceship-titanic_v31_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_mykhailokaschiy_spaceship-titanic-80-2-accuracy_v4_C1.ipynb": {
+    "target": 0.79588
+  },
+  "spaceship-titanic_sidhireddyaneesh_spaceship-titanic-submission-1_v1_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_presanna_spaceship-titanic-presanna_v18_C1.ipynb": {
+    "target": 0.79284
+  },
+  "spaceship-titanic_edilsoncastro_starship-titanic-study-for-competition_v15_C1.ipynb": {
+    "target": 0.79565
+  },
+  "spaceship-titanic_sec98b4e_spaceship-voting_v2_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_kunrittyhe_spaceship-titanic-competition_v9_C1.ipynb": {
+    "target": 0.76572
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v25_C1.ipynb": {
+    "target": 0.78466
+  },
+  "spaceship-titanic_iamdal_spacehip-titanic-eda-xgboost2_v27_C1.ipynb": {
+    "target": 0.79611
+  },
+  "spaceship-titanic_vinnieb_spaceship-titanic-random-forest-practice_v5_C1.ipynb": {
+    "target": 0.7262
+  },
+  "spaceship-titanic_weiwsc_spaceship-tinanic-modeling-with-catboost_v6_C1.ipynb": {
+    "target": 0.79705
+  },
+  "spaceship-titanic_kagstick_spaceship-titanic_v22_C1.ipynb": {
+    "target": 0.80102
+  },
+  "spaceship-titanic_dumanmesut_spaceship-classification-and-eda-lgbm-xgb_v3_C1.ipynb": {
+    "target": 0.79892
+  },
+  "spaceship-titanic_aaron95629_spaceship-titanic_v16_C1.ipynb": {
+    "target": 0.79635
+  },
+  "spaceship-titanic_lorcansamuel_spaceship-titanic-eda-ensemble-using-pipes_v2_C1.ipynb": {
+    "target": 0.80009
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v48_C1.ipynb": {
+    "target": 0.79728
+  },
+  "spaceship-titanic_rajdhilipg21csr158_spaceship-titanic-rajdhilip_v10_C1.ipynb": {
+    "target": 0.79237
+  },
+  "spaceship-titanic_petitrastignac_spaceship-titanic-random-forest_v17_C1.ipynb": {
+    "target": 0.77881
+  },
+  "spaceship-titanic_mohammadrazeghi_spaceship-titanic-eda-intro_v18_C1.ipynb": {
+    "target": 0.69604
+  },
+  "spaceship-titanic_m000sey_space-eda-w-boost-0-79869_v51_C1.ipynb": {
+    "target": 0.7891
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v22_C1.ipynb": {
+    "target": 0.80289
+  },
+  "spaceship-titanic_rayenghali023_simple-preprocessing-smote-le-ohe-gridsearch_v10_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_vishnupriyagarige_spaceship-titanic-classification_v28_C1.ipynb": {
+    "target": 0.79261
+  },
+  "spaceship-titanic_latypovramil_spaceship-thinking-preprocessing-modeling_v5_C1.ipynb": {
+    "target": 0.80383
+  },
+  "spaceship-titanic_entelpi_voting-classifier-spaceship-titanic_v9_C1.ipynb": {
+    "target": 0.79939
+  },
+  "spaceship-titanic_shazelp_spaceship-titanic-xgboost_v2_C1.ipynb": {
+    "target": 0.74959
+  },
+  "spaceship-titanic_cezarr_spaceshiptitanic-tutorial-beginner-80-accuracy_v7_C1.ipynb": {
+    "target": 0.80056
+  },
+  "spaceship-titanic_nathanrichard_quick-view-spaceship-titanic-scikit-learn-80_v16_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_reymaster_spaceship-titanic-complete-walkthrough-80_v19_C1.ipynb": {
+    "target": 0.79471
+  },
+  "spaceship-titanic_joshxmiller656_sklearn-catboost_v23_C1.ipynb": {
+    "target": 0.8043
+  },
+  "spaceship-titanic_marioshadjiantonis_spaceship-titanic_v6_C1.ipynb": {
+    "target": 0.80219
+  },
+  "spaceship-titanic_sanjaylalwani_spaceship-titanic-eda-ensemble-with-80-5_v43_C1.ipynb": {
+    "target": 0.79331
+  },
+  "spaceship-titanic_elvinafd_classification-randomforest-etc-optuna-ustai-final_v11_C1.ipynb": {
+    "target": 0.80149
+  },
+  "spaceship-titanic_guanlintao_spaceship-titanic-tpotclassifier_v8_C1.ipynb": {
+    "target": 0.79635
+  },
+  "petfinder-pawpularity-score_k589k589_lightgbm-eda_v2_C1.ipynb": {
+    "target": 20.69065
+  },
+  "petfinder-pawpularity-score_demko1_pet-finder-my-nn-v2_v3_C1.ipynb": {
+    "target": 20.58252
+  },
+  "petfinder-pawpularity-score_hotsonhonet_petfinder-predictions-using-metadata_v7_C1.ipynb": {
+    "target": 20.51933
+  },
+  "petfinder-pawpularity-score_yushimaeno_submissionflow_v6_C1.ipynb": {
+    "target": 27.48607
+  },
+  "petfinder-pawpularity-score_hoangpham51_petfinder-votingregressor_v3_C1.ipynb": {
+    "target": 20.52929
+  },
+  "petfinder-pawpularity-score_jzjamie_notebookfe84f155f2_v2_C1.ipynb": {
+    "target": 25.6957
+  },
+  "petfinder-pawpularity-score_nikhilsatani_petfinder_v11_C1.ipynb": {
+    "target": 26.43062
+  },
+  "petfinder-pawpularity-score_maximeperez_xgboost_v5_C1.ipynb": {
+    "target": 27.46852
+  },
+  "petfinder-pawpularity-score_hoangpham51_petfinder-votingregressor_v2_C1.ipynb": {
+    "target": 20.75546
+  },
+  "petfinder-pawpularity-score_lokeshsaipureddi_eda-transfer-learning-using-pretrained-weights_v6_C1.ipynb": {
+    "target": 22.5021
+  },
+  "tabular-playground-series-may-2022_ashishkattel_simple-approach-random-forest-logistic-regression_v3_C1.ipynb": {
+    "target": 0.73304
+  },
+  "tabular-playground-series-may-2022_gavisr_baseline-with-fast-automl-flaml_v1_C1.ipynb": {
+    "target": 0.91948
+  },
+  "tabular-playground-series-may-2022_zhangcheche_tabular-202205-baseline_v1_C1.ipynb": {
+    "target": 0.92477
+  },
+  "tabular-playground-series-may-2022_juanromera_tabular-playground-series-may-2022_v3_C1.ipynb": {
+    "target": 0.97886
+  },
+  "tabular-playground-series-may-2022_utkarshshukla2912_random-forest-baseline-classification_v1_C1.ipynb": {
+    "target": 0.82432
+  },
+  "movie-review-sentiment-analysis-kernels-only_baolongpham2017_my-first-try_v17_C1.ipynb": {
+    "target": 0.60162
+  },
+  "movie-review-sentiment-analysis-kernels-only_up201204722_movie-sentiment-analysis_v7_C1.ipynb": {
+    "target": 0.4747
+  },
+  "movie-review-sentiment-analysis-kernels-only_colsen_starter-classifiers-with-data-prep-commentary_v4_C1.ipynb": {
+    "target": 0.60769
+  },
+  "movie-review-sentiment-analysis-kernels-only_kottisasikanth_movie-review-sentiment-analysis-kernel_v8_C1.ipynb": {
+    "target": 0.61485
+  },
+  "movie-review-sentiment-analysis-kernels-only_toraaglobal_sentiment-analysis-mnb_v4_C1.ipynb": {
+    "target": 0.59283
+  },
+  "movie-review-sentiment-analysis-kernels-only_up201204722_movie-sentiment-analysis_v6_C1.ipynb": {
+    "target": 0.47817
+  },
+  "movie-review-sentiment-analysis-kernels-only_kottisasikanth_movie-review-sentiment-analysis-kernel_v7_C1.ipynb": {
+    "target": 0.60197
+  },
+  "movie-review-sentiment-analysis-kernels-only_nicapotato_sparse-n-dense-logistic-n-tsvd-starter_v6_C1.ipynb": {
+    "target": 0.60011
+  },
+  "movie-review-sentiment-analysis-kernels-only_kottisasikanth_movie-review-sentiment-analysis-kernel_v9_C1.ipynb": {
+    "target": 0.61402
+  },
+  "movie-review-sentiment-analysis-kernels-only_kottisasikanth_movie-review-sentiment-analysis-kernel_v11_C1.ipynb": {
+    "target": 0.61485
+  },
+  "movie-review-sentiment-analysis-kernels-only_snehithatiger_movie-review-sentiment-analysis_v5_C1.ipynb": {
+    "target": 0.61411
+  },
+  "movie-review-sentiment-analysis-kernels-only_nicapotato_sparse-n-dense-logistic-n-tsvd-starter_v2_C1.ipynb": {
+    "target": 0.54834
+  },
+  "leaf-classification_islammohaisen_leaf-classification-rfc_v2_C1.ipynb": {
+    "target": 0.80969
+  },
+  "leaf-classification_gauravjoshi1986_leaf-classification_v8_C1.ipynb": {
+    "target": 0.98616
+  },
+  "leaf-classification_towhid1_rforest-with-calibration-score-0-07948_v5_C1.ipynb": {
+    "target": 0.07947
+  },
+  "leaf-classification_sravanirayapati_leaf-classfication_v1_C1.ipynb": {
+    "target": 0.8074
+  },
+  "leaf-classification_mitchfrump_leaf-classification_v10_C1.ipynb": {
+    "target": 11.39663
+  },
+  "leaf-classification_mikhailg0_leaf-classification-solution_v3_C1.ipynb": {
+    "target": 0.87847
+  },
+  "leaf-classification_sahilsunda_model-1_v2_C1.ipynb": {
+    "target": 0.85973
+  },
+  "leaf-classification_zocainviken_tp-leaf-classification_v6_C1.ipynb": {
+    "target": 2.00522
+  },
+  "leaf-classification_nagwaahmed_leaf-classification-competition-96-score-0-69_v40_C1.ipynb": {
+    "target": 4.80481
+  },
+  "leaf-classification_imranmik_leaf-classification_v2_C1.ipynb": {
+    "target": 5.08427
+  },
+  "leaf-classification_mitchfrump_leaf-classification_v12_C1.ipynb": {
+    "target": 1.45365
+  },
+  "leaf-classification_gauravjoshi1986_leaf-classification_v10_C1.ipynb": {
+    "target": 1.24854
+  },
+  "leaf-classification_mikhailg0_leaf-classification-solution_v1_C1.ipynb": {
+    "target": 1.00272
+  },
+  "new-york-city-taxi-fare-prediction_nikaglunchadze_linear-regression-and-xgboost_v7_C1.ipynb": {
+    "target": 3.19317
+  },
+  "new-york-city-taxi-fare-prediction_junchengzhou_ny-city-taxi-fare-prediction_v10_C1.ipynb": {
+    "target": 4.33523
+  },
+  "new-york-city-taxi-fare-prediction_santhoshbala18_fork-of-taxi-fare-prediction_v9_C1.ipynb": {
+    "target": 3.35291
+  },
+  "new-york-city-taxi-fare-prediction_madhurisivalenka_cleansing-eda-modelling-lgbm-xgboost-starters_v11_C1.ipynb": {
+    "target": 3.61434
+  },
+  "new-york-city-taxi-fare-prediction_kaibaur_taxi-fare-simplerandomforest-score-3-99_v3_C1.ipynb": {
+    "target": 10.78623
+  },
+  "new-york-city-taxi-fare-prediction_allenkong_nyc-taxi-fare_v7_C1.ipynb": {
+    "target": 3.9704
+  },
+  "new-york-city-taxi-fare-prediction_danpavlov_ny-taxi-fare-comprehensive-and-simple-analysis_v6_C1.ipynb": {
+    "target": 2.1362993276757745e+29
+  },
+  "new-york-city-taxi-fare-prediction_tejaeduc_newyorktaxifare_v4_C1.ipynb": {
+    "target": 3.33042
+  },
+  "new-york-city-taxi-fare-prediction_nikaglunchadze_linear-regression-and-xgboost_v9_C1.ipynb": {
+    "target": 3.6129
+  },
+  "new-york-city-taxi-fare-prediction_caomanhdat_taxi-fare_v3_C1.ipynb": {
+    "target": 40.14356
+  },
+  "new-york-city-taxi-fare-prediction_tejaeduc_newyorktaxifare_v5_C1.ipynb": {
+    "target": 3.40804
+  },
+  "new-york-city-taxi-fare-prediction_besarionimanagadze_notebook19fc83a043_v25_C1.ipynb": {
+    "target": 5.07094
+  },
+  "new-york-city-taxi-fare-prediction_yekahaaagayeham_new-york-city-taxi-fare-prediction-eda-baseline_v1_C1.ipynb": {
+    "target": 3.15471
+  },
+  "new-york-city-taxi-fare-prediction_caomanhdat_taxi-fare_v1_C1.ipynb": {
+    "target": 37.5116
+  },
+  "new-york-city-taxi-fare-prediction_danpavlov_ny-taxi-fare-comprehensive-and-simple-analysis_v9_C1.ipynb": {
+    "target": 8.03246
+  },
+  "new-york-city-taxi-fare-prediction_danpavlov_ny-taxi-fare-comprehensive-and-simple-analysis_v7_C1.ipynb": {
+    "target": 9.1952
+  },
+  "new-york-city-taxi-fare-prediction_bulbazavr_new-york-city-taxi-fare-prediction_v1_C1.ipynb": {
+    "target": 5.67556
+  },
+  "siim-isic-melanoma-classification_shubham9455999082_xgboost-cross-validation_v2_C1.ipynb": {
+    "target": 0.6744
+  },
+  "siim-isic-melanoma-classification_annasofielunde_xgboost-on-metadata-for-ml_v12_C1.ipynb": {
+    "target": 0.6082
+  },
+  "plant-pathology-2020-fgvc7_ooo256_decision-tree2_v2_C1.ipynb": {
+    "target": 0.53712
+  },
+  "plant-pathology-2020-fgvc7_ooo256_decision-tree2_v3_C1.ipynb": {
+    "target": 0.53499
+  },
+  "plant-pathology-2020-fgvc7_ooo256_decision-tree2_v1_C1.ipynb": {
+    "target": 0.53551
+  },
+  "ventilator-pressure-prediction_yasuosuzuki_various-feature-and-lightgbm_v4_C1.ipynb": {
+    "target": 1.4451
+  },
+  "ventilator-pressure-prediction_yasuosuzuki_various-feature-and-lightgbm_v6_C1.ipynb": {
+    "target": 1.2625
+  },
+  "ventilator-pressure-prediction_shashimo_foolishly-implemented-what-i-learned-in-introml_v1_C1.ipynb": {
+    "target": 4.4329
+  },
+  "ventilator-pressure-prediction_drastamat_lgbm-starter_v4_C1.ipynb": {
+    "target": 0.7978
+  },
+  "ventilator-pressure-prediction_edwintyh_ventilator-pressure-quick-eda-dummy-baseline_v2_C1.ipynb": {
+    "target": 6.2068
+  },
+  "ventilator-pressure-prediction_drastamat_lgbm-starter_v2_C1.ipynb": {
+    "target": 7.0596
+  },
+  "ventilator-pressure-prediction_albertferre_timeserieskmeans-clustering_v6_C1.ipynb": {
+    "target": 6.162
+  },
+  "ventilator-pressure-prediction_yasuosuzuki_various-feature-and-lightgbm_v14_C1.ipynb": {
+    "target": 1.1155
+  },
+  "tabular-playground-series-dec-2021_namanbansalcodes_playground-dec2021-naman-svm_v11_C1.ipynb": {
+    "target": 0.47529
+  },
+  "tabular-playground-series-dec-2021_rhythmcam_optuna-basic-lgbmclassifier-best-model_v2_C1.ipynb": {
+    "target": 0.93724
+  },
+  "tabular-playground-series-dec-2021_namanbansalcodes_playground-dec2021-naman-svm_v8_C1.ipynb": {
+    "target": 0.15175
+  },
+  "tabular-playground-series-dec-2021_mastmustu_forest-cover-type-dec-2021-playground_v2_C1.ipynb": {
+    "target": 0.91604
+  },
+  "tabular-playground-series-dec-2021_tariqchhussain_lightgbm-oversampling-tps-dec-2021_v1_C1.ipynb": {
+    "target": 0.93199
+  },
+  "google-quest-challenge_pavelvpster_google-q-a-labeling-tf-idf-pytorch_v15_C1.ipynb": {
+    "target": 0.2903
+  },
+  "google-quest-challenge_carlolepelaars_understanding-the-metric-spearman-s-rho_v5_C1.ipynb": {
+    "target": 0.00022
+  },
+  "lmsys-chatbot-arena_leetolo_random-binary-output-submission_v3_C1.ipynb": {
+    "target": 24.03704
+  },
+  "lmsys-chatbot-arena_hung1047_nhom12-hhlt_v4_C1.ipynb": {
+    "target": 1.08235
+  },
+  "lmsys-chatbot-arena_nileshely_unveiling-human-preferences_v2_C1.ipynb": {
+    "target": 1.32545
+  },
+  "lmsys-chatbot-arena_nileshely_unveiling-human-preferences_v3_C1.ipynb": {
+    "target": 1.33488
+  },
+  "lmsys-chatbot-arena_leetolo_lmsys-luck-simulator-random-output-submission_v1_C1.ipynb": {
+    "target": 1.31438
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v26_C1.ipynb": {
+    "target": 1.073851
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v29_C1.ipynb": {
+    "target": 1.036779
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v20_C1.ipynb": {
+    "target": 1.979928
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v21_C1.ipynb": {
+    "target": 1.833731
+  },
+  "hms-harmful-brain-activity-classification_venkatkumar001_hms-firststep-exploration_v6_C1.ipynb": {
+    "target": 1.138332
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v33_C1.ipynb": {
+    "target": 1.033695
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v36_C1.ipynb": {
+    "target": 1.01812
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v23_C1.ipynb": {
+    "target": 1.68843
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v31_C1.ipynb": {
+    "target": 1.057977
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v38_C1.ipynb": {
+    "target": 1.025582
+  },
+  "hms-harmful-brain-activity-classification_dan3dewey_hms-2024-brain-addicted-to-tinkering_v30_C1.ipynb": {
+    "target": 1.06367
+  },
+  "uw-madison-gi-tract-image-segmentation_jirkaborovec_tract-segm-statistic-predictions_v10_C1.ipynb": {
+    "target": 0.55248
+  },
+  "uw-madison-gi-tract-image-segmentation_jirkaborovec_tract-segm-statistic-predictions_v8_C1.ipynb": {
+    "target": 0.5519
+  },
+  "learning-agency-lab-automated-essay-scoring-2_tongminhtri_logistic-regression-baseline-tri_v6_C1.ipynb": {
+    "target": 0.76391
+  },
+  "learning-agency-lab-automated-essay-scoring-2_zhangyue199_tf-idf-baseline_v2_C1.ipynb": {
+    "target": 0.57129
+  },
+  "learning-agency-lab-automated-essay-scoring-2_tongminhtri_logistic-regression-baseline-tri_v12_C1.ipynb": {
+    "target": 0.77571
+  },
+  "learning-agency-lab-automated-essay-scoring-2_idontknowadrija_essaywritinggrading_v15_C1.ipynb": {
+    "target": 0.49673
+  },
+  "learning-agency-lab-automated-essay-scoring-2_udaken10_word2vec-lgb_v17_C1.ipynb": {
+    "target": 0.72709
+  },
+  "learning-agency-lab-automated-essay-scoring-2_nateliu0621_neuron-network_v7_C1.ipynb": {
+    "target": 0.7418
+  },
+  "learning-agency-lab-automated-essay-scoring-2_tongminhtri_logistic-regression-baseline-tri_v10_C1.ipynb": {
+    "target": 0.75792
+  },
+  "learning-agency-lab-automated-essay-scoring-2_abeshith_classifier-agency-lab_v6_C1.ipynb": {
+    "target": 0.59966
+  },
+  "learning-agency-lab-automated-essay-scoring-2_semiheren_doc2vec-similarity-baseline_v6_C1.ipynb": {
+    "target": 0.45181
+  },
+  "learning-agency-lab-automated-essay-scoring-2_docxian_automated-essay-scoring-first-glance_v14_C1.ipynb": {
+    "target": 0.72994
+  },
+  "learning-agency-lab-automated-essay-scoring-2_tongminhtri_logistic-regression-baseline-tri_v8_C1.ipynb": {
+    "target": 0.75401
+  },
+  "stanford-covid-vaccine_t88take_openvaccine-simple-lgb-baseline_v3_C1.ipynb": {
+    "target": 0.41876
+  },
+  "jigsaw-unintended-bias-in-toxicity-classification_mvpvalues_jigsaw-unintended-bias-kernel_v4_C1.ipynb": {
+    "target": 0.50186
+  },
+  "jigsaw-toxic-comment-classification-challenge_drkaggle22_toxic-comments-classification-tf-idf-nltk_v32_C1.ipynb": {
+    "target": 0.95298
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v37_C1.ipynb": {
+    "target": 0.97319
+  },
+  "jigsaw-toxic-comment-classification-challenge_lxyuan0420_logistic-regression-with-tf-idf-ngram_v8_C1.ipynb": {
+    "target": 0.97418
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v36_C1.ipynb": {
+    "target": 0.95063
+  },
+  "jigsaw-toxic-comment-classification-challenge_saurabhg476_finding-toxic-comments_v3_C1.ipynb": {
+    "target": 0.85279
+  },
+  "jigsaw-toxic-comment-classification-challenge_drkaggle22_toxic-comments-classification-tf-idf-nltk_v20_C1.ipynb": {
+    "target": 0.6436
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v35_C1.ipynb": {
+    "target": 0.96877
+  },
+  "jigsaw-toxic-comment-classification-challenge_arifali77_toxic-comment-classification-quora_v2_C1.ipynb": {
+    "target": 0.96186
+  },
+  "jigsaw-toxic-comment-classification-challenge_drkaggle22_toxic-comments-classification-tf-idf-nltk_v22_C1.ipynb": {
+    "target": 0.66533
+  },
+  "jigsaw-toxic-comment-classification-challenge_keshavbalivada_toxic-comment-classification_v4_C1.ipynb": {
+    "target": 0.95526
+  },
+  "jigsaw-toxic-comment-classification-challenge_sergeypolivin_toxicity-clf_v2_C1.ipynb": {
+    "target": 0.97502
+  },
+  "jigsaw-toxic-comment-classification-challenge_sergeypolivin_toxicity-clf_v4_C1.ipynb": {
+    "target": 0.9491
+  },
+  "jigsaw-toxic-comment-classification-challenge_rhodiumbeng_classifying-multi-label-comments-0-9741-lb_v34_C1.ipynb": {
+    "target": 0.97463
+  },
+  "jigsaw-toxic-comment-classification-challenge_drkaggle22_toxic-comments-classification-tf-idf-nltk_v33_C1.ipynb": {
+    "target": 0.91778
+  },
+  "jigsaw-toxic-comment-classification-challenge_anirbansen3027_jtcc-bag-of-words_v3_C1.ipynb": {
+    "target": 0.92425
+  },
+  "jigsaw-toxic-comment-classification-challenge_nayubin_ml-toxic-comment-classification-challenge_v5_C1.ipynb": {
+    "target": 0.94523
+  },
+  "jigsaw-toxic-comment-classification-challenge_anirbansen3027_jtcc-fasttext-supervised_v5_C1.ipynb": {
+    "target": 0.78803
+  },
+  "jigsaw-toxic-comment-classification-challenge_wepasabyrow_toxic-comment-classification-challenge_v3_C1.ipynb": {
+    "target": 0.92582
+  },
+  "jigsaw-toxic-comment-classification-challenge_rahuld_classifying-multi-label-comments-0-9741-lb_v1_C1.ipynb": {
+    "target": 0.96309
+  },
+  "jigsaw-toxic-comment-classification-challenge_alokevil_01-strong-baseline-model_v1_C1.ipynb": {
+    "target": 0.94486
+  },
+  "cassava-leaf-disease-classification_devanshusingh_notebook7a30253b3d_v4_C1.ipynb": {
+    "target": 0.053
+  },
+  "spooky-author-identification_nayubin_ml-spooky-nlp-and-topic-modeling_v2_C1.ipynb": {
+    "target": 0.59835
+  },
+  "spooky-author-identification_jeru666_my-spooky-notebook_v6_C1.ipynb": {
+    "target": 0.38103
+  },
+  "spooky-author-identification_jeru666_my-spooky-notebook_v4_C1.ipynb": {
+    "target": 0.88827
+  },
+  "spooky-author-identification_guidosalimbeni_multinomial-naive-bayes_v2_C1.ipynb": {
+    "target": 0.4431
+  },
+  "spooky-author-identification_sudhirnl7_simple-naive-bayes-xgboost_v5_C1.ipynb": {
+    "target": 2.50269
+  },
+  "tweet-sentiment-extraction_myho63_test-version2_v5_C1.ipynb": {
+    "target": 0.48668
+  },
+  "tweet-sentiment-extraction_myho63_test-version2_v7_C1.ipynb": {
+    "target": 0.48789
+  },
+  "tweet-sentiment-extraction_josefelixramos_frankoceanfanclub_v5_C1.ipynb": {
+    "target": 0.52638
+  },
+  "alaska2-image-steganalysis_akashsuper2000_jpeg-compression-rate_v1_C1.ipynb": {
+    "target": 0.587
+  },
+  "alaska2-image-steganalysis_akashsuper2000_jpeg-compression-rate_v3_C1.ipynb": {
+    "target": 0.594
+  },
+  "herbarium-2020-fgvc7_seraphwedd18_herbarium-consolidating-the-details_v3_C1.ipynb": {
+    "target": 1e-05
+  },
+  "herbarium-2020-fgvc7_khotijahs1_identify-plant-species-from-herbarium-specimens_v3_C1.ipynb": {
+    "target": 2e-05
+  },
+  "herbarium-2020-fgvc7_khotijahs1_identify-plant-species-from-herbarium-specimens_v2_C1.ipynb": {
+    "target": 1e-05
+  },
+  "paddy-disease-classification_wittmannf_simple-benchmark-with-deepfeatx-and-sklearn_v4_C1.ipynb": {
+    "target": 0.91705
+  },
+  "AI4Code_readoc_ai4code-lb-prober_v6_C1.ipynb": {
+    "target": 0.0612
+  },
+  "AI4Code_readoc_ai4code-lb-prober_v8_C1.ipynb": {
+    "target": 0.0146
+  },
+  "AI4Code_readoc_ai4code-lb-prober_v3_C1.ipynb": {
+    "target": 0.0226
+  },
+  "us-patent-phrase-to-phrase-matching_rafaeldd_patent-randomforest_v3_C1.ipynb": {
+    "target": 0.4994
+  },
+  "us-patent-phrase-to-phrase-matching_venkatkumar001_u-s-p-p-baseline-eda-dataprep_v2_C1.ipynb": {
+    "target": 0.1455
+  },
+  "rsna-breast-cancer-detection_shameinew_rsna-bc-prediction_v7_C1.ipynb": {
+    "target": 0.04
+  },
+  "rsna-breast-cancer-detection_rsiva1104_eda-and-data-analysis_v1_C1.ipynb": {
+    "target": 0.03
+  },
+  "rsna-breast-cancer-detection_tomooinubushi_some-lb-probing-results-to-share_v14_C1.ipynb": {
+    "target": 0.03
+  },
+  "rsna-breast-cancer-detection_tomooinubushi_some-lb-probing-results-to-share_v15_C1.ipynb": {
+    "target": 0.03
+  },
+  "champs-scalar-coupling_mittalh_predicting-mol-prop_v4_C1.ipynb": {
+    "target": 1.27785
+  }
+}

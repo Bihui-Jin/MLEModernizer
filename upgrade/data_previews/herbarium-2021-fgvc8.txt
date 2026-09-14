@@ -1,0 +1,700 @@
+```
+/
+    kaggle/
+        data/
+            description.md (168 lines)
+            sample_submission.csv (477807 lines)
+            sample_submission.csv.zip (1.1 MB)
+            test.zip (28.9 GB)
+            train.zip (107.6 GB)
+            herbarium-2021-fgvc8/
+                description.md (168 lines)
+                sample_submission.csv (477807 lines)
+                ... and 3 other files
+                herbarium-2021-fgvc8/
+                test/
+                    metadata.json (3344671 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 476 other folders
+                    test/
+                train/
+                    metadata.json (23526444 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 643 other folders
+                    train/
+            test/
+                metadata.json (3344671 lines)
+                images/
+                    000/
+                        190.jpg (67.1 kB)
+                        637.jpg (47.9 kB)
+                        ... and 998 other files
+                    001/
+                        1248.jpg (47.3 kB)
+                        1629.jpg (54.5 kB)
+                        ... and 998 other files
+                    ... and 476 other folders
+                test/
+            train/
+                metadata.json (23526444 lines)
+                images/
+                    000/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 98 other folders
+                    001/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 98 other folders
+                    ... and 643 other folders
+                train/
+        input/
+            description.md (168 lines)
+            sample_submission.csv (477807 lines)
+            sample_submission.csv.zip (1.1 MB)
+            test.zip (28.9 GB)
+            train.zip (107.6 GB)
+            herbarium-2021-fgvc8/
+                description.md (168 lines)
+                sample_submission.csv (477807 lines)
+                ... and 3 other files
+                herbarium-2021-fgvc8/
+                test/
+                    metadata.json (3344671 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 476 other folders
+                    test/
+                train/
+                    metadata.json (23526444 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 643 other folders
+                    train/
+            test/
+                metadata.json (3344671 lines)
+                images/
+                    000/
+                        190.jpg (67.1 kB)
+                        637.jpg (47.9 kB)
+                        ... and 998 other files
+                    001/
+                        1248.jpg (47.3 kB)
+                        1629.jpg (54.5 kB)
+                        ... and 998 other files
+                    ... and 476 other folders
+                test/
+                    metadata.json (3344671 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 476 other folders
+                    test/
+            train/
+                metadata.json (23526444 lines)
+                images/
+                    000/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 98 other folders
+                    001/
+                        00/
+                            ... (max depth reached)
+                        01/
+                            ... (max depth reached)
+                        ... and 98 other folders
+                    ... and 643 other folders
+                train/
+                    metadata.json (23526444 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 643 other folders
+                    train/
+        working/
+            herbarium-2021-fgvc8/
+                description.md (168 lines)
+                sample_submission.csv (477807 lines)
+                ... and 3 other files
+                herbarium-2021-fgvc8/
+                test/
+                    metadata.json (3344671 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 476 other folders
+                    test/
+                train/
+                    metadata.json (23526444 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 643 other folders
+                    train/
+```
+
+-> data/herbarium-2021-fgvc8/sample_submission.csv has 477806 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/herbarium-2021-fgvc8/test/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/herbarium-2021-fgvc8/train/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "integer"
+          },
+          "institution_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id",
+          "institution_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "family",
+          "id",
+          "name",
+          "order"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "institutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "institutions",
+    "licenses"
+  ]
+}
+
+-> data/sample_submission.csv has 477806 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/test/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/train/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "integer"
+          },
+          "institution_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id",
+          "institution_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "family",
+          "id",
+          "name",
+          "order"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "institutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "institutions",
+    "licenses"
+  ]
+}
+
+-> (stopped after 10 files for performance)

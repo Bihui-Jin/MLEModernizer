@@ -1,0 +1,196 @@
+```
+/
+    kaggle/
+        data/
+            description.md (276 lines)
+            sample_submission.csv (14537 lines)
+            sample_submission.csv.zip (50.3 kB)
+            segmentations.zip (3.0 MB)
+            test.csv (14537 lines)
+            test.csv.zip (94.5 kB)
+            test.zip (160 Bytes)
+            test_images.zip (181.9 GB)
+            train.csv (203 lines)
+            train.csv.zip (1.2 kB)
+            train.zip (162 Bytes)
+            train_bounding_boxes.csv (691 lines)
+            train_bounding_boxes.csv.zip (11.5 kB)
+            train_images.zip (20.3 GB)
+            rsna-2022-cervical-spine-fracture-detection/
+                description.md (276 lines)
+                sample_submission.csv (14537 lines)
+                ... and 12 other files
+                rsna-2022-cervical-spine-fracture-detection/
+                segmentations/
+                    1.2.826.0.1.3680043.12292.nii (89.4 MB)
+                    1.2.826.0.1.3680043.24617.nii (307.2 MB)
+                    ... and 7 other files
+                test_images/
+                    1.2.826.0.1.3680043.10001/
+                        1.dcm (525.0 kB)
+                        10.dcm (525.0 kB)
+                        ... and 266 other files
+                    1.2.826.0.1.3680043.10005/
+                        1.dcm (525.1 kB)
+                        10.dcm (525.1 kB)
+                        ... and 257 other files
+                    ... and 1816 other folders
+                train_images/
+                    1.2.826.0.1.3680043.10014/
+                        1.dcm (240.9 kB)
+                        10.dcm (250.8 kB)
+                        ... and 256 other files
+                    1.2.826.0.1.3680043.10058/
+                        1.dcm (525.0 kB)
+                        10.dcm (525.0 kB)
+                        ... and 574 other files
+                    ... and 201 other folders
+            segmentations/
+                1.2.826.0.1.3680043.12292.nii (89.4 MB)
+                1.2.826.0.1.3680043.24617.nii (307.2 MB)
+                ... and 7 other files
+            test_images/
+                1.2.826.0.1.3680043.10001/
+                    1.dcm (525.0 kB)
+                    10.dcm (525.0 kB)
+                    ... and 266 other files
+                1.2.826.0.1.3680043.10005/
+                    1.dcm (525.1 kB)
+                    10.dcm (525.1 kB)
+                    ... and 257 other files
+                ... and 1816 other folders
+            train_images/
+                1.2.826.0.1.3680043.10014/
+                    1.dcm (240.9 kB)
+                    10.dcm (250.8 kB)
+                    ... and 256 other files
+                1.2.826.0.1.3680043.10058/
+                    1.dcm (525.0 kB)
+                    10.dcm (525.0 kB)
+                    ... and 574 other files
+                ... and 201 other folders
+        input/
+            description.md (276 lines)
+            sample_submission.csv (14537 lines)
+            sample_submission.csv.zip (50.3 kB)
+            segmentations.zip (3.0 MB)
+            test.csv (14537 lines)
+            test.csv.zip (94.5 kB)
+            test.zip (160 Bytes)
+            test_images.zip (181.9 GB)
+            train.csv (203 lines)
+            train.csv.zip (1.2 kB)
+            train.zip (162 Bytes)
+            train_bounding_boxes.csv (691 lines)
+            train_bounding_boxes.csv.zip (11.5 kB)
+            train_images.zip (20.3 GB)
+            rsna-2022-cervical-spine-fracture-detection/
+                description.md (276 lines)
+                sample_submission.csv (14537 lines)
+                ... and 12 other files
+                rsna-2022-cervical-spine-fracture-detection/
+                segmentations/
+                    1.2.826.0.1.3680043.12292.nii (89.4 MB)
+                    1.2.826.0.1.3680043.24617.nii (307.2 MB)
+                    ... and 7 other files
+                test_images/
+                    1.2.826.0.1.3680043.10001/
+                        1.dcm (525.0 kB)
+                        10.dcm (525.0 kB)
+                        ... and 266 other files
+                    1.2.826.0.1.3680043.10005/
+                        1.dcm (525.1 kB)
+                        10.dcm (525.1 kB)
+                        ... and 257 other files
+                    ... and 1816 other folders
+                train_images/
+                    1.2.826.0.1.3680043.10014/
+                        1.dcm (240.9 kB)
+                        10.dcm (250.8 kB)
+                        ... and 256 other files
+                    1.2.826.0.1.3680043.10058/
+                        1.dcm (525.0 kB)
+                        10.dcm (525.0 kB)
+                        ... and 574 other files
+                    ... and 201 other folders
+            segmentations/
+                1.2.826.0.1.3680043.12292.nii (89.4 MB)
+                1.2.826.0.1.3680043.24617.nii (307.2 MB)
+                ... and 7 other files
+            test_images/
+                1.2.826.0.1.3680043.10001/
+                    1.dcm (525.0 kB)
+                    10.dcm (525.0 kB)
+                    ... and 266 other files
+                1.2.826.0.1.3680043.10005/
+                    1.dcm (525.1 kB)
+                    10.dcm (525.1 kB)
+                    ... and 257 other files
+                ... and 1816 other folders
+            train_images/
+                1.2.826.0.1.3680043.10014/
+                    1.dcm (240.9 kB)
+                    10.dcm (250.8 kB)
+                    ... and 256 other files
+                1.2.826.0.1.3680043.10058/
+                    1.dcm (525.0 kB)
+                    10.dcm (525.0 kB)
+                    ... and 574 other files
+                ... and 201 other folders
+        working/
+            rsna-2022-cervical-spine-fracture-detection/
+                description.md (276 lines)
+                sample_submission.csv (14537 lines)
+                ... and 12 other files
+                rsna-2022-cervical-spine-fracture-detection/
+                segmentations/
+                    1.2.826.0.1.3680043.12292.nii (89.4 MB)
+                    1.2.826.0.1.3680043.24617.nii (307.2 MB)
+                    ... and 7 other files
+                test_images/
+                    1.2.826.0.1.3680043.10001/
+                        1.dcm (525.0 kB)
+                        10.dcm (525.0 kB)
+                        ... and 266 other files
+                    1.2.826.0.1.3680043.10005/
+                        1.dcm (525.1 kB)
+                        10.dcm (525.1 kB)
+                        ... and 257 other files
+                    ... and 1816 other folders
+                train_images/
+                    1.2.826.0.1.3680043.10014/
+                        1.dcm (240.9 kB)
+                        10.dcm (250.8 kB)
+                        ... and 256 other files
+                    1.2.826.0.1.3680043.10058/
+                        1.dcm (525.0 kB)
+                        10.dcm (525.0 kB)
+                        ... and 574 other files
+                    ... and 201 other folders
+```
+
+-> data/rsna-2022-cervical-spine-fracture-detection/sample_submission.csv has 14536 rows and 2 columns.
+The columns are: row_id, fractured
+
+-> data/rsna-2022-cervical-spine-fracture-detection/test.csv has 14536 rows and 3 columns.
+The columns are: StudyInstanceUID, prediction_type, row_id
+
+-> data/rsna-2022-cervical-spine-fracture-detection/train.csv has 202 rows and 9 columns.
+The columns are: StudyInstanceUID, patient_overall, C1, C2, C3, C4, C5, C6, C7
+
+-> data/rsna-2022-cervical-spine-fracture-detection/train_bounding_boxes.csv has 690 rows and 6 columns.
+The columns are: StudyInstanceUID, x, y, width, height, slice_number
+
+-> data/sample_submission.csv has 14536 rows and 2 columns.
+The columns are: row_id, fractured
+
+-> data/test.csv has 14536 rows and 3 columns.
+The columns are: StudyInstanceUID, prediction_type, row_id
+
+-> data/train.csv has 202 rows and 9 columns.
+The columns are: StudyInstanceUID, patient_overall, C1, C2, C3, C4, C5, C6, C7
+
+-> data/train_bounding_boxes.csv has 690 rows and 6 columns.
+The columns are: StudyInstanceUID, x, y, width, height, slice_number
+
+-> (stopped after 10 files for performance)

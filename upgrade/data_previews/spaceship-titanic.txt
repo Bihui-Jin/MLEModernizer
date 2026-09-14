@@ -1,0 +1,59 @@
+```
+/
+    kaggle/
+        data/
+            description.md (93 lines)
+            sample_submission.csv (871 lines)
+            sample_submission.csv.zip (3.0 kB)
+            test.csv (871 lines)
+            test.csv.zip (22.1 kB)
+            train.csv (7824 lines)
+            train.csv.zip (197.3 kB)
+            spaceship-titanic/
+                description.md (93 lines)
+                sample_submission.csv (871 lines)
+                ... and 5 other files
+                spaceship-titanic/
+        input/
+            description.md (93 lines)
+            sample_submission.csv (871 lines)
+            sample_submission.csv.zip (3.0 kB)
+            test.csv (871 lines)
+            test.csv.zip (22.1 kB)
+            train.csv (7824 lines)
+            train.csv.zip (197.3 kB)
+            spaceship-titanic/
+                description.md (93 lines)
+                sample_submission.csv (871 lines)
+                ... and 5 other files
+                spaceship-titanic/
+        working/
+            spaceship-titanic/
+                description.md (93 lines)
+                sample_submission.csv (871 lines)
+                ... and 5 other files
+                spaceship-titanic/
+```
+
+-> data/sample_submission.csv has 870 rows and 2 columns.
+The columns are: PassengerId, Transported
+
+-> data/spaceship-titanic/sample_submission.csv has 870 rows and 2 columns.
+The columns are: PassengerId, Transported
+
+-> data/spaceship-titanic/test.csv has 870 rows and 13 columns.
+The columns are: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, Age, VIP, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck, Name
+
+-> data/spaceship-titanic/train.csv has 7823 rows and 14 columns.
+The columns are: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, Age, VIP, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck, Name, Transported
+
+-> data/test.csv has 870 rows and 13 columns.
+The columns are: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, Age, VIP, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck, Name
+
+-> data/train.csv has 7823 rows and 14 columns.
+The columns are: PassengerId, HomePlanet, CryoSleep, Cabin, Destination, Age, VIP, RoomService, FoodCourt, ShoppingMall, Spa, VRDeck, Name, Transported
+
+-> input/sample_submission.csv has 870 rows and 2 columns.
+The columns are: PassengerId, Transported
+
+-> (stopped after 10 files for performance)

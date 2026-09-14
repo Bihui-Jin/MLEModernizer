@@ -1,0 +1,56 @@
+```
+/
+    kaggle/
+        data/
+            description.md (164 lines)
+            sample_submission_null.csv (2648 lines)
+            sample_submission_null.csv.zip (247.2 kB)
+            test.csv (2648 lines)
+            test.csv.zip (246.6 kB)
+            train.csv (3948 lines)
+            train.csv.zip (359.5 kB)
+            detecting-insults-in-social-commentary/
+                description.md (164 lines)
+                sample_submission_null.csv (2648 lines)
+                ... and 5 other files
+                detecting-insults-in-social-commentary/
+        input/
+            description.md (164 lines)
+            sample_submission_null.csv (2648 lines)
+            sample_submission_null.csv.zip (247.2 kB)
+            test.csv (2648 lines)
+            test.csv.zip (246.6 kB)
+            train.csv (3948 lines)
+            train.csv.zip (359.5 kB)
+            detecting-insults-in-social-commentary/
+                description.md (164 lines)
+                sample_submission_null.csv (2648 lines)
+                ... and 5 other files
+                detecting-insults-in-social-commentary/
+        working/
+            detecting-insults-in-social-commentary/
+                description.md (164 lines)
+                sample_submission_null.csv (2648 lines)
+                ... and 5 other files
+                detecting-insults-in-social-commentary/
+```
+
+-> data/detecting-insults-in-social-commentary/sample_submission_null.csv has 2647 rows and 3 columns.
+The columns are: Insult, Date, Comment
+
+-> data/detecting-insults-in-social-commentary/test.csv has 2647 rows and 2 columns.
+The columns are: Date, Comment
+
+-> data/detecting-insults-in-social-commentary/train.csv has 3947 rows and 3 columns.
+The columns are: Insult, Date, Comment
+
+-> data/sample_submission_null.csv has 2647 rows and 3 columns.
+The columns are: Insult, Date, Comment
+
+-> data/test.csv has 2647 rows and 2 columns.
+The columns are: Date, Comment
+
+-> data/train.csv has 3947 rows and 3 columns.
+The columns are: Insult, Date, Comment
+
+-> (stopped after 10 files for performance)

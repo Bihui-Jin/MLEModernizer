@@ -1,0 +1,512 @@
+```
+/
+    kaggle/
+        data/
+            description.md (117 lines)
+            sampleSubmission.csv (1163 lines)
+            sampleSubmission.csv.zip (5.4 kB)
+            test.json (44674 lines)
+            test.zip (443.5 kB)
+            train.json (151601 lines)
+            train.zip (1.3 MB)
+            random-acts-of-pizza/
+                description.md (117 lines)
+                sampleSubmission.csv (1163 lines)
+                ... and 5 other files
+                random-acts-of-pizza/
+        input/
+            description.md (117 lines)
+            sampleSubmission.csv (1163 lines)
+            sampleSubmission.csv.zip (5.4 kB)
+            test.json (44674 lines)
+            test.zip (443.5 kB)
+            train.json (151601 lines)
+            train.zip (1.3 MB)
+            random-acts-of-pizza/
+                description.md (117 lines)
+                sampleSubmission.csv (1163 lines)
+                ... and 5 other files
+                random-acts-of-pizza/
+        working/
+            random-acts-of-pizza/
+                description.md (117 lines)
+                sampleSubmission.csv (1163 lines)
+                ... and 5 other files
+                random-acts-of-pizza/
+```
+
+-> data/random-acts-of-pizza/sampleSubmission.csv has 1162 rows and 2 columns.
+The columns are: request_id, requester_received_pizza
+
+-> data/random-acts-of-pizza/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "giver_username_if_known": {
+        "type": "string"
+      },
+      "request_id": {
+        "type": "string"
+      },
+      "request_text_edit_aware": {
+        "type": "string"
+      },
+      "request_title": {
+        "type": "string"
+      },
+      "requester_account_age_in_days_at_request": {
+        "type": "number"
+      },
+      "requester_days_since_first_post_on_raop_at_request": {
+        "type": "number"
+      },
+      "requester_number_of_comments_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_in_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_on_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_subreddits_at_request": {
+        "type": "integer"
+      },
+      "requester_subreddits_at_request": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "requester_upvotes_minus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_upvotes_plus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_username": {
+        "type": "string"
+      },
+      "unix_timestamp_of_request": {
+        "type": "number"
+      },
+      "unix_timestamp_of_request_utc": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "giver_username_if_known",
+      "request_id",
+      "request_text_edit_aware",
+      "request_title",
+      "requester_account_age_in_days_at_request",
+      "requester_days_since_first_post_on_raop_at_request",
+      "requester_number_of_comments_at_request",
+      "requester_number_of_comments_in_raop_at_request",
+      "requester_number_of_posts_at_request",
+      "requester_number_of_posts_on_raop_at_request",
+      "requester_number_of_subreddits_at_request",
+      "requester_subreddits_at_request",
+      "requester_upvotes_minus_downvotes_at_request",
+      "requester_upvotes_plus_downvotes_at_request",
+      "requester_username",
+      "unix_timestamp_of_request",
+      "unix_timestamp_of_request_utc"
+    ]
+  }
+}
+
+-> data/random-acts-of-pizza/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "giver_username_if_known": {
+        "type": "string"
+      },
+      "number_of_downvotes_of_request_at_retrieval": {
+        "type": "integer"
+      },
+      "number_of_upvotes_of_request_at_retrieval": {
+        "type": "integer"
+      },
+      "post_was_edited": {
+        "type": [
+          "boolean",
+          "number"
+        ]
+      },
+      "request_id": {
+        "type": "string"
+      },
+      "request_number_of_comments_at_retrieval": {
+        "type": "integer"
+      },
+      "request_text": {
+        "type": "string"
+      },
+      "request_text_edit_aware": {
+        "type": "string"
+      },
+      "request_title": {
+        "type": "string"
+      },
+      "requester_account_age_in_days_at_request": {
+        "type": "number"
+      },
+      "requester_account_age_in_days_at_retrieval": {
+        "type": "number"
+      },
+      "requester_days_since_first_post_on_raop_at_request": {
+        "type": "number"
+      },
+      "requester_days_since_first_post_on_raop_at_retrieval": {
+        "type": "number"
+      },
+      "requester_number_of_comments_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_in_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_in_raop_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_on_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_on_raop_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_subreddits_at_request": {
+        "type": "integer"
+      },
+      "requester_received_pizza": {
+        "type": "boolean"
+      },
+      "requester_subreddits_at_request": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "requester_upvotes_minus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_upvotes_minus_downvotes_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_upvotes_plus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_upvotes_plus_downvotes_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_user_flair": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "requester_username": {
+        "type": "string"
+      },
+      "unix_timestamp_of_request": {
+        "type": "number"
+      },
+      "unix_timestamp_of_request_utc": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "giver_username_if_known",
+      "number_of_downvotes_of_request_at_retrieval",
+      "number_of_upvotes_of_request_at_retrieval",
+      "post_was_edited",
+      "request_id",
+      "request_number_of_comments_at_retrieval",
+      "request_text",
+      "request_text_edit_aware",
+      "request_title",
+      "requester_account_age_in_days_at_request",
+      "requester_account_age_in_days_at_retrieval",
+      "requester_days_since_first_post_on_raop_at_request",
+      "requester_days_since_first_post_on_raop_at_retrieval",
+      "requester_number_of_comments_at_request",
+      "requester_number_of_comments_at_retrieval",
+      "requester_number_of_comments_in_raop_at_request",
+      "requester_number_of_comments_in_raop_at_retrieval",
+      "requester_number_of_posts_at_request",
+      "requester_number_of_posts_at_retrieval",
+      "requester_number_of_posts_on_raop_at_request",
+      "requester_number_of_posts_on_raop_at_retrieval",
+      "requester_number_of_subreddits_at_request",
+      "requester_received_pizza",
+      "requester_subreddits_at_request",
+      "requester_upvotes_minus_downvotes_at_request",
+      "requester_upvotes_minus_downvotes_at_retrieval",
+      "requester_upvotes_plus_downvotes_at_request",
+      "requester_upvotes_plus_downvotes_at_retrieval",
+      "requester_user_flair",
+      "requester_username",
+      "unix_timestamp_of_request",
+      "unix_timestamp_of_request_utc"
+    ]
+  }
+}
+
+-> data/sampleSubmission.csv has 1162 rows and 2 columns.
+The columns are: request_id, requester_received_pizza
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "giver_username_if_known": {
+        "type": "string"
+      },
+      "request_id": {
+        "type": "string"
+      },
+      "request_text_edit_aware": {
+        "type": "string"
+      },
+      "request_title": {
+        "type": "string"
+      },
+      "requester_account_age_in_days_at_request": {
+        "type": "number"
+      },
+      "requester_days_since_first_post_on_raop_at_request": {
+        "type": "number"
+      },
+      "requester_number_of_comments_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_in_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_on_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_subreddits_at_request": {
+        "type": "integer"
+      },
+      "requester_subreddits_at_request": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "requester_upvotes_minus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_upvotes_plus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_username": {
+        "type": "string"
+      },
+      "unix_timestamp_of_request": {
+        "type": "number"
+      },
+      "unix_timestamp_of_request_utc": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "giver_username_if_known",
+      "request_id",
+      "request_text_edit_aware",
+      "request_title",
+      "requester_account_age_in_days_at_request",
+      "requester_days_since_first_post_on_raop_at_request",
+      "requester_number_of_comments_at_request",
+      "requester_number_of_comments_in_raop_at_request",
+      "requester_number_of_posts_at_request",
+      "requester_number_of_posts_on_raop_at_request",
+      "requester_number_of_subreddits_at_request",
+      "requester_subreddits_at_request",
+      "requester_upvotes_minus_downvotes_at_request",
+      "requester_upvotes_plus_downvotes_at_request",
+      "requester_username",
+      "unix_timestamp_of_request",
+      "unix_timestamp_of_request_utc"
+    ]
+  }
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "giver_username_if_known": {
+        "type": "string"
+      },
+      "number_of_downvotes_of_request_at_retrieval": {
+        "type": "integer"
+      },
+      "number_of_upvotes_of_request_at_retrieval": {
+        "type": "integer"
+      },
+      "post_was_edited": {
+        "type": [
+          "boolean",
+          "number"
+        ]
+      },
+      "request_id": {
+        "type": "string"
+      },
+      "request_number_of_comments_at_retrieval": {
+        "type": "integer"
+      },
+      "request_text": {
+        "type": "string"
+      },
+      "request_text_edit_aware": {
+        "type": "string"
+      },
+      "request_title": {
+        "type": "string"
+      },
+      "requester_account_age_in_days_at_request": {
+        "type": "number"
+      },
+      "requester_account_age_in_days_at_retrieval": {
+        "type": "number"
+      },
+      "requester_days_since_first_post_on_raop_at_request": {
+        "type": "number"
+      },
+      "requester_days_since_first_post_on_raop_at_retrieval": {
+        "type": "number"
+      },
+      "requester_number_of_comments_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_in_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_comments_in_raop_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_on_raop_at_request": {
+        "type": "integer"
+      },
+      "requester_number_of_posts_on_raop_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_number_of_subreddits_at_request": {
+        "type": "integer"
+      },
+      "requester_received_pizza": {
+        "type": "boolean"
+      },
+      "requester_subreddits_at_request": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "requester_upvotes_minus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_upvotes_minus_downvotes_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_upvotes_plus_downvotes_at_request": {
+        "type": "integer"
+      },
+      "requester_upvotes_plus_downvotes_at_retrieval": {
+        "type": "integer"
+      },
+      "requester_user_flair": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "requester_username": {
+        "type": "string"
+      },
+      "unix_timestamp_of_request": {
+        "type": "number"
+      },
+      "unix_timestamp_of_request_utc": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "giver_username_if_known",
+      "number_of_downvotes_of_request_at_retrieval",
+      "number_of_upvotes_of_request_at_retrieval",
+      "post_was_edited",
+      "request_id",
+      "request_number_of_comments_at_retrieval",
+      "request_text",
+      "request_text_edit_aware",
+      "request_title",
+      "requester_account_age_in_days_at_request",
+      "requester_account_age_in_days_at_retrieval",
+      "requester_days_since_first_post_on_raop_at_request",
+      "requester_days_since_first_post_on_raop_at_retrieval",
+      "requester_number_of_comments_at_request",
+      "requester_number_of_comments_at_retrieval",
+      "requester_number_of_comments_in_raop_at_request",
+      "requester_number_of_comments_in_raop_at_retrieval",
+      "requester_number_of_posts_at_request",
+      "requester_number_of_posts_at_retrieval",
+      "requester_number_of_posts_on_raop_at_request",
+      "requester_number_of_posts_on_raop_at_retrieval",
+      "requester_number_of_subreddits_at_request",
+      "requester_received_pizza",
+      "requester_subreddits_at_request",
+      "requester_upvotes_minus_downvotes_at_request",
+      "requester_upvotes_minus_downvotes_at_retrieval",
+      "requester_upvotes_plus_downvotes_at_request",
+      "requester_upvotes_plus_downvotes_at_retrieval",
+      "requester_user_flair",
+      "requester_username",
+      "unix_timestamp_of_request",
+      "unix_timestamp_of_request_utc"
+    ]
+  }
+}
+
+-> (stopped after 10 files for performance)

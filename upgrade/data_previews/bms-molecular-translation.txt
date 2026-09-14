@@ -1,0 +1,267 @@
+```
+/
+    kaggle/
+        data/
+            description.md (68 lines)
+            extra_approved_InChIs.csv (9998712 lines)
+            extra_approved_InChIs.csv.zip (428.7 MB)
+            sample_submission.csv (484839 lines)
+            sample_submission.csv.zip (4.1 MB)
+            test.zip (883.2 MB)
+            train.zip (3.5 GB)
+            train_labels.csv (1939349 lines)
+            train_labels.csv.zip (102.5 MB)
+            bms-molecular-translation/
+                description.md (68 lines)
+                extra_approved_InChIs.csv (9998712 lines)
+                ... and 7 other files
+                bms-molecular-translation/
+                test/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 15 other folders
+                train/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 15 other folders
+            test/
+                0/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                1/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                ... and 15 other folders
+            train/
+                0/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                1/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                ... and 15 other folders
+        input/
+            description.md (68 lines)
+            extra_approved_InChIs.csv (9998712 lines)
+            extra_approved_InChIs.csv.zip (428.7 MB)
+            sample_submission.csv (484839 lines)
+            sample_submission.csv.zip (4.1 MB)
+            test.zip (883.2 MB)
+            train.zip (3.5 GB)
+            train_labels.csv (1939349 lines)
+            train_labels.csv.zip (102.5 MB)
+            bms-molecular-translation/
+                description.md (68 lines)
+                extra_approved_InChIs.csv (9998712 lines)
+                ... and 7 other files
+                bms-molecular-translation/
+                test/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 15 other folders
+                train/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 15 other folders
+            test/
+                0/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                1/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                ... and 15 other folders
+            train/
+                0/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                1/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 14 other folders
+                ... and 15 other folders
+        working/
+            bms-molecular-translation/
+                description.md (68 lines)
+                extra_approved_InChIs.csv (9998712 lines)
+                ... and 7 other files
+                bms-molecular-translation/
+                test/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 15 other folders
+                train/
+                    0/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    1/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    ... and 15 other folders
+```
+
+-> data/bms-molecular-translation/extra_approved_InChIs.csv has 9998711 rows and 1 columns.
+The columns are: InChI
+
+-> data/bms-molecular-translation/sample_submission.csv has 484838 rows and 2 columns.
+The columns are: image_id, InChI
+
+-> data/bms-molecular-translation/train_labels.csv has 1939348 rows and 2 columns.
+The columns are: image_id, InChI
+
+-> data/extra_approved_InChIs.csv has 9998711 rows and 1 columns.
+The columns are: InChI
+
+-> data/sample_submission.csv has 484838 rows and 2 columns.
+The columns are: image_id, InChI
+
+-> data/train_labels.csv has 1939348 rows and 2 columns.
+The columns are: image_id, InChI
+
+-> input/bms-molecular-translation/extra_approved_InChIs.csv has 9998711 rows and 1 columns.
+The columns are: InChI
+
+-> (stopped after 10 files for performance)

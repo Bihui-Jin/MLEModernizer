@@ -1,0 +1,118 @@
+```
+/
+    kaggle/
+        data/
+            description.md (231 lines)
+            sample_submission.csv (13200001 lines)
+            sample_submission.csv.zip (35.3 MB)
+            sensor_geometry.csv (5161 lines)
+            sensor_geometry.csv.zip (36.0 kB)
+            test.zip (9.3 GB)
+            test_meta.parquet (172.5 MB)
+            train.zip (83.9 GB)
+            train_meta.parquet (3.5 GB)
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+            test/
+                batch_104.parquet (172.9 MB)
+                batch_128.parquet (172.7 MB)
+                ... and 64 other files
+                test/
+            train/
+                batch_1.parquet (172.1 MB)
+                batch_10.parquet (173.4 MB)
+                ... and 592 other files
+                train/
+        input/
+            description.md (231 lines)
+            sample_submission.csv (13200001 lines)
+            sample_submission.csv.zip (35.3 MB)
+            sensor_geometry.csv (5161 lines)
+            sensor_geometry.csv.zip (36.0 kB)
+            test.zip (9.3 GB)
+            test_meta.parquet (172.5 MB)
+            train.zip (83.9 GB)
+            train_meta.parquet (3.5 GB)
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+            test/
+                batch_104.parquet (172.9 MB)
+                batch_128.parquet (172.7 MB)
+                ... and 64 other files
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+            train/
+                batch_1.parquet (172.1 MB)
+                batch_10.parquet (173.4 MB)
+                ... and 592 other files
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+        working/
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+```
+
+-> data/icecube-neutrinos-in-deep-ice/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> data/icecube-neutrinos-in-deep-ice/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> data/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> data/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> input/icecube-neutrinos-in-deep-ice/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> input/icecube-neutrinos-in-deep-ice/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> (stopped after 10 files for performance)

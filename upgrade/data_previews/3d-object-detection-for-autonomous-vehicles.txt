@@ -1,0 +1,360 @@
+```
+/
+    kaggle/
+        data/
+            description.md (157 lines)
+            sample_submission.csv (4537 lines)
+            sample_submission.csv.zip (171.7 kB)
+            test.zip (160 Bytes)
+            test_data.zip (14.1 MB)
+            test_images.zip (4.2 GB)
+            test_lidar.zip (4.0 GB)
+            test_maps.zip (8.4 MB)
+            train.csv (18145 lines)
+            train.csv.zip (22.6 MB)
+            train.zip (162 Bytes)
+            train_data.zip (197.5 MB)
+            train_images.zip (17.8 GB)
+            train_lidar.zip (18.3 GB)
+            train_maps.zip (8.4 MB)
+            3d-object-detection-for-autonomous-vehicles/
+                description.md (157 lines)
+                sample_submission.csv (4537 lines)
+                ... and 13 other files
+                3d-object-detection-for-autonomous-vehicles/
+                test/
+                    test/
+                ... and 9 other folders
+            test/
+                test/
+            ... and 9 other folders
+        input/
+            description.md (157 lines)
+            sample_submission.csv (4537 lines)
+            sample_submission.csv.zip (171.7 kB)
+            test.zip (160 Bytes)
+            test_data.zip (14.1 MB)
+            test_images.zip (4.2 GB)
+            test_lidar.zip (4.0 GB)
+            test_maps.zip (8.4 MB)
+            train.csv (18145 lines)
+            train.csv.zip (22.6 MB)
+            train.zip (162 Bytes)
+            train_data.zip (197.5 MB)
+            train_images.zip (17.8 GB)
+            train_lidar.zip (18.3 GB)
+            train_maps.zip (8.4 MB)
+            3d-object-detection-for-autonomous-vehicles/
+                description.md (157 lines)
+                sample_submission.csv (4537 lines)
+                ... and 13 other files
+                3d-object-detection-for-autonomous-vehicles/
+                test/
+                    test/
+                ... and 9 other folders
+            test/
+                test/
+                    test/
+            ... and 9 other folders
+        working/
+            3d-object-detection-for-autonomous-vehicles/
+                description.md (157 lines)
+                sample_submission.csv (4537 lines)
+                ... and 13 other files
+                3d-object-detection-for-autonomous-vehicles/
+                test/
+                    test/
+                ... and 9 other folders
+```
+
+-> data/3d-object-detection-for-autonomous-vehicles/sample_submission.csv has 4536 rows and 2 columns.
+The columns are: Id, PredictionString
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/attribute.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "description": {
+        "type": "string"
+      },
+      "token": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "description",
+      "name",
+      "token"
+    ]
+  }
+}
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/calibrated_sensor.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "sensor_token": {
+        "type": "string"
+      },
+      "rotation": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "camera_intrinsic": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      },
+      "translation": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "token": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "camera_intrinsic",
+      "rotation",
+      "sensor_token",
+      "token",
+      "translation"
+    ]
+  }
+}
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/category.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "description": {
+        "type": "string"
+      },
+      "token": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "description",
+      "name",
+      "token"
+    ]
+  }
+}
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/ego_pose.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "rotation": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "translation": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        }
+      },
+      "token": {
+        "type": "string"
+      },
+      "timestamp": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "rotation",
+      "timestamp",
+      "token",
+      "translation"
+    ]
+  }
+}
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/log.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "date_captured": {
+        "type": "string"
+      },
+      "logfile": {
+        "type": "string"
+      },
+      "token": {
+        "type": "string"
+      },
+      "vehicle": {
+        "type": "string"
+      },
+      "location": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "date_captured",
+      "location",
+      "logfile",
+      "token",
+      "vehicle"
+    ]
+  }
+}
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "log_tokens": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "token": {
+        "type": "string"
+      },
+      "filename": {
+        "type": "string"
+      },
+      "category": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "category",
+      "filename",
+      "log_tokens",
+      "token"
+    ]
+  }
+}
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/sample.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "next": {
+        "type": "string"
+      },
+      "prev": {
+        "type": "string"
+      },
+      "token": {
+        "type": "string"
+      },
+      "timestamp": {
+        "type": "number"
+      },
+      "scene_token": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "next",
+      "prev",
+      "scene_token",
+      "timestamp",
+      "token"
+    ]
+  }
+}
+
+-> data/3d-object-detection-for-autonomous-vehicles/test_data/sample_data.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "is_key_frame": {
+        "type": "boolean"
+      },
+      "fileformat": {
+        "type": "string"
+      },
+      "prev": {
+        "type": "string"
+      },
+      "calibrated_sensor_token": {
+        "type": "string"
+      },
+      "ego_pose_token": {
+        "type": "string"
+      },
+      "timestamp": {
+        "type": "number"
+      },
+      "next": {
+        "type": "string"
+      },
+      "token": {
+        "type": "string"
+      },
+      "sample_token": {
+        "type": "string"
+      },
+      "filename": {
+        "type": "string"
+      },
+      "width": {
+        "type": "integer"
+      },
+      "height": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "calibrated_sensor_token",
+      "ego_pose_token",
+      "fileformat",
+      "filename",
+      "is_key_frame",
+      "next",
+      "prev",
+      "sample_token",
+      "timestamp",
+      "token"
+    ]
+  }
+}
+
+-> (stopped after 10 files for performance)

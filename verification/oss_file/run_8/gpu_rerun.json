@@ -1,0 +1,1033 @@
+{
+  "cassava-leaf-disease-classification_bilibi_retrievalsubmission_v16_C1.ipynb": {
+    "score": "Invalid submission: Submission must have the same length as the answers.",
+    "target": 0.8481414324569356,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_keimoriyama_my-baseline_v55_C1.ipynb": {
+    "target": 0.6128739800543971,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_bilibi_retrievalsubmission_v7_C1.ipynb": {
+    "score": "Invalid submission: Submission must have the same length as the answers.",
+    "target": 0.8655182834693261,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_sarangbhatnagar_easy-code-efficientnetb3-submission_v2_C1.ipynb": {
+    "target": 0.7085222121486854,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "cassava-leaf-disease-classification_olegkomenchuk_cassava-leaf-disease-classification-submission_v7_C1.ipynb": {
+    "target": 0.8801752795406467,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_surolee_notebookdb53715c88_v14_C1.ipynb": {
+    "target": 0.8626473254759747,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_anhtu96_cassava-inference_v13_C1.ipynb": {
+    "score": "Invalid submission: Submission must have the same length as the answers.",
+    "target": 0.8553943789664551,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "cassava-leaf-disease-classification_nordicy_ensemble_v14_C1.ipynb": {
+    "score": "Invalid submission: Submission must have the same length as the answers.",
+    "target": 0.8677848292535509,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "cassava-leaf-disease-classification_kerrfitzgerald_wolf359_v10_C1.ipynb": {
+    "target": 0.852825627077667,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_surolee_notebookdb53715c88_v9_C1.ipynb": {
+    "target": 0.8491991538229072,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_chaewonkimmm_cs376-team-3-cassava-leaf-training_v20_C1.ipynb": {
+    "target": 0.7388939256572983,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_kkniuniu_asda-new_v2_C1.ipynb": {
+    "target": 0.7391961317618616,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "cassava-leaf-disease-classification_sinnfashen_notebook16b1f35852_v9_C1.ipynb": {
+    "target": 0.866424901783016,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_domizianostingi_cnn-keras-model_v11_C1.ipynb": {
+    "target": 0.1403,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "cassava-leaf-disease-classification_chuka19952_cassava-disease-detection_v5_C1.ipynb": {
+    "target": 0.2577,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "cassava-leaf-disease-classification_yeokayhong_submission_v14_C1.ipynb": {
+    "target": 0.8555454820187368,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": ""
+  },
+  "cassava-leaf-disease-classification_chaewonkimmm_cs376-team-3-cassava-leaf-training_v23_C1.ipynb": {
+    "target": 0.6128739800543971,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimbalanced-learn==0.13.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "cassava-leaf-disease-classification_virajkadam_cassava-leaf-disease-classification-tpu_v1_C1.ipynb": {
+    "target": 0.170444242973708,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "cassava-leaf-disease-classification_kuro98_original-submission_v23_C1.ipynb": {
+    "score": "Invalid submission: Submission must have the same length as the answers.",
+    "target": 0.8647627682079178,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_sarangbhatnagar_easy-code-efficientnetb3-submission_v4_C1.ipynb": {
+    "target": 0.776820791779994,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "cassava-leaf-disease-classification_sd4321_fastai-baseline-model_v2_C1.ipynb": {
+    "target": 0.4280749471139317,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "cassava-leaf-disease-classification_khlevnov_efficientnetb0-training_v9_C1.ipynb": {
+    "score": "Invalid submission: Submission must have the same length as the answers.",
+    "target": 0.5646,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "cassava-leaf-disease-classification_chaewonkimmm_cs376-team-3-cassava-leaf-training_v10_C1.ipynb": {
+    "target": 0.6128739800543971,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "cassava-leaf-disease-classification_nordicy_ensemble_v11_C1.ipynb": {
+    "target": 0.1548806285886975,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "cassava-leaf-disease-classification_sm00ther_cassava-keras-test_v11_C1.ipynb": {
+    "target": 0.6128,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "google-quest-challenge_varunsaproo_google-q-a-using-lstm_v2_C1.ipynb": {
+    "target": 0.2724101302979739,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "gensim==4.4.0\ngeopandas==0.14.4\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "google-quest-challenge_mathayus1729_kernel7de774bc1a_v3_C1.ipynb": {
+    "score": 0.29571,
+    "target": 0.18187,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0"
+  },
+  "jigsaw-toxic-comment-classification-challenge_amanbhalla_toxic-comment-challenge-cnn-text_v1_C1.ipynb": {
+    "target": 0.82325,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "movie-review-sentiment-analysis-kernels-only_tandonarpit6_movie-review-sentiment-analysis_v7_C1.ipynb": {
+    "target": 0.63678,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "plant-pathology-2021-fgvc8_flsantna_plant-pathology_v16_C1.ipynb": {
+    "target": 0.6601477377654648,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "plant-pathology-2021-fgvc8_vgarshin_plant-efficientnet-submit-pytorch_v1_C1.ipynb": {
+    "target": 0.1578947368421052,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "plant-pathology-2021-fgvc8_vgarshin_plant-efficientnet-submit-pytorch_v15_C1.ipynb": {
+    "target": 0.8245798707294568,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "ventilator-pressure-prediction_dienhoa_ventillator-fastai-lb-0-168-no-kfolds-no-blend_v25_C1.ipynb": {
+    "target": 0.6766,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "petfinder-pawpularity-score_bhuwanchandra11_cnn-work_v2_C1.ipynb": {
+    "target": 20.49045,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "petfinder-pawpularity-score_marcuscheong_pawpularity-contest_v10_C1.ipynb": {
+    "score": 37.80771,
+    "target": 20.46629,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntqdm==4.67.1"
+  },
+  "petfinder-pawpularity-score_dhruvchopra2500_epoch_v20_C1.ipynb": {
+    "target": 22.05008,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "petfinder-pawpularity-score_ashikshafi_fastai-quick-baseline_v1_C1.ipynb": {
+    "score": "Invalid submission: Missing Id column in submission",
+    "target": 18.55098574444537,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "petfinder-pawpularity-score_dhruvchopra2500_epoch_v19_C1.ipynb": {
+    "target": 20.89973,
+    "python_version": "3.12",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v120_C1.ipynb": {
+    "target": 0.32123,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v90_C1.ipynb": {
+    "target": 0.41255,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v99_C1.ipynb": {
+    "target": 0.38933,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v134_C1.ipynb": {
+    "target": 0.42368,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v97_C1.ipynb": {
+    "target": 0.33703,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v148_C1.ipynb": {
+    "target": 0.31219,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v113_C1.ipynb": {
+    "target": 0.30337,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v57_C1.ipynb": {
+    "target": 0.37739,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v55_C1.ipynb": {
+    "target": 0.29172,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v87_C1.ipynb": {
+    "target": 0.31335,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v163_C1.ipynb": {
+    "target": 0.40354,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v109_C1.ipynb": {
+    "target": 0.28894,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v122_C1.ipynb": {
+    "target": 0.35198,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v58_C1.ipynb": {
+    "target": 0.47976,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v95_C1.ipynb": {
+    "target": 0.34993,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v131_C1.ipynb": {
+    "target": 0.31125,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v84_C1.ipynb": {
+    "target": 0.34838,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v167_C1.ipynb": {
+    "target": 0.32751,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v156_C1.ipynb": {
+    "target": 0.34367,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v98_C1.ipynb": {
+    "target": 0.30227,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v121_C1.ipynb": {
+    "target": 0.36753,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v118_C1.ipynb": {
+    "target": 0.29748,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "denoising-dirty-documents_aeter42_denoising-documents-with-conv-autoencoders_v14_C1.ipynb": {
+    "target": 0.28311,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nPyYAML==6.0.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "denoising-dirty-documents_youngsunjoung_autoencoder-of-denoising-dirty-documents-pytorch_v106_C1.ipynb": {
+    "target": 0.31012,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aerial-cactus-identification_yutaroshimizu_quick-cnn-solution_v7_C1.ipynb": {
+    "target": 0.6886,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_anirudhchak_cnn-using-keras_v6_C1.ipynb": {
+    "score": 0.30161,
+    "target": 0.9995,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_gabrielmv_aerial-cactus-identification-keras_v9_C1.ipynb": {
+    "target": 0.9998,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_samshenvi_cactus-detection-using-fastai-resnet34_v2_C1.ipynb": {
+    "target": 0.8801,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_mariammohamed_simple-cnn_v14_C1.ipynb": {
+    "target": 0.9979,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_nathanh12_fastai-1-0lb-300s_v4_C1.ipynb": {
+    "target": 1.0,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "aerial-cactus-identification_vovaekb90_aerial-cactus-simple-vgg-like-cnn_v3_C1.ipynb": {
+    "target": 0.4981,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimageio==2.37.0\nimageio-ffmpeg==0.6.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_yutaroshimizu_quick-cnn-solution_v8_C1.ipynb": {
+    "target": 0.7385,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_interneuron_fast-fastai-with-condensenet_v5_C1.ipynb": {
+    "target": 1.0,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aerial-cactus-identification_sohaibanwaar1203_dense-net-image-classification_v2_C1.ipynb": {
+    "target": 0.4911,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_larawusl123_cactus-practice-predictions_v8_C1.ipynb": {
+    "target": 0.99965,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimutils==0.5.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "aerial-cactus-identification_artgor_detecting-cactus-with-kekas_v10_C1.ipynb": {
+    "target": 0.9997,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aerial-cactus-identification_zhengze94_multiple-instance-learning-as-pooling-layer-in-cnn_v21_C1.ipynb": {
+    "target": 0.6591,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_vovaekb90_aerial-cactus-simple-vgg-like-cnn_v13_C1.ipynb": {
+    "target": 0.9957,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimageio==2.37.0\nimageio-ffmpeg==0.6.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_gabrielmv_aerial-cactus-identification-keras_v7_C1.ipynb": {
+    "target": 0.9996,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_mariammohamed_simple-cnn_v12_C1.ipynb": {
+    "target": 0.9973,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_calder10_aerial-cactus-identification-using-cnn_v11_C1.ipynb": {
+    "target": 0.9964,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_calder10_aerial-cactus-identification-using-cnn_v20_C1.ipynb": {
+    "target": 0.9875,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_bonhart_simple-cnn-on-pytorch-for-beginers_v12_C1.ipynb": {
+    "score": "Invalid submission: Submission has_cactus column should contain probabilities, and therefore contain values between 0 and 1 inclusive",
+    "target": 0.9989,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aerial-cactus-identification_larawusl123_cactus-practice-predictions_v2_C1.ipynb": {
+    "target": 0.997213,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimutils==0.5.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "aerial-cactus-identification_szyjak_cactus-done-right_v3_C1.ipynb": {
+    "target": 0.9961,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_abhijit96_detect-cactus-keras_v3_C1.ipynb": {
+    "target": 0.999,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "aerial-cactus-identification_shahules_getting-started-with-cnn-and-vgg16_v7_C1.ipynb": {
+    "target": 0.9981,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_anshu1man_aerial-cactus_v2_C1.ipynb": {
+    "target": 0.9616,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_hutmacher303_convnet-without-pretrained-network_v2_C1.ipynb": {
+    "target": 0.9934,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_muhammedfathi_aerial-cactus-with-keras_v1_C1.ipynb": {
+    "target": 0.9983,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_ateplyuk_keras-starter-efficientnet_v1_C1.ipynb": {
+    "target": 0.4988,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_elgatodelbosque_aerial-cactus-keras_v18_C1.ipynb": {
+    "score": 0.48879,
+    "target": 0.9996,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_jusikyun_kaggle-cactus-ex_v2_C1.ipynb": {
+    "target": 0.5,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_artgor_detecting-cactus-with-kekas_v9_C1.ipynb": {
+    "target": 0.9998,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aerial-cactus-identification_cibi075_kernel-cb-i_v2_C1.ipynb": {
+    "target": 0.9558,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_nazmulshuvo03_aerial-cactus-identification_v2_C1.ipynb": {
+    "score": "Invalid submission: Submission has_cactus column should contain probabilities, and therefore contain values between 0 and 1 inclusive",
+    "target": 0.9809,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aerial-cactus-identification_vovaekb90_aerial-cactus-simple-vgg-like-cnn_v14_C1.ipynb": {
+    "target": 0.9957,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimageio==2.37.0\nimageio-ffmpeg==0.6.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_zhengze94_multiple-instance-learning-as-pooling-layer-in-cnn_v12_C1.ipynb": {
+    "target": 0.8526,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_s3chwartz_aerial-cactus-identification_v3_C1.ipynb": {
+    "target": 0.5083,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "aerial-cactus-identification_kabilan45_aerial-cactus-classification_v8_C1.ipynb": {
+    "target": 0.982,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nprotobuf==6.33.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "aerial-cactus-identification_nuldiego_baseline-cactus-cnn-with-keras_v5_C1.ipynb": {
+    "target": 0.5005,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aerial-cactus-identification_calder10_aerial-cactus-identification-using-cnn_v9_C1.ipynb": {
+    "target": 0.9937,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_njwangyuting_kernel5065e63c60_v8_C1.ipynb": {
+    "target": 0.9999,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "aerial-cactus-identification_gabrielmv_aerial-cactus-identification-keras_v2_C1.ipynb": {
+    "target": 0.9988,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_yutaroshimizu_quick-cnn-solution_v9_C1.ipynb": {
+    "target": 0.8145,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aerial-cactus-identification_kasumil5x_kernelba61e95ea2_v3_C1.ipynb": {
+    "target": 0.4916,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "aptos2019-blindness-detection_bohau0856095_notebooka4cf7f3c4d_v5_C1.ipynb": {
+    "target": 0.8695353814185223,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aptos2019-blindness-detection_hitoidas_inference-kernel-pytorch_v24_C1.ipynb": {
+    "target": 0.8534645190996363,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v53_C1.ipynb": {
+    "target": 0.7490183509406168,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v54_C1.ipynb": {
+    "target": 0.8486945958951383,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_bohau0856095_notebooka4cf7f3c4d_v9_C1.ipynb": {
+    "target": 0.8923503909317514,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aptos2019-blindness-detection_ctrasd123_kernel5915277570_v17_C1.ipynb": {
+    "target": 0.7715022529981524,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v47_C1.ipynb": {
+    "target": 0.6047050755475034,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_ctrasd123_kernel5915277570_v42_C1.ipynb": {
+    "target": 0.8747400261442159,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_ctrasd123_kernel5915277570_v12_C1.ipynb": {
+    "target": 0.4618926760326969,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v1_C1.ipynb": {
+    "score": 0.0,
+    "target": 0.8545481310495799,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v4_C1.ipynb": {
+    "score": 0.0,
+    "target": 0.8705056502201469,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v6_C1.ipynb": {
+    "score": -0.0066,
+    "target": 0.872404072348969,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v18_C1.ipynb": {
+    "target": 0.2411250728487901,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_girish17019_aptos-submission_v8_C1.ipynb": {
+    "target": 0.5264906317441983,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_xcz12138_pytorch-vgg16-train_v11_C1.ipynb": {
+    "target": 0.7219723542467201,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v7_C1.ipynb": {
+    "score": 0.0,
+    "target": 0.8640688834780353,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_hmendonca_efficientnet-pytorch-ignite-aptos19-submission_v14_C1.ipynb": {
+    "target": 0.703759914575621,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v52_C1.ipynb": {
+    "target": 0.7339056544724731,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_ctrasd123_kernel5915277570_v45_C1.ipynb": {
+    "target": 0.8637257072282227,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v19_C1.ipynb": {
+    "target": -0.0005384578321254,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_hitoidas_inference-kernel-pytorch_v3_C1.ipynb": {
+    "target": 0.8504636105881416,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "aptos2019-blindness-detection_braindeadtheory_resnetpretrainedensemble_v11_C1.ipynb": {
+    "target": 0.89353670176906,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v4_C1.ipynb": {
+    "target": 0.0761537016384402,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v6_C1.ipynb": {
+    "target": 0.0780772011140781,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "aptos2019-blindness-detection_smabdulahad_aptos-submission-ensamble_v26_C1.ipynb": {
+    "target": 0.5442382715616201,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "playground-series-s3e18_averma111_pytorch-pss3e18-vanilla_v17_C1.ipynb": {
+    "target": 0.64128,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "array_record==0.7.2\ngeopandas==0.14.4\nimbalanced-learn==0.13.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nplotly==5.24.1\nplotly-express==0.4.1\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nray==2.51.1\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1\nxarray==2025.7.1\nxarray-einstats==0.9.1\nydata-profiling==4.17.0"
+  },
+  "dogs-vs-cats-redux-kernels-edition_aditya100_cats-and-dogs_v3_C1.ipynb": {
+    "target": 1.10347,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "dogs-vs-cats-redux-kernels-edition_chromtoxenon_konishi-ver13_v4_C1.ipynb": {
+    "target": 0.0963131783871192,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "dogs-vs-cats-redux-kernels-edition_abdullahjamour_cats-and-dogs-classification_v4_C1.ipynb": {
+    "target": 9.30998,
+    "python_version": "3.10",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntqdm==4.67.1"
+  },
+  "dogs-vs-cats-redux-kernels-edition_lime1123_dogs-vs-cats-submission-test_v19_C1.ipynb": {
+    "score": "Invalid submission: Submission and answers have different id's",
+    "target": 0.0316052125468551,
+    "python_version": "3.13",
+    "lower_is_better": true,
+    "installed_packages": ""
+  },
+  "paddy-disease-classification_trnhdnghoan_submit-paddy-transformer_v1_C1.ipynb": {
+    "target": 0.4700460829493088,
+    "python_version": "3.13",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntimm==1.0.19\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "paddy-disease-classification_rounakkumbhakar_pytorch-resnet34-96-6-accuracy_v1_C1.ipynb": {
+    "score": "Invalid submission: Expected 2602 rows, but got 2603",
+    "target": 0.80645,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "dog-breed-identification_hongpeiyi_identify-dog-breed-using-single-resnet-with-fastai_v10_C1.ipynb": {
+    "score": 0.51509,
+    "target": 0.61387,
+    "python_version": "3.9",
+    "lower_is_better": true,
+    "installed_packages": "fastai==2.8.5\ngeopandas==0.14.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nsklearn-pandas==2.2.0"
+  },
+  "dog-breed-identification_myuferov_notebook30a4f94ab6_v9_C1.ipynb": {
+    "target": 4.78512,
+    "python_version": "3.8",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "dog-breed-identification_myuferov_notebook30a4f94ab6_v6_C1.ipynb": {
+    "target": 4.85642,
+    "python_version": "3.8",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "leaf-classification_zenstat_nn-through-keras-learn-through-trial-and-error_v5_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame must have an 'id' column and a column for each class.",
+    "target": 0.02073,
+    "python_version": "3.5",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "leaf-classification_alexionby_notebookcbc6345b8f_v4_C1.ipynb": {
+    "target": 0.04635,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "leaf-classification_zenstat_nn-through-keras-learn-through-trial-and-error_v26_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame must have an 'id' column and a column for each class.",
+    "target": 0.0251,
+    "python_version": "3.5",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "leaf-classification_tobikaggle_nn-through-keras-copied-mod-shuffle_v38_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame must have an 'id' column and a column for each class.",
+    "target": 0.06016,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "leaf-classification_zenstat_nn-through-keras-learn-through-trial-and-error_v115_C1.ipynb": {
+    "score": "Invalid submission: Submission DataFrame must have an 'id' column and a column for each class.",
+    "target": 0.02226,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "leaf-classification_zhudongxiao_cnn-w-o-image-data_v1_C1.ipynb": {
+    "target": 0.04549,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "leaf-classification_wordsforthewise_neural-network-through-keras_v8_C1.ipynb": {
+    "target": 0.02668,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "plant-pathology-2020-fgvc7_seihakaku_cnn-based-model-kaku_v8_C1.ipynb": {
+    "score": 0.90044,
+    "target": 0.60476,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nplotly==5.24.1\nplotly-express==0.4.1\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "plant-pathology-2020-fgvc7_phuc16102001_plant-pathology-2020-vgg-style_v3_C1.ipynb": {
+    "target": 0.93493,
+    "python_version": "3.11",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "plant-pathology-2020-fgvc7_ryches_sdml-starter_v4_C1.ipynb": {
+    "score": 0.55288,
+    "target": 0.86442,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntqdm==4.67.1"
+  },
+  "plant-pathology-2020-fgvc7_harshitlakhani_plant-pathology-pytorch-resnet50-93-15_v6_C1.ipynb": {
+    "target": 0.91943,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "albumentations==2.0.8\ngeopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "plant-pathology-2020-fgvc7_ajax0564_kernel427156046d_v1_C1.ipynb": {
+    "target": 0.69643,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0"
+  },
+  "freesound-audio-tagging-2019_talmanr_cnn-with-pytorch-using-mel-features_v44_C1.ipynb": {
+    "target": 0.14312,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nlibrosa==0.11.0\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124"
+  },
+  "us-patent-phrase-to-phrase-matching_amosditto_model-v2_v6_C1.ipynb": {
+    "target": 0.2177,
+    "python_version": "3.10",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0"
+  },
+  "plant-seedlings-classification_pavanireddyv_plant-seedling-classification-cnn_v2_C1.ipynb": {
+    "target": 0.69647,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "plant-seedlings-classification_malinivy_plantseedling-cnn-keras-beginner_v2_C1.ipynb": {
+    "target": 0.82997,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0"
+  },
+  "osic-pulmonary-fibrosis-progression_khadijatulkobra_meatadata_v18_C1.ipynb": {
+    "target": -6.944239230412828,
+    "python_version": "3.9",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npydicom==3.0.1\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-image==0.25.2\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nscipy==1.15.3\nsklearn-pandas==2.2.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "tensorflow2-question-answering_jazivxt_on-the-professor-and-the-madman_v9_C1.ipynb": {
+    "score": "Invalid submission: Submission length 8000 != 2 * answers length 30738",
+    "target": 0.00695,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "beautifulsoup4==4.13.4\ngeopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  },
+  "histopathologic-cancer-detection_giniya_hist-cap2-3_v16_C1.ipynb": {
+    "target": 0.6759,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\nopencv-python==4.12.0.88\nopencv-python-headless==4.12.0.88\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0\ntqdm==4.67.1"
+  },
+  "histopathologic-cancer-detection_jaymanvirk_model-designs-impact-on-cnn_v17_C1.ipynb": {
+    "target": 0.7367,
+    "python_version": "3.12",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\npillow==11.3.0\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0"
+  },
+  "siim-isic-melanoma-classification_shisham_transfer-learning-using-resnet50_v5_C1.ipynb": {
+    "target": 0.8015,
+    "python_version": "3.8",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0"
+  },
+  "new-york-city-taxi-fare-prediction_sunnets_taxi-fare-prediction-try-3_v83_C1.ipynb": {
+    "score": 15.34676,
+    "target": 4.94576,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "new-york-city-taxi-fare-prediction_sunnets_taxi-fare-prediction-try-3_v56_C1.ipynb": {
+    "score": 15.26995,
+    "target": 4.35348,
+    "python_version": "3.7",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\ngoogle-api-python-client==2.177.0\nipython==7.34.0\nipython-genutils==0.2.0\nipython_pygments_lexers==1.1.1\nipython-sql==0.5.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntf_keras==2.18.0"
+  },
+  "spooky-author-identification_suyue715_spooky-eda_v12_C1.ipynb": {
+    "target": 0.49321,
+    "python_version": "3.6",
+    "lower_is_better": true,
+    "installed_packages": "gensim==4.4.0\ngeopandas==0.14.4\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnltk==3.9.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nseaborn==0.12.2\nsklearn-pandas==2.2.0\ntextblob==0.19.0\ntf_keras==2.18.0\nwordcloud==1.9.4"
+  },
+  "tgs-salt-identification-challenge_iamhamzaabdullah_salt-identification-algorithm_v5_C1.ipynb": {
+    "target": 0.6418,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimageio==2.37.0\nimageio-ffmpeg==0.6.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-image==0.25.2\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "tgs-salt-identification-challenge_iamhamzaabdullah_salt-identification-algorithm_v6_C1.ipynb": {
+    "target": 0.64274,
+    "python_version": "3.7",
+    "lower_is_better": false,
+    "installed_packages": "geopandas==0.14.4\nimageio==2.37.0\nimageio-ffmpeg==0.6.0\nkeras==3.8.0\nkeras-core==0.1.7\nkeras-cv==0.9.0\nkeras-hub==0.18.1\nkeras-nlp==0.18.1\nkeras-tuner==1.4.7\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\npytorch-ignite==0.5.3\npytorch-lightning==2.5.5\nscikit-image==0.25.2\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntf_keras==2.18.0\ntorch==2.6.0+cu124\ntorchao==0.10.0\ntorchaudio==2.6.0+cu124\ntorchdata==0.11.0\ntorchinfo==1.8.0\ntorchmetrics==1.8.2\ntorchsummary==1.5.1\ntorchtune==0.6.1\ntorchvision==0.21.0+cu124\ntqdm==4.67.1"
+  },
+  "stanford-covid-vaccine_shubhamkumar56_openvaccine-gru-lstm-noiselevel-no-activation_v10_C1.ipynb": {
+    "target": 0.39744,
+    "python_version": "3.8",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nmatplotlib==3.7.2\nmatplotlib-inline==0.1.7\nmatplotlib-venn==1.1.2\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1\ntqdm==4.67.1"
+  },
+  "stanford-covid-vaccine_parmarsuraj99_neural-covid-vaccine_v10_C1.ipynb": {
+    "target": 0.42119,
+    "python_version": "3.8",
+    "lower_is_better": true,
+    "installed_packages": "geopandas==0.14.4\nnumpy==1.26.4\npandas==2.2.3\npandas-datareader==0.10.0\npandas-gbq==0.29.2\npandas-profiling==3.6.6\npandas-stubs==2.2.2.240909\npandasql==0.7.3\nprotobuf==6.33.0\nscikit-learn==1.2.2\nscikit-learn-intelex==2025.9.0\nsklearn-pandas==2.2.0\ntensorflow==2.18.0\ntensorflow-cloud==0.1.5\ntensorflow-datasets==4.9.9\ntensorflow_decision_forests==1.11.0\ntensorflow-hub==0.16.1\ntensorflow-io==0.37.1\ntensorflow-io-gcs-filesystem==0.37.1\ntensorflow-metadata==1.17.2\ntensorflow-probability==0.25.0\ntensorflow-text==2.18.1"
+  }
+}

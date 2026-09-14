@@ -1,0 +1,80 @@
+```
+/
+    kaggle/
+        data/
+            description.md (35 lines)
+            sampleSubmission.csv (330292 lines)
+            sampleSubmission.csv.zip (731.8 kB)
+            timit_11.zip (2.3 GB)
+            ml2021spring-hw2/
+                description.md (35 lines)
+                sampleSubmission.csv (330292 lines)
+                ... and 2 other files
+                ml2021spring-hw2/
+                timit_11/
+                    timit_11/
+                        test_11.npy (1.1 GB)
+                        train_11.npy (3.1 GB)
+                        ... and 1 other files
+            timit_11/
+                timit_11/
+                    test_11.npy (1.1 GB)
+                    train_11.npy (3.1 GB)
+                    ... and 1 other files
+        input/
+            description.md (35 lines)
+            sampleSubmission.csv (330292 lines)
+            sampleSubmission.csv.zip (731.8 kB)
+            timit_11.zip (2.3 GB)
+            ml2021spring-hw2/
+                description.md (35 lines)
+                sampleSubmission.csv (330292 lines)
+                ... and 2 other files
+                ml2021spring-hw2/
+                timit_11/
+                    timit_11/
+                        test_11.npy (1.1 GB)
+                        train_11.npy (3.1 GB)
+                        ... and 1 other files
+            timit_11/
+                timit_11/
+                    test_11.npy (1.1 GB)
+                    train_11.npy (3.1 GB)
+                    ... and 1 other files
+        working/
+            ml2021spring-hw2/
+                description.md (35 lines)
+                sampleSubmission.csv (330292 lines)
+                ... and 2 other files
+                ml2021spring-hw2/
+                timit_11/
+                    timit_11/
+                        test_11.npy (1.1 GB)
+                        train_11.npy (3.1 GB)
+                        ... and 1 other files
+```
+
+-> data/ml2021spring-hw2/sampleSubmission.csv has 330291 rows and 2 columns.
+Here is some information about the columns:
+ClassId (int64) has 1 unique values: [0]
+Id (int64) has range: 0.00 - 1999.00, 0 nan values
+
+-> data/sampleSubmission.csv has 330291 rows and 2 columns.
+Here is some information about the columns:
+ClassId (int64) has 1 unique values: [0]
+Id (int64) has range: 0.00 - 1999.00, 0 nan values
+
+-> input/ml2021spring-hw2/sampleSubmission.csv has 330291 rows and 2 columns.
+Here is some information about the columns:
+ClassId (int64) has 1 unique values: [0]
+Id (int64) has range: 0.00 - 1999.00, 0 nan values
+
+-> input/sampleSubmission.csv has 330291 rows and 2 columns.
+Here is some information about the columns:
+ClassId (int64) has 1 unique values: [0]
+Id (int64) has range: 0.00 - 1999.00, 0 nan values
+
+-> working/ml2021spring-hw2/sampleSubmission.csv has 330291 rows and 2 columns.
+Here is some information about the columns:
+ClassId (int64) has 1 unique values: [0]
+Id (int64) has range: 0.00 - 1999.00, 0 nan values

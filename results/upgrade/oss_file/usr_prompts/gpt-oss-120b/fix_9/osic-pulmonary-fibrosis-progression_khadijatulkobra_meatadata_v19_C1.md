@@ -1,0 +1,731 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pydicom==3.0.1
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-image==0.25.2
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-6.878097021917149
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -10.52504) has done: 'I fixed the pandas append deprecation, added a safe fallback when the pretrained model file is missing, and introduced a simple linear‑trend baseline (using the global slope from the training set) to generate predictions. This ensures the script runs end‑to‑end, creates a valid `submission.csv`, and improves the score without altering the core model architecture.'
+- What this solution (achieved -10.81761) has done: 'I add a lightweight fallback linear regression that is trained on the full training set and used when the pretrained SIGMA model is unavailable. This provides more personalized FVC predictions than the simple global slope and also supplies a calibrated confidence (standard deviation of residuals, clipped at 70). The change preserves the existing SIGMA architecture and only adjusts the fallback path, moving the score closer to the target.'
+- What this solution (achieved -10.52504) has done: 'I adjust the fallback prediction logic (used when the pretrained SIGMA model is unavailable) to apply a simple per‑patient linear trend based on the global slope computed from the training data instead of the generic linear regression on all features. This keeps the core architecture unchanged, adds only a tiny computation, and is expected to raise the metric (move the score closer to the target) while still respecting the required submission format.'
+- What this solution (achieved -10.81761) has done: 'I replace the fallback branch in **cell 4** so that, when the pretrained SIGMA model is unavailable, the script uses the linear‑regression model (`lin_regressor`) trained on the full training set to predict FVC instead of the coarse global slope. The confidence remains the clipped residual standard deviation, which keeps the submission valid while giving more personalized predictions, expected to raise the score toward the target.'
+- What this solution (achieved -10.52504) has done: 'I replace the fallback branch in **cell 4** so that when the pretrained SIGMA model is unavailable the script uses a simple per‑patient linear trend based on the global slope (computed from the training data) to predict FVC for future weeks, and sets the confidence to the required minimum of 70 ml. This keeps the core architecture untouched, improves the relevance of the predictions, and is expected to raise the metric toward the target score.'
+- What this solution (achieved -10.81761) has done: 'I replace the fallback branch in **cell 4** so that when the pretrained SIGMA model is unavailable the script uses the already‑trained `LinearRegression` (`lin_regressor`) to predict FVC instead of the coarse global slope. The confidence is set to the residual standard deviation from that regression, clipped to the required minimum of 70 ml. This small change keeps the core architecture intact while providing more personalized predictions, which should raise the metric toward the target score.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+from pathlib import Path
+
+C1, C2 = torch.tensor(70, dtype=torch.float32), torch.tensor(1000, dtype=torch.float32)
+
+
+
+
+## === cell 1
+def csv_preprocess(data):
+    data["Healthy-FVC"] = round((data["FVC"] * 100) / data["Percent"])
+    FE = []
+    FE.append("Healthy-FVC")
+    COLS = ["Sex", "SmokingStatus"]
+    for col in COLS:
+        for mod in data[col].unique():
+            FE.append(mod)
+            data[mod] = (data[col] == mod).astype(int)
+    data = data[["Patient", "Weeks", "FVC", "Age"] + FE]
+    data = data.sort_values(["Patient", "Weeks"], ascending=True).reset_index(drop=True)
+    FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+    rename_col = {"Weeks": "base_Weeks", "FVC": "base_FVC"}
+    data = data.rename(columns=rename_col)
+    npData = pd.DataFrame(
+        columns=["Patient", "base_Weeks", "base_FVC", "Age"]
+        + FE1
+        + ["Week", "Healthy-FVC", "actual_FVC"]
+    )
+    for pid in data["Patient"].unique():
+        weeks = data.loc[data["Patient"] == pid].base_Weeks
+        fvc = data.loc[data["Patient"] == pid].base_FVC
+        index = data.loc[data["Patient"] == pid].index
+        weeks.reset_index(inplace=True, drop=True)
+        fvc.reset_index(inplace=True, drop=True)
+        for k in range(len(weeks)):
+            npData = pd.concat([npData, data.loc[data.index == index[0]]], sort=False)
+            npData.iloc[-1, npData.columns.get_loc("Week")] = weeks[k]
+            npData.iloc[-1, npData.columns.get_loc("actual_FVC")] = fvc[k]
+    npData.reset_index(inplace=True, drop=True)
+    npData = npData.fillna(0)
+    return npData
+
+
+
+
+## === cell 2
+class SIGMA(nn.Module):
+    def __init__(self):
+        super(SIGMA, self).__init__()
+        self.data_net1 = nn.Sequential(
+            nn.Linear(10, 42),
+            nn.ReLU(),
+            nn.Linear(42, 64),
+            nn.ReLU(),
+            nn.Linear(64, 118),
+            nn.ReLU(),
+        )
+        self.data_net2 = nn.Sequential(
+            nn.Linear(128, 256), nn.ReLU(), nn.Linear(256, 502), nn.ReLU()
+        )
+        self.data_net3 = nn.Sequential(
+            nn.Linear(512, 256), nn.ReLU(), nn.Linear(256, 118), nn.ReLU()
+        )
+        self.data_net4 = nn.Sequential(
+            nn.Linear(748, 256),
+            nn.ReLU(),
+            nn.Linear(256, 64),
+            nn.ReLU(),
+            nn.Linear(64, 3),
+            nn.ReLU(),
+        )
+
+    def forward(self, data_i):
+        out1 = self.data_net1(data_i)
+        out2 = torch.cat((data_i, out1), dim=-1)
+        out2 = self.data_net2(out2)
+        out3 = torch.cat((data_i, out2), dim=-1)
+        out3 = self.data_net3(out3)
+        out4 = torch.cat((data_i, out1, out2, out3), dim=-1)
+        out = self.data_net4(out4)
+        return out
+
+
+
+
+## === cell 3
+def score(y_true, y_pred):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    fvc_pred = y_pred[:, 1]
+    delta = (y_true[:, 0] - fvc_pred).abs()
+    sq2 = torch.tensor(2.0).sqrt()
+    metric = (delta / sigma) * sq2 + (sigma * sq2).log()
+    return metric.mean()
+
+
+def closs(y_true, y_pred):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    e = torch.abs(y_true - y_pred[:, 1])
+    loss = torch.abs(sigma - e)
+    return loss
+
+
+def quartile_loss(y_true, y_pred):
+    return score(y_true, y_pred)
+
+
+
+
+## === cell 4
+def make_eval_data(npEval, model, device="cuda"):
+    """
+    Produce predictions for the evaluation dataframe.
+    If a trained model is supplied, use it; otherwise fall back to a simple
+    linear‑trend based on the global slope from the training set.
+    Confidence is clipped to a minimum of 70 ml.
+    """
+    x_features = npEval[
+        [
+            "base_Weeks",
+            "base_FVC",
+            "Age",
+            "Male",
+            "Female",
+            "Ex-smoker",
+            "Never smoked",
+            "Currently smokes",
+            "Week",
+            "Healthy-FVC",
+        ]
+    ]
+    x_features_tensor = torch.tensor(x_features.values).float()
+    x_patientids_name = npEval[["Patient"]].values
+
+    if model is not None and torch.cuda.is_available() and device == "cuda":
+        model.to("cuda")
+    if model is not None:
+        model.eval()
+        predictions = []
+        for i, patientid in enumerate(x_patientids_name):
+            x_feature = x_features_tensor[i].unsqueeze(0)
+            if torch.cuda.is_available() and device == "cuda":
+                x_feature = x_feature.cuda()
+            prediction = model(x_feature)
+            predictions.append(prediction.detach().cpu().numpy()[0])
+        predictions = np.array(predictions)  # shape [n,3]
+        npEval["FVC"] = predictions[:, 1]
+        npEval["Confidence"] = predictions[:, 2] - predictions[:, 0]
+    else:
+        week_offset = (npEval["Week"] - npEval["base_Weeks"]).values
+        npEval["FVC"] = npEval["base_FVC"] + global_slope * week_offset
+        npEval["Confidence"] = max(70.0, residual_std)
+    return npEval
+
+
+
+
+## === cell 5
+base_dir = Path("./data/osic-pulmonary-fibrosis-progression")
+train_path = base_dir / "train.csv"
+test_path = base_dir / "test.csv"
+sample_sub_path = base_dir / "sample_submission.csv"
+
+data_train = pd.read_csv(train_path)
+data_test = pd.read_csv(test_path)
+submission = pd.read_csv(sample_sub_path)
+
+train_df = data_train.copy()
+train_df["Healthy-FVC"] = round((train_df["FVC"] * 100) / train_df["Percent"])
+train_df.rename(columns={"Weeks": "base_Weeks", "FVC": "base_FVC"}, inplace=True)
+
+for col in ["Sex", "SmokingStatus"]:
+    for mod in train_df[col].unique():
+        train_df[mod] = (train_df[col] == mod).astype(int)
+
+expected_cols = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+for col in expected_cols:
+    if col not in train_df.columns:
+        train_df[col] = 0
+
+train_df["Week"] = train_df["base_Weeks"]
+
+lin_features = [
+    "base_Weeks",
+    "base_FVC",
+    "Age",
+    "Male",
+    "Female",
+    "Ex-smoker",
+    "Never smoked",
+    "Currently smokes",
+    "Week",
+    "Healthy-FVC",
+]
+
+from sklearn.linear_model import LinearRegression
+
+lin_regressor = LinearRegression()
+lin_regressor.fit(train_df[lin_features], train_df["base_FVC"])
+
+train_preds = lin_regressor.predict(train_df[lin_features])
+residuals = train_df["base_FVC"] - train_preds
+residual_std = float(np.std(residuals, ddof=1))
+
+global_slope = np.polyfit(data_train["Weeks"], data_train["FVC"], 1)[0]
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/450228157.py in <cell line: 0>()
+      5 sample_sub_path = base_dir / "sample_submission.csv"
+      6 
+----> 7 data_train = pd.read_csv(train_path)
+      8 data_test = pd.read_csv(test_path)
+      9 submission = pd.read_csv(sample_sub_path)
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in read_csv(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, date_format, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options, dtype_backend)
+   1024     kwds.update(kwds_defaults)
+   1025 
+-> 1026     return _read(filepath_or_buffer, kwds)
+   1027 
+   1028 
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in _read(filepath_or_buffer, kwds)
+    618 
+    619     # Create the parser.
+--> 620     parser = TextFileReader(filepath_or_buffer, **kwds)
+    621 
+    622     if chunksize or iterator:
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in __init__(self, f, engine, **kwds)
+   1618 
+   1619         self.handles: IOHandles | None = None
+-> 1620         self._engine = self._make_engine(f, self.engine)
+   1621 
+   1622     def close(self) -> None:
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/parsers/readers.py in _make_engine(self, f, engine)
+   1878                 if "b" not in mode:
+   1879                     mode += "b"
+-> 1880             self.handles = get_handle(
+   1881                 f,
+   1882                 mode,
+
+/usr/local/lib/python3.11/dist-packages/pandas/io/common.py in get_handle(path_or_buf, mode, encoding, compression, memory_map, is_text, errors, storage_options)
+    871         if ioargs.encoding and "b" not in ioargs.mode:
+    872             # Encoding
+--> 873             handle = open(
+    874                 handle,
+    875                 ioargs.mode,
+
+FileNotFoundError: [Errno 2] No such file or directory: 'data/osic-pulmonary-fibrosis-progression/train.csv'
+
+## === cell 6
+submission["Patient"] = submission["Patient_Week"].apply(lambda x: x.split("_")[0])
+submission["Weeks"] = submission["Patient_Week"].apply(lambda x: int(x.split("_")[1]))
+submission = submission.sort_values(
+    by=["Patient", "Weeks"], ascending=True
+).reset_index(drop=True)
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2314055513.py in <cell line: 0>()
+      1 # expand the sample submission so we have Patient and Week columns
+----> 2 submission["Patient"] = submission["Patient_Week"].apply(lambda x: x.split("_")[0])
+      3 submission["Weeks"] = submission["Patient_Week"].apply(lambda x: int(x.split("_")[1]))
+      4 submission = submission.sort_values(
+      5     by=["Patient", "Weeks"], ascending=True
+
+NameError: name 'submission' is not defined
+
+## === cell 7
+merge = (
+    pd.merge(data_test, submission, on=["Patient"], how="left")
+    .sort_values(["Patient", "Weeks_y"])
+    .reset_index(drop=True)
+)
+merge = merge.drop(columns=["FVC_y"])
+merge = merge.rename(
+    columns={"FVC_x": "base_FVC", "Weeks_y": "Week", "Weeks_x": "base_Weeks"}
+)
+
+del data_test, submission
+
+data_test = merge[
+    [
+        "Patient",
+        "base_Weeks",
+        "base_FVC",
+        "Percent",
+        "Age",
+        "Sex",
+        "SmokingStatus",
+        "Week",
+    ]
+]
+submission = merge[["Patient_Week", "base_FVC", "Confidence"]].rename(
+    columns={"base_FVC": "FVC"}
+)
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3594482177.py in <cell line: 0>()
+      1 # merge test metadata with the submission scaffold
+      2 merge = (
+----> 3     pd.merge(data_test, submission, on=["Patient"], how="left")
+      4     .sort_values(["Patient", "Weeks_y"])
+      5     .reset_index(drop=True)
+
+NameError: name 'data_test' is not defined
+
+## === cell 8
+data = data_test.copy()
+data["Healthy-FVC"] = round((data["base_FVC"] * 100) / data["Percent"])
+FE = ["Healthy-FVC"]
+COLS = ["Sex", "SmokingStatus"]
+for col in COLS:
+    for mod in data[col].unique():
+        FE.append(mod)
+        data[mod] = (data[col] == mod).astype(int)
+FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+npData = pd.DataFrame(
+    columns=["Patient", "base_Weeks", "base_FVC", "Age", "Healthy-FVC"] + FE1 + ["Week"]
+)
+npData = pd.concat([npData, data], ignore_index=True).fillna(0)
+
+data_test = npData[
+    [
+        "Patient",
+        "base_Weeks",
+        "base_FVC",
+        "Age",
+        "Healthy-FVC",
+        "Male",
+        "Female",
+        "Ex-smoker",
+        "Never smoked",
+        "Currently smokes",
+        "Week",
+    ]
+]
+
+
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/290043586.py in <cell line: 0>()
+      1 # create the full feature dataframe for evaluation
+----> 2 data = data_test.copy()
+      3 data["Healthy-FVC"] = round((data["base_FVC"] * 100) / data["Percent"])
+      4 FE = ["Healthy-FVC"]
+      5 COLS = ["Sex", "SmokingStatus"]
+
+NameError: name 'data_test' is not defined
+
+## === cell 9
+model = SIGMA()
+model_path = Path(
+    "../input/03-672/Epoch3_Score6.7219885971372495_Acc0.9353421184795582.pth"
+)
+if model_path.is_file():
+    model.load_state_dict(torch.load(model_path, map_location="cpu"))
+else:
+    model = None
+
+test = make_eval_data(data_test.copy(), model)
+
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2920548746.py in <cell line: 0>()
+      9     model = None
+     10 
+---> 11 test = make_eval_data(data_test.copy(), model)
+     12 
+
+NameError: name 'data_test' is not defined
+
+## === cell 10
+for nid in test["Patient"].unique():
+    idx = test[(test["Patient"] == nid) & (test["Week"] == test["base_Weeks"])].index
+    if len(idx) > 0:
+        i = idx[0]
+        test.at[i, "FVC"] = test.at[i, "base_FVC"]
+        test.at[i, "Confidence"] = 70
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3087146449.py in <cell line: 0>()
+      1 # ensure baseline week predictions use the original baseline values and a minimum confidence
+----> 2 for nid in test["Patient"].unique():
+      3     idx = test[(test["Patient"] == nid) & (test["Week"] == test["base_Weeks"])].index
+      4     if len(idx) > 0:
+      5         i = idx[0]
+
+NameError: name 'test' is not defined
+
+## === cell 11
+test.loc[test["Confidence"] < 70, "Confidence"] = 70
+submission.loc[:, "FVC"] = test["FVC"]
+submission.loc[:, "Confidence"] = test["Confidence"]
+submission.to_csv("submission.csv", index=False)
+
+## --- ERROR in cell 11, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/567409971.py in <cell line: 0>()
+      1 # enforce the minimum confidence of 70 ml and write the submission file
+----> 2 test.loc[test["Confidence"] < 70, "Confidence"] = 70
+      3 submission.loc[:, "FVC"] = test["FVC"]
+      4 submission.loc[:, "Confidence"] = test["Confidence"]
+      5 submission.to_csv("submission.csv", index=False)
+
+NameError: name 'test' is not defined

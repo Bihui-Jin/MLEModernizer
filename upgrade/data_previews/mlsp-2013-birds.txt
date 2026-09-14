@@ -1,0 +1,222 @@
+```
+/
+    kaggle/
+        data/
+            description.md (269 lines)
+            essential_data.zip (65.5 MB)
+            sample_submission.csv (1217 lines)
+            sample_submission.csv.zip (3.0 kB)
+            supplemental_data.zip (229.5 MB)
+            essential_data/
+                CVfolds_2.txt (323 lines)
+                rec_id2filename.txt (323 lines)
+                ... and 2 other files
+                src_wavs/
+                    PC10_20090513_054500_0020.wav (320.0 kB)
+                    PC10_20090513_054500_0030.wav (320.0 kB)
+                    ... and 320 other files
+            mlsp-2013-birds/
+                description.md (269 lines)
+                essential_data.zip (65.5 MB)
+                ... and 3 other files
+                essential_data/
+                    CVfolds_2.txt (323 lines)
+                    rec_id2filename.txt (323 lines)
+                    ... and 2 other files
+                    src_wavs/
+                        PC10_20090513_054500_0020.wav (320.0 kB)
+                        PC10_20090513_054500_0030.wav (320.0 kB)
+                        ... and 320 other files
+                mlsp-2013-birds/
+                supplemental_data/
+                    histogram_of_segments.txt (323 lines)
+                    segment_clusters.bmp (16.1 MB)
+                    ... and 3 other files
+                    filtered_spectrograms/
+                        PC10_20090513_054500_0040.bmp (320.6 kB)
+                        PC15_20090705_050000_0010.bmp (320.6 kB)
+                        ... and 320 other files
+                    segmentation_examples/
+                        PC10_20090606_054500_0040.bmp (957.5 kB)
+                        PC10_20100705_070000_0020.bmp (957.5 kB)
+                        ... and 18 other files
+                    spectrograms/
+                        PC17_20090705_070000_0040.bmp (320.6 kB)
+                        PC7_20090606_070011_0010.bmp (320.6 kB)
+                        ... and 320 other files
+                    supervised_segmentation/
+                        PC11_20090705_050000_0020.bmp (957.5 kB)
+                        PC15_20100705_050000_0030.bmp (957.5 kB)
+                        ... and 320 other files
+            supplemental_data/
+                histogram_of_segments.txt (323 lines)
+                segment_clusters.bmp (16.1 MB)
+                ... and 3 other files
+                filtered_spectrograms/
+                    PC10_20090513_054500_0040.bmp (320.6 kB)
+                    PC15_20090705_050000_0010.bmp (320.6 kB)
+                    ... and 320 other files
+                segmentation_examples/
+                    PC10_20090606_054500_0040.bmp (957.5 kB)
+                    PC10_20100705_070000_0020.bmp (957.5 kB)
+                    ... and 18 other files
+                spectrograms/
+                    PC17_20090705_070000_0040.bmp (320.6 kB)
+                    PC7_20090606_070011_0010.bmp (320.6 kB)
+                    ... and 320 other files
+                supervised_segmentation/
+                    PC11_20090705_050000_0020.bmp (957.5 kB)
+                    PC15_20100705_050000_0030.bmp (957.5 kB)
+                    ... and 320 other files
+        input/
+            description.md (269 lines)
+            essential_data.zip (65.5 MB)
+            sample_submission.csv (1217 lines)
+            sample_submission.csv.zip (3.0 kB)
+            supplemental_data.zip (229.5 MB)
+            essential_data/
+                CVfolds_2.txt (323 lines)
+                rec_id2filename.txt (323 lines)
+                ... and 2 other files
+                src_wavs/
+                    PC10_20090513_054500_0020.wav (320.0 kB)
+                    PC10_20090513_054500_0030.wav (320.0 kB)
+                    ... and 320 other files
+            mlsp-2013-birds/
+                description.md (269 lines)
+                essential_data.zip (65.5 MB)
+                ... and 3 other files
+                essential_data/
+                    CVfolds_2.txt (323 lines)
+                    rec_id2filename.txt (323 lines)
+                    ... and 2 other files
+                    src_wavs/
+                        PC10_20090513_054500_0020.wav (320.0 kB)
+                        PC10_20090513_054500_0030.wav (320.0 kB)
+                        ... and 320 other files
+                mlsp-2013-birds/
+                supplemental_data/
+                    histogram_of_segments.txt (323 lines)
+                    segment_clusters.bmp (16.1 MB)
+                    ... and 3 other files
+                    filtered_spectrograms/
+                        PC10_20090513_054500_0040.bmp (320.6 kB)
+                        PC15_20090705_050000_0010.bmp (320.6 kB)
+                        ... and 320 other files
+                    segmentation_examples/
+                        PC10_20090606_054500_0040.bmp (957.5 kB)
+                        PC10_20100705_070000_0020.bmp (957.5 kB)
+                        ... and 18 other files
+                    spectrograms/
+                        PC17_20090705_070000_0040.bmp (320.6 kB)
+                        PC7_20090606_070011_0010.bmp (320.6 kB)
+                        ... and 320 other files
+                    supervised_segmentation/
+                        PC11_20090705_050000_0020.bmp (957.5 kB)
+                        PC15_20100705_050000_0030.bmp (957.5 kB)
+                        ... and 320 other files
+            supplemental_data/
+                histogram_of_segments.txt (323 lines)
+                segment_clusters.bmp (16.1 MB)
+                ... and 3 other files
+                filtered_spectrograms/
+                    PC10_20090513_054500_0040.bmp (320.6 kB)
+                    PC15_20090705_050000_0010.bmp (320.6 kB)
+                    ... and 320 other files
+                segmentation_examples/
+                    PC10_20090606_054500_0040.bmp (957.5 kB)
+                    PC10_20100705_070000_0020.bmp (957.5 kB)
+                    ... and 18 other files
+                spectrograms/
+                    PC17_20090705_070000_0040.bmp (320.6 kB)
+                    PC7_20090606_070011_0010.bmp (320.6 kB)
+                    ... and 320 other files
+                supervised_segmentation/
+                    PC11_20090705_050000_0020.bmp (957.5 kB)
+                    PC15_20100705_050000_0030.bmp (957.5 kB)
+                    ... and 320 other files
+        working/
+            mlsp-2013-birds/
+                description.md (269 lines)
+                essential_data.zip (65.5 MB)
+                ... and 3 other files
+                essential_data/
+                    CVfolds_2.txt (323 lines)
+                    rec_id2filename.txt (323 lines)
+                    ... and 2 other files
+                    src_wavs/
+                        PC10_20090513_054500_0020.wav (320.0 kB)
+                        PC10_20090513_054500_0030.wav (320.0 kB)
+                        ... and 320 other files
+                mlsp-2013-birds/
+                supplemental_data/
+                    histogram_of_segments.txt (323 lines)
+                    segment_clusters.bmp (16.1 MB)
+                    ... and 3 other files
+                    filtered_spectrograms/
+                        PC10_20090513_054500_0040.bmp (320.6 kB)
+                        PC15_20090705_050000_0010.bmp (320.6 kB)
+                        ... and 320 other files
+                    segmentation_examples/
+                        PC10_20090606_054500_0040.bmp (957.5 kB)
+                        PC10_20100705_070000_0020.bmp (957.5 kB)
+                        ... and 18 other files
+                    spectrograms/
+                        PC17_20090705_070000_0040.bmp (320.6 kB)
+                        PC7_20090606_070011_0010.bmp (320.6 kB)
+                        ... and 320 other files
+                    supervised_segmentation/
+                        PC11_20090705_050000_0020.bmp (957.5 kB)
+                        PC15_20100705_050000_0030.bmp (957.5 kB)
+                        ... and 320 other files
+```
+
+-> data/essential_data/species_list.txt has content:
+
+class_id,code,species
+0,BRCR,Brown Creeper
+1,PAWR,Pacific Wren
+2,PSFL,Pacific-slope Flycatcher
+3,RBNU,Red-breasted Nuthatch
+4,DEJU,Dark-eyed Junco
+5,OSFL,Olive-sided Flycatcher
+6,HETH,Hermit Thrush
+7,CBCH,Chestnut-backed Chickadee
+8,VATH,Varied Thrush
+9,HEWA,Hermit Warbler
+10,SWTH,Swainson's Thrush
+11,HAFL,Hammond's Flycatcher
+12,WETA,Western Tanager
+13,BHGB,Black-headed Grosbeak
+14,GCKI,Golden Crowned Kinglet
+15,WAVI,Warbling Vireo
+16,MGWA,MacGillivray's Warbler
+17,STJA,Stellar's Jay
+18,CONI,Common Nighthawk
+
+
+-> data/mlsp-2013-birds/essential_data/species_list.txt has content:
+
+class_id,code,species
+0,BRCR,Brown Creeper
+1,PAWR,Pacific Wren
+2,PSFL,Pacific-slope Flycatcher
+3,RBNU,Red-breasted Nuthatch
+4,DEJU,Dark-eyed Junco
+5,OSFL,Olive-sided Flycatcher
+6,HETH,Hermit Thrush
+7,CBCH,Chestnut-backed Chickadee
+8,VATH,Varied Thrush
+9,HEWA,Hermit Warbler
+10,SWTH,Swainson's Thrush
+11,HAFL,Hammond's Flycatcher
+12,WETA,Western Tanager
+13,BHGB,Black-headed Grosbeak
+14,GCKI,Golden Crowned Kinglet
+15,WAVI,Warbling Vireo
+16,MGWA,MacGillivray's Warbler
+17,STJA,Stellar's Jay
+18,CONI,Common Nighthawk
+
+
+-> (stopped after 10 files for performance)

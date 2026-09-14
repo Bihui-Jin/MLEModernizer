@@ -1,0 +1,56 @@
+```
+/
+    kaggle/
+        data/
+            description.md (98 lines)
+            sample_submission.csv (5749 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (5749 lines)
+            test.csv.zip (5.9 MB)
+            train.csv (51730 lines)
+            train.csv.zip (53.4 MB)
+            lmsys-chatbot-arena/
+                description.md (98 lines)
+                sample_submission.csv (5749 lines)
+                ... and 5 other files
+                lmsys-chatbot-arena/
+        input/
+            description.md (98 lines)
+            sample_submission.csv (5749 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (5749 lines)
+            test.csv.zip (5.9 MB)
+            train.csv (51730 lines)
+            train.csv.zip (53.4 MB)
+            lmsys-chatbot-arena/
+                description.md (98 lines)
+                sample_submission.csv (5749 lines)
+                ... and 5 other files
+                lmsys-chatbot-arena/
+        working/
+            lmsys-chatbot-arena/
+                description.md (98 lines)
+                sample_submission.csv (5749 lines)
+                ... and 5 other files
+                lmsys-chatbot-arena/
+```
+
+-> data/lmsys-chatbot-arena/sample_submission.csv has 5748 rows and 4 columns.
+The columns are: id, winner_model_a, winner_model_b, winner_tie
+
+-> data/lmsys-chatbot-arena/test.csv has 5748 rows and 4 columns.
+The columns are: id, prompt, response_a, response_b
+
+-> data/lmsys-chatbot-arena/train.csv has 51729 rows and 9 columns.
+The columns are: id, model_a, model_b, prompt, response_a, response_b, winner_model_a, winner_model_b, winner_tie
+
+-> data/sample_submission.csv has 5748 rows and 4 columns.
+The columns are: id, winner_model_a, winner_model_b, winner_tie
+
+-> data/test.csv has 5748 rows and 4 columns.
+The columns are: id, prompt, response_a, response_b
+
+-> data/train.csv has 51729 rows and 9 columns.
+The columns are: id, model_a, model_b, prompt, response_a, response_b, winner_model_a, winner_model_b, winner_tie
+
+-> (stopped after 10 files for performance)

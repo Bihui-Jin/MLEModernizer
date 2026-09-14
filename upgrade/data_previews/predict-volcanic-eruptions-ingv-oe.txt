@@ -1,0 +1,120 @@
+```
+/
+    kaggle/
+        data/
+            description.md (70 lines)
+            sample_submission.csv (445 lines)
+            sample_submission.csv.zip (2.8 kB)
+            test.zip (514.3 MB)
+            train.csv (3988 lines)
+            train.csv.zip (39.1 kB)
+            train.zip (4.6 GB)
+            predict-volcanic-eruptions-ingv-oe/
+                description.md (70 lines)
+                sample_submission.csv (445 lines)
+                ... and 5 other files
+                predict-volcanic-eruptions-ingv-oe/
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+            test/
+                1003520023.csv (60002 lines)
+                1004346803.csv (60002 lines)
+                ... and 442 other files
+                test/
+            train/
+                1000015382.csv (60002 lines)
+                1000554676.csv (60002 lines)
+                ... and 3985 other files
+                train/
+        input/
+            description.md (70 lines)
+            sample_submission.csv (445 lines)
+            sample_submission.csv.zip (2.8 kB)
+            test.zip (514.3 MB)
+            train.csv (3988 lines)
+            train.csv.zip (39.1 kB)
+            train.zip (4.6 GB)
+            predict-volcanic-eruptions-ingv-oe/
+                description.md (70 lines)
+                sample_submission.csv (445 lines)
+                ... and 5 other files
+                predict-volcanic-eruptions-ingv-oe/
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+            test/
+                1003520023.csv (60002 lines)
+                1004346803.csv (60002 lines)
+                ... and 442 other files
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+            train/
+                1000015382.csv (60002 lines)
+                1000554676.csv (60002 lines)
+                ... and 3985 other files
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+        working/
+            predict-volcanic-eruptions-ingv-oe/
+                description.md (70 lines)
+                sample_submission.csv (445 lines)
+                ... and 5 other files
+                predict-volcanic-eruptions-ingv-oe/
+                test/
+                    1003520023.csv (60002 lines)
+                    1004346803.csv (60002 lines)
+                    ... and 442 other files
+                    test/
+                train/
+                    1000015382.csv (60002 lines)
+                    1000554676.csv (60002 lines)
+                    ... and 3985 other files
+                    train/
+```
+
+-> data/predict-volcanic-eruptions-ingv-oe/sample_submission.csv has 444 rows and 2 columns.
+The columns are: segment_id, time_to_eruption
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1003520023.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1004346803.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1007996426.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1009749143.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1016956864.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1024522044.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> data/predict-volcanic-eruptions-ingv-oe/test/1028325789.csv has 60001 rows and 10 columns.
+The columns are: sensor_1, sensor_2, sensor_3, sensor_4, sensor_5, sensor_6, sensor_7, sensor_8, sensor_9, sensor_10
+
+-> (stopped after 10 files for performance)

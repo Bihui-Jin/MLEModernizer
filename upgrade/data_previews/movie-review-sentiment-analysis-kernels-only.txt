@@ -1,0 +1,48 @@
+```
+/
+    kaggle/
+        data/
+            description.md (72 lines)
+            sampleSubmission.csv (46819 lines)
+            sampleSubmission.csv.zip (146.0 kB)
+            test.tsv (46819 lines)
+            test.tsv.zip (1.1 MB)
+            train.tsv (109243 lines)
+            train.tsv.zip (2.7 MB)
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+        input/
+            description.md (72 lines)
+            sampleSubmission.csv (46819 lines)
+            sampleSubmission.csv.zip (146.0 kB)
+            test.tsv (46819 lines)
+            test.tsv.zip (1.1 MB)
+            train.tsv (109243 lines)
+            train.tsv.zip (2.7 MB)
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+        working/
+            movie-review-sentiment-analysis-kernels-only/
+                description.md (72 lines)
+                sampleSubmission.csv (46819 lines)
+                ... and 5 other files
+                movie-review-sentiment-analysis-kernels-only/
+```
+
+-> data/movie-review-sentiment-analysis-kernels-only/sampleSubmission.csv has 46818 rows and 2 columns.
+Here is some information about the columns:
+PhraseId (int64) has range: 29.00 - 156030.00, 0 nan values
+Sentiment (int64) has 1 unique values: [2]
+
+-> data/sampleSubmission.csv has 46818 rows and 2 columns.
+Here is some information about the columns:
+PhraseId (int64) has range: 29.00 - 156030.00, 0 nan values
+Sentiment (int64) has 1 unique values: [2]
+
+-> (stopped after 10 files for performance)

@@ -1,0 +1,57 @@
+```
+/
+    kaggle/
+        data/
+            description.md (173 lines)
+            sample_submission.csv (61477 lines)
+            sample_submission.csv.zip (460.6 kB)
+            simplified-nq-test.jsonl (1.7 GB)
+            simplified-nq-train.jsonl (15.7 GB)
+            tensorflow2-question-answering/
+                description.md (173 lines)
+                sample_submission.csv (61477 lines)
+                ... and 3 other files
+                tensorflow2-question-answering/
+        input/
+            description.md (173 lines)
+            sample_submission.csv (61477 lines)
+            sample_submission.csv.zip (460.6 kB)
+            simplified-nq-test.jsonl (1.7 GB)
+            simplified-nq-train.jsonl (15.7 GB)
+            tensorflow2-question-answering/
+                description.md (173 lines)
+                sample_submission.csv (61477 lines)
+                ... and 3 other files
+                tensorflow2-question-answering/
+        working/
+            tensorflow2-question-answering/
+                description.md (173 lines)
+                sample_submission.csv (61477 lines)
+                ... and 3 other files
+                tensorflow2-question-answering/
+```
+
+-> data/sample_submission.csv has 61476 rows and 2 columns.
+Here is some information about the columns:
+PredictionString (float64) has 0 unique values: [nan]
+example_id (object) has 2000 unique values. Some example values: ['-4639148749459150090_long', '-257485578111885185_short', '-257485578111885185_long', '-9110190923673509457_short']
+
+-> data/tensorflow2-question-answering/sample_submission.csv has 61476 rows and 2 columns.
+Here is some information about the columns:
+PredictionString (float64) has 0 unique values: [nan]
+example_id (object) has 2000 unique values. Some example values: ['-4639148749459150090_long', '-257485578111885185_short', '-257485578111885185_long', '-9110190923673509457_short']
+
+-> input/sample_submission.csv has 61476 rows and 2 columns.
+Here is some information about the columns:
+PredictionString (float64) has 0 unique values: [nan]
+example_id (object) has 2000 unique values. Some example values: ['-4639148749459150090_long', '-257485578111885185_short', '-257485578111885185_long', '-9110190923673509457_short']
+
+-> input/tensorflow2-question-answering/sample_submission.csv has 61476 rows and 2 columns.
+Here is some information about the columns:
+PredictionString (float64) has 0 unique values: [nan]
+example_id (object) has 2000 unique values. Some example values: ['-4639148749459150090_long', '-257485578111885185_short', '-257485578111885185_long', '-9110190923673509457_short']
+
+-> working/tensorflow2-question-answering/sample_submission.csv has 61476 rows and 2 columns.
+Here is some information about the columns:
+PredictionString (float64) has 0 unique values: [nan]
+example_id (object) has 2000 unique values. Some example values: ['-4639148749459150090_long', '-257485578111885185_short', '-257485578111885185_long', '-9110190923673509457_short']

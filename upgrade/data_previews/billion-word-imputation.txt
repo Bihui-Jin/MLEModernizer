@@ -1,0 +1,34 @@
+```
+/
+    kaggle/
+        data/
+            description.md (52 lines)
+            test_v2.txt (302645 lines)
+            test_v2.txt.zip (18.0 MB)
+            train_v2.txt (29998384 lines)
+            train_v2.txt.zip (1.7 GB)
+            billion-word-imputation/
+                description.md (52 lines)
+                test_v2.txt (302645 lines)
+                ... and 3 other files
+                billion-word-imputation/
+        input/
+            description.md (52 lines)
+            test_v2.txt (302645 lines)
+            test_v2.txt.zip (18.0 MB)
+            train_v2.txt (29998384 lines)
+            train_v2.txt.zip (1.7 GB)
+            billion-word-imputation/
+                description.md (52 lines)
+                test_v2.txt (302645 lines)
+                ... and 3 other files
+                billion-word-imputation/
+        working/
+            billion-word-imputation/
+                description.md (52 lines)
+                test_v2.txt (302645 lines)
+                ... and 3 other files
+                billion-word-imputation/
+```
+
+-> (stopped after 10 files for performance)

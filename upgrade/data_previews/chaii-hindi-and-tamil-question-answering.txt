@@ -1,0 +1,59 @@
+```
+/
+    kaggle/
+        data/
+            description.md (138 lines)
+            sample_submission.csv (113 lines)
+            sample_submission.csv.zip (950 Bytes)
+            test.csv (7173 lines)
+            test.csv.zip (648.4 kB)
+            train.csv (67723 lines)
+            train.csv.zip (5.9 MB)
+            chaii-hindi-and-tamil-question-answering/
+                description.md (138 lines)
+                sample_submission.csv (113 lines)
+                ... and 5 other files
+                chaii-hindi-and-tamil-question-answering/
+        input/
+            description.md (138 lines)
+            sample_submission.csv (113 lines)
+            sample_submission.csv.zip (950 Bytes)
+            test.csv (7173 lines)
+            test.csv.zip (648.4 kB)
+            train.csv (67723 lines)
+            train.csv.zip (5.9 MB)
+            chaii-hindi-and-tamil-question-answering/
+                description.md (138 lines)
+                sample_submission.csv (113 lines)
+                ... and 5 other files
+                chaii-hindi-and-tamil-question-answering/
+        working/
+            chaii-hindi-and-tamil-question-answering/
+                description.md (138 lines)
+                sample_submission.csv (113 lines)
+                ... and 5 other files
+                chaii-hindi-and-tamil-question-answering/
+```
+
+-> data/chaii-hindi-and-tamil-question-answering/sample_submission.csv has 112 rows and 2 columns.
+The columns are: id, PredictionString
+
+-> data/chaii-hindi-and-tamil-question-answering/test.csv has 7172 rows and 4 columns.
+The columns are: id, context, question, language
+
+-> data/chaii-hindi-and-tamil-question-answering/train.csv has 67722 rows and 6 columns.
+The columns are: id, context, question, answer_text, answer_start, language
+
+-> data/sample_submission.csv has 112 rows and 2 columns.
+The columns are: id, PredictionString
+
+-> data/test.csv has 7172 rows and 4 columns.
+The columns are: id, context, question, language
+
+-> data/train.csv has 67722 rows and 6 columns.
+The columns are: id, context, question, answer_text, answer_start, language
+
+-> input/chaii-hindi-and-tamil-question-answering/sample_submission.csv has 112 rows and 2 columns.
+The columns are: id, PredictionString
+
+-> (stopped after 10 files for performance)

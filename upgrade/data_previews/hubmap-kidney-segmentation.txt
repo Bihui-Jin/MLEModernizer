@@ -1,0 +1,499 @@
+```
+/
+    kaggle/
+        data/
+            HuBMAP-20-dataset_information.csv (16 lines)
+            HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+            description.md (211 lines)
+            sample_submission.csv (4 lines)
+            sample_submission.csv.zip (238 Bytes)
+            test.zip (3.3 GB)
+            train.csv (13 lines)
+            train.csv.zip (5.0 MB)
+            train.zip (16.5 GB)
+            hubmap-kidney-segmentation/
+                HuBMAP-20-dataset_information.csv (16 lines)
+                HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+                ... and 7 other files
+                hubmap-kidney-segmentation/
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+            test/
+                0486052bb-anatomical-structure.json (161 lines)
+                0486052bb.json (11619 lines)
+                ... and 8 other files
+                test/
+            train/
+                1e2425f28-anatomical-structure.json (127 lines)
+                1e2425f28.json (30956 lines)
+                ... and 34 other files
+                train/
+        input/
+            HuBMAP-20-dataset_information.csv (16 lines)
+            HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+            description.md (211 lines)
+            sample_submission.csv (4 lines)
+            sample_submission.csv.zip (238 Bytes)
+            test.zip (3.3 GB)
+            train.csv (13 lines)
+            train.csv.zip (5.0 MB)
+            train.zip (16.5 GB)
+            hubmap-kidney-segmentation/
+                HuBMAP-20-dataset_information.csv (16 lines)
+                HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+                ... and 7 other files
+                hubmap-kidney-segmentation/
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+            test/
+                0486052bb-anatomical-structure.json (161 lines)
+                0486052bb.json (11619 lines)
+                ... and 8 other files
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+            train/
+                1e2425f28-anatomical-structure.json (127 lines)
+                1e2425f28.json (30956 lines)
+                ... and 34 other files
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+        working/
+            hubmap-kidney-segmentation/
+                HuBMAP-20-dataset_information.csv (16 lines)
+                HuBMAP-20-dataset_information.csv.zip (987 Bytes)
+                ... and 7 other files
+                hubmap-kidney-segmentation/
+                test/
+                    0486052bb-anatomical-structure.json (161 lines)
+                    0486052bb.json (11619 lines)
+                    ... and 8 other files
+                    test/
+                train/
+                    1e2425f28-anatomical-structure.json (127 lines)
+                    1e2425f28.json (30956 lines)
+                    ... and 34 other files
+                    train/
+```
+
+-> data/HuBMAP-20-dataset_information.csv has 15 rows and 16 columns.
+The columns are: image_file, width_pixels, height_pixels, anatomical_structures_segmention_file, glomerulus_segmentation_file, patient_number, race, ethnicity, sex, age, weight_kilograms, height_centimeters, bmi_kg/m^2, laterality, percent_cortex... and 1 more columns
+
+-> data/hubmap-kidney-segmentation/HuBMAP-20-dataset_information.csv has 15 rows and 16 columns.
+The columns are: image_file, width_pixels, height_pixels, anatomical_structures_segmention_file, glomerulus_segmentation_file, patient_number, race, ethnicity, sex, age, weight_kilograms, height_centimeters, bmi_kg/m^2, laterality, percent_cortex... and 1 more columns
+
+-> data/hubmap-kidney-segmentation/sample_submission.csv has 3 rows and 2 columns.
+The columns are: id, predicted
+
+-> data/hubmap-kidney-segmentation/test/0486052bb-anatomical-structure.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/0486052bb.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/095bf7a1f-anatomical-structure.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/095bf7a1f.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> data/hubmap-kidney-segmentation/test/8242609fa-anatomical-structure.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": "string"
+      },
+      "id": {
+        "type": "string"
+      },
+      "geometry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "coordinates",
+          "type"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "classification": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "colorRGB": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "colorRGB",
+              "name"
+            ]
+          },
+          "isLocked": {
+            "type": "boolean"
+          },
+          "measurements": {
+            "type": "array"
+          }
+        },
+        "required": [
+          "classification",
+          "isLocked",
+          "measurements"
+        ]
+      }
+    },
+    "required": [
+      "geometry",
+      "id",
+      "properties",
+      "type"
+    ]
+  }
+}
+
+-> (stopped after 10 files for performance)

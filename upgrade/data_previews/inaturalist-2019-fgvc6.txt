@@ -1,0 +1,1274 @@
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            kaggle_sample_submission.csv (32215 lines)
+            kaggle_sample_submission.csv.zip (106.9 kB)
+            test2019.json (257766 lines)
+            test2019.tar.gz (9.5 GB)
+            test2019.zip (9.4 GB)
+            train2019.json (3039145 lines)
+            train_val2019.tar.gz (68.6 GB)
+            train_val2019.zip (68.1 GB)
+            val2019.json (1 lines)
+            inaturalist-2019-fgvc6/
+                description.md (122 lines)
+                kaggle_sample_submission.csv (32215 lines)
+                ... and 8 other files
+                inaturalist-2019-fgvc6/
+                test2019/
+                    c1092b3c073ae6d0e5b551d756589321.jpg (94.2 kB)
+                    2aec916a965fed318d0ef7e08c05d24c.jpg (114.8 kB)
+                    ... and 32212 other files
+                train_val2019/
+                    Amphibians/
+                        153/
+                            ... (max depth reached)
+                        154/
+                            ... (max depth reached)
+                        155/
+                            ... (max depth reached)
+                        156/
+                            ... (max depth reached)
+                        157/
+                            ... (max depth reached)
+                        158/
+                            ... (max depth reached)
+                        159/
+                            ... (max depth reached)
+                        160/
+                            ... (max depth reached)
+                        161/
+                            ... (max depth reached)
+                        162/
+                            ... (max depth reached)
+                    Birds/
+                        202/
+                            ... (max depth reached)
+                        203/
+                            ... (max depth reached)
+                        ... and 124 other folders
+                    Fungi/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 10 other folders
+                    Insects/
+                        100/
+                            ... (max depth reached)
+                        101/
+                            ... (max depth reached)
+                        ... and 139 other folders
+                    Plants/
+                        1000/
+                            ... (max depth reached)
+                        1001/
+                            ... (max depth reached)
+                        ... and 680 other folders
+                    Reptiles/
+                        163/
+                            ... (max depth reached)
+                        164/
+                            ... (max depth reached)
+                        ... and 37 other folders
+            test2019/
+                c1092b3c073ae6d0e5b551d756589321.jpg (94.2 kB)
+                2aec916a965fed318d0ef7e08c05d24c.jpg (114.8 kB)
+                ... and 32212 other files
+            train_val2019/
+                Amphibians/
+                    153/
+                        c79932560c3d7c3c45be08e2fbc03aa5.jpg (486.0 kB)
+                        4bfc399c57e71eae26a8387df45f1088.jpg (190.8 kB)
+                        ... and 438 other files
+                    154/
+                        01c3f28091a49e6b94ca00f118756dad.jpg (124.2 kB)
+                        0318ddb43246a87282c79c46a7121a1a.jpg (174.6 kB)
+                        ... and 43 other files
+                    155/
+                        50938cc1ad899c10463d020d88daa5fc.jpg (181.3 kB)
+                        fb9ddd9edc0bcc13f077dbac90fe345a.jpg (207.8 kB)
+                        ... and 438 other files
+                    156/
+                        897f9a74d4580dd1b640e56f3faf24f2.jpg (700.0 kB)
+                        297ca4f68f4ff79f3ee93fda82683135.jpg (485.1 kB)
+                        ... and 438 other files
+                    157/
+                        657911a3bd750a48823c9d0ea0784bd1.jpg (45.3 kB)
+                        ec801f17fe24c76869f665b89a97e583.jpg (127.8 kB)
+                        ... and 106 other files
+                    158/
+                        c474d6b7ae5fb8adb7e672895f59d8b6.jpg (281.2 kB)
+                        d8eee6df7393e794989c427fb5bb41f2.jpg (492.0 kB)
+                        ... and 438 other files
+                    159/
+                        c74a8d3162a5746a17d21ea852912ffd.jpg (531.6 kB)
+                        54533cc43f165927819d32f37e424f73.jpg (728.3 kB)
+                        ... and 438 other files
+                    160/
+                        9fea96537e3aa5091dc2e065db93adb8.jpg (306.6 kB)
+                        291d85bcef5819bb7eec2c60518301cb.jpg (324.6 kB)
+                        ... and 438 other files
+                    161/
+                        f30ea8056ebd9e1d84172f95bba44166.jpg (269.0 kB)
+                        db997c366a32645f6c14a23bc1adcfe2.jpg (306.9 kB)
+                        ... and 438 other files
+                    162/
+                        078e8eadffe4c2875610bed0d9abc94b.jpg (648.7 kB)
+                        ffb02a27cbf28f4c4fada54e2127e5fc.jpg (86.4 kB)
+                        ... and 180 other files
+                Birds/
+                    202/
+                        ea516811b1574a9b6f52fcc545677663.jpg (155.3 kB)
+                        031e50a36b03fc141c9f468c3e5eb9b7.jpg (143.2 kB)
+                        ... and 438 other files
+                    203/
+                        fab70b28be8b455a2ea0cdd84da7b1f4.jpg (100.5 kB)
+                        24b9c463d931238eca34b77f9f1c0c33.jpg (47.1 kB)
+                        ... and 438 other files
+                    ... and 124 other folders
+                Fungi/
+                    0/
+                        cd2a9696fab9993da168e47f79011f8c.jpg (599.8 kB)
+                        6f4fd3ded86a3a68d95e032209fea839.jpg (251.2 kB)
+                        ... and 55 other files
+                    1/
+                        d015361dfde16d2a6458ecd016234039.jpg (263.0 kB)
+                        89675297799e4d3e94d2e5355171bf47.jpg (265.8 kB)
+                        ... and 209 other files
+                    ... and 10 other folders
+                Insects/
+                    100/
+                        f1f27a1dd8a98bdeee00b83aeda6fbec.jpg (333.9 kB)
+                        eff42d7053949c28eb4ba903f651f39b.jpg (549.6 kB)
+                        ... and 438 other files
+                    101/
+                        0b45d4d58aa2d4eb5ba20274f3109db0.jpg (146.1 kB)
+                        0bf4b87edce3974bdc0b85567426f9b4.jpg (72.2 kB)
+                        ... and 438 other files
+                    ... and 139 other folders
+                Plants/
+                    1000/
+                        43a844045ded41f65b52cf5319f3381c.jpg (391.5 kB)
+                        3aeedd04b05b4bc2fed4e3100efc4749.jpg (322.0 kB)
+                        ... and 115 other files
+                    1001/
+                        7524b0f29d378bb3eaa59200b8676023.jpg (245.5 kB)
+                        cc982a45039e2e13e2a2b711550d056e.jpg (257.5 kB)
+                        ... and 141 other files
+                    ... and 680 other folders
+                Reptiles/
+                    163/
+                        e5a271e233235dbc14857aff292a21b5.jpg (75.6 kB)
+                        77cbdab165027603f1908db67d1e6471.jpg (523.1 kB)
+                        ... and 257 other files
+                    164/
+                        daac85bfdc2eec03632e63c1b4ec5a38.jpg (112.8 kB)
+                        33f5659b5d561822aae4d3c772a8be3b.jpg (43.9 kB)
+                        ... and 438 other files
+                    ... and 37 other folders
+        input/
+            description.md (122 lines)
+            kaggle_sample_submission.csv (32215 lines)
+            kaggle_sample_submission.csv.zip (106.9 kB)
+            test2019.json (257766 lines)
+            test2019.tar.gz (9.5 GB)
+            test2019.zip (9.4 GB)
+            train2019.json (3039145 lines)
+            train_val2019.tar.gz (68.6 GB)
+            train_val2019.zip (68.1 GB)
+            val2019.json (1 lines)
+            inaturalist-2019-fgvc6/
+                description.md (122 lines)
+                kaggle_sample_submission.csv (32215 lines)
+                ... and 8 other files
+                inaturalist-2019-fgvc6/
+                test2019/
+                    c1092b3c073ae6d0e5b551d756589321.jpg (94.2 kB)
+                    2aec916a965fed318d0ef7e08c05d24c.jpg (114.8 kB)
+                    ... and 32212 other files
+                train_val2019/
+                    Amphibians/
+                        153/
+                            ... (max depth reached)
+                        154/
+                            ... (max depth reached)
+                        155/
+                            ... (max depth reached)
+                        156/
+                            ... (max depth reached)
+                        157/
+                            ... (max depth reached)
+                        158/
+                            ... (max depth reached)
+                        159/
+                            ... (max depth reached)
+                        160/
+                            ... (max depth reached)
+                        161/
+                            ... (max depth reached)
+                        162/
+                            ... (max depth reached)
+                    Birds/
+                        202/
+                            ... (max depth reached)
+                        203/
+                            ... (max depth reached)
+                        ... and 124 other folders
+                    Fungi/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 10 other folders
+                    Insects/
+                        100/
+                            ... (max depth reached)
+                        101/
+                            ... (max depth reached)
+                        ... and 139 other folders
+                    Plants/
+                        1000/
+                            ... (max depth reached)
+                        1001/
+                            ... (max depth reached)
+                        ... and 680 other folders
+                    Reptiles/
+                        163/
+                            ... (max depth reached)
+                        164/
+                            ... (max depth reached)
+                        ... and 37 other folders
+            test2019/
+                c1092b3c073ae6d0e5b551d756589321.jpg (94.2 kB)
+                2aec916a965fed318d0ef7e08c05d24c.jpg (114.8 kB)
+                ... and 32212 other files
+            train_val2019/
+                Amphibians/
+                    153/
+                        c79932560c3d7c3c45be08e2fbc03aa5.jpg (486.0 kB)
+                        4bfc399c57e71eae26a8387df45f1088.jpg (190.8 kB)
+                        ... and 438 other files
+                    154/
+                        01c3f28091a49e6b94ca00f118756dad.jpg (124.2 kB)
+                        0318ddb43246a87282c79c46a7121a1a.jpg (174.6 kB)
+                        ... and 43 other files
+                    155/
+                        50938cc1ad899c10463d020d88daa5fc.jpg (181.3 kB)
+                        fb9ddd9edc0bcc13f077dbac90fe345a.jpg (207.8 kB)
+                        ... and 438 other files
+                    156/
+                        897f9a74d4580dd1b640e56f3faf24f2.jpg (700.0 kB)
+                        297ca4f68f4ff79f3ee93fda82683135.jpg (485.1 kB)
+                        ... and 438 other files
+                    157/
+                        657911a3bd750a48823c9d0ea0784bd1.jpg (45.3 kB)
+                        ec801f17fe24c76869f665b89a97e583.jpg (127.8 kB)
+                        ... and 106 other files
+                    158/
+                        c474d6b7ae5fb8adb7e672895f59d8b6.jpg (281.2 kB)
+                        d8eee6df7393e794989c427fb5bb41f2.jpg (492.0 kB)
+                        ... and 438 other files
+                    159/
+                        c74a8d3162a5746a17d21ea852912ffd.jpg (531.6 kB)
+                        54533cc43f165927819d32f37e424f73.jpg (728.3 kB)
+                        ... and 438 other files
+                    160/
+                        9fea96537e3aa5091dc2e065db93adb8.jpg (306.6 kB)
+                        291d85bcef5819bb7eec2c60518301cb.jpg (324.6 kB)
+                        ... and 438 other files
+                    161/
+                        f30ea8056ebd9e1d84172f95bba44166.jpg (269.0 kB)
+                        db997c366a32645f6c14a23bc1adcfe2.jpg (306.9 kB)
+                        ... and 438 other files
+                    162/
+                        078e8eadffe4c2875610bed0d9abc94b.jpg (648.7 kB)
+                        ffb02a27cbf28f4c4fada54e2127e5fc.jpg (86.4 kB)
+                        ... and 180 other files
+                Birds/
+                    202/
+                        ea516811b1574a9b6f52fcc545677663.jpg (155.3 kB)
+                        031e50a36b03fc141c9f468c3e5eb9b7.jpg (143.2 kB)
+                        ... and 438 other files
+                    203/
+                        fab70b28be8b455a2ea0cdd84da7b1f4.jpg (100.5 kB)
+                        24b9c463d931238eca34b77f9f1c0c33.jpg (47.1 kB)
+                        ... and 438 other files
+                    ... and 124 other folders
+                Fungi/
+                    0/
+                        cd2a9696fab9993da168e47f79011f8c.jpg (599.8 kB)
+                        6f4fd3ded86a3a68d95e032209fea839.jpg (251.2 kB)
+                        ... and 55 other files
+                    1/
+                        d015361dfde16d2a6458ecd016234039.jpg (263.0 kB)
+                        89675297799e4d3e94d2e5355171bf47.jpg (265.8 kB)
+                        ... and 209 other files
+                    ... and 10 other folders
+                Insects/
+                    100/
+                        f1f27a1dd8a98bdeee00b83aeda6fbec.jpg (333.9 kB)
+                        eff42d7053949c28eb4ba903f651f39b.jpg (549.6 kB)
+                        ... and 438 other files
+                    101/
+                        0b45d4d58aa2d4eb5ba20274f3109db0.jpg (146.1 kB)
+                        0bf4b87edce3974bdc0b85567426f9b4.jpg (72.2 kB)
+                        ... and 438 other files
+                    ... and 139 other folders
+                Plants/
+                    1000/
+                        43a844045ded41f65b52cf5319f3381c.jpg (391.5 kB)
+                        3aeedd04b05b4bc2fed4e3100efc4749.jpg (322.0 kB)
+                        ... and 115 other files
+                    1001/
+                        7524b0f29d378bb3eaa59200b8676023.jpg (245.5 kB)
+                        cc982a45039e2e13e2a2b711550d056e.jpg (257.5 kB)
+                        ... and 141 other files
+                    ... and 680 other folders
+                Reptiles/
+                    163/
+                        e5a271e233235dbc14857aff292a21b5.jpg (75.6 kB)
+                        77cbdab165027603f1908db67d1e6471.jpg (523.1 kB)
+                        ... and 257 other files
+                    164/
+                        daac85bfdc2eec03632e63c1b4ec5a38.jpg (112.8 kB)
+                        33f5659b5d561822aae4d3c772a8be3b.jpg (43.9 kB)
+                        ... and 438 other files
+                    ... and 37 other folders
+        working/
+            inaturalist-2019-fgvc6/
+                description.md (122 lines)
+                kaggle_sample_submission.csv (32215 lines)
+                ... and 8 other files
+                inaturalist-2019-fgvc6/
+                test2019/
+                    c1092b3c073ae6d0e5b551d756589321.jpg (94.2 kB)
+                    2aec916a965fed318d0ef7e08c05d24c.jpg (114.8 kB)
+                    ... and 32212 other files
+                train_val2019/
+                    Amphibians/
+                        153/
+                            ... (max depth reached)
+                        154/
+                            ... (max depth reached)
+                        155/
+                            ... (max depth reached)
+                        156/
+                            ... (max depth reached)
+                        157/
+                            ... (max depth reached)
+                        158/
+                            ... (max depth reached)
+                        159/
+                            ... (max depth reached)
+                        160/
+                            ... (max depth reached)
+                        161/
+                            ... (max depth reached)
+                        162/
+                            ... (max depth reached)
+                    Birds/
+                        202/
+                            ... (max depth reached)
+                        203/
+                            ... (max depth reached)
+                        ... and 124 other folders
+                    Fungi/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 10 other folders
+                    Insects/
+                        100/
+                            ... (max depth reached)
+                        101/
+                            ... (max depth reached)
+                        ... and 139 other folders
+                    Plants/
+                        1000/
+                            ... (max depth reached)
+                        1001/
+                            ... (max depth reached)
+                        ... and 680 other folders
+                    Reptiles/
+                        163/
+                            ... (max depth reached)
+                        164/
+                            ... (max depth reached)
+                        ... and 37 other folders
+```
+
+-> data/inaturalist-2019-fgvc6/kaggle_sample_submission.csv has 32214 rows and 2 columns.
+The columns are: id, predicted
+
+-> data/inaturalist-2019-fgvc6/test2019.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "rights_holder": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "rights_holder",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/inaturalist-2019-fgvc6/train2019.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "class": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          },
+          "phylum": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "class",
+          "family",
+          "genus",
+          "id",
+          "kingdom",
+          "name",
+          "order",
+          "phylum"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "rights_holder": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "rights_holder",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/inaturalist-2019-fgvc6/val2019.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "info": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "license": {
+            "type": "integer"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "rights_holder": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "rights_holder",
+          "width"
+        ]
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "image_id": {
+            "type": "integer"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kingdom": {
+            "type": "string"
+          },
+          "phylum": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "class": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "class",
+          "family",
+          "genus",
+          "id",
+          "kingdom",
+          "name",
+          "order",
+          "phylum"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/kaggle_sample_submission.csv has 32214 rows and 2 columns.
+The columns are: id, predicted
+
+-> data/test2019.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "rights_holder": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "rights_holder",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/train2019.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "class": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "kingdom": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          },
+          "phylum": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "class",
+          "family",
+          "genus",
+          "id",
+          "kingdom",
+          "name",
+          "order",
+          "phylum"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "rights_holder": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "rights_holder",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/val2019.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "info": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        },
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "license": {
+            "type": "integer"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "rights_holder": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "rights_holder",
+          "width"
+        ]
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "image_id": {
+            "type": "integer"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kingdom": {
+            "type": "string"
+          },
+          "phylum": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "class": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "class",
+          "family",
+          "genus",
+          "id",
+          "kingdom",
+          "name",
+          "order",
+          "phylum"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> (stopped after 10 files for performance)

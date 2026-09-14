@@ -1,0 +1,118 @@
+```
+/
+    kaggle/
+        data/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+        input/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+        working/
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+```
+
+-> data/ranzcr-clip-catheter-line-classification/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/ranzcr-clip-catheter-line-classification/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/ranzcr-clip-catheter-line-classification/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> data/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> (stopped after 10 files for performance)

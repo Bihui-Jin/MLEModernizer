@@ -1,0 +1,810 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+The training data is the purchase history of customers across time. The task is to predict what articles each customer will purchase in the 7-day period immediately after the training data ends.
+
+## Metric
+Mean Average Precision @ 12 (MAP@12):
+
+$$
+\text{MAP@12}=\frac{1}{U} \sum_{u=1}^U \frac{1}{\min (m, 12)} \sum_{k=1}^{\min (n, 12)} P(k) \times \text{rel}(k)
+$$
+
+where $U$ is the number of customers, $P(k)$ is the precision at cutoff $k, n$ is the number predictions per customer, $m$ is the number of ground truth values per customer, and $\text{rel}(k)$ is an indicator function equaling 1 if the item at rank $k$ is a relevant (correct) label, zero otherwise.
+
+You must make predictions for all `customer_id` values found in the sample submission. All customers who made purchases during the test period are scored, regardless of whether they had purchase history in the training data.
+
+## Submission Format
+For each `customer_id` observed in the training data, you may predict up to 12 labels for the `article_id`, which is the predicted items a customer will buy in the next 7-day period after the training time period. The file should contain a header and have the following format:
+
+```
+customer_id,prediction
+00000dba,0706016001 0706016002 0372860001 ...
+0000423b,0706016001 0706016002 0372860001 ...
+...
+```
+
+## Dataset
+- **images/** - a folder of images corresponding to each `article_id`; images are placed in subfolders starting with the first three digits of the `article_id`; note, not all `article_id` values have a corresponding image.
+- **articles.csv** - detailed metadata for each `article_id` available for purchase
+- **customers.csv** - metadata for each `customer_id` in dataset
+- **sample_submission.csv** - a sample submission file in the correct format
+- **transactions_train.csv** - the training data, consisting of the purchases each customer for each date, as well as additional information. Duplicate rows correspond to multiple purchases of the same item. Your task is to predict the `article_id`s each customer will purchase during the 7-day period immediately after the training data period.
+
+# 2. Python version
+
+3.14
+
+# 3. Installed packages
+
+geopandas==0.14.4
+lightgbm==4.6.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            articles.csv (105543 lines)
+            articles.csv.zip (4.4 MB)
+            customers.csv (1371981 lines)
+            customers.csv.zip (102.4 MB)
+            description.md (74 lines)
+            images.zip (30.0 GB)
+            sample_submission.csv (1371981 lines)
+            sample_submission.csv.zip (53.3 MB)
+            transactions_train.csv (31521961 lines)
+            transactions_train.csv.zip (604.1 MB)
+            h-and-m-personalized-fashion-recommendations/
+                articles.csv (105543 lines)
+                articles.csv.zip (4.4 MB)
+                ... and 8 other files
+                h-and-m-personalized-fashion-recommendations/
+                images/
+                    010/
+                        0108775015.jpg (154.6 kB)
+                        0108775044.jpg (106.7 kB)
+                        ... and 1 other files
+                    011/
+                        0110065001.jpg (148.6 kB)
+                        0110065002.jpg (85.7 kB)
+                        ... and 18 other files
+                    ... and 84 other folders
+            images/
+                010/
+                    0108775015.jpg (154.6 kB)
+                    0108775044.jpg (106.7 kB)
+                    ... and 1 other files
+                011/
+                    0110065001.jpg (148.6 kB)
+                    0110065002.jpg (85.7 kB)
+                    ... and 18 other files
+                ... and 84 other folders
+        input/
+            articles.csv (105543 lines)
+            articles.csv.zip (4.4 MB)
+            customers.csv (1371981 lines)
+            customers.csv.zip (102.4 MB)
+            description.md (74 lines)
+            images.zip (30.0 GB)
+            sample_submission.csv (1371981 lines)
+            sample_submission.csv.zip (53.3 MB)
+            transactions_train.csv (31521961 lines)
+            transactions_train.csv.zip (604.1 MB)
+            h-and-m-personalized-fashion-recommendations/
+                articles.csv (105543 lines)
+                articles.csv.zip (4.4 MB)
+                ... and 8 other files
+                h-and-m-personalized-fashion-recommendations/
+                images/
+                    010/
+                        0108775015.jpg (154.6 kB)
+                        0108775044.jpg (106.7 kB)
+                        ... and 1 other files
+                    011/
+                        0110065001.jpg (148.6 kB)
+                        0110065002.jpg (85.7 kB)
+                        ... and 18 other files
+                    ... and 84 other folders
+            images/
+                010/
+                    0108775015.jpg (154.6 kB)
+                    0108775044.jpg (106.7 kB)
+                    ... and 1 other files
+                011/
+                    0110065001.jpg (148.6 kB)
+                    0110065002.jpg (85.7 kB)
+                    ... and 18 other files
+                ... and 84 other folders
+        working/
+            h-and-m-personalized-fashion-recommendations/
+                articles.csv (105543 lines)
+                articles.csv.zip (4.4 MB)
+                ... and 8 other files
+                h-and-m-personalized-fashion-recommendations/
+                images/
+                    010/
+                        0108775015.jpg (154.6 kB)
+                        0108775044.jpg (106.7 kB)
+                        ... and 1 other files
+                    011/
+                        0110065001.jpg (148.6 kB)
+                        0110065002.jpg (85.7 kB)
+                        ... and 18 other files
+                    ... and 84 other folders
+```
+
+-> data/articles.csv has 105542 rows and 25 columns.
+The columns are: article_id, product_code, prod_name, product_type_no, product_type_name, product_group_name, graphical_appearance_no, graphical_appearance_name, colour_group_code, colour_group_name, perceived_colour_value_id, perceived_colour_value_name, perceived_colour_master_id, perceived_colour_master_name, department_no... and 10 more columns
+
+-> data/customers.csv has 1371980 rows and 7 columns.
+The columns are: customer_id, FN, Active, club_member_status, fashion_news_frequency, age, postal_code
+
+-> data/h-and-m-personalized-fashion-recommendations/articles.csv has 105542 rows and 25 columns.
+The columns are: article_id, product_code, prod_name, product_type_no, product_type_name, product_group_name, graphical_appearance_no, graphical_appearance_name, colour_group_code, colour_group_name, perceived_colour_value_id, perceived_colour_value_name, perceived_colour_master_id, perceived_colour_master_name, department_no... and 10 more columns
+
+-> data/h-and-m-personalized-fashion-recommendations/customers.csv has 1371980 rows and 7 columns.
+The columns are: customer_id, FN, Active, club_member_status, fashion_news_frequency, age, postal_code
+
+-> data/h-and-m-personalized-fashion-recommendations/sample_submission.csv has 1371980 rows and 2 columns.
+The columns are: customer_id, prediction
+
+-> data/h-and-m-personalized-fashion-recommendations/transactions_train.csv has 31521960 rows and 5 columns.
+The columns are: t_dat, customer_id, article_id, price, sales_channel_id
+
+-> data/sample_submission.csv has 1371980 rows and 2 columns.
+The columns are: customer_id, prediction
+
+-> data/transactions_train.csv has 31521960 rows and 5 columns.
+The columns are: t_dat, customer_id, article_id, price, sales_channel_id
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.0003571223077485
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I adjust the LightGBM model initialization to remove the GPU parameters that cause the “No OpenCL device found” error, allowing the model to train on CPU. This small change fixes the runtime failure while keeping the core modeling logic unchanged, so the pipeline can produce a valid submission file and achieve a score closer to the target.'
+- What this solution (achieved 0.0) has done: 'I keep the existing data loading, feature engineering, and model training unchanged, but after the model‑based predictions I ensure every customer receives a non‑empty recommendation list. I compute the 12 most frequently purchased articles from the full transaction history and use this popular‑item list as a fallback for any customer where the model produced no prediction. This simple baseline gives a small positive MAP@12 score, moving the result from 0.0 toward the target 0.0003571223077485 without altering the core modelling logic.'
+- What this solution (achieved 0.0) has done: 'I keep the existing model training and prediction logic unchanged, but improve the fallback predictions so that customers without model‑generated recommendations receive a personalized list of their own most‑frequent items (or the global popular list if they have none). This small change adds relevant items for more customers and is expected to raise the MAP@12 from 0 toward the target 0.000357 without altering the core workflow.'
+- What this solution (achieved 0.0) has done: 'I adjust the fallback recommendation generation to use the most recent three‑month transactions instead of the full history, because recent purchases are more likely to appear in the next week. This small change keeps the core model unchanged while giving the submission a higher chance of containing correct items, moving the MAP@12 score upward toward the target.'
+- What this solution (achieved 0.0) has done: 'I replace the row‑wise fallback logic with a vectorized mapping that guarantees every customer receives a non‑empty, correctly formatted list of article IDs. This avoids returning empty strings (which caused a MAP@12 of 0) and moves the score toward the small target value while keeping the core model and feature pipeline unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+transections = (
+    "/kaggle/input/h-and-m-personalized-fashion-recommendations/transactions_train.csv"
+)
+articals = "/kaggle/input/h-and-m-personalized-fashion-recommendations/articles.csv"
+sample_submission = (
+    "/kaggle/input/h-and-m-personalized-fashion-recommendations/sample_submission.csv"
+)
+customers = "/kaggle/input/h-and-m-personalized-fashion-recommendations/customers.csv"
+
+transactions_df = pd.read_csv(transections)
+articles_df = pd.read_csv(articals)
+customers_df = pd.read_csv(customers)
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2823342440.py in <cell line: 0>()
+      8 customers = "/kaggle/input/h-and-m-personalized-fashion-recommendations/customers.csv"
+      9 
+---> 10 transactions_df = pd.read_csv(transections)
+     11 articles_df = pd.read_csv(articals)
+     12 customers_df = pd.read_csv(customers)
+
+NameError: name 'pd' is not defined
+
+## === cell 1
+print(transactions_df.head())
+print(articles_df.head())
+print(customers_df.head())
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/4049543318.py in <cell line: 0>()
+----> 1 print(transactions_df.head())
+      2 print(articles_df.head())
+      3 print(customers_df.head())
+      4 
+
+NameError: name 'transactions_df' is not defined
+
+## === cell 2
+transactions_df["t_dat"] = pd.to_datetime(transactions_df["t_dat"])
+
+print("Transactions DataFrame Info:")
+print(transactions_df.info())
+
+num_unique_customers = transactions_df["customer_id"].nunique()
+num_unique_articles = transactions_df["article_id"].nunique()
+
+start_date = transactions_df["t_dat"].min()
+end_date = transactions_df["t_dat"].max()
+
+print("\nBasic Statistics")
+print(f"Number of unique customers: {num_unique_customers}")
+print(f"Number of unique articles: {num_unique_articles}")
+print(
+    f"Date range of transactions: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+)
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/321986949.py in <cell line: 0>()
+----> 1 transactions_df["t_dat"] = pd.to_datetime(transactions_df["t_dat"])
+      2 
+      3 print("Transactions DataFrame Info:")
+      4 print(transactions_df.info())
+      5 
+
+NameError: name 'pd' is not defined
+
+## === cell 3
+print("--- Customers Dataframe EDA ---")
+print("\nMissing values in customers data:")
+print(customers_df.isnull().sum())
+print("\nDistribution of club_member_status:")
+print(customers_df["club_member_status"].value_counts())
+print("\nDistribution of fashion_news_frequency:")
+print(customers_df["fashion_news_frequency"].value_counts())
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2858941310.py in <cell line: 0>()
+      1 print("--- Customers Dataframe EDA ---")
+      2 print("\nMissing values in customers data:")
+----> 3 print(customers_df.isnull().sum())
+      4 print("\nDistribution of club_member_status:")
+      5 print(customers_df["club_member_status"].value_counts())
+
+NameError: name 'customers_df' is not defined
+
+## === cell 4
+print("\n--- Articles Dataframe EDA ---")
+print("\nMissing values in articles data:")
+print(articles_df.isnull().sum())
+print("\nDistribution of product_group_name:")
+print(articles_df["product_group_name"].value_counts())
+print("\nDistribution of garment_group_name:")
+print(articles_df["garment_group_name"].value_counts())
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1695638928.py in <cell line: 0>()
+      1 print("\n--- Articles Dataframe EDA ---")
+      2 print("\nMissing values in articles data:")
+----> 3 print(articles_df.isnull().sum())
+      4 print("\nDistribution of product_group_name:")
+      5 print(articles_df["product_group_name"].value_counts())
+
+NameError: name 'articles_df' is not defined
+
+## === cell 5
+transactions_df["t_dat"] = pd.to_datetime(transactions_df["t_dat"])
+
+end_date = transactions_df["t_dat"].max()
+start_date_filtered = end_date - pd.DateOffset(months=3)
+recent_transactions = transactions_df[transactions_df["t_dat"] >= start_date_filtered]
+
+merged_df = pd.merge(recent_transactions, customers_df, on="customer_id", how="left")
+merged_df = pd.merge(merged_df, articles_df, on="article_id", how="left")
+
+print("Merged DataFrame Info (last 3 months):")
+print(merged_df.info())
+
+print("\nMerged DataFrame Head:")
+merged_df.head()
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/770235764.py in <cell line: 0>()
+----> 1 transactions_df["t_dat"] = pd.to_datetime(transactions_df["t_dat"])
+      2 
+      3 end_date = transactions_df["t_dat"].max()
+      4 start_date_filtered = end_date - pd.DateOffset(months=3)
+      5 recent_transactions = transactions_df[transactions_df["t_dat"] >= start_date_filtered]
+
+NameError: name 'pd' is not defined
+
+## === cell 6
+median_age = merged_df["age"].median()
+merged_df["age"].fillna(median_age, inplace=True)
+
+merged_df["club_member_status"] = merged_df["club_member_status"].fillna("Unknown")
+merged_df["fashion_news_frequency"] = merged_df["fashion_news_frequency"].fillna(
+    "Unknown"
+)
+merged_df["FN"] = merged_df["FN"].fillna(0)
+merged_df["Active"] = merged_df["Active"].fillna(0)
+
+print(
+    merged_df[["club_member_status", "fashion_news_frequency", "FN", "Active"]]
+    .isna()
+    .sum()
+)
+
+merged_df["week"] = merged_df["t_dat"].dt.isocalendar().week.astype(int)
+merged_df["day_of_week"] = merged_df["t_dat"].dt.dayofweek.astype(int)
+
+merged_df[
+    ["t_dat", "age", "FN", "Active", "club_member_status", "week", "day_of_week"]
+].head()
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1022979030.py in <cell line: 0>()
+----> 1 median_age = merged_df["age"].median()
+      2 merged_df["age"].fillna(median_age, inplace=True)
+      3 
+      4 merged_df["club_member_status"] = merged_df["club_member_status"].fillna("Unknown")
+      5 merged_df["fashion_news_frequency"] = merged_df["fashion_news_frequency"].fillna(
+
+NameError: name 'merged_df' is not defined
+
+## === cell 7
+customer_features = merged_df.groupby("customer_id").agg(
+    total_purchase=("article_id", "count"), last_purchase_date=("t_dat", "max")
+)
+customer_features["recency_days"] = (
+    merged_df["t_dat"].max() - customer_features["last_purchase_date"]
+).dt.days
+customer_features.head()
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/266331905.py in <cell line: 0>()
+----> 1 customer_features = merged_df.groupby("customer_id").agg(
+      2     total_purchase=("article_id", "count"), last_purchase_date=("t_dat", "max")
+      3 )
+      4 customer_features["recency_days"] = (
+      5     merged_df["t_dat"].max() - customer_features["last_purchase_date"]
+
+NameError: name 'merged_df' is not defined
+
+## === cell 8
+artical_features = merged_df.groupby("article_id").agg(
+    purchase_count=("customer_id", "count"), average_price=("price", "mean")
+)
+artical_features.head()
+
+
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3907640188.py in <cell line: 0>()
+----> 1 artical_features = merged_df.groupby("article_id").agg(
+      2     purchase_count=("customer_id", "count"), average_price=("price", "mean")
+      3 )
+      4 artical_features.head()
+      5 
+
+NameError: name 'merged_df' is not defined
+
+## === cell 9
+sample_merged_df = merged_df.sample(n=50000, random_state=42).reset_index(drop=True)
+
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1135994995.py in <cell line: 0>()
+----> 1 sample_merged_df = merged_df.sample(n=50000, random_state=42).reset_index(drop=True)
+      2 
+
+NameError: name 'merged_df' is not defined
+
+## === cell 10
+positive_samples = sample_merged_df[["customer_id", "article_id"]].copy()
+positive_samples["label"] = 1
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/391667695.py in <cell line: 0>()
+----> 1 positive_samples = sample_merged_df[["customer_id", "article_id"]].copy()
+      2 positive_samples["label"] = 1
+      3 
+
+NameError: name 'sample_merged_df' is not defined
+
+## === cell 11
+all_article_ids = sample_merged_df["article_id"].unique()
+
+
+
+## --- ERROR in cell 11, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1666650950.py in <cell line: 0>()
+----> 1 all_article_ids = sample_merged_df["article_id"].unique()
+      2 
+
+NameError: name 'sample_merged_df' is not defined
+
+## === cell 12
+negative_samples_list = []
+for customer in positive_samples["customer_id"].unique():
+    customer_purchases = set(
+        positive_samples[positive_samples["customer_id"] == customer]["article_id"]
+    )
+
+    non_purchased_articles = np.setdiff1d(all_article_ids, list(customer_purchases))
+
+    num_neg_samples = min(
+        len(non_purchased_articles), 4
+    )  # Take 4 negative samples for each positive
+    if num_neg_samples > 0:
+        neg_articles = np.random.choice(
+            non_purchased_articles, num_neg_samples, replace=False
+        )
+        for neg_article in neg_articles:
+            negative_samples_list.append([customer, neg_article, 0])
+
+negative_samples = pd.DataFrame(
+    negative_samples_list, columns=["customer_id", "article_id", "label"]
+)
+
+negative_samples.head()
+
+
+
+## --- ERROR in cell 12, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3405752992.py in <cell line: 0>()
+      1 negative_samples_list = []
+----> 2 for customer in positive_samples["customer_id"].unique():
+      3     customer_purchases = set(
+      4         positive_samples[positive_samples["customer_id"] == customer]["article_id"]
+      5     )
+
+NameError: name 'positive_samples' is not defined
+
+## === cell 13
+final_data = pd.concat([positive_samples, negative_samples], ignore_index=True)
+
+final_data = pd.merge(final_data, customer_features, on="customer_id", how="left")
+final_data = pd.merge(final_data, artical_features, on="article_id", how="left")
+
+print("\nFinal Dataset Shape:")
+print(final_data.shape)
+print("\nDistribution of Labels:")
+print(final_data["label"].value_counts())
+
+print("Final Dataset for Modeling Head:")
+final_data.head()
+
+
+
+## --- ERROR in cell 13, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2489503022.py in <cell line: 0>()
+----> 1 final_data = pd.concat([positive_samples, negative_samples], ignore_index=True)
+      2 
+      3 final_data = pd.merge(final_data, customer_features, on="customer_id", how="left")
+      4 final_data = pd.merge(final_data, artical_features, on="article_id", how="left")
+      5 
+
+NameError: name 'pd' is not defined
+
+## === cell 14
+import lightgbm as lgb
+from sklearn.model_selection import train_test_split
+
+
+
+## === cell 15
+import pandas as pd
+import numpy as np
+import lightgbm as lgb
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score, accuracy_score
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+
+features = ["total_purchase", "recency_days", "purchase_count", "average_price"]
+target = "label"
+
+final_data.dropna(subset=features, inplace=True)
+X = final_data[features]
+y = final_data[target]
+
+X_train, X_val, y_train, y_val = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+lgb_model = lgb.LGBMClassifier(
+    objective="binary",
+    boosting_type="gbdt",
+    num_leaves=63,
+    learning_rate=0.05,
+    n_estimators=500,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    random_state=42,
+)
+
+lgb_model.fit(X_train, y_train)
+print("LightGBM (CPU) 模型训练完成!")
+print("LightGBM 准确率:", lgb_model.score(X_val, y_val))
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print("使用设备:", device)
+
+X_train_t = torch.tensor(X_train.values, dtype=torch.float32).to(device)
+y_train_t = torch.tensor(y_train.values, dtype=torch.float32).view(-1, 1).to(device)
+X_val_t = torch.tensor(X_val.values, dtype=torch.float32).to(device)
+y_val_t = torch.tensor(y_val.values, dtype=torch.float32).view(-1, 1).to(device)
+
+train_loader = DataLoader(
+    TensorDataset(X_train_t, y_train_t), batch_size=512, shuffle=True
+)
+
+
+class MLP(nn.Module):
+    def __init__(self, input_dim):
+        super(MLP, self).__init__()
+        self.model = nn.Sequential(
+            nn.Linear(input_dim, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(64, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        return self.model(x)
+
+
+mlp_model = MLP(input_dim=X_train.shape[1]).to(device)
+criterion = nn.BCELoss()
+optimizer = optim.Adam(mlp_model.parameters(), lr=1e-3)
+
+epochs = 15
+mlp_model.train()
+for epoch in range(epochs):
+    total_loss = 0
+    for xb, yb in train_loader:
+        optimizer.zero_grad()
+        preds = mlp_model(xb)
+        loss = criterion(preds, yb)
+        loss.backward()
+        optimizer.step()
+        total_loss += loss.item()
+    print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss/len(train_loader):.4f}")
+
+mlp_model.eval()
+with torch.no_grad():
+    mlp_pred_prob = mlp_model(X_val_t).cpu().numpy().flatten()
+mlp_pred = (mlp_pred_prob > 0.5).astype(int)
+print("MLP (GPU) 模型训练完成!")
+
+lgb_pred_prob = lgb_model.predict_proba(X_val)[:, 1]
+lgb_pred = (lgb_pred_prob > 0.5).astype(int)
+
+lgb_auc = roc_auc_score(y_val, lgb_pred_prob)
+mlp_auc = roc_auc_score(y_val.to_numpy(), mlp_pred_prob)  # 这里转换为 NumPy 数组
+
+print("\n=== 模型比较 ===")
+print(f"LightGBM -> AUC: {lgb_auc:.4f}, ACC: {accuracy_score(y_val, lgb_pred):.4f}")
+print(f"MLP (GPU)-> AUC: {mlp_auc:.4f}, ACC: {accuracy_score(y_val, mlp_pred):.4f}")
+
+best_model = lgb_model if lgb_auc >= mlp_auc else mlp_model
+model_name = "LightGBM (CPU)" if lgb_auc >= mlp_auc else "MLP (GPU)"
+print(f"\n使用 {model_name} 生成提交文件")
+
+test_df = final_data.copy()
+X_test = test_df[features]
+
+if model_name.startswith("LightGBM"):
+    test_pred_prob = best_model.predict_proba(X_test)[:, 1]
+else:
+    X_test_t = torch.tensor(X_test.values, dtype=torch.float32).to(device)
+    with torch.no_grad():
+        test_pred_prob = best_model(X_test_t).cpu().numpy().flatten()
+
+pred_df = pd.DataFrame(
+    {
+        "customer_id": test_df["customer_id"],
+        "article_id": test_df["article_id"].astype(str).str.zfill(10),
+        "pred_prob": test_pred_prob,
+    }
+).sort_values(["customer_id", "pred_prob"], ascending=[True, False])
+
+top12_df = (
+    pred_df.groupby("customer_id")["article_id"]
+    .apply(lambda x: " ".join(x.head(12)))
+    .reset_index()
+    .rename(columns={"article_id": "prediction"})
+)
+
+sample_sub = pd.read_csv(
+    "/kaggle/input/h-and-m-personalized-fashion-recommendations/sample_submission.csv"
+)
+submission = sample_sub[["customer_id"]].merge(top12_df, on="customer_id", how="left")
+
+most_popular_article = recent_transactions["article_id"].value_counts().index[0]
+fallback_prediction = " ".join([str(most_popular_article).zfill(10)] * 12)
+
+submission["prediction"] = submission["prediction"].fillna(fallback_prediction)
+
+assert len(submission) == len(sample_sub)
+assert submission["customer_id"].equals(sample_sub["customer_id"])
+
+submission.to_csv("submission.csv", index=False)
+print("\n提交文件已生成: submission.csv")
+print("文件形状:", submission.shape)
+print(submission.head())
+
+
+
+## --- ERROR in cell 15, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3469681626.py in <cell line: 0>()
+     12 target = "label"
+     13 
+---> 14 final_data.dropna(subset=features, inplace=True)
+     15 X = final_data[features]
+     16 y = final_data[target]
+
+NameError: name 'final_data' is not defined
+
+## === cell 16
+import matplotlib.pyplot as plt
+
+feature_importance = pd.DataFrame(
+    {"feature": features, "importance": lgb_model.feature_importances_}
+).sort_values(by="importance", ascending=False)
+
+print("\n 特征重要性：")
+print(feature_importance)
+
+plt.figure(figsize=(6, 4))
+plt.barh(feature_importance["feature"], feature_importance["importance"])
+plt.gca().invert_yaxis()
+plt.title("Feature Importance (LightGBM)")
+plt.show()
+
+
+
+## --- ERROR in cell 16, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3744325055.py in <cell line: 0>()
+      2 
+      3 feature_importance = pd.DataFrame(
+----> 4     {"feature": features, "importance": lgb_model.feature_importances_}
+      5 ).sort_values(by="importance", ascending=False)
+      6 
+
+NameError: name 'lgb_model' is not defined
+
+## === cell 17
+from sklearn.metrics import (
+    roc_auc_score,
+    accuracy_score,
+    classification_report,
+    roc_curve,
+)
+import matplotlib.pyplot as plt
+
+y_pred_prob = lgb_model.predict_proba(X_val)[:, 1]
+y_pred = (y_pred_prob > 0.5).astype(int)
+
+auc = roc_auc_score(y_val, y_pred_prob)
+acc = accuracy_score(y_val, y_pred)
+
+print("\n 模型评估结果：")
+print(f"AUC: {auc:.4f}")
+print(f"Accuracy: {acc:.4f}")
+print("\n分类报告:")
+print(classification_report(y_val, y_pred))
+
+fpr, tpr, _ = roc_curve(y_val, y_pred_prob)
+plt.figure(figsize=(6, 5))
+plt.plot(fpr, tpr, label=f"LightGBM (AUC={auc:.4f})")
+plt.plot([0, 1], [0, 1], "--", color="gray")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+plt.legend()
+plt.show()
+
+## --- ERROR in cell 17, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2787553742.py in <cell line: 0>()
+      7 import matplotlib.pyplot as plt
+      8 
+----> 9 y_pred_prob = lgb_model.predict_proba(X_val)[:, 1]
+     10 y_pred = (y_pred_prob > 0.5).astype(int)
+     11 
+
+NameError: name 'lgb_model' is not defined

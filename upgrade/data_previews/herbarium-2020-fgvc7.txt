@@ -1,0 +1,629 @@
+```
+/
+    kaggle/
+        data/
+            description.md (159 lines)
+            nybg2020.zip (53.5 GB)
+            sample_submission.csv (219125 lines)
+            sample_submission.csv.zip (483.2 kB)
+            herbarium-2020-fgvc7/
+                description.md (159 lines)
+                nybg2020.zip (53.5 GB)
+                ... and 2 other files
+                herbarium-2020-fgvc7/
+                nybg2020/
+                    test/
+                        metadata.json (1533887 lines)
+                        images/
+                            ... (max depth reached)
+                    train/
+                        metadata.json (10743704 lines)
+                        images/
+                            ... (max depth reached)
+            nybg2020/
+                test/
+                    metadata.json (1533887 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 218 other folders
+                train/
+                    metadata.json (10743704 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 319 other folders
+        input/
+            description.md (159 lines)
+            nybg2020.zip (53.5 GB)
+            sample_submission.csv (219125 lines)
+            sample_submission.csv.zip (483.2 kB)
+            herbarium-2020-fgvc7/
+                description.md (159 lines)
+                nybg2020.zip (53.5 GB)
+                ... and 2 other files
+                herbarium-2020-fgvc7/
+                nybg2020/
+                    test/
+                        metadata.json (1533887 lines)
+                        images/
+                            ... (max depth reached)
+                    train/
+                        metadata.json (10743704 lines)
+                        images/
+                            ... (max depth reached)
+            nybg2020/
+                test/
+                    metadata.json (1533887 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 218 other folders
+                train/
+                    metadata.json (10743704 lines)
+                    images/
+                        000/
+                            ... (max depth reached)
+                        001/
+                            ... (max depth reached)
+                        ... and 319 other folders
+        working/
+            herbarium-2020-fgvc7/
+                description.md (159 lines)
+                nybg2020.zip (53.5 GB)
+                ... and 2 other files
+                herbarium-2020-fgvc7/
+                nybg2020/
+                    test/
+                        metadata.json (1533887 lines)
+                        images/
+                            ... (max depth reached)
+                    train/
+                        metadata.json (10743704 lines)
+                        images/
+                            ... (max depth reached)
+```
+
+-> data/herbarium-2020-fgvc7/nybg2020/test/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/herbarium-2020-fgvc7/nybg2020/train/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "integer"
+          },
+          "region_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id",
+          "region_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "family",
+          "genus",
+          "id",
+          "name"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "licenses",
+    "regions"
+  ]
+}
+
+-> data/herbarium-2020-fgvc7/sample_submission.csv has 219124 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/nybg2020/test/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    }
+  },
+  "required": [
+    "images",
+    "info",
+    "licenses"
+  ]
+}
+
+-> data/nybg2020/train/metadata.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "image_id": {
+            "type": "integer"
+          },
+          "region_id": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category_id",
+          "id",
+          "image_id",
+          "region_id"
+        ]
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string"
+          },
+          "genus": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "family",
+          "genus",
+          "id",
+          "name"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "height": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "license": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "file_name",
+          "height",
+          "id",
+          "license",
+          "width"
+        ]
+      }
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "contributor": {
+          "type": "string"
+        },
+        "date_created": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "year": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "contributor",
+        "date_created",
+        "description",
+        "url",
+        "version",
+        "year"
+      ]
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ]
+      }
+    },
+    "regions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    }
+  },
+  "required": [
+    "annotations",
+    "categories",
+    "images",
+    "info",
+    "licenses",
+    "regions"
+  ]
+}
+
+-> data/sample_submission.csv has 219124 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> (stopped after 10 files for performance)

@@ -1,0 +1,323 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.6
+
+# 2. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (89 lines)
+            sample_submission.csv (241 lines)
+            sample_submission.csv.zip (765 Bytes)
+            test.csv (241 lines)
+            test.csv.zip (6.0 kB)
+            test.zip (505.0 kB)
+            train.csv (2161 lines)
+            train.csv.zip (56.7 kB)
+            train.zip (4.5 MB)
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+            test/
+                1/
+                    geometry.xyz (3.0 kB)
+                10/
+                    geometry.xyz (3.0 kB)
+                ... and 239 other folders
+            train/
+                1/
+                    geometry.xyz (5.5 kB)
+                10/
+                    geometry.xyz (2.3 kB)
+                ... and 2159 other folders
+        input/
+            description.md (89 lines)
+            sample_submission.csv (241 lines)
+            sample_submission.csv.zip (765 Bytes)
+            test.csv (241 lines)
+            test.csv.zip (6.0 kB)
+            test.zip (505.0 kB)
+            train.csv (2161 lines)
+            train.csv.zip (56.7 kB)
+            train.zip (4.5 MB)
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+            test/
+                1/
+                    geometry.xyz (3.0 kB)
+                10/
+                    geometry.xyz (3.0 kB)
+                ... and 239 other folders
+            train/
+                1/
+                    geometry.xyz (5.5 kB)
+                10/
+                    geometry.xyz (2.3 kB)
+                ... and 2159 other folders
+        working/
+            nomad2018-predict-transparent-conductors/
+                description.md (89 lines)
+                sample_submission.csv (241 lines)
+                ... and 7 other files
+                nomad2018-predict-transparent-conductors/
+                test/
+                    1/
+                        geometry.xyz (3.0 kB)
+                    10/
+                        geometry.xyz (3.0 kB)
+                    ... and 239 other folders
+                train/
+                    1/
+                        geometry.xyz (5.5 kB)
+                    10/
+                        geometry.xyz (2.3 kB)
+                    ... and 2159 other folders
+```
+
+-> data/nomad2018-predict-transparent-conductors/sample_submission.csv has 240 rows and 3 columns.
+The columns are: id, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/nomad2018-predict-transparent-conductors/test.csv has 240 rows and 12 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree
+
+-> data/nomad2018-predict-transparent-conductors/train.csv has 2160 rows and 14 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/sample_submission.csv has 240 rows and 3 columns.
+The columns are: id, formation_energy_ev_natom, bandgap_energy_ev
+
+-> data/test.csv has 240 rows and 12 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree
+
+-> data/train.csv has 2160 rows and 14 columns.
+The columns are: id, spacegroup, number_of_total_atoms, percent_atom_al, percent_atom_ga, percent_atom_in, lattice_vector_1_ang, lattice_vector_2_ang, lattice_vector_3_ang, lattice_angle_alpha_degree, lattice_angle_beta_degree, lattice_angle_gamma_degree, formation_energy_ev_natom, bandgap_energy_ev
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import KFold
+from sklearn.metrics import log_loss
+%matplotlib inline
+seed=2390
+
+
+## === cell 1
+path = '../input/'
+train = pd.read_csv(path+'train.csv')
+test = pd.read_csv(path+'test.csv')
+print('Number of rows and columns in train data set:',train.shape)
+print('Number of rows and columns in test data  set:',test.shape)
+
+
+## === cell 2
+train.head()
+
+
+## === cell 3
+fig,ax = plt.subplots(2,1,figsize=(10,6))
+ax1,ax2 = ax.flatten()
+sns.distplot(train['formation_energy_ev_natom'],bins=50,ax=ax1,color='b')
+sns.distplot(train['bandgap_energy_ev'],bins=50,ax=ax2,color='r')
+
+
+## === cell 4
+plt.figure(figsize=(14, 8))
+plt.scatter(train["formation_energy_ev_natom"], train["bandgap_energy_ev"], color="r")
+
+
+## === cell 5
+train.describe()
+
+
+## === cell 6
+cor = train.corr()
+plt.figure(figsize=(12,8))
+sns.heatmap(cor,cmap='Set1',annot=True)
+
+
+## === cell 7
+fig,ax = plt.subplots(1,2, figsize=(14,6))
+ax1, ax2 = ax.flatten()
+sns.countplot(train['spacegroup'], palette = 'magma', ax = ax1)
+sns.countplot(x = train['number_of_total_atoms'], palette = 'viridis', ax = ax2)
+
+
+## === cell 8
+pd.crosstab(train['number_of_total_atoms'],train['spacegroup'])
+
+
+## === cell 9
+train['alpha_rad'] = np.radians(train['lattice_angle_alpha_degree'])
+train['beta_rad'] = np.radians(train['lattice_angle_beta_degree'])
+train['gamma_rad'] = np.radians(train['lattice_angle_gamma_degree'])
+
+test['alpha_rad'] = np.radians(test['lattice_angle_alpha_degree'])
+test['beta_rad'] = np.radians(test['lattice_angle_beta_degree'])
+test['gamma_rad'] = np.radians(test['lattice_angle_gamma_degree'])
+
+
+## === cell 10
+def vol(df):
+    """
+    Args:
+        a (float) - lattice vector 1
+        b (float) - lattice vector 2
+        c (float) - lattice vector 3
+        alpha (float) - lattice angle 1 [radians]
+        beta (float) - lattice angle 2 [radians]
+        gamma (float) - lattice angle 3 [radians]
+    Returns:
+        volume (float) of the parallelepiped unit cell
+    """
+    volumn = df['lattice_vector_1_ang']*df['lattice_vector_2_ang']*df['lattice_vector_3_ang']*np.sqrt(
+    1 + 2*np.cos(df['alpha_rad'])*np.cos(df['beta_rad'])*np.cos(df['gamma_rad'])
+    -np.cos(df['alpha_rad'])**2
+    -np.cos(df['beta_rad'])**2
+    -np.cos(df['gamma_rad'])**2)
+    df['volumn'] = volumn
+
+
+## === cell 11
+vol(train)
+vol(test)
+
+
+## === cell 12
+train['density'] = train['number_of_total_atoms'] / train['volumn']
+test['density'] = test['number_of_total_atoms'] / test['volumn']
+
+
+## === cell 13
+def mean_median_feature(df):
+    dmean = df.mean()
+    dmedian = df.median()
+    col = df.columns
+    del_col = ['id','formation_energy_ev_natom','bandgap_energy_ev']
+    col = [w for w in col if w not in del_col]
+    
+    for c in col:
+        df['mean_'+c] = (df[c] > dmean[c]).astype(np.uint8)
+        df['median_'+c] = (df[c] > dmedian[c]).astype(np.uint8)
+
+
+mean_median_feature(train)
+mean_median_feature(test) 
+
+
+## === cell 14
+col = ['formation_energy_ev_natom','bandgap_energy_ev']
+X = train.drop(['id']+col,axis=1)
+y = train[col]
+x_test = test.drop(['id'],axis=1)
+
+
+## === cell 15
+kf = KFold(n_splits=5,random_state=seed,shuffle=True)
+cv_score =[]
+pred_test_full =  0 #np.zeros((x_test.shape[0],y.shape[1]))
+lr = LinearRegression(normalize=1)
+
+for i, (train_index, valid_index) in enumerate(kf.split(X)):
+    print('{} of Kfold {}'.format(i+1,kf.n_splits))
+    xtrain, xvalid = X.loc[train_index], X.loc[valid_index]
+    ytrain, yvalid = y.loc[train_index], y.loc[valid_index]
+
+    lr.fit(X,y)
+    pred_test = lr.predict(x_test)
+    pred_test_full +=pred_test
+    score = lr.score(xvalid,yvalid)
+    print('R square :',score)
+    cv_score.append(score)
+
+
+## --- ERROR in cell 15, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/2288127701.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m      2[0m [0mcv_score[0m [0;34m=[0m[0;34m[[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0mpred_test_full[0m [0;34m=[0m  [0;36m0[0m [0;31m#np.zeros((x_test.shape[0],y.shape[1]))[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 4[0;31m [0mlr[0m [0;34m=[0m [0mLinearRegression[0m[0;34m([0m[0mnormalize[0m[0;34m=[0m[0;36m1[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      5[0m [0;34m[0m[0m
+[1;32m      6[0m [0;32mfor[0m [0mi[0m[0;34m,[0m [0;34m([0m[0mtrain_index[0m[0;34m,[0m [0mvalid_index[0m[0;34m)[0m [0;32min[0m [0menumerate[0m[0;34m([0m[0mkf[0m[0;34m.[0m[0msplit[0m[0;34m([0m[0mX[0m[0;34m)[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mTypeError[0m: LinearRegression.__init__() got an unexpected keyword argument 'normalize'
+
+## === cell 16
+y_pred = pred_test_full/5
+y_pred[y_pred <= 0] = 1e-5
+
+submit = pd.DataFrame({'id':test['id'],'formation_energy_ev_natom':y_pred[:,0],'bandgap_energy_ev':y_pred[:,1]})
+submit.to_csv('lr_conductor.csv',index=False)

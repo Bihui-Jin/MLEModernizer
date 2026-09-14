@@ -1,0 +1,529 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of scanned text that is noisy, remove the noise.
+
+## Metric
+Root mean squared error between the cleaned pixel intensities and the actual grayscale pixel intensities.
+
+## Submission Format
+Form the submission file by melting each images into a set of pixels, assigning each pixel an id of image_row_col (e.g. 1_2_1 is image 1, row 2, column 1). Intensity values range from 0 (black) to 1 (white). The file should contain a header and have the following format:
+
+```
+id,value
+1_1_1,1
+1_2_1,1
+1_3_1,1
+etc.
+```
+
+## Dataset
+You are provided two sets of images, train and test. These images contain various styles of text, to which synthetic noise has been added to simulate real-world, messy artifacts. The training set includes the test without the noise (train_cleaned).
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sampleSubmission.csv (5789881 lines)
+            sampleSubmission.csv.zip (12.0 MB)
+            test.zip (4.0 MB)
+            train.zip (15.5 MB)
+            train_cleaned.zip (5.2 MB)
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+            test/
+                110.png (149.2 kB)
+                111.png (146.9 kB)
+                ... and 27 other files
+                test/
+            train/
+                116.png (152.2 kB)
+                201.png (156.1 kB)
+                ... and 113 other files
+                train/
+            train_cleaned/
+                173.png (60.4 kB)
+                47.png (35.5 kB)
+                ... and 113 other files
+        input/
+            description.md (59 lines)
+            sampleSubmission.csv (5789881 lines)
+            sampleSubmission.csv.zip (12.0 MB)
+            test.zip (4.0 MB)
+            train.zip (15.5 MB)
+            train_cleaned.zip (5.2 MB)
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+            test/
+                110.png (149.2 kB)
+                111.png (146.9 kB)
+                ... and 27 other files
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+            train/
+                116.png (152.2 kB)
+                201.png (156.1 kB)
+                ... and 113 other files
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+            train_cleaned/
+                173.png (60.4 kB)
+                47.png (35.5 kB)
+                ... and 113 other files
+        working/
+            denoising-dirty-documents/
+                description.md (59 lines)
+                sampleSubmission.csv (5789881 lines)
+                ... and 4 other files
+                denoising-dirty-documents/
+                test/
+                    110.png (149.2 kB)
+                    111.png (146.9 kB)
+                    ... and 27 other files
+                    test/
+                train/
+                    116.png (152.2 kB)
+                    201.png (156.1 kB)
+                    ... and 113 other files
+                    train/
+                train_cleaned/
+                    173.png (60.4 kB)
+                    47.png (35.5 kB)
+                    ... and 113 other files
+```
+
+-> data/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> data/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> input/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> input/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+-> working/denoising-dirty-documents/sampleSubmission.csv has 5789880 rows and 2 columns.
+The columns are: id, value
+
+# 5. Target score
+
+0.02953
+
+# 6. Current score
+
+0.28607
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.28616) has done: 'Diagnosis: The crash happens immediately in cell 0 during imports, before any data is loaded. The traceback (`'MessageFactory' object has no attribute 'GetPrototype'`) is a known incompatibility between `imgaug` (via its protobuf usage) and the installed `protobuf==6.33.0`. Since `imgaug` is only imported in cell 0, the minimal fix is to avoid importing `imgaug` so the notebook can run with the current environment. This preserves all other logic and prevents the import-time protobuf crash.
+
+Patch summary: Remove the `imgaug` imports in cell 0 and keep the rest of the imports unchanged so downstream cells can execute. This is the smallest localized change that eliminates the protobuf-related AttributeError.
+
+Updated cells: Only cell 0 is modified.
+
+Compatibility notes for cell k+1: Cell 1 does not reference `ia`, `iaa`, or `imgaug`, so removing these imports does not affect cell 1’s variables or behavior.
+
+Assumptions: This notebook can run without `imgaug` at least up to and including cell 1, and any later augmentation code either is not required for execution in this environment or can be handled elsewhere (not modified here per constraints).'
+- What this solution (achieved 0.28616) has done: 'The crash happens during the TensorFlow import in cell 0, before any notebook logic runs. With TensorFlow 2.18.0 and protobuf 6.33.0, this `MessageFactory.GetPrototype` AttributeError is a known incompatibility caused by TensorFlow/TFDS expecting an older protobuf runtime API. The minimal deterministic fix is to pin protobuf to a compatible 4.x version at runtime (before importing TensorFlow), then restart-import TensorFlow cleanly within the cell. This keeps the model/training logic unchanged and only adjusts the environment dependency that triggers the import-time crash.'
+- What this solution (achieved 0.28607) has done: 'The timeout is dominated by (1) reading/resizing images one-by-one in Python loops, (2) training a fairly large ConvNet on full-resolution images without using a performant `tf.data` pipeline, and (3) the submission creation step doing ~5.8M pixel ids via nested Python loops and repeated model calls. I keep the exact same model/loss/training semantics, but speed up the data input with parallelized + preallocated loading, switch training to a cached/prefetched `tf.data.Dataset` (same epochs/batch size/shuffle behavior), and vectorize submission generation by batching predictions and building the `id`/`value` columns without Python per-pixel loops. I also remove redundant `.numpy()` roundtrips and call `autoencoder` directly for inference to reduce overhead while producing identical outputs up to negligible float diffs. All paths and core logic (architecture, loss, training loop/epochs) remain unchanged.'
+- What this solution (achieved 0.28607) has done: 'Diagnosis: The crash happens during the TensorFlow import in cell 0, and the traceback indicates an incompatibility between the installed `protobuf==6.33.0` and TensorFlow’s expected protobuf runtime, leading to `MessageFactory.GetPrototype` missing. The current code tries to fix protobuf *after* importing TensorFlow, which is too late because the failing import already occurred. The minimal fix is to ensure a compatible protobuf version is installed and loaded *before* importing TensorFlow.
+
+Patch summary: Move the protobuf compatibility check/installation to occur before `import tensorflow as tf`, and force a runtime restart of the protobuf module import by importing it only after the install step. Keep all other logic (seeds, determinism, threading, imports) unchanged.
+
+Updated cells: cell 0 only.
+
+Compatibility notes for cell k+1: All variables and imports used by cell 1 (`os`, `sys`, `zipfile`, `subprocess`, etc.) remain available exactly as before; only the ordering of the protobuf/TensorFlow import is adjusted to prevent the crash.
+
+Assumptions: The environment allows `pip install` during execution (as the original code already attempted), and TensorFlow 2.18 is compatible with `protobuf<5` in this environment.'
+
+# 9. Code solution
+
+## === cell 0
+import os, sys, zipfile, subprocess
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import cv2
+from tqdm.auto import tqdm
+
+try:
+    import google.protobuf  # noqa: F401
+    from packaging.version import parse as _vparse
+    import google.protobuf as _gp
+
+    if _vparse(_gp.__version__) >= _vparse("5.0.0"):
+        raise RuntimeError("Incompatible protobuf version for this TF build")
+except Exception:
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "-q", "protobuf<5,>=4.21.12"]
+    )
+    if "google.protobuf" in sys.modules:
+        del sys.modules["google.protobuf"]
+
+import tensorflow as tf
+
+tf.keras.utils.set_random_seed(19)
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+from tensorflow.keras.models import Model
+from tensorflow.keras import layers, callbacks
+
+sns.set_style("darkgrid")
+
+try:
+    tf.config.threading.set_intra_op_parallelism_threads(2)
+    tf.config.threading.set_inter_op_parallelism_threads(2)
+except Exception:
+    pass
+
+
+## === cell 1
+path_zip = "../input/denoising-dirty-documents/"
+path = "/kaggle/working/"
+
+
+def _extract_if_missing(zip_path, out_dir, marker_dir):
+    if not os.path.exists(os.path.join(out_dir, marker_dir)):
+        with zipfile.ZipFile(zip_path, "r") as z:
+            z.extractall(out_dir)
+
+
+_extract_if_missing(path_zip + "train.zip", path, "train")
+_extract_if_missing(path_zip + "test.zip", path, "test")
+_extract_if_missing(path_zip + "train_cleaned.zip", path, "train_cleaned")
+if not os.path.exists(os.path.join(path, "sampleSubmission.csv")):
+    _extract_if_missing(path_zip + "sampleSubmission.csv.zip", path, "")
+
+train_img = sorted(os.listdir(path + "/train"))
+train_cleaned_img = sorted(os.listdir(path + "/train_cleaned"))
+test_img = sorted(os.listdir(path + "/test"))
+
+
+
+
+## === cell 2
+class config:
+    IMG_SIZE = (420, 540)
+
+
+_sample_files = train_img[:10]
+imgs = [cv2.imread(path + "train/" + f) for f in _sample_files]
+print(
+    "Median Dimensions:",
+    np.median([len(img) for img in imgs]),
+    np.median([len(img[0]) for img in imgs]),
+)
+del imgs, _sample_files
+
+
+
+
+## === cell 3
+def process_image(path_):
+    img = cv2.imread(path_)
+    img = np.asarray(img, dtype="float32")
+    img = cv2.resize(img, config.IMG_SIZE[::-1])
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = img / 255.0
+    img = np.reshape(img, (*config.IMG_SIZE, 1))
+    return img
+
+
+
+
+## === cell 4
+def _load_folder_to_array(folder, files):
+    n = len(files)
+    arr = np.empty((n, config.IMG_SIZE[0], config.IMG_SIZE[1], 1), dtype=np.float32)
+    for i, f in enumerate(files):
+        arr[i] = process_image(folder + f)
+    return arr
+
+
+train = _load_folder_to_array(path + "train/", sorted(os.listdir(path + "train/")))
+train_cleaned = _load_folder_to_array(
+    path + "train_cleaned/", sorted(os.listdir(path + "train_cleaned/"))
+)
+test = _load_folder_to_array(path + "test/", sorted(os.listdir(path + "test/")))
+
+train.shape, train_cleaned.shape, test.shape
+
+
+
+
+## === cell 5
+SHOW_PLOTS = False
+
+if SHOW_PLOTS:
+    fig, ax = plt.subplots(4, 2, figsize=(15, 25))
+    for i in range(4):
+        ax[i][0].imshow(tf.squeeze(train[i]), cmap="gray")
+        ax[i][0].set_title("Noise image: {}".format(train_img[i]))
+
+        ax[i][1].imshow(tf.squeeze(train_cleaned[i]), cmap="gray")
+        ax[i][1].set_title("Denoised image: {}".format(train_img[i]))
+
+        ax[i][0].get_xaxis().set_visible(False)
+        ax[i][0].get_yaxis().set_visible(False)
+        ax[i][1].get_xaxis().set_visible(False)
+        ax[i][1].get_yaxis().set_visible(False)
+
+
+
+
+## === cell 6
+def augment_pipeline(pipeline, images, seed=19):
+    return images
+
+
+
+
+## === cell 7
+rotate90 = rotate180 = rotate270 = random_rotate = perc_transform = None
+rotate10 = rotate10r = crop = hflip = vflip = gblur = motionblur = None
+seq_rp = seq_cfg = seq_fm = None
+
+
+
+
+## === cell 8
+pipeline = []
+
+
+
+
+## === cell 10
+class DenoisingAutoencoder(Model):
+    def __init__(self):
+        super(DenoisingAutoencoder, self).__init__()
+        self.encoder = tf.keras.Sequential(
+            [
+                layers.Input(shape=(*config.IMG_SIZE, 1)),
+                layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
+                layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+                layers.BatchNormalization(),
+                layers.MaxPooling2D((2, 2), padding="same"),
+                layers.Dropout(0.5),
+            ]
+        )
+
+        self.decoder = tf.keras.Sequential(
+            [
+                layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
+                layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
+                layers.BatchNormalization(),
+                layers.UpSampling2D((2, 2)),
+                layers.Conv2D(1, (3, 3), activation="sigmoid", padding="same"),
+            ]
+        )
+
+    def call(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
+
+autoencoder = DenoisingAutoencoder()
+autoencoder.compile(
+    optimizer="adam", loss="mean_squared_error", metrics=["mean_absolute_error"]
+)
+
+
+
+
+## === cell 11
+es = callbacks.EarlyStopping(
+    monitor="loss", patience=30, verbose=1, restore_best_weights=True
+)
+
+BATCH_SIZE = 24
+train_ds = tf.data.Dataset.from_tensor_slices((train, train_cleaned))
+train_ds = train_ds.shuffle(
+    buffer_size=train.shape[0], seed=19, reshuffle_each_iteration=True
+)
+train_ds = (
+    train_ds.batch(BATCH_SIZE, drop_remainder=False).cache().prefetch(tf.data.AUTOTUNE)
+)
+
+history = autoencoder.fit(train_ds, callbacks=[es], epochs=500)
+
+
+
+
+## === cell 12
+if SHOW_PLOTS:
+    fig, ax = plt.subplots(figsize=(20, 6))
+    pd.DataFrame(history.history).iloc[:, :-1].plot(ax=ax)
+del history
+
+
+
+
+## === cell 13
+autoencoder.encoder.summary()
+autoencoder.decoder.summary()
+
+
+
+
+## === cell 14
+if SHOW_PLOTS:
+    decoded_imgs = autoencoder(train[:4], training=False).numpy()
+
+    fig, ax = plt.subplots(4, 2, figsize=(15, 25))
+    for i in range(4):
+        ax[i][0].imshow(tf.squeeze(train_cleaned[i]), cmap="gray")
+        ax[i][0].set_title("Denoised image: {}".format(train_img[i]))
+
+        ax[i][1].imshow(tf.squeeze(decoded_imgs[i]), cmap="gray")
+        ax[i][1].set_title("Predicted image: {}".format(train_img[i]))
+
+        ax[i][0].get_xaxis().set_visible(False)
+        ax[i][0].get_yaxis().set_visible(False)
+        ax[i][1].get_xaxis().set_visible(False)
+        ax[i][1].get_yaxis().set_visible(False)
+
+    del decoded_imgs
+
+
+
+
+## === cell 15
+test_batch = 4  # small batching for memory safety; increases throughput significantly.
+preds = autoencoder.predict(
+    test, batch_size=test_batch, verbose=0
+)  # shape (N, 420, 540, 1)
+
+ids_chunks = []
+vals_chunks = []
+
+for i, f in tqdm(list(enumerate(test_img)), total=len(test_img)):
+    file = path + "test/" + f
+    imgid = int(f[:-4])
+
+    img = cv2.imread(file, 0)
+    h, w = img.shape
+
+    decoded_img = np.squeeze(preds[i])  # (420, 540)
+    preds_reshaped = cv2.resize(
+        decoded_img, (w, h), interpolation=cv2.INTER_LINEAR
+    ).astype(np.float32, copy=False)
+
+    r = np.arange(1, h + 1, dtype=np.int32)
+    c = np.arange(1, w + 1, dtype=np.int32)
+    rr = np.repeat(r, w)
+    cc = np.tile(c, h)
+
+    img_prefix = str(imgid) + "_"
+    ids = np.char.add(np.char.add(img_prefix, rr.astype(str)), "_")
+    ids = np.char.add(ids, cc.astype(str))
+
+    ids_chunks.append(ids.astype(object))
+    vals_chunks.append(preds_reshaped.reshape(-1))
+
+ids = np.concatenate(ids_chunks)
+vals = np.concatenate(vals_chunks)
+
+print("Length of IDs: {}".format(len(ids)))
+pd.DataFrame({"id": ids, "value": vals}).to_csv("submission.csv", index=False)
+print("Results saved to submission.csv!")

@@ -1,0 +1,180 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.8
+
+# 2. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tf_keras==2.18.0
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (69 lines)
+            sample_submission.csv (153165 lines)
+            sample_submission.csv.zip (1.5 MB)
+            test.csv (552889 lines)
+            test.csv.zip (24.6 MB)
+            train.csv (561809 lines)
+            train.csv.zip (27.7 MB)
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+        input/
+            description.md (69 lines)
+            sample_submission.csv (153165 lines)
+            sample_submission.csv.zip (1.5 MB)
+            test.csv (552889 lines)
+            test.csv.zip (24.6 MB)
+            train.csv (561809 lines)
+            train.csv.zip (27.7 MB)
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+        working/
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+```
+
+-> data/jigsaw-toxic-comment-classification-challenge/sample_submission.csv has 153164 rows and 7 columns.
+The columns are: id, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/jigsaw-toxic-comment-classification-challenge/test.csv has 552888 rows and 2 columns.
+The columns are: id, comment_text
+
+-> data/jigsaw-toxic-comment-classification-challenge/train.csv has 561808 rows and 8 columns.
+The columns are: id, comment_text, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/sample_submission.csv has 153164 rows and 7 columns.
+The columns are: id, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/test.csv has 552888 rows and 2 columns.
+The columns are: id, comment_text
+
+-> data/train.csv has 561808 rows and 8 columns.
+The columns are: id, comment_text, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+
+import os
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 1
+import sys
+
+if "google.protobuf" not in sys.modules:
+    try:
+        import google.protobuf as _pb
+
+        _ver = getattr(_pb, "__version__", "0")
+    except Exception:
+        _ver = "0"
+    major = (
+        int(str(_ver).split(".", 1)[0]) if str(_ver).split(".", 1)[0].isdigit() else 0
+    )
+    if major >= 5:
+        import subprocess
+
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "-q", "protobuf>=4.21.0,<5"]
+        )
+
+import matplotlib.pyplot as plt
+import re
+import tensorflow as tf
+from keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.text import Tokenizer
+from keras.models import Model
+from keras.layers import Input, Dense, Embedding, Dropout, Conv1D, GlobalMaxPooling1D
+from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.utils.vis_utils import plot_model
+from sklearn.metrics import roc_auc_score
+
+import warnings
+
+warnings.simplefilter(action="ignore", category=FutureWarning)
+
+
+## --- ERROR in cell 1, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/4041914920.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m     27[0m [0;32mimport[0m [0mtensorflow[0m [0;32mas[0m [0mtf[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     28[0m [0;32mfrom[0m [0mkeras[0m[0;34m.[0m[0mpreprocessing[0m[0;34m.[0m[0msequence[0m [0;32mimport[0m [0mpad_sequences[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 29[0;31m [0;32mfrom[0m [0mkeras[0m[0;34m.[0m[0mpreprocessing[0m[0;34m.[0m[0mtext[0m [0;32mimport[0m [0mTokenizer[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     30[0m [0;32mfrom[0m [0mkeras[0m[0;34m.[0m[0mmodels[0m [0;32mimport[0m [0mModel[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     31[0m [0;32mfrom[0m [0mkeras[0m[0;34m.[0m[0mlayers[0m [0;32mimport[0m [0mInput[0m[0;34m,[0m [0mDense[0m[0;34m,[0m [0mEmbedding[0m[0;34m,[0m [0mDropout[0m[0;34m,[0m [0mConv1D[0m[0;34m,[0m [0mGlobalMaxPooling1D[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mModuleNotFoundError[0m: No module named 'keras.preprocessing.text'
+
+## === cell 2
+!unzip /kaggle/input/jigsaw-toxic-comment-classification-challenge/train.csv.zip
+!unzip /kaggle/input/jigsaw-toxic-comment-classification-challenge/test.csv.zip

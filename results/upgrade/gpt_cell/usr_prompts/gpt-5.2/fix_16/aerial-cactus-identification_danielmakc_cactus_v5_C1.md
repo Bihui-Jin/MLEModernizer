@@ -1,0 +1,372 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.7
+
+# 2. Installed packages
+
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+joblib==1.5.2
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+tqdm==4.67.1
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+from IPython.display import display
+
+image_size = (32, 32)
+
+
+## === cell 1
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "2")
+
+from PIL import Image
+from os import listdir
+from os.path import join
+from pandas import read_csv
+
+
+def pil_load_img(path, target_size=None):
+    img = Image.open(path).convert("RGB")
+    if target_size is not None:
+        img = img.resize((target_size[1], target_size[0]), resample=Image.BILINEAR)
+    return img
+
+
+train_labels = read_csv("../input/train.csv")
+for image_name in listdir("../input/train/train")[:10]:
+    image = pil_load_img(
+        join("../input/train/train", image_name), target_size=image_size
+    )
+    display(train_labels[train_labels["id"] == image_name]["has_cactus"].item())
+    display(image)
+
+
+## === cell 2
+from google.protobuf import message_factory as _message_factory
+
+if not hasattr(_message_factory.MessageFactory, "GetPrototype"):
+    if hasattr(_message_factory.MessageFactory, "GetMessageClass"):
+        _message_factory.MessageFactory.GetPrototype = (
+            _message_factory.MessageFactory.GetMessageClass
+        )
+    else:
+        def _GetPrototype(self, descriptor):
+            return self.GetMessages([descriptor])[descriptor.full_name]
+
+        _message_factory.MessageFactory.GetPrototype = _GetPrototype
+
+from tf_keras.applications.vgg19 import VGG19, preprocess_input
+from tf_keras.preprocessing.image import img_to_array, load_img
+from tf_keras.utils import to_categorical
+from numpy import array
+from os import listdir
+from os.path import join
+from pandas import read_csv
+from tqdm import tqdm_notebook
+
+
+def extract_features(label_path, set_path):
+    images = []
+    labels = []
+
+    model = VGG19(include_top=False, input_shape=(image_size[0], image_size[1], 3))
+
+    train_labels = read_csv(label_path)
+    for image_name in tqdm_notebook(listdir(set_path)):
+        image = load_img(join(set_path, image_name), target_size=image_size)
+        images.append(img_to_array(image))
+        label = train_labels[train_labels["id"] == image_name]["has_cactus"].item()
+        labels.append(label)
+
+    training_images = preprocess_input(array(images))
+    training_labels = array(labels)
+
+    features = model.predict(training_images)
+
+    return features, training_labels
+
+
+## === cell 3
+from os.path import isfile
+from joblib import dump
+from os import listdir
+
+
+def extract_features(label_path, set_path):
+    images = []
+    labels = []
+
+    model = VGG19(include_top=False, input_shape=(image_size[0], image_size[1], 3))
+
+    train_labels = read_csv(label_path)
+
+    file_names = [
+        n
+        for n in listdir(set_path)
+        if isfile(join(set_path, n))
+        and n.lower().endswith((".jpg", ".jpeg", ".png", ".bmp"))
+    ]
+
+    for image_name in tqdm_notebook(file_names):
+        image = load_img(join(set_path, image_name), target_size=image_size)
+        images.append(img_to_array(image))
+        label = train_labels[train_labels["id"] == image_name]["has_cactus"].item()
+        labels.append(label)
+
+    training_images = preprocess_input(array(images))
+    training_labels = array(labels)
+
+    features = model.predict(training_images)
+
+    return features, training_labels
+
+
+features, training_labels = extract_features(
+    "../input/train.csv", "../input/train/train"
+)
+
+dump(features, "features.dat")
+dump(training_labels, "labels.dat")
+
+display(listdir("."))
+
+
+## === cell 4
+from joblib import load
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten 
+from pathlib import Path
+
+x_train = load('features.dat')
+y_train = load('labels.dat')
+
+model = Sequential()
+model.add(Flatten(input_shape=x_train.shape[1:]))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation='sigmoid'))
+model.summary()
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.fit(x_train, y_train, epochs=50, shuffle=True, validation_split=0.2)
+
+Path('model_structure.json').write_text(model.to_json())
+model.save_weights('model_weights.h5')
+
+display(listdir('.'))
+
+
+## --- ERROR in cell 4, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/3545029043.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m     22[0m [0;31m# Save the trained network[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     23[0m [0mPath[0m[0;34m([0m[0;34m'model_structure.json'[0m[0;34m)[0m[0;34m.[0m[0mwrite_text[0m[0;34m([0m[0mmodel[0m[0;34m.[0m[0mto_json[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 24[0;31m [0mmodel[0m[0;34m.[0m[0msave_weights[0m[0;34m([0m[0;34m'model_weights.h5'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     25[0m [0;34m[0m[0m
+[1;32m     26[0m [0mdisplay[0m[0;34m([0m[0mlistdir[0m[0;34m([0m[0;34m'.'[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py[0m in [0;36merror_handler[0;34m(*args, **kwargs)[0m
+[1;32m    120[0m             [0;31m# To get the full stack trace, call:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    121[0m             [0;31m# `keras.config.disable_traceback_filtering()`[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 122[0;31m             [0;32mraise[0m [0me[0m[0;34m.[0m[0mwith_traceback[0m[0;34m([0m[0mfiltered_tb[0m[0;34m)[0m [0;32mfrom[0m [0;32mNone[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    123[0m         [0;32mfinally[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    124[0m             [0;32mdel[0m [0mfiltered_tb[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/keras/src/saving/saving_api.py[0m in [0;36msave_weights[0;34m(model, filepath, overwrite, **kwargs)[0m
+[1;32m    222[0m [0;32mdef[0m [0msave_weights[0m[0;34m([0m[0mmodel[0m[0;34m,[0m [0mfilepath[0m[0;34m,[0m [0moverwrite[0m[0;34m=[0m[0;32mTrue[0m[0;34m,[0m [0;34m**[0m[0mkwargs[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    223[0m     [0;32mif[0m [0;32mnot[0m [0mstr[0m[0;34m([0m[0mfilepath[0m[0;34m)[0m[0;34m.[0m[0mendswith[0m[0;34m([0m[0;34m".weights.h5"[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 224[0;31m         raise ValueError(
+[0m[1;32m    225[0m             [0;34m"The filename must end in `.weights.h5`. "[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    226[0m             [0;34mf"Received: filepath={filepath}"[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mValueError[0m: The filename must end in `.weights.h5`. Received: filepath=model_weights.h5
+
+## === cell 5
+from csv import writer
+from keras.applications.vgg19 import preprocess_input
+from keras.models import model_from_json
+from keras.preprocessing.image import img_to_array
+from numpy import array
+from pathlib import Path
+from tqdm import tqdm_notebook 
+
+model_structure = Path('model_structure.json').read_text()
+model = model_from_json(model_structure)
+model.load_weights('model_weights.h5')
+
+images = []
+for image_name in tqdm_notebook(listdir('../input/test/test')):
+    image = load_img(join('../input/test/test', image_name), target_size=image_size)
+    images.append(img_to_array(image))
+    
+images_to_predict = preprocess_input(array(images))
+
+feature_extractor = VGG19(include_top=False, input_shape=(image_size[0], image_size[1], 3))
+features = feature_extractor.predict(images_to_predict)
+predictions = model.predict(features)
+
+display(predictions)
+
+with open('submission.csv', 'w+') as submissionCsvFile:
+    csvWriter = writer(submissionCsvFile, lineterminator='\n')
+    csvWriter.writerow(['id', 'has_cactus'])
+    
+    for index, image_name in enumerate(listdir('../input/test/test')):        
+        csvWriter.writerow([image_name, predictions[index][0]])

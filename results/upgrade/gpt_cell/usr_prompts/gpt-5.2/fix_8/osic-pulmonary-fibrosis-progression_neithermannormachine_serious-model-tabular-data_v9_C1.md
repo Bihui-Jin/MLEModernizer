@@ -1,0 +1,934 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-6.8685
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 1
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+
+import os
+'''
+for dirname, _, filenames in os.walk('/kaggle/input'):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+'''
+
+
+
+## === cell 3
+train_df = pd.read_csv('../input/osic-pulmonary-fibrosis-progression/train.csv')
+train_df
+
+
+## === cell 4
+def feature_engineer(data):
+    '''
+    method to feature engineer any df, train or test
+    '''
+    
+    df = data.copy()
+    
+    df['FirstWeek'] = df.groupby('Patient')['Weeks'].transform('min')
+    
+    first_fvc = (df.loc[df['Weeks'] == df['FirstWeek']][['Patient','FVC']]
+                        .groupby('Patient')
+                        .first() #some patients have multiple measurements in same week - get the first
+                        .reset_index()
+                         .rename(columns = {'FVC': 'FirstFVC'}) )
+    
+    df = df.merge(first_fvc, on = 'Patient') #add FirstFVC column
+    
+    df['WeeksPassed'] = df['Weeks'] - df['FirstWeek']
+    
+    '''
+    
+    
+    '''
+    
+    
+    
+    def calculate_height(row): #height can be predictor of FVC -- this estimates the height of patients
+        if row['Sex'] == 'Male':
+            return row['FirstFVC'] / (27.63 - 0.112 * row['Age'])
+        else:
+            return row['FirstFVC'] / (21.78 - 0.101 * row['Age'])
+
+    df['Height'] = df.apply(calculate_height, axis=1)
+    
+    return df
+
+
+feature_engineer(train_df) #just looking
+
+
+## === cell 5
+from sklearn.base import BaseEstimator, TransformerMixin
+
+class MyFeatureEngineerer(BaseEstimator, TransformerMixin):
+    '''
+    this is class so that feature engineering can be done on separate sets
+    
+    
+    To use, call fit on a DataFrame to compute and record values that need to be saved before modification (ie before adding new weeks)
+    Examples of values needed to be saved are: FirstFVC, FirstWeek, ...
+    Then transform after modifications are done
+    
+    can just fit_transform if not modifying DataFrame further
+    
+    '''
+    def __init__(self):
+        pass
+    
+    def fit(self, X, y = None):
+        try:
+            self.df_ = feature_engineer(X)
+        except AttributeError: #fit should only be called on pandas DataFrame
+            raise ValueError('Can only use this estimator on Pandas DataFrame')
+        return self #return fitted self for further method calls
+    
+    def transform(self, X):
+        '''
+        X has been modified with additional weeks
+        '''
+        
+        if len(X) != len(self.df_):
+            drop = X.columns.values 
+            df = self.df_.drop(drop, axis = 1).join(self.df_['Patient']) #drop columns already in X, except for patient
+            df = X.merge(df, on = 'Patient')
+            df['WeeksPassed'] = df['Weeks'] - df['FirstWeek']
+        else:
+            df = self.df_ #if not, just return self.df_
+        return df
+    
+'''
+from sklearn.utils.estimator_checks import check_estimator
+check_estimator(MyFeatureEngineerer())
+'''
+
+
+## === cell 6
+from sklearn.base import BaseEstimator, TransformerMixin
+
+class ParamMinMaxScaler(BaseEstimator, TransformerMixin):
+    '''
+    custom minmax scaler where min and max are not based on data,
+    but are passed in as parameters
+    
+    pretty good for percentages
+    '''
+    def __init__(self, min_val = 0, max_val = 100):
+        self.min_val = min_val
+        self.max_val = max_val
+    
+    
+    def fit(self, X, y=None): #don't need to fit at all
+        return self
+
+    def transform(self, X): #do minmax scaling
+        data = (X - self.min_val) / (self.max_val - self.min_val)
+        return data
+'''
+from sklearn.utils.estimator_checks import check_estimator
+check_estimator(ParamMinMaxScaler())'''
+
+
+## === cell 7
+def transformed_col_names(col_trans):
+    '''
+    helper function to get column names of dataframe back after column transforming
+    because col_trans.get_feature_names() doesn't work very well
+    Use this after fitting col_trans
+    '''
+    import re
+    
+    new_colnames = []
+    for _, t, col in col_trans.transformers_: #loop thru all transformers
+        try: #try to get new column names
+            temp = t.get_feature_names()
+            temp2 = []
+            for name in temp: #loop thru feature names returned by t
+                match = re.search('x(\d+)+_', name) #look for this ugly bit
+                i = int(match.group(1)) #get the feature number
+                new_name = col[i] + '_' + name[match.end():] #replace x0 or whatever number with meaningful feature name
+                temp2.append(new_name)
+            col = temp2
+        except AttributeError: #if transformer t does not provide get_feature_names()
+            pass #no big deal, just ignore it; we'll extend with original column names
+        new_colnames.extend(col) #then append column names to list
+        
+    return new_colnames
+
+
+## === cell 8
+from sklearn_pandas import DataFrameMapper #yes it works!
+help(DataFrameMapper) #todo: work this into the pipeline, refactor code so it's less crud
+
+
+## === cell 9
+
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+
+passthru_features = ['Patient', 'FVC']
+onehot_features = ['Sex', 'SmokingStatus']
+hundred_features = ['Percent', 'Age']
+minmax_features = ['FirstFVC', 'FirstWeek', 'WeeksPassed', 'Height']
+
+
+oh_enc = OneHotEncoder(sparse = False, drop = 'if_binary')
+hundred_minmax = ParamMinMaxScaler()
+week_minmax = ParamMinMaxScaler(min_val = -12, max_val = 133)
+minmax = MinMaxScaler()
+
+col_trans = ColumnTransformer([
+                ('original', 'passthrough', passthru_features),
+                ('week_minmax', week_minmax, ['Weeks']),
+                ('hundred_minmax', minmax, hundred_features),
+                ('minmax', minmax, minmax_features),
+                ('onehot', oh_enc, onehot_features)
+            ], remainder = 'passthrough', sparse_threshold=0)
+
+
+## === cell 10
+help(ColumnTransformer)
+
+
+## === cell 11
+train_df = MyFeatureEngineerer().fit_transform(train_df)
+
+new_df = col_trans.fit_transform(train_df)
+
+
+def _safe_column_transformer_feature_names(ct, X_df):
+    import numpy as np
+    from sklearn.preprocessing import OneHotEncoder
+
+    feature_names = []
+
+    for name, trans, cols in ct.transformers_:
+        if trans == "drop":
+            continue
+
+        if trans == "passthrough":
+            if isinstance(cols, slice):
+                cols_list = list(X_df.columns[cols])
+            elif isinstance(cols, (list, tuple, np.ndarray)):
+                cols_list = list(cols)
+            else:
+                cols_list = [cols]
+            feature_names.extend([str(c) for c in cols_list])
+            continue
+
+        if hasattr(trans, "get_feature_names_out"):
+            try:
+                out = trans.get_feature_names_out(cols)
+                feature_names.extend([str(x) for x in out])
+                continue
+            except Exception:
+                pass
+
+        if isinstance(cols, slice):
+            cols_list = list(X_df.columns[cols])
+        elif isinstance(cols, (list, tuple, np.ndarray)):
+            cols_list = list(cols)
+        else:
+            cols_list = [cols]
+
+        if isinstance(trans, OneHotEncoder) and hasattr(trans, "categories_"):
+            drop_idx = getattr(trans, "drop_idx_", None)
+            for i, c in enumerate(cols_list):
+                cats = list(trans.categories_[i])
+                if drop_idx is not None and drop_idx[i] is not None:
+                    di = drop_idx[i]
+                    if isinstance(di, (int, np.integer)):
+                        cats = [cat for j, cat in enumerate(cats) if j != di]
+                feature_names.extend([f"{c}_{cat}" for cat in cats])
+        else:
+            feature_names.extend([str(c) for c in cols_list])
+
+    return np.asarray(feature_names, dtype=object)
+
+
+try:
+    feature_names = col_trans.get_feature_names_out()
+except AttributeError:
+    feature_names = _safe_column_transformer_feature_names(col_trans, train_df)
+
+train_df = pd.DataFrame(new_df, columns=feature_names)
+train_df
+
+
+## === cell 12
+"""
+For sklearn compatibility, functions should have signature f(y_true, y_pred, **kwargs)
+For tensorflow compatibility, functions should have signature f(y_true, y_pred)
+"""
+
+import numpy as np
+
+
+class _NPTF:
+    class dtypes:
+        @staticmethod
+        def cast(x, dtype=None):
+            return np.asarray(x, dtype=np.float32 if dtype is None else dtype)
+
+    @staticmethod
+    def constant(x, dtype=None):
+        return np.asarray(x, dtype=np.float32 if dtype is None else dtype)
+
+    @staticmethod
+    def abs(x):
+        return np.abs(x)
+
+    @staticmethod
+    def maximum(a, b):
+        return np.maximum(a, b)
+
+    @staticmethod
+    def minimum(a, b):
+        return np.minimum(a, b)
+
+    @staticmethod
+    def sqrt(x):
+        return np.sqrt(x)
+
+    class math:
+        @staticmethod
+        def log(x):
+            return np.log(x)
+
+    class keras:
+        class backend:
+            @staticmethod
+            def mean(x):
+                return np.asarray(np.mean(x), dtype=np.float32)
+
+
+tf = _NPTF()
+
+
+def laplace_log_score(**kwargs):
+    """
+    The competition metric. Average laplace log score over all examples.
+    Technically I don't need to return a separate function, I just do this for consistency
+    with the other functions I defined
+    for now kwargs is ignored
+
+    Returns loss function that returns average laplace log score over all predictions.
+
+    y_true is shape (N x 1)
+    y_pred is shape (N x 3)
+    """
+    sigma_min = 70  # confidence can't be lower than this
+    delta_max = 1000  # delta can't be higher than this
+
+    def loss(y_true, y_pred):
+        y_true = tf.dtypes.cast(y_true, np.float32)
+        y_pred = tf.dtypes.cast(y_pred, np.float32)
+
+        sigma = y_pred[:, 2] - y_pred[:, 0]
+        fvc_pred = y_pred[
+            :, 1
+        ]  # looks like we are using the median y_pred (0.5 quantile) as our final prediction
+
+        sigma_clip = tf.maximum(
+            sigma, sigma_min
+        )  # can't go lower than confidence of 70
+        delta = tf.abs(y_true[:, 0] - fvc_pred)  # delta is error
+        delta = tf.minimum(delta, delta_max)
+        sq2 = tf.sqrt(tf.dtypes.cast(2, dtype=np.float32))
+        metric = (delta / sigma_clip) * sq2 + tf.math.log(sigma_clip * sq2)
+        return float(tf.keras.backend.mean(metric))
+
+    return loss
+
+
+def pinball_qloss(quantiles):
+    """
+    Pinball Loss, a metric to measure quantile regression
+    Avg pinball loss over all examples
+    quantiles is some iterable which holds the quantiles we want to compute loss at
+
+    Returns a loss function that returns avg pinball loss over all examples
+
+    y_true is shape (N x 1)
+    y_pred is shape (N x 3)
+    """
+    q = tf.constant(
+        np.array([quantiles]), dtype=np.float32
+    )  # for tensorflow compatibility
+
+    def loss(y_true, y_pred):  # loss function to return
+        y_true = tf.dtypes.cast(y_true, np.float32)
+        y_pred = tf.dtypes.cast(y_pred, np.float32)
+        e = (
+            y_true - y_pred
+        )  # the error between prediction and true value for each example (shape N x 3)
+        v = tf.maximum(q * e, (q - 1) * e)  # the definition of pinball loss
+        return float(tf.keras.backend.mean(v))  # return avg over all examples
+
+    return loss
+
+
+def weighted_loss(weights, loss_functions):
+    """
+    Generic function that takes the weighted average of multiple loss functions
+    weights is an iterable of the weights for the corresponding loss function
+    loss_functions is an iterable of loss functions of signature f(y_true, y_pred)
+    weights should be same length as loss_functions
+
+    Returns a loss function that takes weighted average of given loss functions
+    """
+
+    weights = np.array(weights)  # ensure numpy compatibility
+
+    def loss(y_true, y_pred):  # loss function to return
+        losses = np.array([lf(y_true, y_pred) for lf in loss_functions], dtype=float)
+        return float(np.sum(weights * losses))  # then compute weighted average (scalar)
+
+    return loss
+
+
+def mloss(w):
+    """
+    Convenient function wrapper for weighted_loss with weights and losses already here
+    """
+    weights = [w, 1 - w]
+    losses = [pinball_qloss([0.2, 0.5, 0.8]), laplace_log_score()]
+    lf = weighted_loss(weights, losses)
+
+    def loss(y_true, y_pred):
+        return lf(y_true, y_pred)
+
+    return loss
+
+
+## === cell 13
+from sklearn.linear_model import LinearRegression, GammaRegressor, TweedieRegressor
+
+
+def make_model():  # let's start with a simple tabular model; integrate images later
+    """
+    creates and returns a model, but does not fit it
+    """
+
+    loss = mloss(0.8)  # loss has signature f(y_true, y_pred)
+
+    model = LinearRegression()
+
+    return model
+
+
+## === cell 14
+train_df #just look over train_df again
+
+
+## === cell 15
+
+
+model = make_model()
+
+drop_features = ['Patient', 'FVC', 'Weeks', 'Percent'] #features to drop from X training data
+
+X_train = train_df.drop(drop_features, axis = 1)
+y_train = train_df['FVC']
+
+model.fit(X_train, y_train)
+X_train
+
+
+## === cell 16
+from sklearn.model_selection import RandomizedSearchCV
+
+'''
+params = {
+    
+            }
+hyper_search = RandomizedSearchCV(model, param_distributions=params, n_iter = 20)'''
+
+
+## === cell 18
+from sklearn.model_selection import cross_val_score, GroupKFold
+from sklearn.metrics import make_scorer, mean_absolute_error
+
+NFOLDS = 6
+gkf = GroupKFold(n_splits = NFOLDS) #use groupkfold to prevent same patient in training and test set
+groups = train_df['Patient'].values
+
+scorer = make_scorer(mean_absolute_error)
+
+
+
+
+def temp_loss(y_true, y_pred): #just a temp loss function to wrap around laplace log score
+    CONFIDENCE = c #c is our loop variable
+    y_true = np.expand_dims(y_true, -1)
+    y_mod = np.zeros((y_pred.shape[0],3))
+    y_mod[:, 1] = y_pred
+    y_mod[:, 0] = y_pred - CONFIDENCE / 2
+    y_mod[:, 2] = y_pred + CONFIDENCE / 2
+    return laplace_log_score()(y_true.astype('float32'),y_mod.astype('float32'))
+
+
+
+conf = np.arange(100, 401, 5) #various confidence values
+conf_df = pd.DataFrame(index = conf, columns = ['mean score', 'std score'])
+conf_df.index.name = 'Confidence'
+for c in conf: #optimize over various confidence values
+    scorer = make_scorer(temp_loss)
+    cv_scores = cross_val_score(model, X_train, y_train, cv = gkf, groups = groups, scoring = scorer)
+    
+    avg_score = np.mean(cv_scores)
+    std_score = np.std(cv_scores)
+    
+    conf_df.loc[c, :] = [avg_score, std_score]
+    
+    '''
+    confidence = np.mean(cv_scores) #temp confidence value for submission
+    print(confidence)
+    '''
+
+
+num_std = 2.3 #this number seems to produce worst cases that line up pretty well with leaderboard, at least for simple LinearRegression
+conf_df['worst case'] = (conf_df['mean score'] + num_std * conf_df['std score'] )
+conf_df = conf_df.convert_dtypes() #ensure numeric
+
+conf_df
+
+
+## === cell 19
+best = conf_df.nsmallest(10, columns = ['worst case'], keep = 'all')
+best = best.applymap('{:,.4f}'.format) #format for output to 4 decimal places
+
+best#.loc[[200,270,300,350]]
+
+
+## === cell 20
+import matplotlib.pyplot as plt
+
+plt.bar(X_train.columns.values, model.coef_)
+plt.xticks(rotation = 70)
+
+
+## === cell 21
+pred_train = model.predict(X_train)
+pred_train
+
+
+## === cell 22
+import random
+
+p = random.choice(train_df['Patient'].unique())
+
+mask = train_df['Patient'] == p
+ser = pd.Series(pred_train)[mask]
+
+temp_df = train_df.loc[mask, ['Weeks', 'FVC']].join(pd.Series(pred_train, name = 'FVC_pred')[mask])
+
+
+
+temp_df.plot(x = 'Weeks', y = ['FVC', 'FVC_pred'])
+
+
+## === cell 23
+from sklearn.pipeline import Pipeline
+
+
+'''
+pipeline = Pipeline([
+                ('fe', MyFeatureEngineerer()),
+                ('ct', col_trans),
+                ('model', make_model())
+            ])
+
+
+pipeline.fit(X_train, y_train)'''
+
+
+## === cell 24
+input_df = pd.read_csv('../input/osic-pulmonary-fibrosis-progression/test.csv')
+input_df #preprocess this to turn into test_df
+
+
+## === cell 25
+eng = MyFeatureEngineerer()
+eng.fit(input_df)
+
+input_df2 = input_df.drop(
+    ["FVC", "Weeks"], axis=1
+)  # this info is stored in FirstFVC and FirstWeek of eng
+print(input_df)
+
+all_weeks = pd.DataFrame(np.array(range(-12, 134)), columns=["Weeks"])
+
+frames = []
+for p in input_df[
+    "Patient"
+].unique():  # this loop creates rows for every week/patient combo
+    tdf = all_weeks.copy()
+    tdf["Patient"] = p
+    frames.append(tdf)
+
+patient_weeks = (
+    pd.concat(frames, ignore_index=True)
+    if frames
+    else pd.DataFrame(columns=["Weeks", "Patient"])
+)
+
+temp_df = patient_weeks.merge(input_df2, on="Patient")
+
+print(temp_df)
+print(eng.df_)
+new_df = eng.transform(temp_df)
+new_df
+
+
+## === cell 26
+new_df["FVC"] = 0  # need this for column transforming, can drop afterwards
+print(new_df.columns)
+
+_new_df_for_names = new_df.copy()
+
+new_df = col_trans.transform(new_df)  # col_trans already fit on train, don't worry
+
+try:
+    feature_names_test = col_trans.get_feature_names_out()
+except Exception:
+    try:
+        feature_names_test = _safe_column_transformer_feature_names(
+            col_trans, _new_df_for_names
+        )
+    except Exception:
+        feature_names_test = transformed_col_names(col_trans)
+
+test_df = pd.DataFrame(new_df, columns=feature_names_test)
+test_df
+
+
+## === cell 27
+X_test = test_df.drop(drop_features, axis = 1) 
+X_test
+
+
+## === cell 28
+pred = model.predict(X_test)
+
+
+pred
+
+
+## === cell 29
+sub_df = patient_weeks.join(pd.Series(pred, name = 'FVC'))
+sub_df
+
+
+## === cell 30
+plt.figure(figsize=(17, 10))
+max_plots = 2 * 3
+for i, (patient, frame) in enumerate(sub_df.groupby("Patient")):
+    if i >= max_plots:
+        break
+    ax = plt.subplot(2, 3, i + 1)
+    frame[["Weeks", "FVC"]].plot(x="Weeks", y="FVC", title=patient, ax=ax)
+
+
+## === cell 31
+
+sub_df['Patient_Week'] = sub_df['Patient'] + '_' + sub_df['Weeks'].astype(str)
+sub_df['Confidence'] = 260 #choose best confidence (best worst case), as determined by cross-val
+
+
+sub_df
+
+
+## === cell 32
+sub_df[['Patient_Week', 'FVC', 'Confidence']].to_csv('submission.csv', index = False)

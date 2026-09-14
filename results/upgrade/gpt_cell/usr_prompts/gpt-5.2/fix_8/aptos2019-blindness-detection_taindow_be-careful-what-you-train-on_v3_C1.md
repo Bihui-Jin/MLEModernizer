@@ -1,0 +1,712 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+shap==0.44.1
+shapely==2.1.2
+sklearn-pandas==2.2.0
+tqdm==4.67.1
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.463379
+
+# 6. Current score
+
+0.71887
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.71887) has done: 'Diagnosis: Cell 4 crashes because the XGBoost parameter `tree_method` is set to `gpu_hist`, but the runtime has no accessible GPU device (`ctx_->gpu_id >= 0 ... Must have at least one device`). This is an environment/runtime mismatch rather than a data or modeling issue. The minimal safe fix is to fall back to CPU histogram training when no GPU is available, while keeping the rest of the training configuration identical.
+
+Patch summary: In cell 4 only, add a small guard that attempts to use `gpu_hist` if available and otherwise switches `params['tree_method']` to `'hist'`. This avoids the GPU-only codepath that raises the exception while preserving the same model objective, evaluation metric, and training loop behavior.
+
+Updated cells: (cell 4 only)
+
+Compatibility notes for cell k+1: The variables `bst` and `dvalid` are still created with the same types/interfaces, so cell 5 (`bst.predict(dvalid)`) remains compatible and unchanged.
+
+Assumptions: The environment may run without GPU access; the fix assumes CPU training is acceptable and that changing `tree_method` does not alter the notebook’s intended semantics beyond the necessary device fallback.'
+- What this solution (achieved 0.71887) has done: 'Your current public score (0.71887) is already well above the target (0.463379), so the objective is to move performance down toward the target band with the smallest safe change. The minimal way to do this without changing the model/training/feature logic is to adjust only the final inference post-processing: instead of taking `argmax`, apply a conservative “shrink toward class 0” by raising predicted probabilities to a power > 1 before `argmax`, which reduces confident higher-class picks and typically lowers QWK. I keep training, features, and parameters identical and only modify the prediction step used for both validation reporting and submission generation so the behavior is consistent. The submission writing remains the same (`submission.csv` with `id_code,diagnosis`).'
+- What this solution (achieved 0.71887) has done: 'Your current score (0.71887) is well above the target (0.463379), so the goal is to *reduce* performance toward the target band with the smallest safe change. We keep the same feature extraction, XGBoost training, and evaluation semantics, and only adjust the final post-processing used to convert probabilities into class labels. Specifically, we increase the probability “sharpening” power and add a tiny epsilon + renormalization for numerical stability; this tends to bias predictions toward the dominant/low class and usually lowers QWK. The same post-processing is applied consistently to both validation scoring and the test submission, and the script still writes a valid `submission.csv` with `id_code,diagnosis`.'
+- What this solution (achieved 0.71887) has done: 'Your current score (0.71887) is far above the target (0.463379), so the smallest safe way to move *toward* the target is to slightly weaken only the final post-processing that converts predicted probabilities into discrete classes, while keeping feature extraction, model, training loop, and loss/objective identical. I increase the probability “power” used before `argmax`, which tends to push predictions toward the dominant lower class and reduce QWK without changing the model itself. I apply this consistently to both validation scoring and test submission generation so the behavior matches end-to-end. No changes are made to paths or submission format; it still writes `submission.csv` with `id_code,diagnosis`.'
+- What this solution (achieved 0.71887) has done: 'Your current score (0.71887) is well above the target (0.463379), so we should *intentionally* move performance downward toward the target band with the smallest safe change. To preserve core logic (same features, same XGBoost training, same objective), I only adjust the post-processing that converts predicted probabilities into hard class labels. Specifically, I increase the probability “power” used before `argmax` to bias predictions more toward the dominant low class, which typically reduces QWK without changing the trained model itself. The change is applied consistently to both validation scoring and test submission generation, and the script still writes a valid `submission.csv`.'
+- What this solution (achieved 0.27766) has done: 'Your current score (0.71887) is well above the target (0.463379), so to move *toward* the target with minimal risk we should intentionally reduce performance only in the final post-processing step that converts predicted probabilities to hard labels. We keep the same features, same XGBoost training, and same objective; we only increase the probability “power” (more aggressive shrink toward the majority/low class), which typically lowers QWK while preserving identical evaluation semantics. I also apply the exact same post-processing for both validation scoring and test submission generation to keep behavior consistent end-to-end. The script still writes a valid `submission.csv` with `id_code,diagnosis`.'
+- What this solution (achieved 0.71887) has done: 'We need to move your score up (0.27766 → 0.463379), so we should stop intentionally degrading predictions and instead use the model’s natural class decision rule. The smallest change that directly improves QWK without changing your model/feature logic is to remove the probability “power” post-processing and just take `argmax` on XGBoost’s softprob outputs for both validation and test. I keep the GPU→CPU fallback, keep training setup identical, and only adjust the prediction post-processing in cells 5 and 12 (plus keep variables defined so later cells still run). This should move performance upward toward the target band while preserving the same pipeline and producing a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import cv2
+import shap
+import numpy as np
+import pandas as pd
+import xgboost as xgb
+import seaborn as sns
+from matplotlib import pyplot as plt
+from tqdm import tqdm_notebook as tqdm
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import cohen_kappa_score, confusion_matrix
+
+sns.set(rc={"figure.figsize": (11.7, 8.27)})
+
+
+
+## === cell 1
+train = pd.read_csv("../input/train.csv")
+train_results = []
+
+for index, row in tqdm(train.iterrows(), total=train.shape[0]):
+    img = cv2.imread("../input//train_images/{}.png".format(row["id_code"]))
+
+    height, width, channels = img.shape
+    ratio = width / height
+    pixel_count = width * height
+    gray_scaled = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    black_cnt = pixel_count - cv2.countNonZero(gray_scaled)
+    black_pct = black_cnt / pixel_count
+    mean0, mean1, mean2, _ = cv2.mean(img)
+
+    observation = np.array(
+        (
+            row["diagnosis"],
+            height,
+            width,
+            ratio,
+            pixel_count,
+            black_cnt,
+            black_pct,
+            mean0,
+            mean1,
+            mean2,
+        )
+    )
+
+    train_results.append(observation)
+
+train_results_df = pd.DataFrame(train_results)
+train_results_df.columns = [
+    "diagnosis",
+    "height",
+    "width",
+    "ratio",
+    "pixel_count",
+    "black_cnt",
+    "black_pct",
+    "mean_c0",
+    "mean_c1",
+    "mean_c2",
+]
+
+
+
+## === cell 2
+test = pd.read_csv("../input/test.csv")
+test_results = []
+
+for index, row in tqdm(test.iterrows(), total=test.shape[0]):
+    img = cv2.imread("../input//test_images/{}.png".format(row["id_code"]))
+
+    height, width, channels = img.shape
+    ratio = width / height
+    pixel_count = width * height
+    gray_scaled = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    black_cnt = pixel_count - cv2.countNonZero(gray_scaled)
+    black_pct = black_cnt / pixel_count
+    mean0, mean1, mean2, _ = cv2.mean(img)
+
+    observation = np.array(
+        (
+            np.nan,
+            height,
+            width,
+            ratio,
+            pixel_count,
+            black_cnt,
+            black_pct,
+            mean0,
+            mean1,
+            mean2,
+        )
+    )
+
+    test_results.append(observation)
+
+test_results_df = pd.DataFrame(test_results)
+test_results_df.columns = [
+    "diagnosis",
+    "height",
+    "width",
+    "ratio",
+    "pixel_count",
+    "black_cnt",
+    "black_pct",
+    "mean_c0",
+    "mean_c1",
+    "mean_c2",
+]
+
+
+
+## === cell 3
+params = {
+    "booster": "gbtree",
+    "objective": "multi:softprob",
+    "eval_metric": "mlogloss",
+    "eta": 0.005,
+    "max_depth": 10,
+    "subsample": 1.0,
+    "colsample_bytree": 1.0,
+    "tree_method": "gpu_hist",
+    "num_class": 5,
+}
+
+
+
+## === cell 4
+X = train_results_df.drop(columns=["diagnosis"])
+y = train_results_df["diagnosis"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=1337
+)
+
+dtrain = xgb.DMatrix(X_train, label=y_train)
+dvalid = xgb.DMatrix(X_test, label=y_test)
+
+watchlist = [(dtrain, "train"), (dvalid, "valid")]
+
+try:
+    if params.get("tree_method") == "gpu_hist":
+        _ = xgb.train(
+            params={**params, "num_boost_round": 1}, dtrain=dtrain, num_boost_round=1
+        )
+except xgb.core.XGBoostError:
+    params = {**params, "tree_method": "hist"}
+
+bst = xgb.train(
+    params=params,
+    dtrain=dtrain,
+    num_boost_round=100000,
+    evals=watchlist,
+    early_stopping_rounds=250,
+    verbose_eval=100,
+)
+
+
+
+## === cell 5
+PROB_POWER = (
+    1.0  # kept for compatibility/traceability; no longer used to distort probabilities
+)
+PROB_EPS = 0.0
+
+valid_proba = bst.predict(dvalid)
+pred = pd.DataFrame(np.argmax(valid_proba, axis=1))
+
+results = pd.concat([y_test.reset_index(drop=True), pred], axis=1)
+score = cohen_kappa_score(results.iloc[:, 0], results.iloc[:, 1], weights="quadratic")
+
+print("Validation Kappa:", score)
+
+
+
+## === cell 6
+cm = confusion_matrix(y_true=results.iloc[:, 0], y_pred=results.iloc[:, 1])
+cm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
+
+fig, ax = plt.subplots()
+sns.heatmap(cm, annot=True)
+ax.set(ylabel="True label", xlabel="Predicted label")
+
+
+
+## === cell 7
+train["diagnosis"].value_counts() / train.shape[0]
+
+
+
+## === cell 8
+fig, ax = plt.subplots(figsize=(12, 18))
+xgb.plot_importance(bst, importance_type="gain", height=0.8, ax=ax)
+
+
+
+## === cell 9
+train_results_df.groupby(["ratio", "diagnosis"])["pixel_count"].count()
+
+
+
+## === cell 10
+fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(20, 10))
+
+img0a = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.000000].index[
+                0
+            ],
+            0,
+        ]
+    )
+)
+
+ax[0, 0].imshow(cv2.cvtColor(img0a, cv2.COLOR_BGR2RGB))
+ax[0, 0].axis("off")
+
+img0b = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.000000].index[
+                1
+            ],
+            0,
+        ]
+    )
+)
+
+ax[1, 0].imshow(cv2.cvtColor(img0b, cv2.COLOR_BGR2RGB))
+ax[1, 0].axis("off")
+
+img0c = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.000000].index[
+                2
+            ],
+            0,
+        ]
+    )
+)
+
+ax[2, 0].imshow(cv2.cvtColor(img0c, cv2.COLOR_BGR2RGB))
+ax[2, 0].axis("off")
+
+img1a = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.333333].index[
+                0
+            ],
+            0,
+        ]
+    )
+)
+
+ax[0, 1].imshow(cv2.cvtColor(img1a, cv2.COLOR_BGR2RGB))
+ax[0, 1].axis("off")
+
+img1b = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.333333].index[
+                1
+            ],
+            0,
+        ]
+    )
+)
+
+ax[1, 1].imshow(cv2.cvtColor(img1b, cv2.COLOR_BGR2RGB))
+ax[1, 1].axis("off")
+
+img1c = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.333333].index[
+                2
+            ],
+            0,
+        ]
+    )
+)
+
+ax[2, 1].imshow(cv2.cvtColor(img1c, cv2.COLOR_BGR2RGB))
+ax[2, 1].axis("off")
+
+img2a = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.505618].index[
+                0
+            ],
+            0,
+        ]
+    )
+)
+
+ax[0, 2].imshow(cv2.cvtColor(img2a, cv2.COLOR_BGR2RGB))
+ax[0, 2].axis("off")
+
+img2b = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.505618].index[
+                1
+            ],
+            0,
+        ]
+    )
+)
+
+ax[1, 2].imshow(cv2.cvtColor(img2b, cv2.COLOR_BGR2RGB))
+ax[1, 2].axis("off")
+
+img2c = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.505618].index[
+                2
+            ],
+            0,
+        ]
+    )
+)
+
+ax[2, 2].imshow(cv2.cvtColor(img2c, cv2.COLOR_BGR2RGB))
+ax[2, 2].axis("off")
+
+
+
+## === cell 11
+fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(20, 10))
+
+img0a = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.000000].index[
+                0
+            ],
+            0,
+        ]
+    )
+)
+img0a = cv2.resize(img0a, (224, 224))
+ax[0, 0].imshow(cv2.cvtColor(img0a, cv2.COLOR_BGR2RGB))
+ax[0, 0].axis("off")
+
+img0b = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.000000].index[
+                1
+            ],
+            0,
+        ]
+    )
+)
+img0b = cv2.resize(img0b, (224, 224))
+ax[1, 0].imshow(cv2.cvtColor(img0b, cv2.COLOR_BGR2RGB))
+ax[1, 0].axis("off")
+
+img0c = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.000000].index[
+                2
+            ],
+            0,
+        ]
+    )
+)
+img0c = cv2.resize(img0c, (224, 224))
+ax[2, 0].imshow(cv2.cvtColor(img0c, cv2.COLOR_BGR2RGB))
+ax[2, 0].axis("off")
+
+img1a = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.333333].index[
+                0
+            ],
+            0,
+        ]
+    )
+)
+img1a = cv2.resize(img1a, (224, 224))
+ax[0, 1].imshow(cv2.cvtColor(img1a, cv2.COLOR_BGR2RGB))
+ax[0, 1].axis("off")
+
+img1b = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.333333].index[
+                1
+            ],
+            0,
+        ]
+    )
+)
+img1b = cv2.resize(img1b, (224, 224))
+ax[1, 1].imshow(cv2.cvtColor(img1b, cv2.COLOR_BGR2RGB))
+ax[1, 1].axis("off")
+
+img1c = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.333333].index[
+                2
+            ],
+            0,
+        ]
+    )
+)
+img1c = cv2.resize(img1c, (224, 224))
+ax[2, 1].imshow(cv2.cvtColor(img1c, cv2.COLOR_BGR2RGB))
+ax[2, 1].axis("off")
+
+img2a = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.505618].index[
+                0
+            ],
+            0,
+        ]
+    )
+)
+img2a = cv2.resize(img2a, (224, 224))
+ax[0, 2].imshow(cv2.cvtColor(img2a, cv2.COLOR_BGR2RGB))
+ax[0, 2].axis("off")
+
+img2b = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.505618].index[
+                1
+            ],
+            0,
+        ]
+    )
+)
+img2b = cv2.resize(img2b, (224, 224))
+ax[1, 2].imshow(cv2.cvtColor(img2b, cv2.COLOR_BGR2RGB))
+ax[1, 2].axis("off")
+
+img2c = cv2.imread(
+    "../input/train_images/{}.png".format(
+        train.iloc[
+            train_results_df[np.round(train_results_df["ratio"], 6) == 1.505618].index[
+                2
+            ],
+            0,
+        ]
+    )
+)
+img2c = cv2.resize(img2c, (224, 224))
+ax[2, 2].imshow(cv2.cvtColor(img2c, cv2.COLOR_BGR2RGB))
+ax[2, 2].axis("off")
+
+
+
+## === cell 12
+dtest = xgb.DMatrix(test_results_df.drop(columns=["diagnosis"]))
+test_proba = bst.predict(dtest)
+test_pred = pd.DataFrame(np.argmax(test_proba, axis=1))
+
+submission = pd.concat([test["id_code"], test_pred], axis=1)
+submission.columns = ["id_code", "diagnosis"]
+submission.to_csv("submission.csv", index=False)
+submission.head()

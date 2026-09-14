@@ -1,0 +1,341 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given pairs of phrases (an `anchor` and a `target` phrase), build a model to rate how similar they are.  
+
+## Metric
+Pearson correlation coefficient.
+
+## Submission Format
+For each `id` (representing a pair of phrases) in the test set, you must predict the similarity `score`. The file should contain a header and have the following format:
+
+```
+id,score
+4112d61851461f60,0
+09e418c93a776564,0.25
+36baf228038e314b,1
+etc.
+
+```
+
+## Dataset
+The scores are in the 0-1 range with increments of 0.25 with the following meanings:
+
+- **1.0** - Very close match. This is typically an exact match except possibly for differences in conjugation, quantity (e.g. singular vs. plural), and addition or removal of stopwords (e.g. "the", "and", "or").
+- **0.75** - Close synonym, e.g. "mobile phone" vs. "cellphone". This also includes abbreviations, e.g. "TCP" -> "transmission control protocol".
+- **0.5** - Synonyms which don't have the same meaning (same function, same properties). This includes broad-narrow (hyponym) and narrow-broad (hypernym) matches.
+- **0.25** - Somewhat related, e.g. the two phrases are in the same high level domain but are not synonyms. This also includes antonyms.
+- **0.0** - Unrelated.
+
+Files
+-----
+
+- **train.csv** - the training set, containing phrases, contexts, and their similarity scores
+- **test.csv** - the test set set, identical in structure to the training set but without the score
+- **sample_submission.csv** - a sample submission file in the correct format
+
+Columns
+-------
+
+- `id` - a unique identifier for a pair of phrases
+- `anchor` - the first phrase
+- `target` - the second phrase
+- `context` - the [CPC classification (version 2021.05)](https://en.wikipedia.org/wiki/Cooperative_Patent_Classification), which indicates the subject within which the similarity is to be scored
+- `score` - the similarity. This is sourced from a combination of one or more manual expert ratings.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+spacy==3.8.7
+spacy-legacy==3.0.12
+spacy-loggers==1.0.5
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        working/
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+```
+
+-> data/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> data/us-patent-phrase-to-phrase-matching/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/us-patent-phrase-to-phrase-matching/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/us-patent-phrase-to-phrase-matching/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> input/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.444
+
+# 6. Current score
+
+0.35408
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.28726) has done: 'Diagnosis: Cell 13 crashes because `X_test["anchor"][i]` uses label-based indexing on a Series whose index is inherited from `combi` (it continues from `len(train)`), so label `0` does not exist and raises `KeyError: 0`. This is a pandas indexing bug (mixing positional loop with label indexing), not a spaCy issue.
+
+Patch summary: In cell 13, switch to positional indexing via `.iloc[i]` for both `anchor` and `target` when iterating over `range(len(X_test))`. This preserves identical logic while making indexing deterministic and compatible with any inherited index.
+
+Updated cells: Only cell 13 is modified.
+
+Compatibility notes for cell k+1: `simularity` remains a Python list of length `len(X_test)`, so cell 14 (`submission['score'] = simularity`) continues to work unchanged.
+
+Assumptions: `X_test` is a DataFrame with columns `anchor` and `target`, and its length matches the submission template length.'
+- What this solution (achieved 0.354) has done: 'To move your Pearson score up toward the 0.444 target without changing the overall approach (spaCy semantic similarity), I make two minimal, metric-relevant fixes: (1) ensure we always use a real vectors model (`en_core_web_md` or `en_core_web_lg`) instead of silently falling back to a blank model (which hurts similarity quality), and (2) include the `context` string in both texts when computing similarity, which is a small, legitimate feature addition that often improves correlation for this dataset. I also keep the same train/test reading and submission writing, and speed up inference (without changing semantics) by using `nlp.pipe` in batches. These changes are expected to increase the score from ~0.287 toward your 0.444 target while staying within the same core logic.'
+- What this solution (achieved 0.12909) has done: 'We keep your spaCy similarity approach intact and make two small, metric-relevant tweaks that typically raise Pearson correlation on this competition: (1) rescale cosine similarities from the vectors model into the target’s 0–1 range (clipping to valid bounds), and (2) lightly calibrate predictions by snapping to the nearest allowed label level {0, 0.25, 0.5, 0.75, 1.0}, which matches how the ground-truth scores are distributed. These changes don’t alter the model/loop/feature extraction; they only adjust post-processing to better align with the evaluation target distribution. We also avoid accidentally using `en_core_web_sm` (no vectors) to prevent low-quality similarity scores. The script still run end-to-end and write a valid `submission.csv`.'
+- What this solution (achieved 0.37482) has done: 'We keep your spaCy vector-similarity core logic intact and only adjust post-processing, because your current 0.129 score is far below the 0.444 target and the biggest lever left is calibration. Snapping to discrete levels can *hurt* Pearson correlation (it destroys ranking/linearity), so we remove that quantization while keeping the valid 0–1 scaling and clipping. We also apply a tiny linear calibration (mean/variance match) using the training distribution of the same similarity signal, which typically improves Pearson without changing the underlying model or features. The script still run end-to-end and write a valid `submission.csv` with `id,score`.'
+- What this solution (achieved 0.35408) has done: 'You’re currently below the 0.444 target (0.37482), so we make a small, metric-aligned improvement without changing the spaCy similarity core logic. The main tweak is to learn a *Pearson-optimal* linear calibration (scale+shift) on the training “similarity signal” rather than matching mean/std; for Pearson correlation, least-squares calibration is the right minimal adjustment and often gives a modest lift. We also guard against rare NaNs from `Doc.similarity` and ensure submission row alignment stays intact. Everything else (spaCy vectors similarity + context concatenation + 0–1 scaling/clipping + CSV output) remains the same.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+## === cell 1
+import os
+
+for dirname, _, filenames in os.walk("/kaggle/input"):
+    for filename in filenames:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 2
+train = pd.read_csv("/kaggle/input/us-patent-phrase-to-phrase-matching/train.csv")
+test = pd.read_csv("/kaggle/input/us-patent-phrase-to-phrase-matching/test.csv")
+submission = pd.read_csv(
+    "/kaggle/input/us-patent-phrase-to-phrase-matching/sample_submission.csv"
+)
+
+
+
+## === cell 3
+train
+
+
+
+## === cell 4
+test
+
+
+
+## === cell 5
+submission
+
+
+
+## === cell 6
+sns.distplot(train.score)
+
+
+
+## === cell 7
+plt.boxplot(train.score)
+
+
+
+## === cell 8
+target = train.score
+
+
+
+## === cell 9
+combi = pd.concat([train.drop(["score"], axis=1), test], axis=0, ignore_index=True)
+combi
+
+
+
+## === cell 10
+y = target
+X = combi[: len(train)]
+X_test = combi[len(train) :]
+
+
+
+## === cell 11
+import sys, subprocess
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "-U", "spacy"])
+subprocess.check_call(
+    [sys.executable, "-m", "spacy", "download", "en_core_web_md", "-q"]
+)
+
+
+
+## === cell 12
+import spacy
+
+nlp = None
+for model_name in ("en_core_web_lg", "en_core_web_md"):
+    try:
+        nlp = spacy.load(model_name)
+        break
+    except OSError:
+        continue
+
+if nlp is None:
+    nlp = spacy.blank("en")
+    if "sentencizer" not in nlp.pipe_names:
+        nlp.add_pipe("sentencizer")
+
+disable = []
+for comp in ("parser", "tagger", "ner", "lemmatizer", "attribute_ruler"):
+    if comp in nlp.pipe_names:
+        disable.append(comp)
+
+
+def _make_texts(df: pd.DataFrame, col: str) -> list:
+    return (df[col].astype(str) + " [CTX] " + df["context"].astype(str)).tolist()
+
+
+def _safe_similarity(doc_a, doc_b) -> float:
+    s = doc_a.similarity(doc_b)
+    if not np.isfinite(s):
+        return 0.0
+    return float(s)
+
+
+train_texts_anchor = _make_texts(X, "anchor")
+train_texts_target = _make_texts(X, "target")
+
+train_anchors = list(nlp.pipe(train_texts_anchor, batch_size=128, disable=disable))
+train_targets = list(nlp.pipe(train_texts_target, batch_size=128, disable=disable))
+train_sim = np.array(
+    [_safe_similarity(a, t) for a, t in zip(train_anchors, train_targets)],
+    dtype=np.float64,
+)
+
+train_pred01 = (train_sim + 1.0) / 2.0
+train_pred01 = np.clip(train_pred01, 0.0, 1.0)
+
+x = train_pred01.astype(np.float64)
+yy = y.to_numpy(dtype=np.float64)
+
+x_mean = float(x.mean())
+y_mean = float(yy.mean())
+x_center = x - x_mean
+y_center = yy - y_mean
+
+den = float(np.dot(x_center, x_center))
+if den <= 0.0:
+    alpha = 1.0
+    beta = 0.0
+else:
+    alpha = float(np.dot(x_center, y_center) / den)
+    beta = y_mean - alpha * x_mean
+
+test_texts_anchor = _make_texts(X_test, "anchor")
+test_texts_target = _make_texts(X_test, "target")
+
+test_anchors = list(nlp.pipe(test_texts_anchor, batch_size=128, disable=disable))
+test_targets = list(nlp.pipe(test_texts_target, batch_size=128, disable=disable))
+test_sim = np.array(
+    [_safe_similarity(a, t) for a, t in zip(test_anchors, test_targets)],
+    dtype=np.float64,
+)
+
+pred = (test_sim + 1.0) / 2.0
+pred = np.clip(pred, 0.0, 1.0)
+
+pred = alpha * pred + beta
+pred = np.clip(pred, 0.0, 1.0)
+
+simularity = pred.tolist()
+
+print(len(simularity))
+print(simularity[:10])
+
+
+
+## === cell 13
+submission["score"] = simularity
+submission.to_csv("submission.csv", index=False)
+submission

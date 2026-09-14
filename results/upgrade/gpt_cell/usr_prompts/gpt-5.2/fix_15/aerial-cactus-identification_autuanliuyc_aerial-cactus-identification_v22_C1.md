@@ -1,0 +1,313 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.7
+
+# 2. Installed packages
+
+fastai==2.8.5
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+%matplotlib inline
+%reload_ext autoreload
+%autoreload 2
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = "all" 
+
+
+## === cell 1
+from fastai.vision import *
+from pathlib import Path
+
+
+## === cell 2
+root = Path("../input")
+root
+root.as_posix()
+
+
+## === cell 3
+import pandas as pd
+
+train_df = pd.read_csv(root / "train.csv")
+test_df = pd.read_csv(root / "sample_submission.csv")
+
+
+## === cell 4
+train_df.head()
+test_df.head()
+
+
+## === cell 5
+test_set = [root / "test" / "test" / fn for fn in test_df["id"].tolist()]
+
+
+## === cell 6
+test_set
+
+
+## === cell 7
+from fastai.vision.augment import aug_transforms
+
+tsfm = aug_transforms(
+    do_flip=True,
+    flip_vert=True,
+    max_rotate=10.0,
+    max_zoom=1.1,
+    max_lighting=0.2,
+    max_warp=0.2,
+    p_affine=0.75,
+    p_lighting=0.75,
+)
+
+
+## === cell 8
+SZ=128
+BS=64
+
+
+## === cell 9
+from fastai.vision.all import *
+
+import numpy as np
+
+np.random.seed(42)
+
+train_path = root / "train" / "train"
+
+dblock = DataBlock(
+    blocks=(ImageBlock, CategoryBlock),
+    get_x=ColReader("id", pref=str(train_path) + "/"),
+    get_y=ColReader("has_cactus"),
+    splitter=RandomSplitter(valid_pct=0.01, seed=42),
+    item_tfms=Resize(SZ),
+    batch_tfms=[
+        *aug_transforms(
+            do_flip=True,
+            flip_vert=True,
+            max_rotate=10.0,
+            max_zoom=1.1,
+            max_lighting=0.2,
+            max_warp=0.2,
+            p_affine=0.75,
+            p_lighting=0.75,
+        ),
+        Normalize.from_stats(*imagenet_stats),
+    ],
+)
+
+data = dblock.dataloaders(train_df, bs=BS)
+
+test_items = [root / "test" / "test" / fn for fn in test_df["id"].tolist()]
+data_test_dl = data.test_dl(test_items)
+
+
+## === cell 10
+data
+
+
+## === cell 11
+data.show_batch(nrows=3, max_n=9, figsize=(6, 6))
+
+
+## === cell 12
+arch = models.densenet161
+
+
+## === cell 13
+learn = cnn_learner(data, arch, metrics=[error_rate, accuracy])
+
+
+## === cell 14
+lr_finder = learn.lr_find(show_plot=True)
+
+
+## === cell 15
+lr = 1e-02
+learn.fit_one_cycle(5, slice(lr))
+
+
+## === cell 16
+learn.cbs.filter(lambda cb: cb.__class__.__name__ == "Recorder")[0].plot_losses()
+
+
+## --- ERROR in cell 16, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/1116656390.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m      1[0m [0;31m# fastai v2: `plot_losses` is a method on the Recorder callback, not on `learn.recorder`.[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      2[0m [0;31m# Access the Recorder callback directly to avoid fastcore attribute delegation resolving to the model.[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 3[0;31m [0mlearn[0m[0;34m.[0m[0mcbs[0m[0;34m.[0m[0mfilter[0m[0;34m([0m[0;32mlambda[0m [0mcb[0m[0;34m:[0m [0mcb[0m[0;34m.[0m[0m__class__[0m[0;34m.[0m[0m__name__[0m [0;34m==[0m [0;34m"Recorder"[0m[0;34m)[0m[0;34m[[0m[0;36m0[0m[0;34m][0m[0;34m.[0m[0mplot_losses[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;32m/usr/local/lib/python3.11/dist-packages/fastcore/basics.py[0m in [0;36m__getattr__[0;34m(self, k)[0m
+[1;32m    551[0m         [0;32mif[0m [0mself[0m[0;34m.[0m[0m_component_attr_filter[0m[0;34m([0m[0mk[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    552[0m             [0mattr[0m [0;34m=[0m [0mgetattr[0m[0;34m([0m[0mself[0m[0;34m,[0m[0mself[0m[0;34m.[0m[0m_default[0m[0;34m,[0m[0;32mNone[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 553[0;31m             [0;32mif[0m [0mattr[0m [0;32mis[0m [0;32mnot[0m [0;32mNone[0m[0;34m:[0m [0;32mreturn[0m [0mgetattr[0m[0;34m([0m[0mattr[0m[0;34m,[0m[0mk[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    554[0m         [0;32mraise[0m [0mAttributeError[0m[0;34m([0m[0mk[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    555[0m     [0;32mdef[0m [0m__dir__[0m[0;34m([0m[0mself[0m[0;34m)[0m[0;34m:[0m [0;32mreturn[0m [0mcustom_dir[0m[0;34m([0m[0mself[0m[0;34m,[0m[0mself[0m[0;34m.[0m[0m_dir[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/fastcore/basics.py[0m in [0;36m__getattr__[0;34m(self, k)[0m
+[1;32m    551[0m         [0;32mif[0m [0mself[0m[0;34m.[0m[0m_component_attr_filter[0m[0;34m([0m[0mk[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    552[0m             [0mattr[0m [0;34m=[0m [0mgetattr[0m[0;34m([0m[0mself[0m[0;34m,[0m[0mself[0m[0;34m.[0m[0m_default[0m[0;34m,[0m[0;32mNone[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 553[0;31m             [0;32mif[0m [0mattr[0m [0;32mis[0m [0;32mnot[0m [0;32mNone[0m[0;34m:[0m [0;32mreturn[0m [0mgetattr[0m[0;34m([0m[0mattr[0m[0;34m,[0m[0mk[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    554[0m         [0;32mraise[0m [0mAttributeError[0m[0;34m([0m[0mk[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    555[0m     [0;32mdef[0m [0m__dir__[0m[0;34m([0m[0mself[0m[0;34m)[0m[0;34m:[0m [0;32mreturn[0m [0mcustom_dir[0m[0;34m([0m[0mself[0m[0;34m,[0m[0mself[0m[0;34m.[0m[0m_dir[0m[0;34m([0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py[0m in [0;36m__getattr__[0;34m(self, name)[0m
+[1;32m   1926[0m             [0;32mif[0m [0mname[0m [0;32min[0m [0mmodules[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   1927[0m                 [0;32mreturn[0m [0mmodules[0m[0;34m[[0m[0mname[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[0;32m-> 1928[0;31m         raise AttributeError(
+[0m[1;32m   1929[0m             [0;34mf"'{type(self).__name__}' object has no attribute '{name}'"[0m[0;34m[0m[0;34m[0m[0m
+[1;32m   1930[0m         )
+
+[0;31mAttributeError[0m: 'Sequential' object has no attribute 'plot_losses'
+
+## === cell 28
+learn.recorder.plot_losses()

@@ -1,0 +1,427 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.7
+
+# 2. Installed packages
+
+No external packages required in the script and installed.
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+
+
+import os
+print(os.listdir("../input"))
+
+from PIL import Image
+import matplotlib.pyplot as plt
+
+%matplotlib inline
+
+
+
+## === cell 1
+os.listdir('../input/')
+
+
+## === cell 2
+df = pd.read_csv('../input/train.csv')
+df.head()
+
+
+## === cell 3
+os.listdir('../input/test/test')
+
+
+## === cell 4
+os.listdir('../input/train/train')
+
+
+## === cell 5
+data_dir = '../input/train/train/'
+filename = df['id'][0]
+path = os.path.join(data_dir, filename)
+path
+
+test_dir = '../input/test/test/'
+
+
+## === cell 6
+image_pil = Image.open(path)
+image_pil
+
+
+## === cell 7
+image = np.array(image_pil)
+plt.imshow(image)
+plt.show()
+
+
+## === cell 8
+has_cactus = df['has_cactus'][0]
+has_cactus
+
+
+## === cell 9
+image = np.array(image_pil)
+plt.title(has_cactus)
+plt.imshow(image)
+plt.show()
+
+
+## === cell 10
+np.mean(df['has_cactus']) # cactus가 포함될 비율
+
+
+## === cell 11
+np.sum(df['has_cactus']), len(df['has_cactus'])
+
+
+## === cell 12
+image.shape
+
+
+## === cell 13
+np.min(image), np.max(image)
+
+
+## === cell 14
+heights = []
+widths = []
+train_arr = []
+test_arr = []
+
+for filename in df["id"]:
+    path = os.path.join(data_dir, filename)
+    image_pil = Image.open(path)
+    image = np.array(image_pil)
+    train_arr.append(image)
+    h, w, c = image.shape
+    if h not in heights:
+        heights.append(h)
+    if w not in widths:
+        widths.append(w)
+
+train_data = np.array(train_arr)  # 또는 np.array의 concatenate 이용
+
+train_labels_list = []
+for label in df["has_cactus"]:
+    train_labels_list.append(label)
+
+train_labels = np.array(train_labels_list)
+
+for testfilename in os.listdir(test_dir):
+    path = os.path.join(test_dir, testfilename)
+    if not os.path.isfile(path):
+        continue
+    image_pil = Image.open(path)
+    image = np.array(image_pil)
+    test_arr.append(image)
+
+test_data = np.array(test_arr)
+
+
+## === cell 15
+from tqdm import tqdm_notebook
+
+
+## === cell 16
+for filename in tqdm_notebook(df['id']):
+    path = os.path.join(data_dir, filename)
+    image = Image.open(path)
+
+
+## === cell 17
+plt.imshow(train_data[12])
+
+
+## === cell 18
+train_data.shape
+
+
+## === cell 19
+train_labels
+
+
+## === cell 20
+heights
+
+
+## === cell 21
+widths
+
+
+## === cell 22
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import os
+import time
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+get_ipython().run_line_magic("matplotlib", "inline")
+from IPython.display import clear_output
+
+import sys
+import subprocess
+
+try:
+    import google.protobuf  # noqa: F401
+    from google.protobuf import __version__ as _pb_ver
+except Exception:
+    _pb_ver = None
+
+
+def _pb_version_tuple(v):
+    try:
+        return tuple(int(x) for x in v.split(".")[:3])
+    except Exception:
+        return None
+
+
+_pb_tuple = _pb_version_tuple(_pb_ver) if _pb_ver else None
+if _pb_tuple is None or _pb_tuple >= (4, 21, 0) or _pb_tuple < (3, 20, 0):
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "-q", "protobuf==3.20.3"]
+    )
+    import importlib
+
+    if "google.protobuf" in sys.modules:
+        importlib.reload(sys.modules["google.protobuf"])
+
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "2")
+
+import tensorflow as tf
+from tensorflow.keras import layers
+
+if hasattr(tf, "enable_eager_execution"):
+    tf.enable_eager_execution()
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+
+## === cell 23
+print('TensorFlow version: {}'.format(tf.__version__))
+
+
+## === cell 24
+train_data = train_data / 255.
+train_data = train_data.reshape([-1, 32, 32, 3])
+train_data = train_data.astype(np.float32)
+train_labels = train_labels.astype(np.int32)
+train_labels = train_labels.astype(np.float64)
+
+test_data = test_data / 255.
+test_data = test_data.reshape([-1, 32, 32, 3])
+test_data = test_data.astype(np.float32)
+
+
+## === cell 25
+tf.set_random_seed(219)
+batch_size = 32
+max_epochs = 20
+
+N = len(train_data)
+train_dataset = tf.data.Dataset.from_tensor_slices((train_data, train_labels))
+train_dataset = train_dataset.shuffle(buffer_size = 10000)
+train_dataset = train_dataset.batch(batch_size = batch_size)
+print(train_dataset)
+
+
+## --- ERROR in cell 25, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/3169107637.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[0;32m----> 1[0;31m [0mtf[0m[0;34m.[0m[0mset_random_seed[0m[0;34m([0m[0;36m219[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      2[0m [0mbatch_size[0m [0;34m=[0m [0;36m32[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m [0mmax_epochs[0m [0;34m=[0m [0;36m20[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      4[0m [0;34m[0m[0m
+[1;32m      5[0m [0;31m# for train[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mAttributeError[0m: module 'tensorflow' has no attribute 'set_random_seed'
+
+## === cell 26
+class MNISTModel(tf.keras.Model):
+  def __init__(self):
+    super(MNISTModel, self).__init__()
+    self.l2_decay = 0.001
+    self.conv1 = layers.Conv2D(filters=32, kernel_size=[5, 5], padding='same',
+                               kernel_regularizer=tf.keras.regularizers.l2(self.l2_decay))
+    self.conv1_bn = layers.BatchNormalization()
+    self.pool1 = layers.MaxPool2D()
+    self.conv2 = layers.Conv2D(filters=64, kernel_size=[5, 5], padding='same',
+                               kernel_regularizer=tf.keras.regularizers.l2(self.l2_decay))
+    self.conv2_bn = layers.BatchNormalization()
+    self.pool2 = layers.MaxPool2D()
+    self.flatten = layers.Flatten()
+    self.dense1 = layers.Dense(units=1024,
+                               kernel_regularizer=tf.keras.regularizers.l2(self.l2_decay))
+    self.dense1_bn = layers.BatchNormalization()
+    self.drop1 = layers.Dropout(rate=0.6)
+    self.dense2 = layers.Dense(units=1, activation='sigmoid',
+                               kernel_regularizer=tf.keras.regularizers.l2(self.l2_decay))
+
+  def call(self, inputs, training=False):
+    """Run the model."""
+    self.conv1_ = self.conv1(inputs)
+    self.conv1_bn_ = self.conv1_bn(self.conv1_, training=training)
+    self.conv1_ = tf.nn.relu(self.conv1_bn_)
+    self.pool1_ = self.pool1(self.conv1_)
+    
+    self.conv2_ = self.conv2(self.pool1_)
+    self.conv2_bn_ = self.conv2_bn(self.conv2_, training=training)
+    self.conv2_ = tf.nn.relu(self.conv2_bn_)
+    self.pool2_ = self.pool2(self.conv2_)
+    
+    self.flatten_ = self.flatten(self.pool2_)
+    self.dense1_ = self.dense1(self.flatten_)
+    self.dense1_bn_ = self.dense1_bn(self.dense1_, training=training)
+    self.dense1_ = tf.nn.relu(self.dense1_bn_)
+    self.drop1_ = self.drop1(self.dense1_, training=training)
+    
+    self.predictions_ = self.dense2(self.drop1_)
+    
+    return self.predictions_

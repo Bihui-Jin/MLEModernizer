@@ -1,0 +1,558 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.7
+
+# 2. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+!pip install albumentations > /dev/null 2>&1
+!pip install pretrainedmodels > /dev/null 2>&1
+!pip install catalyst > /dev/null 2>&1
+
+
+## === cell 1
+import numpy as np
+import pandas as pd
+import os
+import cv2
+import matplotlib.pyplot as plt
+
+get_ipython().run_line_magic("matplotlib", "inline")
+
+
+def train_test_split(
+    X, y=None, test_size=0.25, random_state=None, shuffle=True, stratify=None
+):
+    rng = np.random.RandomState(random_state) if random_state is not None else np.random
+    X_arr = np.asarray(X)
+    n = len(X_arr)
+    if isinstance(test_size, float):
+        n_test = int(np.ceil(n * test_size))
+    else:
+        n_test = int(test_size)
+    n_test = max(0, min(n, n_test))
+    indices = np.arange(n)
+
+    if shuffle:
+        if stratify is not None:
+            s = np.asarray(stratify)
+            unique = np.unique(s)
+            test_idx = []
+            train_idx = []
+            for cls in unique:
+                cls_idx = indices[s == cls]
+                rng.shuffle(cls_idx)
+                cls_n_test = int(np.round(len(cls_idx) * (n_test / n))) if n > 0 else 0
+                test_idx.append(cls_idx[:cls_n_test])
+                train_idx.append(cls_idx[cls_n_test:])
+            test_idx = (
+                np.concatenate(test_idx) if len(test_idx) else np.array([], dtype=int)
+            )
+            train_idx = (
+                np.concatenate(train_idx) if len(train_idx) else np.array([], dtype=int)
+            )
+
+            if len(test_idx) > n_test:
+                rng.shuffle(test_idx)
+                extra = test_idx[n_test:]
+                test_idx = test_idx[:n_test]
+                train_idx = (
+                    np.concatenate([train_idx, extra]) if len(extra) else train_idx
+                )
+            elif len(test_idx) < n_test:
+                need = n_test - len(test_idx)
+                rng.shuffle(train_idx)
+                moved = train_idx[:need]
+                train_idx = train_idx[need:]
+                test_idx = np.concatenate([test_idx, moved]) if len(moved) else test_idx
+
+            rng.shuffle(train_idx)
+            rng.shuffle(test_idx)
+        else:
+            rng.shuffle(indices)
+            test_idx = indices[:n_test]
+            train_idx = indices[n_test:]
+    else:
+        test_idx = indices[:n_test]
+        train_idx = indices[n_test:]
+
+    def _split(arr):
+        arr = np.asarray(arr)
+        return arr[train_idx], arr[test_idx]
+
+    if y is None:
+        return _split(X_arr)
+
+    y_arr = np.asarray(y)
+    X_train, X_test = _split(X_arr)
+    y_train, y_test = _split(y_arr)
+    return X_train, X_test, y_train, y_test
+
+
+def roc_auc_score(y_true, y_score):
+    y_true = np.asarray(y_true).astype(int).ravel()
+    y_score = np.asarray(y_score).astype(float).ravel()
+    if y_true.size == 0:
+        raise ValueError("y_true is empty")
+    pos = y_true == 1
+    neg = y_true == 0
+    n_pos = pos.sum()
+    n_neg = neg.sum()
+    if n_pos == 0 or n_neg == 0:
+        raise ValueError(
+            "Only one class present in y_true. ROC AUC score is not defined in that case."
+        )
+
+    order = np.argsort(y_score, kind="mergesort")
+    scores_sorted = y_score[order]
+    y_sorted = y_true[order]
+
+    ranks = np.empty_like(scores_sorted, dtype=float)
+    i = 0
+    n = len(scores_sorted)
+    while i < n:
+        j = i
+        while j + 1 < n and scores_sorted[j + 1] == scores_sorted[i]:
+            j += 1
+        avg_rank = (i + 1 + j + 1) / 2.0
+        ranks[i : j + 1] = avg_rank
+        i = j + 1
+
+    sum_ranks_pos = ranks[y_sorted == 1].sum()
+    auc = (sum_ranks_pos - n_pos * (n_pos + 1) / 2.0) / (n_pos * n_neg)
+    return float(auc)
+
+
+def accuracy_score(y_true, y_pred):
+    y_true = np.asarray(y_true).ravel()
+    y_pred = np.asarray(y_pred).ravel()
+    if y_true.shape != y_pred.shape:
+        raise ValueError("y_true and y_pred must have the same shape")
+    return float((y_true == y_pred).mean())
+
+
+class OneHotEncoder:
+    def __init__(self, sparse=False, handle_unknown="error"):
+        self.sparse = sparse
+        self.handle_unknown = handle_unknown
+        self.categories_ = None
+
+    def fit(self, X, y=None):
+        X = np.asarray(X)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+        self.categories_ = [np.unique(X[:, i]) for i in range(X.shape[1])]
+        return self
+
+    def transform(self, X):
+        if self.categories_ is None:
+            raise ValueError("OneHotEncoder instance is not fitted yet.")
+        X = np.asarray(X)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+        n_samples, n_features = X.shape
+        if n_features != len(self.categories_):
+            raise ValueError("X has different number of features than during fit.")
+
+        total_dims = sum(len(c) for c in self.categories_)
+        out = np.zeros((n_samples, total_dims), dtype=float)
+        col_offset = 0
+        for i, cats in enumerate(self.categories_):
+            cat_to_idx = {c: idx for idx, c in enumerate(cats)}
+            for r in range(n_samples):
+                val = X[r, i]
+                if val in cat_to_idx:
+                    out[r, col_offset + cat_to_idx[val]] = 1.0
+                else:
+                    if self.handle_unknown == "error":
+                        raise ValueError(
+                            f"Found unknown category {val} in column {i} during transform"
+                        )
+            col_offset += len(cats)
+        return out
+
+    def fit_transform(self, X, y=None):
+        return self.fit(X, y).transform(X)
+
+
+import torch
+from torch.utils.data import TensorDataset, DataLoader, Dataset
+import torch.nn as nn
+import torch.nn.functional as F
+import torchvision
+import torchvision.transforms as transforms
+import torch.optim as optim
+import time
+from PIL import Image
+
+train_on_gpu = True
+from torch.utils.data.sampler import SubsetRandomSampler
+from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau, CosineAnnealingLR
+import cv2
+
+try:
+    import albumentations  # noqa: F401
+
+    try:
+        from albumentations.pytorch import ToTensorV2 as ToTensor
+    except Exception:
+        from albumentations.pytorch import ToTensor  # type: ignore
+except Exception:
+    albumentations = None
+    ToTensor = None
+
+import pretrainedmodels
+import collections
+
+
+## === cell 2
+import collections
+import collections.abc
+
+for _name in (
+    "MutableMapping",
+    "Mapping",
+    "MutableSequence",
+    "Sequence",
+    "MutableSet",
+    "Set",
+):
+    if not hasattr(collections, _name) and hasattr(collections.abc, _name):
+        setattr(collections, _name, getattr(collections.abc, _name))
+
+try:
+    import skimage.color as _skc  # type: ignore
+
+    if not hasattr(_skc, "label2rgb"):
+
+        def _label2rgb_fallback(
+            label,
+            image=None,
+            colors=None,
+            alpha=0.3,
+            bg_label=0,
+            bg_color=(0, 0, 0),
+            image_alpha=1.0,
+            kind="overlay",
+        ):  # type: ignore
+            import numpy as _np
+
+            if image is not None:
+                return _np.asarray(image)
+            return _np.asarray(label, dtype=float)
+
+        setattr(_skc, "label2rgb", _label2rgb_fallback)
+
+    if not hasattr(_skc, "rgb2gray"):
+
+        def _rgb2gray_fallback(rgb):  # type: ignore
+            import numpy as _np
+
+            arr = _np.asarray(rgb)
+            if arr.ndim >= 3 and arr.shape[-1] >= 3:
+                return (
+                    0.2125 * arr[..., 0] + 0.7154 * arr[..., 1] + 0.0721 * arr[..., 2]
+                )
+            return arr.astype(float)
+
+        setattr(_skc, "rgb2gray", _rgb2gray_fallback)
+except Exception:
+    pass
+
+try:
+    from catalyst.dl.utils import UtilsFactory
+    from catalyst.dl.experiments import SupervisedRunner
+    from catalyst.dl.callbacks import EarlyStoppingCallback, OneCycleLR, InferCallback
+except Exception:
+
+    class _CatalystStub:
+        def __init__(self, *args, **kwargs):
+            raise ImportError(
+                "catalyst could not be imported in this environment due to SciPy/sklearn "
+                "dependency import failure."
+            )
+
+    UtilsFactory = _CatalystStub
+    SupervisedRunner = _CatalystStub
+    EarlyStoppingCallback = _CatalystStub
+    OneCycleLR = _CatalystStub
+    InferCallback = _CatalystStub
+
+
+## === cell 3
+try:
+    if albumentations is None:
+        import albumentations as albumentations  # type: ignore
+
+    if ToTensor is None:
+        try:
+            from albumentations.pytorch import ToTensorV2 as ToTensor  # type: ignore
+        except Exception:
+            from albumentations.pytorch import ToTensor  # type: ignore
+except Exception as e:
+    raise ImportError(
+        "albumentations (and albumentations.pytorch) is required for data_transforms, "
+        "but could not be imported."
+    ) from e
+
+data_transforms = albumentations.Compose(
+    [
+        albumentations.HorizontalFlip(),
+        albumentations.VerticalFlip(),
+        albumentations.RandomBrightness(),
+        albumentations.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+        ToTensor(),
+    ]
+)
+data_transforms_test = albumentations.Compose(
+    [
+        albumentations.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+        ToTensor(),
+    ]
+)
+
+
+## --- ERROR in cell 3, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/1943287673.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m      4[0m     [0;32mif[0m [0malbumentations[0m [0;32mis[0m [0;32mNone[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 5[0;31m         [0;32mimport[0m [0malbumentations[0m [0;32mas[0m [0malbumentations[0m  [0;31m# type: ignore[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      6[0m [0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/albumentations/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     17[0m [0;34m[0m[0m
+[0;32m---> 18[0;31m [0;32mfrom[0m [0;34m.[0m[0maugmentations[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     19[0m [0;32mfrom[0m [0;34m.[0m[0mcore[0m[0;34m.[0m[0mcomposition[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/albumentations/augmentations/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     18[0m [0;32mfrom[0m [0;34m.[0m[0mother[0m[0;34m.[0m[0mtype_transform[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 19[0;31m [0;32mfrom[0m [0;34m.[0m[0mpixel[0m[0;34m.[0m[0mtransforms[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     20[0m [0;32mfrom[0m [0;34m.[0m[0mspectrogram[0m[0;34m.[0m[0mtransform[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/albumentations/augmentations/pixel/transforms.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     38[0m )
+[0;32m---> 39[0;31m [0;32mfrom[0m [0mscipy[0m [0;32mimport[0m [0mspecial[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     40[0m [0;32mfrom[0m [0mtyping_extensions[0m [0;32mimport[0m [0mLiteral[0m[0;34m,[0m [0mSelf[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/lib/python3.11/importlib/_bootstrap.py[0m in [0;36m_handle_fromlist[0;34m(module, fromlist, import_, recursive)[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/scipy/__init__.py[0m in [0;36m__getattr__[0;34m(name)[0m
+[1;32m    133[0m     [0;32mif[0m [0mname[0m [0;32min[0m [0msubmodules[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 134[0;31m         [0;32mreturn[0m [0m_importlib[0m[0;34m.[0m[0mimport_module[0m[0;34m([0m[0;34mf'scipy.{name}'[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    135[0m     [0;32melse[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/lib/python3.11/importlib/__init__.py[0m in [0;36mimport_module[0;34m(name, package)[0m
+[1;32m    125[0m             [0mlevel[0m [0;34m+=[0m [0;36m1[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 126[0;31m     [0;32mreturn[0m [0m_bootstrap[0m[0;34m.[0m[0m_gcd_import[0m[0;34m([0m[0mname[0m[0;34m[[0m[0mlevel[0m[0;34m:[0m[0;34m][0m[0;34m,[0m [0mpackage[0m[0;34m,[0m [0mlevel[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    127[0m [0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/scipy/special/__init__.py[0m in [0;36m<module>[0;34m[0m
+[1;32m    825[0m [0;34m[0m[0m
+[0;32m--> 826[0;31m [0;32mfrom[0m [0;34m.[0m [0;32mimport[0m [0m_basic[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    827[0m [0;32mfrom[0m [0;34m.[0m[0m_basic[0m [0;32mimport[0m [0;34m*[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/scipy/special/_basic.py[0m in [0;36m<module>[0;34m[0m
+[1;32m     21[0m [0;32mfrom[0m [0;34m.[0m[0m_comb[0m [0;32mimport[0m [0m_comb_int[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 22[0;31m from ._multiufuncs import (assoc_legendre_p_all,
+[0m[1;32m     23[0m                            legendre_p_all)
+
+[0;32m/usr/local/lib/python3.11/dist-packages/scipy/special/_multiufuncs.py[0m in [0;36m<module>[0;34m[0m
+[1;32m    141[0m [0;34m[0m[0m
+[0;32m--> 142[0;31m sph_legendre_p = MultiUFunc(
+[0m[1;32m    143[0m     [0msph_legendre_p[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/usr/local/lib/python3.11/dist-packages/scipy/special/_multiufuncs.py[0m in [0;36m__init__[0;34m(self, ufunc_or_ufuncs, doc, force_complex_output, **default_kwargs)[0m
+[1;32m     40[0m                 [0;32mif[0m [0;32mnot[0m [0misinstance[0m[0;34m([0m[0mufunc[0m[0;34m,[0m [0mnp[0m[0;34m.[0m[0mufunc[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 41[0;31m                     raise ValueError("All ufuncs must have type `numpy.ufunc`."
+[0m[1;32m     42[0m                                      f" Received {ufunc_or_ufuncs}")
+
+[0;31mValueError[0m: All ufuncs must have type `numpy.ufunc`. Received (<ufunc 'sph_legendre_p'>, <ufunc 'sph_legendre_p'>, <ufunc 'sph_legendre_p'>)
+
+The above exception was the direct cause of the following exception:
+
+[0;31mImportError[0m                               Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/1943287673.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m     11[0m             [0;32mfrom[0m [0malbumentations[0m[0;34m.[0m[0mpytorch[0m [0;32mimport[0m [0mToTensor[0m  [0;31m# type: ignore[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     12[0m [0;32mexcept[0m [0mException[0m [0;32mas[0m [0me[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m---> 13[0;31m     raise ImportError(
+[0m[1;32m     14[0m         [0;34m"albumentations (and albumentations.pytorch) is required for data_transforms, "[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     15[0m         [0;34m"but could not be imported."[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mImportError[0m: albumentations (and albumentations.pytorch) is required for data_transforms, but could not be imported.
+
+## === cell 4
+train_df = pd.read_csv('../input/train.csv')
+train, valid = train_test_split(train_df.has_cactus, stratify=train_df.has_cactus, test_size=0.1)
+img_class_dict = {k:v for k, v in zip(train_df.id, train_df.has_cactus)}

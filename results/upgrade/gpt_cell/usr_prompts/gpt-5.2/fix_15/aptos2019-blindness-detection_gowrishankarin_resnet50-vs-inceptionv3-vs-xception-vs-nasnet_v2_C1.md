@@ -1,0 +1,356 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.7
+
+# 2. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tf_keras==2.18.0
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+
+import os
+
+print(os.listdir("../input"))
+
+train_df = pd.read_csv("../input/train.csv")
+print("Shape of train data: {0}".format(train_df.shape))
+test_df = pd.read_csv("../input/test.csv")
+print("Shape of test data: {0}".format(test_df.shape))
+
+diagnosis_df = pd.DataFrame(
+    {
+        "diagnosis": [0, 1, 2, 3, 4],
+        "diagnosis_label": ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"],
+    }
+)
+
+train_df = train_df.merge(diagnosis_df, how="left", on="diagnosis")
+
+
+def list_png_files(root_dir):
+    files = []
+    for dp, dn, fn in os.walk(os.path.expanduser(root_dir)):
+        for f in fn:
+            if f.lower().endswith(".png"):
+                files.append(os.path.join(dp, f))
+    files.sort()
+    return files
+
+
+train_image_files = list_png_files("../input/train_images")
+train_images_df = pd.DataFrame(
+    {
+        "files": train_image_files,
+        "id_code": [
+            os.path.splitext(os.path.basename(file))[0] for file in train_image_files
+        ],
+    }
+)
+train_df = train_df.merge(train_images_df, how="left", on="id_code")
+del train_images_df
+print("Shape of train data: {0}".format(train_df.shape))
+
+test_image_files = list_png_files("../input/test_images")
+test_images_df = pd.DataFrame(
+    {
+        "files": test_image_files,
+        "id_code": [
+            os.path.splitext(os.path.basename(file))[0] for file in test_image_files
+        ],
+    }
+)
+
+test_images_df = test_images_df.drop_duplicates(subset=["id_code"], keep="first")
+
+test_df = test_df.merge(
+    test_images_df, how="left", on="id_code", sort=False, validate="one_to_one"
+)
+del test_images_df
+print("Shape of test data: {0}".format(test_df.shape))
+
+missing = test_df["files"].isna().sum()
+print("Missing test image paths:", missing)
+if missing:
+    raise ValueError(
+        "Some test images could not be matched to id_code; submission would be invalid/misaligned."
+    )
+
+
+
+## === cell 1
+train_df.head()
+
+
+
+## === cell 2
+test_df.head()
+
+
+
+## === cell 3
+IMG_SIZE = 150
+N_CLASSES = train_df.diagnosis.nunique()
+CLASSES = list(map(str, range(N_CLASSES)))
+BATCH_SIZE = 32
+EPOCH_STEPS = 10
+EPOCHS = 1
+
+
+
+## === cell 4
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "upb"
+
+import tensorflow as tf
+
+print(tf.__version__)
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+SEED = 123
+
+train_df["diagnosis"] = train_df["diagnosis"].astype(str)
+
+train_data_gen = ImageDataGenerator(rescale=1.0 / 255, validation_split=0.3)
+train_data = train_data_gen.flow_from_dataframe(
+    dataframe=train_df,
+    x_col="files",
+    y_col="diagnosis",
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    seed=SEED,
+    classes=CLASSES,
+    class_mode="sparse",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    subset="training",
+)
+
+validation_data = train_data_gen.flow_from_dataframe(
+    dataframe=train_df,
+    x_col="files",
+    y_col="diagnosis",
+    batch_size=BATCH_SIZE,
+    shuffle=True,
+    seed=SEED,
+    classes=CLASSES,
+    class_mode="sparse",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    subset="validation",
+)
+
+test_data_gen = ImageDataGenerator(rescale=1.0 / 255)
+
+test_data = test_data_gen.flow_from_dataframe(
+    dataframe=test_df,
+    x_col="files",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=1,
+    shuffle=False,
+    class_mode=None,
+    validate_filenames=False,
+)
+
+
+## --- ERROR in cell 4, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+[0;31mAttributeError[0m: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 5
+model = tf.keras.models.Sequential(
+    [
+        tf.keras.layers.Conv2D(
+            64, (3, 3), activation="relu", input_shape=(IMG_SIZE, IMG_SIZE, 3)
+        ),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Conv2D(64, (3, 3), activation="relu"),
+        tf.keras.layers.MaxPooling2D(2, 2),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(1024, activation="relu"),
+        tf.keras.layers.Dense(512, activation="relu"),
+        tf.keras.layers.Dense(256, activation="relu"),
+        tf.keras.layers.Dense(N_CLASSES, activation="softmax"),
+    ]
+)
+
+opt = tf.keras.optimizers.Adam(learning_rate=0.001, epsilon=1e-6)
+
+model.compile(
+    optimizer=opt, loss="sparse_categorical_crossentropy", metrics=["accuracy"]
+)
+model.summary()

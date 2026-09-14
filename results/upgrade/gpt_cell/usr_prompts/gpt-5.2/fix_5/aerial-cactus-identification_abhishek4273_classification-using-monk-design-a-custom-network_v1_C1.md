@@ -1,0 +1,290 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.8
+
+# 2. Installed packages
+
+No external packages required in the script and installed.
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+! git clone https://github.com/Tessellate-Imaging/monk_v1.git
+
+
+## === cell 1
+!pip install -r monk_v1/installation/requirements_kaggle.txt
+
+
+## === cell 2
+import sys
+sys.path.append("/kaggle/working/monk_v1/monk/")
+
+
+## === cell 3
+!unzip -q /kaggle/input/aerial-cactus-identification/train.zip
+
+
+## === cell 4
+!unzip -q /kaggle/input/aerial-cactus-identification/test.zip
+
+
+## === cell 5
+import sys
+import os
+
+stub_dir = "/kaggle/working/_stub_modules"
+os.makedirs(stub_dir, exist_ok=True)
+if stub_dir not in sys.path:
+    sys.path.insert(0, stub_dir)
+
+if "GPUtil" not in sys.modules:
+    try:
+        import GPUtil  # noqa: F401
+    except ModuleNotFoundError:
+        stub_path = os.path.join(stub_dir, "GPUtil.py")
+        if not os.path.exists(stub_path):
+            with open(stub_path, "w") as f:
+                f.write(
+                    "class GPU:\n"
+                    "    def __init__(self, id=0, load=0.0, memoryTotal=0, memoryUsed=0, memoryFree=0, temperature=0):\n"
+                    "        self.id = id\n"
+                    "        self.load = load\n"
+                    "        self.memoryTotal = memoryTotal\n"
+                    "        self.memoryUsed = memoryUsed\n"
+                    "        self.memoryFree = memoryFree\n"
+                    "        self.temperature = temperature\n"
+                    "\n"
+                    "def getGPUs():\n"
+                    "    return []\n"
+                    "\n"
+                    "def showUtilization(all=False):\n"
+                    "    return ''\n"
+                )
+
+if "pylg" not in sys.modules:
+    try:
+        import pylg  # noqa: F401
+    except ModuleNotFoundError:
+        stub_path = os.path.join(stub_dir, "pylg.py")
+        if not os.path.exists(stub_path):
+            with open(stub_path, "w") as f:
+                f.write(
+                    "class TraceFunction:\n"
+                    "    def __init__(self, *args, **kwargs):\n"
+                    "        pass\n"
+                    "    def __call__(self, func=None, *args, **kwargs):\n"
+                    "        return func\n"
+                    "\n"
+                    "def trace(*args, **kwargs):\n"
+                    "    return None\n"
+                )
+
+repo_root = "/kaggle/working/monk_v1"
+if repo_root not in sys.path:
+    sys.path.append(repo_root)
+
+from pytorch_prototype import prototype
+
+
+## === cell 6
+gtf = prototype(verbose=1)
+gtf.Prototype("sample-project-1", "sample-experiment-1")
+
+gtf.Dataset_Params(
+    dataset_path="/kaggle/working/train/",
+    path_to_csv="/kaggle/input/aerial-cactus-identification/train.csv",
+    input_size=(32, 32),
+    batch_size=16,
+    shuffle_data=True,
+    num_processors=3,
+)
+
+gtf.apply_random_horizontal_flip(train=True, val=True)
+gtf.apply_normalize(
+    mean=[0.485, 0.456, 0.406],
+    std=[0.229, 0.224, 0.225],
+    train=True,
+    val=True,
+    test=True,
+)
+
+gtf.Dataset()
+
+
+## --- ERROR in cell 6, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mConstraintError[0m                           Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/2002891637.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[1;32m      3[0m [0mgtf[0m[0;34m.[0m[0mPrototype[0m[0;34m([0m[0;34m"sample-project-1"[0m[0;34m,[0m [0;34m"sample-experiment-1"[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      4[0m [0;34m[0m[0m
+[0;32m----> 5[0;31m gtf.Dataset_Params(
+[0m[1;32m      6[0m     [0mdataset_path[0m[0;34m=[0m[0;34m"/kaggle/working/train/"[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      7[0m     [0mpath_to_csv[0m[0;34m=[0m[0;34m"/kaggle/input/aerial-cactus-identification/train.csv"[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/kaggle/working/monk_v1/monk/system/imports.py[0m in [0;36mdecorator_wrapper[0;34m(*function_args, **function_args_dicts)[0m
+[1;32m    819[0m [0;34m[0m[0m
+[1;32m    820[0m [0;34m[0m[0m
+[0;32m--> 821[0;31m             [0;32mreturn[0m [0mvalidate_function[0m[0;34m([0m[0;34m*[0m[0mfunction_args[0m[0;34m,[0m [0;34m**[0m[0mfunction_args_dicts[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    822[0m         [0;32mreturn[0m [0mdecorator_wrapper[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    823[0m     [0;32mreturn[0m [0maccept_decorator[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/kaggle/working/monk_v1/monk/system/imports.py[0m in [0;36mdecorator_wrapper[0;34m(*function_args, **function_args_dicts)[0m
+[1;32m    478[0m                             [0mcheck_nin[0m[0;34m([0m[0mactual_arg[0m[0;34m,[0m [0marg_constraint[0m[0;34m[[0m[0mi[0m[0;34m*[0m[0;36m2[0m[0;34m+[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mfunction_name[0m[0;34m,[0m [0marg_name[0m[0;34m=[0m[0mkeys[0m[0;34m[[0m[0mx[0m[0;34m][0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    479[0m                         [0;32mif[0m[0;34m([0m[0marg_constraint[0m[0;34m[[0m[0mi[0m[0;34m*[0m[0;36m2[0m[0;34m][0m [0;34m==[0m [0;34m"folder"[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 480[0;31m                             [0mcheck_folder[0m[0;34m([0m[0mactual_arg[0m[0;34m,[0m [0marg_constraint[0m[0;34m[[0m[0mi[0m[0;34m*[0m[0;36m2[0m[0;34m+[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mfunction_name[0m[0;34m,[0m [0marg_name[0m[0;34m=[0m[0mkeys[0m[0;34m[[0m[0mx[0m[0;34m][0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    481[0m                         [0;32mif[0m[0;34m([0m[0marg_constraint[0m[0;34m[[0m[0mi[0m[0;34m*[0m[0;36m2[0m[0;34m][0m [0;34m==[0m [0;34m"file"[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    482[0m                             [0mcheck_file[0m[0;34m([0m[0mactual_arg[0m[0;34m,[0m [0marg_constraint[0m[0;34m[[0m[0mi[0m[0;34m*[0m[0;36m2[0m[0;34m+[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mfunction_name[0m[0;34m,[0m [0marg_name[0m[0;34m=[0m[0mkeys[0m[0;34m[[0m[0mx[0m[0;34m][0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/kaggle/working/monk_v1/monk/system/imports.py[0m in [0;36mcheck_folder[0;34m(actual_value, limit, function_name, arg_num, arg_name)[0m
+[1;32m    299[0m             [0;32mif[0m[0;34m([0m[0;32mnot[0m [0mos[0m[0;34m.[0m[0mpath[0m[0;34m.[0m[0misdir[0m[0;34m([0m[0mactual_value[0m[0;34m)[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    300[0m                 [0mmsg[0m [0;34m=[0m [0;34m"Folder \"{}\" not found"[0m[0;34m.[0m[0mformat[0m[0;34m([0m[0mactual_value[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 301[0;31m                 [0;32mraise[0m [0mConstraintError[0m[0;34m([0m[0mmsg[0m[0;34m)[0m[0;34m;[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m    302[0m             [0;32mif[0m[0;34m([0m[0mlimit[0m [0;34m==[0m [0;34m"r"[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    303[0m                 [0;32mif[0m[0;34m([0m[0;32mnot[0m [0mos[0m[0;34m.[0m[0maccess[0m[0;34m([0m[0mactual_value[0m[0;34m,[0m [0mos[0m[0;34m.[0m[0mR_OK[0m[0;34m)[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mConstraintError[0m: Folder "/kaggle/working/train/" not found
+
+## === cell 8
+network = [];
+network.append(gtf.convolution(output_channels=16));
+network.append(gtf.batch_normalization());
+network.append(gtf.relu());
+network.append(gtf.convolution(output_channels=16));
+network.append(gtf.batch_normalization());
+network.append(gtf.relu());
+network.append(gtf.max_pooling());
+gtf.debug_custom_model_design(network);

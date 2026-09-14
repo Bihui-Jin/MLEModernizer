@@ -1,0 +1,823 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.8
+
+# 2. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        input/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        working/
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+```
+
+-> data/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/stanford-covid-vaccine/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> input/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+import json
+import torch
+from torch import nn
+from torch.utils.data import Dataset, DataLoader
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+import torch.nn.functional as F
+
+try:
+    import catalyst.dl as dl
+    import catalyst.dl.utils as utils
+except ModuleNotFoundError:
+    dl = None
+    utils = None
+
+import pandas as pd
+import numpy as np
+
+
+## === cell 1
+def one_hot(categories, string):
+    encoding = np.zeros((len(string), len(categories)))
+    for idx, char in enumerate(string):
+        encoding[idx, categories.index(char)] = 1
+    return encoding
+
+def featurize(entity):
+    sequence = one_hot(list('ACGU'), entity['sequence'])
+    structure = one_hot(list('.()'), entity['structure'])
+    loop_type = one_hot(list('BEHIMSX'), entity['predicted_loop_type'])
+    features = np.hstack([sequence, structure, loop_type])
+    return features 
+
+def char_encode(index, features, feature_size):
+    half_size = (feature_size - 1) // 2
+    
+    if index - half_size < 0:
+        char_features = features[:index+half_size+1]
+        padding = np.zeros((int(half_size - index), char_features.shape[1]))
+        char_features = np.vstack([padding, char_features])
+    elif index + half_size + 1 > len(features):
+        char_features = features[index-half_size:]
+        padding = np.zeros((int(half_size - (len(features) - index))+1, char_features.shape[1]))
+        char_features = np.vstack([char_features, padding])
+    else:
+        char_features = features[index-half_size:index+half_size+1]
+    
+    return char_features
+
+
+## === cell 2
+class VaxDataset(Dataset):
+    def __init__(self, path, test=False):
+        self.path = path
+        self.test = test
+        self.features = []
+        self.targets = []
+        self.ids = []
+        self.load_data()
+    
+    def load_data(self):
+        with open(self.path, 'r') as text:
+            for line in text:
+                records = json.loads(line)
+                features = featurize(records)
+                
+                for char_i in range(records['seq_scored']):
+                    char_features = char_encode(char_i, features, 21)
+                    self.features.append(char_features)
+                    self.ids.append('%s_%d' % (records['id'], char_i))
+                        
+                if not self.test:
+                    targets = np.stack([records['reactivity'], records['deg_Mg_pH10'], records['deg_Mg_50C']], axis=1)
+                    self.targets.extend([targets[char_i] for char_i in range(records['seq_scored'])])
+                    
+    def __len__(self):
+        return len(self.features)
+    
+    def __getitem__(self, index):
+        if self.test:
+            return self.features[index], self.ids[index]
+        else:
+            return self.features[index], self.targets[index], self.ids[index]
+
+
+## === cell 3
+class Flatten(nn.Module):
+    def forward(self, x):
+        batch_size = x.shape[0]
+        return x.view(batch_size, -1)
+ 
+
+
+class VaxModel(nn.Module):
+    def __init__(self):
+        super(VaxModel, self).__init__()
+        self.layers = nn.Sequential(
+            nn.Dropout(0.2),
+            nn.Conv1d(14, 32, 1, 1),
+            nn.PReLU(),
+            nn.BatchNorm1d(32),
+            nn.Upsample(scale_factor=2, mode='linear'),
+            nn.Dropout(0.2),
+            nn.Conv1d(32, 1, 1, 1),
+        )
+        self.layers2 = nn.Sequential(
+            nn.GRU(42, 32),
+        )
+        self.final = nn.Sequential(
+            nn.PReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(32, 16),
+            nn.PReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(16, 3),
+        )
+    
+    def forward(self, features):
+        features = self.layers(features)
+        features = features.permute(1, 0, 2)
+        features = self.layers2(features)
+         
+        final = self.final(features[0])
+        return final[0, :, :]
+
+
+## === cell 4
+model = VaxModel().cuda()
+optimizer = torch.optim.SGD(model.parameters(), 0.005, momentum=0.9)
+criterion = nn.MSELoss()
+
+
+## === cell 5
+train_dataset = VaxDataset('../input/stanford-covid-vaccine/train.json')
+train_dataloader = DataLoader(train_dataset, 16, shuffle=True, num_workers=4, pin_memory=True)
+
+
+## === cell 6
+if dl is not None and hasattr(dl, "Runner"):
+
+    class CustomRunner(dl.Runner):
+
+        def predict_batch(self, batch):
+            return (
+                self.model(batch[0].to(self.device).permute(0, 2, 1).float()),
+                batch[1],
+            )
+
+        def _handle_batch(self, batch):
+            x, y = batch[0], batch[1]
+            x = x.cuda().permute(0, 2, 1).float()
+            y = y.cuda().float()
+            y_hat = self.model(x)
+
+            loss = criterion(y_hat, y)
+            score = mcrmse_loss(y_hat, y)
+            self.batch_metrics.update({"loss": loss, "metric": score})
+
+            if self.is_train_loader:
+                loss.backward()
+                self.optimizer.step()
+                self.optimizer.zero_grad()
+
+else:
+
+    class CustomRunner:
+        """Minimal fallback to avoid dependency on Catalyst when it's not installed."""
+
+        def __init__(self, model=None, optimizer=None, device=None):
+            self.model = model
+            self.optimizer = optimizer
+            self.device = (
+                device
+                if device is not None
+                else ("cuda" if torch.cuda.is_available() else "cpu")
+            )
+            self.batch_metrics = {}
+            self.is_train_loader = False
+
+        def predict_batch(self, batch):
+            x = batch[0].to(self.device).permute(0, 2, 1).float()
+            return self.model(x), batch[1]
+
+        def _handle_batch(self, batch):
+            x, y = batch[0], batch[1]
+            x = x.to(self.device).permute(0, 2, 1).float()
+            y = y.to(self.device).float()
+            y_hat = self.model(x)
+
+            loss = criterion(y_hat, y)
+            score = mcrmse_loss(y_hat, y)
+            self.batch_metrics.update({"loss": loss, "metric": score})
+
+            if self.is_train_loader:
+                loss.backward()
+                self.optimizer.step()
+                self.optimizer.zero_grad()
+
+
+## === cell 7
+if utils is not None and hasattr(utils, "get_device"):
+    device = utils.get_device()
+else:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+## === cell 8
+def mcrmse_loss(y_true, y_pred, N=3):
+    """
+    Calculates competition eval metric
+    """
+    y_true, y_pred = y_true.detach().cpu().numpy(), y_pred.detach().cpu().numpy()
+    assert len(y_true) == len(y_pred)
+    n = len(y_true)
+    return np.sum(np.sqrt(np.sum((y_true - y_pred)**2, axis=0)/n)) / N
+
+
+## === cell 9
+test_dataset = VaxDataset("../input/stanford-covid-vaccine/test.json", test=True)
+test_dataloader = DataLoader(
+    test_dataset, 16, num_workers=4, drop_last=False, pin_memory=True
+)
+scheduler = torch.optim.lr_scheduler.CyclicLR(
+    optimizer, base_lr=1e-3, max_lr=1e-2, step_size_up=2000
+)
+
+loaders = {"train": train_dataloader}
+
+if not hasattr(CustomRunner, "train"):
+    import os
+
+    def _fallback_train(
+        self,
+        model,
+        optimizer,
+        loaders,
+        logdir,
+        num_epochs,
+        scheduler=None,
+        verbose=False,
+        load_best_on_end=True,
+        **kwargs,
+    ):
+        self.model = model.to(self.device)
+        self.optimizer = optimizer
+
+        os.makedirs(logdir, exist_ok=True)
+        metrics_path = os.path.join(logdir, "metrics.csv")
+
+        with open(metrics_path, "w") as f:
+            f.write("epoch,loader,loss,metric\n")
+
+        for epoch in range(num_epochs):
+            for loader_name, loader in loaders.items():
+                is_train = loader_name == "train"
+                self.is_train_loader = is_train
+                if is_train:
+                    self.model.train()
+                else:
+                    self.model.eval()
+
+                sum_loss = 0.0
+                sum_metric = 0.0
+                n_batches = 0
+
+                for batch in loader:
+                    if is_train:
+                        self._handle_batch(batch)
+                        if scheduler is not None:
+                            scheduler.step()
+                    else:
+                        with torch.no_grad():
+                            self._handle_batch(batch)
+
+                    loss_val = float(self.batch_metrics["loss"].detach().cpu().item())
+                    metric_val = float(self.batch_metrics["metric"])
+                    sum_loss += loss_val
+                    sum_metric += metric_val
+                    n_batches += 1
+
+                avg_loss = sum_loss / max(n_batches, 1)
+                avg_metric = sum_metric / max(n_batches, 1)
+
+                with open(metrics_path, "a") as f:
+                    f.write(f"{epoch},{loader_name},{avg_loss},{avg_metric}\n")
+
+        return self
+
+    CustomRunner.train = _fallback_train
+
+runner = CustomRunner(device=device)
+runner.train(
+    model=model,
+    optimizer=optimizer,
+    loaders=loaders,
+    logdir="../working",
+    num_epochs=5,
+    scheduler=scheduler,
+    verbose=False,
+    load_best_on_end=True,
+)
+
+
+## === cell 10
+if utils is not None and hasattr(utils, "plot_metrics"):
+    utils.plot_metrics(logdir="../working", metrics=["loss", "metric"])
+else:
+    import os
+
+    metrics_path = os.path.join("../working", "metrics.csv")
+
+    try:
+        import matplotlib.pyplot as plt
+
+        if os.path.exists(metrics_path):
+            df_metrics = pd.read_csv(metrics_path)
+
+            df_train = df_metrics[df_metrics["loader"] == "train"].copy()
+            if len(df_train) == 0:
+                df_train = df_metrics.copy()
+
+            fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+            for ax, m in zip(axes, ["loss", "metric"]):
+                if m in df_train.columns:
+                    ax.plot(df_train["epoch"].values, df_train[m].values)
+                    ax.set_title(m)
+                    ax.set_xlabel("epoch")
+                    ax.set_ylabel(m)
+                else:
+                    ax.set_visible(False)
+            plt.tight_layout()
+            plt.show()
+        else:
+            print(f"metrics file not found: {metrics_path}")
+    except Exception as e:
+        print(f"Could not plot metrics (fallback). Reason: {e}")
+
+
+## === cell 11
+if dl is not None and hasattr(dl, "Runner"):
+
+    class CustomRunner(dl.Runner):
+
+        def predict_batch(self, batch):
+            return (
+                self.model(batch[0].to(self.device).permute(0, 2, 1).float()),
+                batch[1],
+            )
+
+        def _handle_batch(self, batch):
+            x, y = batch[0], batch[1]
+            x = x.cuda().permute(0, 2, 1).float()
+            y = y.cuda().float()
+            y_hat = self.model(x)
+
+            loss = criterion(y_hat, y)
+            score = mcrmse_loss(y_hat, y)
+            self.batch_metrics.update({"loss": loss, "metric": score})
+
+            if self.is_train_loader:
+                loss.backward()
+                self.optimizer.step()
+                self.optimizer.zero_grad()
+
+else:
+
+    class CustomRunner:
+        """Minimal fallback to avoid dependency on Catalyst when it's not installed."""
+
+        def __init__(self, model=None, optimizer=None, device=None):
+            self.model = model
+            self.optimizer = optimizer
+            self.device = (
+                device
+                if device is not None
+                else ("cuda" if torch.cuda.is_available() else "cpu")
+            )
+            self.batch_metrics = {}
+            self.is_train_loader = False
+
+        def predict_batch(self, batch):
+            x = batch[0].to(self.device).permute(0, 2, 1).float()
+            return self.model(x), batch[1]
+
+        def predict_loader(self, loader):
+            self.model = self.model.to(self.device)
+            self.model.eval()
+            with torch.no_grad():
+                for batch in loader:
+                    preds, ids = self.predict_batch(batch)
+                    yield preds, ids
+
+        def _handle_batch(self, batch):
+            x, y = batch[0], batch[1]
+            x = x.to(self.device).permute(0, 2, 1).float()
+            y = y.to(self.device).float()
+            y_hat = self.model(x)
+
+            loss = criterion(y_hat, y)
+            score = mcrmse_loss(y_hat, y)
+            self.batch_metrics.update({"loss": loss, "metric": score})
+
+            if self.is_train_loader:
+                loss.backward()
+                self.optimizer.step()
+                self.optimizer.zero_grad()
+
+
+## === cell 12
+sub.head()
+
+
+## --- ERROR in cell 12, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/1894231914.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[0;32m----> 1[0;31m [0msub[0m[0;34m.[0m[0mhead[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;31mNameError[0m: name 'sub' is not defined
+
+## === cell 13
+sub.to_csv('submission.csv')

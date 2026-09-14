@@ -1,0 +1,1768 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Compute smartphones location based on raw location measurements from Android smartphones collected in opensky and light urban roads.
+
+## Metric
+Submissions are scored on the mean of the 50th and 95th percentile distance errors. For every `phone` and once per second, the horizontal distance (in meters) is computed between the predicted latitude/longitude and the ground truth latitude/longitude. These distance errors form a distribution from which the 50th and 95th percentile errors are calculated (i.e. the 95th percentile error is the value, in meters, for which 95% of the distance errors are smaller). The 50th and 95th percentile errors are then averaged for each phone. Lastly, the mean of these averaged values is calculated across all phones in the test set.
+
+## Submission Format
+For each `phone` and `UnixTimeMillis` in the sample submission, you must predict the latitude and longitude. The sample submission typically requires a prediction once per second but may include larger gaps if there were too few valid GNSS signals. The submission file should contain a header and have the following format:
+
+```
+phone,UnixTimeMillis,LatitudeDegrees,LongitudeDegrees
+2020-05-15-US-MTV-1_Pixel4,1273608785432,37.904611315634504,-86.48107806249548
+2020-05-15-US-MTV-1_Pixel4,1273608786432,37.904611315634504,-86.48107806249548
+2020-05-15-US-MTV-1_Pixel4,1273608787432,37.904611315634504,-86.48107806249548
+```
+
+## Dataset
+**[train/test]/[drive_id]/[phone_name]/supplemental/[phone_name][.20o/.21o/.22o/.nmea]** - Equivalent data to the gnss logs in other formats used by the GPS community.
+
+**train/[drive_id]/[phone_name]/ground_truth.csv** - Reference locations at expected timestamps.
+
+- `MessageType` - "Fix", the prefix of sentence.
+
+- `Provider` - "GT", short for ground truth.
+
+- `[Latitude/Longitude]Degrees` - The [WGS84](https://en.wikipedia.org/w/index.php?title=World_Geodetic_System&oldid=1013033380) latitude, longitude (in decimal degrees) estimated by the reference GNSS receiver (NovAtel SPAN). When extracting from the NMEA file, linear interpolation has been applied to align the location to the expected non-integer timestamps.
+
+- `AltitudeMeters` - The height above the WGS84 ellipsoid (in meters) estimated by the reference GNSS receiver.
+
+- `SpeedMps`* - The speed over ground in meters per second.
+
+- `AccuracyMeters` - The estimated horizontal accuracy radius in meters of this location at the 68th percentile confidence level. This means that there is a 68% chance that the true location of the device is within a distance of this uncertainty of the reported location.
+
+- `BearingDegrees` - Bearing is measured in degrees clockwise from north. It ranges from 0 to 359.999 degrees.
+
+- `UnixTimeMillis` - An integer number of milliseconds since the GPS epoch (1970/1/1 midnight UTC). Converted from [GnssClock](https://developer.android.com/reference/android/location/GnssClock).
+
+**[train/test]/[drive_id]/[phone_name]/device_gnss.csv** - Each row contains raw GNSS measurements, derived values, and a baseline estimated location.. This baseline was computed using correctedPrM and the satellite positions, using a standard Weighted Least Squares (WLS) solver, with the phone's position (x, y, z), clock bias (t), and isrbM for each unique signal type as states for each epoch. Some of the raw measurement fields are not included in this file because they are deprecated or are not populated in the original gnss_log.txt.
+
+- `MessageType` - "Raw", the prefix of sentence.
+
+- `utcTimeMillis` - Milliseconds since UTC epoch (1970/1/1), converted from GnssClock.
+
+- `TimeNanos` - The GNSS receiver internal hardware clock value in nanoseconds.
+
+- `LeapSecond` - The leap second associated with the clock's time.
+
+- `FullBiasNanos` - The difference between hardware clock (getTimeNanos()) inside GPS receiver and the true GPS time since 0000Z, January 6, 1980, in nanoseconds.
+
+- `BiasNanos` - The clock's sub-nanosecond bias.
+
+- `BiasUncertaintyNanos` - The clock's bias uncertainty (1-sigma) in nanoseconds.
+
+- `DriftNanosPerSecond` - The clock's drift in nanoseconds per second.
+
+- `DriftUncertaintyNanosPerSecond` - The clock's drift uncertainty (1-sigma) in nanoseconds per second.
+
+- `HardwareClockDiscontinuityCount` - Count of hardware clock discontinuities.
+
+- `Svid` - The satellite ID.
+
+- `TimeOffsetNanos` - The time offset at which the measurement was taken in nanoseconds.
+
+- `State` - Integer signifying sync state of the satellite. Each bit in the integer attributes to a particular state information of the measurement. See the **metadata/raw_state_bit_map.json** file for the mapping between bits and states.
+
+- `ReceivedSvTimeNanos` - The received GNSS satellite time, at the measurement time, in nanoseconds.
+
+- `ReceivedSvTimeUncertaintyNanos` - The error estimate (1-sigma) for the received GNSS time, in nanoseconds.
+
+- `Cn0DbHz` - The carrier-to-noise density in dB-Hz.
+
+- `PseudorangeRateMetersPerSecond` - The pseudorange rate at the timestamp in m/s.
+
+- `PseudorangeRateUncertaintyMetersPerSecond` - The pseudorange's rate uncertainty (1-sigma) in m/s.
+
+- `AccumulatedDeltaRangeState` - This indicates the state of the 'Accumulated Delta Range' measurement. Each bit in the integer attributes to state of the measurement. See the **metadata/accumulated_delta_range_state_bit_map.json** file for the mapping between bits and states.
+
+- `AccumulatedDeltaRangeMeters` - The accumulated delta range since the last channel reset, in meters.
+
+- `AccumulatedDeltaRangeUncertaintyMeters` - The accumulated delta range's uncertainty (1-sigma) in meters.
+
+- `CarrierFrequencyHz` - The carrier frequency of the tracked signal.
+
+- `MultipathIndicator` - A value indicating the 'multipath' state of the event.
+
+- `ConstellationType` - GNSS constellation type. The mapping to human readable values is provided in the **metadata/constellation_type_mapping.csv** file.
+
+- `CodeType` - The GNSS measurement's code type. Only available in recent logs.
+
+- `ChipsetElapsedRealtimeNanos` - The elapsed real-time of this clock since system boot, in nanoseconds. Only available in recent logs.
+
+- `ArrivalTimeNanosSinceGpsEpoch` - An integer number of nanoseconds since the GPS epoch (1980/1/6 midnight UTC). Its value equals round((Raw::TimeNanos - Raw::FullBiasNanos), for each unique epoch described in the Raw sentences.
+
+- `RawPseudorangeMeters` - Raw pseudorange in meters. It is the product between the speed of light and the time difference from the signal transmission time (receivedSvTimeInGpsNanos) to the signal arrival time (Raw::TimeNanos - Raw::FullBiasNanos - Raw;;BiasNanos). Its uncertainty can be approximated by the product between the speed of light and the ReceivedSvTimeUncertaintyNanos.
+
+- `SignalType` - The GNSS signal type is a combination of the constellation name and the frequency band. Common signal types measured by smartphones include GPS_L1, GPS_L5, GAL_E1, GAL_E5A, GLO_G1, BDS_B1I, BDS_B1C, BDS_B2A, QZS_J1, and QZS_J5.
+
+- `ReceivedSvTimeNanosSinceGpsEpoch` - The signal transmission time received by the chipset, in the numbers of nanoseconds since the GPS epoch. Converted from ReceivedSvTimeNanos, this derived value is in a unified time scale for all constellations, while ReceivedSvTimeNanos refers to the time of day for GLONASS and the time of week for non-GLONASS constellations.
+
+- `SvPosition[X/Y/Z]EcefMeters` - The satellite position (meters) in an ECEF coordinate frame at best estimate of "true signal transmission time" defined as ttx = receivedSvTimeInGpsNanos - satClkBiasNanos (defined below). They are computed with the satellite broadcast ephemeris, and have ~1-meter error with respect to the true satellite position.
+
+- `Sv[Elevation/Azimuth]Degrees` - The elevation and azimuth in degrees of the satellite. They are computed using the WLS estimated user position.
+
+- `SvVelocity[X/Y/Z]EcefMetersPerSecond` - The satellite velocity (meters per second) in an ECEF coordinate frame at best estimate of "true signal transmission time" ttx. They are computed with the satellite broadcast ephemeris, with this algorithm.
+
+- `SvClockBiasMeters` - The satellite time correction combined with the satellite hardware delay in meters at the signal transmission time (receivedSvTimeInGpsNanos). Its time equivalent is termed as satClkBiasNanos. satClkBiasNanos equals the satelliteTimeCorrection minus the satelliteHardwareDelay. As defined in IS-GPS-200H Section 20.3.3.3.3.1, satelliteTimeCorrection is calculated from ∆tsv = af0 + af1(t - toc) + af2(t - toc)2 + ∆tr, while satelliteHardwareDelay is defined in Section 20.3.3.3.3.2. Parameters in the equations above are provided on the satellite broadcast ephemeris.
+
+- `SvClockDriftMetersPerSecond` - The satellite clock drift in meters per second at the signal transmission time (receivedSvTimeInGpsNanos). It equals the difference of the satellite clock biases at t+0.5s and t-0.5s.
+
+- `IsrbMeters` - The Inter-Signal Range Bias (ISRB) in meters from a non-GPS-L1 signal to GPS-L1 signals. For example, when the isrbM of GPS L5 is 1000m, it implies that a GPS L5 pseudorange is 1000m longer than the GPS L1 pseudorange transmitted by the same GPS satellite. It's zero for GPS-L1 signals. ISRB is introduced in the GPS chipset level and estimated as a state in the Weighted Least Squares engine.
+
+- `IonosphericDelayMeters` - The ionospheric delay in meters, estimated with the Klobuchar model.
+
+- `TroposphericDelayMeters` - The tropospheric delay in meters, estimated with the EGNOS model by Nigel Penna, Alan Dodson and W. Chen (2001).
+
+- `WlsPositionXEcefMeters` - WlsPositionYEcefMeters,WlsPositionZEcefMeters: User positions in ECEF estimated by a Weighted-Least-Square (WLS) solver.
+
+**[train/test]/[drive_id]/[phone_name]/device_imu.csv** - Readings the phone's accelerometer, gyroscope, and magnetometer.
+
+- `MessageType` - which of the three instruments the row's data is from.
+
+- `utcTimeMillis` - The sum of `elapsedRealtimeNanos` below and the estimated device boot time at UTC, after a recent NTP (Network Time Protocol) sync.
+
+- `Measurement[X/Y/Z]` - [x/y/z]_uncalib without bias compensation.
+
+- `Bias[X/Y/Z]MicroT` - Estimated [x/y/z]_bias. Null in datasets collected in earlier dates.
+
+**[train/test]/[drive_id]/[phone_name]/supplemental/rinex.o** A text file of GNSS measurements on , collected from Android APIs (same as the "Raw" messages above), then converted to the [RINEX v3.03 format](http://rtcm.info/RINEX_3.04.IGS.RTCM_Final.pdf). refers to the last two digits of the year. During the conversion, the following treatments are taken to comply with the RINEX format. Essentially, this file contains a subset of information in the _GnssLog.txt.
+
+1. The epoch time (in GPS time scale as per RINEX standard) is computed from [TimeNanos - (FullBiasNanos + BiasNanos)](https://developer.android.com/reference/android/location/GnssClock#getFullBiasNanos()), and then floored to the 100-nanosecond level to meet the precision requirement of the RINEX epoch time. The sub-100-nanosecond part has been wiped out by subtracting the raw pseudorange by the distance equivalent, and by subtracting the carrier phase range by the product of pseudorange rate and the sub-100-nanosecond part.
+2. An epoch of measurements will not be converted to RINEX, if any of the following conditions occurs: a) the BiasUncertaintyNanos is larger or equal than 1E6, b) GnssClock values are invalid, e.g. FullBiasNanos is not a meaningful number.
+3. Pseudorange value will not be converted if any of the following conditions occurs:
+
+- [STATE_CODE_LOCK](https://developer.android.com/reference/android/location/GnssMeasurement#STATE_CODE_LOCK) (for non-GAL E1) or [STATE_GAL_E1BC_CODE_LOCK](https://developer.android.com/reference/android/location/GnssMeasurement#STATE_GAL_E1BC_CODE_LOCK) (for GAL E1) is not set,
+- [STATE_TOW_DECODED](https://developer.android.com/reference/android/location/GnssMeasurement#STATE_TOW_DECODED) and [STATE_TOW_KNOWN](https://developer.android.com/reference/android/location/GnssMeasurement#STATE_TOW_KNOWN) are not set for non-GLO signals,
+- [STATE_GLO_TOD_DECODED](https://developer.android.com/reference/android/location/GnssMeasurement#STATE_GLO_TOD_DECODED) and [STATE_GLO_TOD_KNOWN](https://developer.android.com/reference/android/location/GnssMeasurement#STATE_GLO_TOD_KNOWN) are not set for GLO signals,
+- CN0 is less than 20 dB-Hz,
+
+1. ReceivedSvTimeUncertaintyNanos is larger than 500 nanoseconds, Carrier frequency is out of nominal range of each band. Loss of lock indicator (LLI) is set to 1 if [ADR_STATE_CYCLE_SLIP](https://developer.android.com/reference/android/location/GnssMeasurement#ADR_STATE_CYCLE_SLIP) is set, or 2 if [ADR_STATE_HALF_CYCLE_REPORTED](https://developer.android.com/reference/android/location/GnssMeasurement#ADR_STATE_HALF_CYCLE_REPORTED) is set and [ADR_STATE_HALF_CYCLE_RESOLVED](https://developer.android.com/reference/android/location/GnssMeasurement#ADR_STATE_HALF_CYCLE_RESOLVED) is not set, or blank if [ADR_STATE_VALID](https://developer.android.com/reference/android/location/GnssMeasurement#ADR_STATE_VALID) is not set or [ADR_STATE_RESET](https://developer.android.com/reference/android/location/GnssMeasurement#ADR_STATE_RESET) is set, or 0 otherwise.
+
+**[train/test]/[drive_id]/[phone_name]/supplemental/gnss_log.txt** - The phone's logs as generated by the [GnssLogger App](https://play.google.com/store/apps/details?id=com.google.android.apps.location.gps.gnsslogger&hl=en_US&gl=US). [This notebook](https://www.kaggle.com/sohier/loading-gnss-logs/) demonstrates how to parse the logs. Each gnss file contains several sub-datasets, each of which is detailed below:
+
+Raw - The raw GNSS measurements of one GNSS signal (each satellite may have 1-2 signals for L5-enabled smartphones), collected from the Android API [GnssMeasurement](https://developer.android.com/reference/android/location/GnssMeasurement).
+
+- `utcTimeMillis` - Milliseconds since UTC epoch (1970/1/1), converted from [GnssClock](https://developer.android.com/reference/android/location/GnssClock)
+
+- [`TimeNanos`](https://developer.android.com/reference/android/location/GnssClock#getTimeNanos()) - The GNSS receiver internal hardware clock value in nanoseconds.
+
+- [`LeapSecond`](https://developer.android.com/reference/android/location/GnssClock#getLeapSecond()) - The leap second associated with the clock's time.
+
+- [`TimeUncertaintyNanos`](https://developer.android.com/reference/android/location/GnssClock#getTimeUncertaintyNanos()) - The clock's time uncertainty (1-sigma) in nanoseconds.
+
+- [`FullBiasNanos`](https://developer.android.com/reference/android/location/GnssClock#getFullBiasNanos()) - The difference between hardware clock [getTimeNanos()](https://developer.android.com/reference/android/location/GnssClock#getTimeNanos()) inside GPS receiver and the true GPS time since 0000Z, January 6, 1980, in nanoseconds.
+
+- [`BiasNanos`](https://developer.android.com/reference/android/location/GnssClock#getBiasNanos()) - The clock's sub-nanosecond bias.
+
+- [`BiasUncertaintyNanos`](https://developer.android.com/reference/android/location/GnssClock#getBiasUncertaintyNanos()) - The clock's bias uncertainty (1-sigma) in nanoseconds.
+
+- [`DriftNanosPerSecond`](https://developer.android.com/reference/android/location/GnssClock#getDriftNanosPerSecond()) - The clock's drift in nanoseconds per second.
+
+- [`DriftUncertaintyNanosPerSecond`](https://developer.android.com/reference/android/location/GnssClock#getDriftUncertaintyNanosPerSecond()) - The clock's drift uncertainty (1-sigma) in nanoseconds per second.
+
+- [`HardwareClockDiscontinuityCount`](https://developer.android.com/reference/android/location/GnssClock#getHardwareClockDiscontinuityCount()) - Count of hardware clock discontinuities.
+
+- [`Svid`](https://developer.android.com/reference/android/location/GnssMeasurement#getSvid()) - The satellite ID. More info can be found [here](https://developer.android.com/reference/android/location/GnssMeasurement#getSvid()).
+
+- [`TimeOffsetNanos`](https://developer.android.com/reference/android/location/GnssMeasurement#getTimeOffsetNanos()) - The time offset at which the measurement was taken in nanoseconds.
+
+- [`State`](https://developer.android.com/reference/android/location/GnssMeasurement#getState()) - Integer signifying sync state of the satellite. Each bit in the integer attributes to a particular state information of the measurement. See the **metadata/raw_state_bit_map.json** file for the mapping between bits and states.
+
+- [`ReceivedSvTimeNanos`](https://developer.android.com/reference/android/location/GnssMeasurement#getReceivedSvTimeNanos()) - The received GNSS satellite time, at the measurement time, in nanoseconds.
+
+- [`ReceivedSvTimeUncertaintyNanos`](https://developer.android.com/reference/android/location/GnssMeasurement#getReceivedSvTimeUncertaintyNanos()) - The error estimate (1-sigma) for the received GNSS time, in nanoseconds.
+
+- [`Cn0DbHz`](https://developer.android.com/reference/android/location/GnssMeasurement#getCn0DbHz()) - The carrier-to-noise density in dB-Hz.
+
+- [`PseudorangeRateMetersPerSecond`](https://developer.android.com/reference/android/location/GnssMeasurement#getPseudorangeRateMetersPerSecond()) - The pseudorange rate at the timestamp in m/s.
+
+- [`PseudorangeRateUncertaintyMetersPerSecond`](https://developer.android.com/reference/android/location/GnssMeasurement#getPseudorangeRateUncertaintyMetersPerSecond()) - The pseudorange's rate uncertainty (1-sigma) in m/s.
+
+- [`AccumulatedDeltaRangeState`](https://developer.android.com/reference/android/location/GnssMeasurement#getAccumulatedDeltaRangeState()) - This indicates the state of the 'Accumulated Delta Range' measurement. Each bit in the integer attributes to state of the measurement. See the **metadata/accumulated_delta_range_state_bit_map.json** file for the mapping between bits and states.
+
+- [`AccumulatedDeltaRangeMeters`](https://developer.android.com/reference/android/location/GnssMeasurement#getAccumulatedDeltaRangeMeters()) - The accumulated delta range since the last channel reset, in meters.
+
+- [`AccumulatedDeltaRangeUncertaintyMeters`](https://developer.android.com/reference/android/location/GnssMeasurement#getAccumulatedDeltaRangeUncertaintyMeters()) - The accumulated delta range's uncertainty (1-sigma) in meters.
+
+- [`CarrierFrequencyHz`](https://developer.android.com/reference/android/location/GnssMeasurement#getCarrierFrequencyHz()) - The carrier frequency of the tracked signal.
+
+- [`CarrierCycles`](https://developer.android.com/reference/android/location/GnssMeasurement#getCarrierCycles()) - The number of full carrier cycles between the satellite and the receiver. Null in these datasets.
+
+- [`CarrierPhase`](https://developer.android.com/reference/android/location/GnssMeasurement#getCarrierPhase()) - The RF phase detected by the receiver. Null in these datasets.
+
+- [`CarrierPhaseUncertainty`](https://developer.android.com/reference/android/location/GnssMeasurement#getCarrierPhaseUncertainty()) - The carrier-phase's uncertainty (1-sigma). Null in these datasets.
+
+- [`MultipathIndicator`](https://developer.android.com/reference/android/location/GnssMeasurement#getMultipathIndicator()) - A value indicating the 'multipath' state of the event.
+
+- [`SnrInDb`](https://developer.android.com/reference/android/location/GnssMeasurement#getSnrInDb()) - The (post-correlation & integration) Signal-to-Noise ratio (SNR) in dB.
+
+- [`ConstellationType`](https://developer.android.com/reference/android/location/GnssMeasurement#getConstellationType()) - GNSS constellation type. It's an integer number, whose mapping to string value is provided in the constellation_type_mapping.csv file.
+
+- [`AgcDb`](https://developer.android.com/reference/android/location/GnssMeasurement#getAutomaticGainControlLevelDb()) - The Automatic Gain Control level in dB.
+
+- [`BasebandCn0DbHz`](https://developer.android.com/reference/android/location/GnssMeasurement#getBasebandCn0DbHz()) - The baseband carrier-to-noise density in dB-Hz. Only available in Android 11.
+
+- [`FullInterSignalBiasNanos`](https://developer.android.com/reference/android/location/GnssMeasurement#getFullInterSignalBiasNanos()) - The GNSS measurement's inter-signal bias in nanoseconds with sub-nanosecond accuracy. Only available in Pixel 5 logs in 2021. Only available in Android 11.
+
+- [`FullInterSignalBiasUncertaintyNanos`](https://developer.android.com/reference/android/location/GnssMeasurement#getFullInterSignalBiasUncertaintyNanos()) - The GNSS measurement's inter-signal bias uncertainty (1 sigma) in nanoseconds with sub-nanosecond accuracy. Only available in Android 11.
+
+- [`SatelliteInterSignalBiasNanos`](https://developer.android.com/reference/android/location/GnssMeasurement#getSatelliteInterSignalBiasNanos()) - The GNSS measurement's satellite inter-signal bias in nanoseconds with sub-nanosecond accuracy. Only available in Android 11.
+
+- [`SatelliteInterSignalBiasUncertaintyNanos`](https://developer.android.com/reference/android/location/GnssMeasurement#getSatelliteInterSignalBiasUncertaintyNanos()) - The GNSS measurement's satellite inter-signal bias uncertainty (1 sigma) in nanoseconds with sub-nanosecond accuracy. Only available in Android 11.
+
+- [`CodeType`](https://developer.android.com/reference/android/location/GnssMeasurement#getCodeType()) - The GNSS measurement's code type. Only available in recent logs.
+
+- [`ChipsetElapsedRealtimeNanos`](https://developer.android.com/reference/android/location/GnssClock#getElapsedRealtimeNanos()) - The elapsed real-time of this clock since system boot, in nanoseconds. Only available in recent logs.
+
+Status - The status of a GNSS signal, as collected from the Android API [GnssStatus](https://developer.android.com/reference/android/location/GnssStatus.Callback).
+
+- `UnixTimeMillis` - Milliseconds since UTC epoch (1970/1/1), reported from the last location changed by [GPS](https://developer.android.com/reference/android/location/LocationManager#GPS_PROVIDER) provider.
+
+- [`SignalCount`](https://developer.android.com/reference/android/location/GnssStatus#getSatelliteCount()) - The total number of satellites in the satellite list.
+
+- `SignalIndex` - The index of current signal.
+
+- [`ConstellationType`](https://developer.android.com/reference/android/location/GnssStatus#getConstellationType(int)): The constellation type of the satellite at the specified index.
+
+- [`Svid`](https://developer.android.com/reference/android/location/GnssStatus#getSvid(int)): The satellite ID.
+
+- [`CarrierFrequencyHz`](https://developer.android.com/reference/android/location/GnssStatus#getCarrierFrequencyHz(int)): The carrier frequency of the signal tracked.
+
+- [`Cn0DbHz`](https://developer.android.com/reference/android/location/GnssStatus#getCn0DbHz(int)): The carrier-to-noise density at the antenna of the satellite at the specified index in dB-Hz.
+
+- [`AzimuthDegrees`](https://developer.android.com/reference/android/location/GnssStatus#getAzimuthDegrees(int)): The azimuth the satellite at the specified index.
+
+- [`ElevationDegrees`](https://developer.android.com/reference/android/location/GnssStatus#getElevationDegrees(int)): The elevation of the satellite at the specified index.
+
+- [`UsedInFix`](https://developer.android.com/reference/android/location/GnssStatus#usedInFix(int)): Whether the satellite at the specified index was used in the calculation of the most recent position fix.
+
+- [`HasAlmanacData`](https://developer.android.com/reference/android/location/GnssStatus#hasAlmanacData(int)): Whether the satellite at the specified index has almanac data.
+
+- [`HasEphemerisData`](https://developer.android.com/reference/android/location/GnssStatus#hasEphemerisData(int)): Whether the satellite at the specified index has ephemeris data.
+
+- [`BasebandCn0DbHz`](https://developer.android.com/reference/android/location/GnssStatus#getBasebandCn0DbHz(int)): The baseband carrier-to-noise density of the satellite at the specified index in dB-Hz.
+
+OrientationDeg - Each row represents an estimated device orientation, collected from Android API [SensorManager#getOrientation](https://developer.android.com/reference/android/hardware/SensorManager#getOrientation(float%5B%5D,%20float%5B%5D)).This message is only available in logs collected since March 2021.
+
+- `utcTimeMillis` - The sum of `elapsedRealtimeNanos` below and the estimated device boot time at UTC, after a recent NTP (Network Time Protocol) sync.
+
+- [`elapsedRealtimeNanos`](https://developer.android.com/reference/android/hardware/SensorEvent#timestamp) - The time in nanoseconds at which the event happened.
+
+- `yawDeg` - If the screen is in portrait mode, this value equals the Azimuth degree (modulus to 0°~360°). If the screen is in landscape mode, it equals the sum (modulus to 0°~360°) of the screen rotation angle (either 90° or 270°) and the Azimuth degree. *Azimuth*, refers to the angle of rotation about the -z axis. This value represents the angle between the device's y axis and the magnetic north pole.
+
+- `rollDeg` - *Roll*, angle of rotation about the y axis. This value represents the angle between a plane perpendicular to the device's screen and a plane perpendicular to the ground.
+
+- `pitchDeg` - *Pitch*, angle of rotation about the x axis. This value represents the angle between a plane parallel to the device's screen and a plane parallel to the ground.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+plotly==5.24.1
+plotly-express==0.4.1
+scipy==1.15.3
+sklearn-pandas==2.2.0
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (321 lines)
+            metadata.zip (1.2 kB)
+            sample_submission.csv (37088 lines)
+            sample_submission.csv.zip (108.0 kB)
+            test.zip (557.7 MB)
+            train.zip (3.7 GB)
+            metadata/
+                accumulated_delta_range_state_bit_map.json (1 lines)
+                constellation_type_mapping.csv (9 lines)
+                ... and 1 other files
+            smartphone-decimeter-2022/
+                description.md (321 lines)
+                metadata.zip (1.2 kB)
+                ... and 4 other files
+                metadata/
+                    accumulated_delta_range_state_bit_map.json (1 lines)
+                    constellation_type_mapping.csv (9 lines)
+                    ... and 1 other files
+                smartphone-decimeter-2022/
+                test/
+                    2020-06-04-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-06-04-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2021-04-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-1/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-2/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-08-24-US-SVL-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    test/
+                train/
+                    2020-05-15-US-MTV-1/
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-05-21-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    ... and 53 other folders
+            test/
+                2020-06-04-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (56087 lines)
+                        device_imu.csv (340189 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (58761 lines)
+                        device_imu.csv (342285 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2020-06-04-US-MTV-2/
+                    GooglePixel4/
+                        device_gnss.csv (68061 lines)
+                        device_imu.csv (338641 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (68855 lines)
+                        device_imu.csv (339610 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2020-07-08-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (73508 lines)
+                        device_imu.csv (456999 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (77061 lines)
+                        device_imu.csv (454150 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2020-07-08-US-MTV-2/
+                    GooglePixel4/
+                        device_gnss.csv (64478 lines)
+                        device_imu.csv (456044 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (68307 lines)
+                        device_imu.csv (449696 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-04-08-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (19537 lines)
+                        device_imu.csv (221095 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel5/
+                        device_gnss.csv (34594 lines)
+                        device_imu.csv (222954 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (40323 lines)
+                        device_imu.csv (216914 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-04-29-US-MTV-1/
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (60277 lines)
+                        device_imu.csv (344013 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    XiaomiMi8/
+                        device_gnss.csv (61077 lines)
+                        device_imu.csv (235288 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-04-29-US-MTV-2/
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (66015 lines)
+                        device_imu.csv (371204 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    XiaomiMi8/
+                        device_gnss.csv (65501 lines)
+                        device_imu.csv (257874 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-08-24-US-SVL-1/
+                    GooglePixel4/
+                        device_gnss.csv (101566 lines)
+                        device_imu.csv (711980 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel5/
+                        device_gnss.csv (112728 lines)
+                        device_imu.csv (721330 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (122140 lines)
+                        device_imu.csv (700392 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    XiaomiMi8/
+                        device_gnss.csv (133142 lines)
+                        device_imu.csv (478300 lines)
+                        supplemental/
+                            ... (max depth reached)
+                test/
+            train/
+                2020-05-15-US-MTV-1/
+                    GooglePixel4XL/
+                        device_gnss.csv (90154 lines)
+                        device_imu.csv (734857 lines)
+                        ... and 1 other files
+                        supplemental/
+                            ... (max depth reached)
+                2020-05-21-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (61368 lines)
+                        device_imu.csv (415251 lines)
+                        ... and 1 other files
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (64498 lines)
+                        device_imu.csv (415486 lines)
+                        ... and 1 other files
+                        supplemental/
+                            ... (max depth reached)
+                ... and 53 other folders
+        input/
+            description.md (321 lines)
+            metadata.zip (1.2 kB)
+            sample_submission.csv (37088 lines)
+            sample_submission.csv.zip (108.0 kB)
+            test.zip (557.7 MB)
+            train.zip (3.7 GB)
+            metadata/
+                accumulated_delta_range_state_bit_map.json (1 lines)
+                constellation_type_mapping.csv (9 lines)
+                ... and 1 other files
+            smartphone-decimeter-2022/
+                description.md (321 lines)
+                metadata.zip (1.2 kB)
+                ... and 4 other files
+                metadata/
+                    accumulated_delta_range_state_bit_map.json (1 lines)
+                    constellation_type_mapping.csv (9 lines)
+                    ... and 1 other files
+                smartphone-decimeter-2022/
+                test/
+                    2020-06-04-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-06-04-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2021-04-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-1/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-2/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-08-24-US-SVL-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    test/
+                train/
+                    2020-05-15-US-MTV-1/
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-05-21-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    ... and 53 other folders
+            test/
+                2020-06-04-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (56087 lines)
+                        device_imu.csv (340189 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (58761 lines)
+                        device_imu.csv (342285 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2020-06-04-US-MTV-2/
+                    GooglePixel4/
+                        device_gnss.csv (68061 lines)
+                        device_imu.csv (338641 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (68855 lines)
+                        device_imu.csv (339610 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2020-07-08-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (73508 lines)
+                        device_imu.csv (456999 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (77061 lines)
+                        device_imu.csv (454150 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2020-07-08-US-MTV-2/
+                    GooglePixel4/
+                        device_gnss.csv (64478 lines)
+                        device_imu.csv (456044 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (68307 lines)
+                        device_imu.csv (449696 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-04-08-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (19537 lines)
+                        device_imu.csv (221095 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel5/
+                        device_gnss.csv (34594 lines)
+                        device_imu.csv (222954 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (40323 lines)
+                        device_imu.csv (216914 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-04-29-US-MTV-1/
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (60277 lines)
+                        device_imu.csv (344013 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    XiaomiMi8/
+                        device_gnss.csv (61077 lines)
+                        device_imu.csv (235288 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-04-29-US-MTV-2/
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (66015 lines)
+                        device_imu.csv (371204 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    XiaomiMi8/
+                        device_gnss.csv (65501 lines)
+                        device_imu.csv (257874 lines)
+                        supplemental/
+                            ... (max depth reached)
+                2021-08-24-US-SVL-1/
+                    GooglePixel4/
+                        device_gnss.csv (101566 lines)
+                        device_imu.csv (711980 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel5/
+                        device_gnss.csv (112728 lines)
+                        device_imu.csv (721330 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    SamsungGalaxyS20Ultra/
+                        device_gnss.csv (122140 lines)
+                        device_imu.csv (700392 lines)
+                        supplemental/
+                            ... (max depth reached)
+                    XiaomiMi8/
+                        device_gnss.csv (133142 lines)
+                        device_imu.csv (478300 lines)
+                        supplemental/
+                            ... (max depth reached)
+                test/
+                    2020-06-04-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-06-04-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2021-04-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-1/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-2/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-08-24-US-SVL-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    test/
+            train/
+                2020-05-15-US-MTV-1/
+                    GooglePixel4XL/
+                        device_gnss.csv (90154 lines)
+                        device_imu.csv (734857 lines)
+                        ... and 1 other files
+                        supplemental/
+                            ... (max depth reached)
+                2020-05-21-US-MTV-1/
+                    GooglePixel4/
+                        device_gnss.csv (61368 lines)
+                        device_imu.csv (415251 lines)
+                        ... and 1 other files
+                        supplemental/
+                            ... (max depth reached)
+                    GooglePixel4XL/
+                        device_gnss.csv (64498 lines)
+                        device_imu.csv (415486 lines)
+                        ... and 1 other files
+                        supplemental/
+                            ... (max depth reached)
+                ... and 53 other folders
+        working/
+            smartphone-decimeter-2022/
+                description.md (321 lines)
+                metadata.zip (1.2 kB)
+                ... and 4 other files
+                metadata/
+                    accumulated_delta_range_state_bit_map.json (1 lines)
+                    constellation_type_mapping.csv (9 lines)
+                    ... and 1 other files
+                smartphone-decimeter-2022/
+                test/
+                    2020-06-04-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-06-04-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-07-08-US-MTV-2/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2021-04-08-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-1/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-04-29-US-MTV-2/
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    2021-08-24-US-SVL-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel5/
+                            ... (max depth reached)
+                        SamsungGalaxyS20Ultra/
+                            ... (max depth reached)
+                        XiaomiMi8/
+                            ... (max depth reached)
+                    test/
+                train/
+                    2020-05-15-US-MTV-1/
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    2020-05-21-US-MTV-1/
+                        GooglePixel4/
+                            ... (max depth reached)
+                        GooglePixel4XL/
+                            ... (max depth reached)
+                    ... and 53 other folders
+```
+
+-> data/metadata/accumulated_delta_range_state_bit_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/metadata/constellation_type_mapping.csv has 8 rows and 2 columns.
+The columns are: constellationType, constellationName
+
+-> data/metadata/raw_state_bit_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    },
+    "5": {
+      "type": "string"
+    },
+    "6": {
+      "type": "string"
+    },
+    "7": {
+      "type": "string"
+    },
+    "8": {
+      "type": "string"
+    },
+    "9": {
+      "type": "string"
+    },
+    "10": {
+      "type": "string"
+    },
+    "11": {
+      "type": "string"
+    },
+    "12": {
+      "type": "string"
+    },
+    "13": {
+      "type": "string"
+    },
+    "14": {
+      "type": "string"
+    },
+    "15": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+  ]
+}
+
+-> data/sample_submission.csv has 37087 rows and 4 columns.
+The columns are: tripId, UnixTimeMillis, LatitudeDegrees, LongitudeDegrees
+
+-> data/smartphone-decimeter-2022/metadata/accumulated_delta_range_state_bit_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/smartphone-decimeter-2022/metadata/constellation_type_mapping.csv has 8 rows and 2 columns.
+The columns are: constellationType, constellationName
+
+-> data/smartphone-decimeter-2022/metadata/raw_state_bit_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    },
+    "5": {
+      "type": "string"
+    },
+    "6": {
+      "type": "string"
+    },
+    "7": {
+      "type": "string"
+    },
+    "8": {
+      "type": "string"
+    },
+    "9": {
+      "type": "string"
+    },
+    "10": {
+      "type": "string"
+    },
+    "11": {
+      "type": "string"
+    },
+    "12": {
+      "type": "string"
+    },
+    "13": {
+      "type": "string"
+    },
+    "14": {
+      "type": "string"
+    },
+    "15": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+  ]
+}
+
+-> data/smartphone-decimeter-2022/sample_submission.csv has 37087 rows and 4 columns.
+The columns are: tripId, UnixTimeMillis, LatitudeDegrees, LongitudeDegrees
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+5.215
+
+# 6. Current score
+
+3122773.6564
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved nan) has done: 'I (1) remove the notebook-only `pip install`/black extension steps that can prevent script-mode execution, while keeping the GNSS→ECEF→lat/lng interpolation logic unchanged. I (2) fix a key bug where `ecef_to_lat_lng()` was interpolating using `utcTimeMillis` but being queried with `UnixTimeMillis`, which can badly misalign timestamps and inflate error; we use the same timestamp column as the sample submission (`UnixTimeMillis`) for both axes. I (3) ensure the submission is correctly aligned to `sample_submission.csv` row order and columns, and keep your existing stop-detection postprocess (but apply it to the actual submission dataframe). These changes are minimal, preserve the core approach, and should yield a valid `submission.csv` and a significantly better score than the current “not yielded”.'
+- What this solution (achieved nan) has done: 'Diagnosis: Cell 23 filters `gts` by `gts["tripId"]`, but `gts` (built in cell 13) is a concat of per-trip `ground_truth.csv` files that do not include a `tripId` column, causing `KeyError: 'tripId'`. The baseline predictions already carry `tripId` (from `ecef_to_lat_lng`), so only `gts` needs an identifier to align rows by trip. We cannot modify earlier cells, so we patch cell 23 to reconstruct a `gts_with_tripid` DataFrame by re-reading each trip’s `ground_truth.csv`, adding `tripId`, and then using it for scoring.
+
+Patch summary: In cell 23 only, detect missing `tripId` in `gts`; if missing, rebuild a ground-truth dataframe with `tripId` using the same train directory glob pattern as earlier cells. Then compute scores using this corrected dataframe, preserving the exact scoring logic and postprocessing outputs.
+
+Updated cells: Only cell 23 is changed.
+
+Compatibility notes for cell k+1: Cell 24 depends on `ss`, `sub_pp`, and `sub_df` only; this patch doesn’t alter them or their schemas. Variables created/used in cell 23 remain local except `mean_score`/`scores`, so no downstream interface changes.
+
+Assumptions: Reading per-trip `ground_truth.csv` files again is acceptable in this environment and matches the directory structure under `../input/smartphone-decimeter-2022/train/*/*/ground_truth.csv`.'
+- What this solution (achieved nan) has done: 'Diagnosis: Cell 23 crashes because `glob` is being treated as a callable function, but in this notebook `glob` was later imported as a module (`import glob` in cell 13), overwriting the earlier `from glob import glob` function import (cell 10). Therefore `glob("pattern")` raises `TypeError: 'module' object is not callable`.  
+Patch summary: In cell 23 only, call the module function explicitly as `glob.glob(...)` so it works regardless of whether `glob` is the module or the function. This is the smallest change that restores determinism and preserves scoring semantics.  
+Updated cells: Only cell 23 is changed.  
+Compatibility notes for cell k+1: All outputs (`mean_score`, and the downstream variables like `gts_with_tripid`) remain the same type/structure; cell 24 continues to work unchanged.  
+Assumptions: The standard library `glob` module is available (it is), and earlier cells may have imported `glob` either as a function or as a module; this fix handles both cases.'
+- What this solution (achieved nan) has done: 'Your current script produces `nan` because it is not guaranteed to run in script mode: `tqdm.notebook` can break outside notebooks, and even if it runs, the output submission can contain missing lat/lon due to interpolation edge cases and/or timestamp mismatches. I make minimal, score-relevant fixes: (1) switch tqdm import to the standard `tqdm` to ensure end-to-end execution, (2) make `ecef_to_lat_lng()` robust to unsorted/duplicate timestamps and interpolation failures by sorting TIME and falling back to linear interpolation (still the same GNSS→ECEF→BLH interpolation approach), and (3) enforce exact submission alignment to `sample_submission.csv` while filling any remaining missing predictions deterministically from the baseline. These changes preserve your core logic and should yield a valid `submission.csv` and a meaningful (non-nan) score that moves toward the target.'
+- What this solution (achieved 3122773.6564) has done: 'Diagnosis: Cell 17 fails because `sub_df`/`sub_pp` coming from earlier steps contain only NaN coordinates for some/all rows, so after merging into `ss_keys` the fallback `global_source` (concat of predicted lat/lon) is empty and the code raises. This can happen deterministically when interpolation upstream returns NaNs (or empty) and the merge leaves all coordinates missing for the submission keys. To unblock execution without changing modeling/postprocess logic, we should keep the existing merge/overlay/ffill/bfill behavior but replace the hard failure fallback with a deterministic, dataset-available default coordinate derived from `sample_submission.csv` itself (or a fixed constant if it’s missing).  
+
+Patch summary: Modify only cell 17 so that when `global_source` is empty, we fill remaining NaNs with a deterministic default (center point computed from `ss` if available, else (0,0)) instead of raising `ValueError`. All existing outputs (`sub_out`, file writing, column names) remain unchanged; only the last-resort fallback behavior changes from crash to fill.  
+
+Updated cells: Only cell 17 is changed.  
+
+Compatibility notes for cell k+1: No interface changes; `submission.csv` is still written with the same columns and `sub_out` remains a DataFrame with required lat/lon values, now guaranteed non-NaN.  
+
+Assumptions: `ss` from cell 4 exists in the kernel and has `LatitudeDegrees`/`LongitudeDegrees` columns (as per the provided schema); if these are entirely missing/NaN, we fall back to (0.0, 0.0) deterministically.'
+- What this solution (achieved 3122773.6564) has done: 'I make the smallest changes needed to (1) ensure the script always writes a valid `submission.csv` and (2) improve the metric by reducing timestamp/merge misalignment and preventing NaN coordinate propagation. Concretely, I keep your GNSS→ECEF→BLH interpolation and the same stop-detection postprocess, but I enforce per-trip sorting/deduplication before postprocess and before merges (so `dist_prev`/stops are computed consistently and overlay aligns exactly). I also ensure we never rename the submission key column incorrectly at the end (your competition sample uses `tripId`, not `phone`), which can silently produce an invalid file on this dataset. Finally, I add a deterministic “nearest-time within trip” fallback merge (same predictions, just safer alignment) for any timestamps that aren’t matched exactly due to dtype or millisecond rounding differences.'
+
+# 9. Code solution
+
+## === cell 0
+import pandas as pd
+import numpy as np
+import matplotlib.pylab as plt
+import plotly.express as px
+
+pd.set_option("display.max_columns", 500)
+
+
+
+## === cell 1
+trip_id = "2020-05-15-US-MTV-1/GooglePixel4XL"
+
+
+
+## === cell 2
+gt = pd.read_csv(
+    "../input/smartphone-decimeter-2022/train/2020-05-15-US-MTV-1/GooglePixel4XL/ground_truth.csv"
+)
+gnss = pd.read_csv(
+    "../input/smartphone-decimeter-2022/train/2020-05-15-US-MTV-1/GooglePixel4XL/device_gnss.csv"
+)
+imu = pd.read_csv(
+    "../input/smartphone-decimeter-2022/train/2020-05-15-US-MTV-1/GooglePixel4XL/device_imu.csv"
+)
+
+
+
+## === cell 3
+import glob
+from dataclasses import dataclass
+
+from tqdm import tqdm
+from scipy.interpolate import InterpolatedUnivariateSpline
+
+INPUT_PATH = "../input/smartphone-decimeter-2022"
+
+WGS84_SEMI_MAJOR_AXIS = 6378137.0
+WGS84_SEMI_MINOR_AXIS = 6356752.314245
+WGS84_SQUARED_FIRST_ECCENTRICITY = 6.69437999013e-3
+WGS84_SQUARED_SECOND_ECCENTRICITY = 6.73949674226e-3
+
+HAVERSINE_RADIUS = 6_371_000
+
+
+@dataclass
+class ECEF:
+    x: np.array
+    y: np.array
+    z: np.array
+
+    def to_numpy(self):
+        return np.stack([self.x, self.y, self.z], axis=0)
+
+    @staticmethod
+    def from_numpy(pos):
+        x, y, z = [np.squeeze(w) for w in np.split(pos, 3, axis=-1)]
+        return ECEF(x=x, y=y, z=z)
+
+
+@dataclass
+class BLH:
+    lat: np.array
+    lng: np.array
+    hgt: np.array
+
+
+def ECEF_to_BLH(ecef):
+    a = WGS84_SEMI_MAJOR_AXIS
+    b = WGS84_SEMI_MINOR_AXIS
+    e2 = WGS84_SQUARED_FIRST_ECCENTRICITY
+    e2_ = WGS84_SQUARED_SECOND_ECCENTRICITY
+    x = ecef.x
+    y = ecef.y
+    z = ecef.z
+    r = np.sqrt(x**2 + y**2)
+    t = np.arctan2(z * (a / b), r)
+    B = np.arctan2(z + (e2_ * b) * np.sin(t) ** 3, r - (e2 * a) * np.cos(t) ** 3)
+    L = np.arctan2(y, x)
+    n = a / np.sqrt(1 - e2 * np.sin(B) ** 2)
+    H = (r / np.cos(B)) - n
+    return BLH(lat=B, lng=L, hgt=H)
+
+
+def haversine_distance(blh_1, blh_2):
+    dlat = blh_2.lat - blh_1.lat
+    dlng = blh_2.lng - blh_1.lng
+    a = (
+        np.sin(dlat / 2) ** 2
+        + np.cos(blh_1.lat) * np.cos(blh_2.lat) * np.sin(dlng / 2) ** 2
+    )
+    dist = 2 * HAVERSINE_RADIUS * np.arcsin(np.sqrt(a))
+    return dist
+
+
+def pandas_haversine_distance(df1, df2):
+    blh1 = BLH(
+        lat=np.deg2rad(df1["LatitudeDegrees"].to_numpy()),
+        lng=np.deg2rad(df1["LongitudeDegrees"].to_numpy()),
+        hgt=0,
+    )
+    blh2 = BLH(
+        lat=np.deg2rad(df2["LatitudeDegrees"].to_numpy()),
+        lng=np.deg2rad(df2["LongitudeDegrees"].to_numpy()),
+        hgt=0,
+    )
+    return haversine_distance(blh1, blh2)
+
+
+def ecef_to_lat_lng(tripID, gnss_df, UnixTimeMillis):
+    """
+    NOTE (score-relevant fix): device_gnss.csv uses 'UnixTimeMillis' (not 'utcTimeMillis') to align with
+    ground_truth/sample_submission. Interpolating on utcTimeMillis and querying with UnixTimeMillis
+    can severely misalign timestamps and worsen the distance error metric.
+
+    NOTE (robustness fix): Spline interpolation requires strictly increasing X. We sort and deduplicate
+    times, and fall back to linear interpolation if the spline fails. This preserves the same overall
+    interpolation-based approach while preventing NaNs that would yield invalid submissions.
+    """
+    ecef_columns = [
+        "WlsPositionXEcefMeters",
+        "WlsPositionYEcefMeters",
+        "WlsPositionZEcefMeters",
+    ]
+
+    if "UnixTimeMillis" in gnss_df.columns:
+        time_col = "UnixTimeMillis"
+    else:
+        time_col = "utcTimeMillis"
+
+    columns = [time_col] + ecef_columns
+    ecef_df = gnss_df[columns].dropna().copy()
+    ecef_df = ecef_df.drop_duplicates(subset=time_col, keep="first").sort_values(
+        time_col
+    )
+    ecef_df = ecef_df.reset_index(drop=True)
+
+    if len(ecef_df) < 2:
+        return pd.DataFrame(
+            {
+                "tripId": tripID,
+                "UnixTimeMillis": UnixTimeMillis,
+                "LatitudeDegrees": np.nan,
+                "LongitudeDegrees": np.nan,
+            }
+        )
+
+    ecef = ECEF.from_numpy(ecef_df[ecef_columns].to_numpy())
+    blh = ECEF_to_BLH(ecef)
+
+    TIME = ecef_df[time_col].to_numpy(dtype=np.float64)
+    query_t = np.asarray(UnixTimeMillis, dtype=np.float64)
+
+    try:
+        lat = InterpolatedUnivariateSpline(TIME, blh.lat.astype(np.float64), ext=3)(
+            query_t
+        )
+        lng = InterpolatedUnivariateSpline(TIME, blh.lng.astype(np.float64), ext=3)(
+            query_t
+        )
+    except Exception:
+        lat = np.interp(
+            query_t,
+            TIME,
+            blh.lat.astype(np.float64),
+            left=blh.lat[0],
+            right=blh.lat[-1],
+        )
+        lng = np.interp(
+            query_t,
+            TIME,
+            blh.lng.astype(np.float64),
+            left=blh.lng[0],
+            right=blh.lng[-1],
+        )
+
+    return pd.DataFrame(
+        {
+            "tripId": tripID,
+            "UnixTimeMillis": UnixTimeMillis,
+            "LatitudeDegrees": np.degrees(lat),
+            "LongitudeDegrees": np.degrees(lng),
+        }
+    )
+
+
+def calc_score(tripID, pred_df, gt_df):
+    d = pandas_haversine_distance(pred_df, gt_df)
+    score = np.mean([np.quantile(d, 0.50), np.quantile(d, 0.95)])
+    return score
+
+
+
+
+## === cell 4
+ss = pd.read_csv("../input/smartphone-decimeter-2022/sample_submission.csv")
+
+if "tripId" not in ss.columns and "phone" in ss.columns:
+    ss = ss.rename(columns={"phone": "tripId"}).copy()
+
+required_cols = ["tripId", "UnixTimeMillis", "LatitudeDegrees", "LongitudeDegrees"]
+missing_cols = [c for c in required_cols if c not in ss.columns]
+if missing_cols:
+    raise ValueError(f"sample_submission missing required columns: {missing_cols}")
+
+
+
+## === cell 5
+trip_id = "2020-05-15-US-MTV-1/GooglePixel4XL"
+baseline = ecef_to_lat_lng(trip_id, gnss, gt["UnixTimeMillis"].values)
+
+
+
+
+## === cell 6
+def visualize_traffic(
+    df,
+    lat_col="LatitudeDegrees",
+    lon_col="LongitudeDegrees",
+    center=None,
+    color_col="phone",
+    label_col="tripId",
+    zoom=9,
+    opacity=1,
+):
+    if center is None:
+        center = {
+            "lat": df[lat_col].mean(),
+            "lon": df[lon_col].mean(),
+        }
+    fig = px.scatter_mapbox(
+        df,
+        lat=lat_col,
+        lon=lon_col,
+        color=color_col,
+        labels=label_col,
+        zoom=zoom,
+        center=center,
+        height=600,
+        width=800,
+        opacity=0.5,
+    )
+    fig.update_layout(mapbox_style="stamen-terrain")
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    fig.update_layout(title_text="GPS trafic")
+    fig.show()
+
+
+def plot_gt_vs_baseline(tripId):
+    """
+    Create a plot of the baseline predictions vs. the ground truth
+    for a given tripId
+    """
+    gt_ = pd.read_csv(
+        f"../input/smartphone-decimeter-2022/train/{tripId}/ground_truth.csv"
+    )
+    gnss_ = pd.read_csv(
+        f"../input/smartphone-decimeter-2022/train/{tripId}/device_gnss.csv"
+    )
+    imu_ = pd.read_csv(
+        f"../input/smartphone-decimeter-2022/train/{tripId}/device_imu.csv"
+    )
+
+    baseline_ = ecef_to_lat_lng(tripId, gnss_, gt_["UnixTimeMillis"].values)
+    baseline_["isGT"] = False
+    gt_["isGT"] = True
+    gt_["tripId"] = tripId
+
+    combined_ = (
+        pd.concat([baseline_, gt_[baseline_.columns]], axis=0)
+        .reset_index(drop=True)
+        .copy()
+    )
+
+    visualize_traffic(
+        combined_,
+        lat_col="LatitudeDegrees",
+        lon_col="LongitudeDegrees",
+        color_col="isGT",
+        zoom=10,
+    )
+
+
+
+
+## === cell 7
+from glob import glob
+
+train_gts = glob("../input/smartphone-decimeter-2022/train/*/*/ground_truth.csv")
+trip_ids = ["/".join(p.split("/")[-3:-1]) for p in train_gts]
+
+
+
+## === cell 8
+tripId = trip_ids[10]
+gt = pd.read_csv(f"../input/smartphone-decimeter-2022/train/{tripId}/ground_truth.csv")
+gnss = pd.read_csv(f"../input/smartphone-decimeter-2022/train/{tripId}/device_gnss.csv")
+imu = pd.read_csv(f"../input/smartphone-decimeter-2022/train/{tripId}/device_imu.csv")
+baseline = ecef_to_lat_lng(tripId, gnss, gt["UnixTimeMillis"].values)
+baseline["isGT"] = False
+gt["isGT"] = True
+gt["tripId"] = tripId
+
+combined = (
+    pd.concat([baseline, gt[baseline.columns]], axis=0).reset_index(drop=True).copy()
+)
+
+
+
+## === cell 9
+import glob
+
+INPUT_PATH = "../input/smartphone-decimeter-2022"
+
+sample_df = pd.read_csv(f"{INPUT_PATH}/sample_submission.csv")
+if "tripId" not in sample_df.columns and "phone" in sample_df.columns:
+    sample_df = sample_df.rename(columns={"phone": "tripId"}).copy()
+
+sample_df["UnixTimeMillis"] = sample_df["UnixTimeMillis"].astype(np.int64)
+
+pred_dfs = []
+for dirname in tqdm(sorted(glob.glob(f"{INPUT_PATH}/test/*/*"))):
+    drive, phone = dirname.split("/")[-2:]
+    tripID = f"{drive}/{phone}"
+    gnss_df = pd.read_csv(f"{dirname}/device_gnss.csv")
+    UnixTimeMillis = sample_df.loc[
+        sample_df["tripId"] == tripID, "UnixTimeMillis"
+    ].to_numpy()
+    pred = ecef_to_lat_lng(tripID, gnss_df, UnixTimeMillis)
+    pred_dfs.append(pred)
+sub_df = pd.concat(pred_dfs, ignore_index=True)
+
+baselines = []
+gts = []
+for dirname in tqdm(sorted(glob.glob(f"{INPUT_PATH}/train/*/*"))):
+    drive, phone = dirname.split("/")[-2:]
+    tripID = f"{drive}/{phone}"
+    gnss_df = pd.read_csv(f"{dirname}/device_gnss.csv", low_memory=False)
+    gt_df = pd.read_csv(f"{dirname}/ground_truth.csv", low_memory=False)
+    gt_df["tripId"] = tripID
+    baseline_df = ecef_to_lat_lng(tripID, gnss_df, gt_df["UnixTimeMillis"].to_numpy())
+    baselines.append(baseline_df)
+    gts.append(gt_df)
+baselines = pd.concat(baselines, ignore_index=True)
+gts = pd.concat(gts, ignore_index=True)
+
+
+
+## === cell 10
+baselines["group"] = "train_baseline"
+sub_df["group"] = "submission_baseline"
+gts["group"] = "train_ground_truth"
+combined = pd.concat([baselines, sub_df, gts], ignore_index=True).copy()
+
+
+
+## === cell 11
+sf_paths = combined.query("LatitudeDegrees > 36").copy()
+la_paths = combined.query("LatitudeDegrees < 36").copy()
+
+
+
+
+## === cell 12
+def calc_haversine(lat1, lon1, lat2, lon2):
+    """Calculates the great circle distance between two points on the earth."""
+    RADIUS = 6_367_000
+    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+    dist = 2 * RADIUS * np.arcsin(a**0.5)
+    return dist
+
+
+def add_prev_post_shift(
+    df,
+    lat_col="LatitudeDegrees",
+    lng_col="LongitudeDegrees",
+    dist_suffix="",
+    sortby=("tripId", "UnixTimeMillis"),
+):
+    df = df.sort_values(list(sortby)).reset_index(drop=True)
+    df[f"{lat_col}_shift1"] = df.groupby(["tripId"])[lat_col].shift(1)
+    df[f"{lng_col}_shift1"] = df.groupby(["tripId"])[lng_col].shift(1)
+    df[f"{lat_col}_shift-1"] = df.groupby(["tripId"])[lat_col].shift(-1)
+    df[f"{lng_col}_shift-1"] = df.groupby(["tripId"])[lng_col].shift(-1)
+
+    df["UnixTimeMillis_shift1"] = df.groupby(["tripId"])["UnixTimeMillis"].shift(1)
+    df["UnixTimeMillis_shift-1"] = df.groupby(["tripId"])["UnixTimeMillis"].shift(-1)
+
+    df[f"dist_prev{dist_suffix}"] = calc_haversine(
+        df[lat_col], df[lng_col], df[f"{lat_col}_shift1"], df[f"{lng_col}_shift1"]
+    )
+    df[f"dist_post{dist_suffix}"] = calc_haversine(
+        df[lat_col], df[lng_col], df[f"{lat_col}_shift-1"], df[f"{lng_col}_shift-1"]
+    )
+    return df
+
+
+
+
+## === cell 13
+def _dedup_trip_time(df):
+    return (
+        df.sort_values(["tripId", "UnixTimeMillis"])
+        .drop_duplicates(subset=["tripId", "UnixTimeMillis"], keep="first")
+        .reset_index(drop=True)
+    )
+
+
+baselines = _dedup_trip_time(baselines)
+sub_df = _dedup_trip_time(sub_df)
+
+baselines2 = add_prev_post_shift(baselines)
+baselines2["UnixTimeMillis_prev_diff"] = (
+    baselines2["UnixTimeMillis"] - baselines2["UnixTimeMillis_shift1"]
+)
+baselines2["speed_calc"] = (
+    baselines2["dist_prev"] / baselines2["UnixTimeMillis_prev_diff"]
+)
+
+sub_df2 = add_prev_post_shift(sub_df)
+sub_df2["UnixTimeMillis_prev_diff"] = (
+    sub_df2["UnixTimeMillis"] - sub_df2["UnixTimeMillis_shift1"]
+)
+sub_df2["speed_calc"] = sub_df2["dist_prev"] / sub_df2["UnixTimeMillis_prev_diff"]
+
+
+
+
+## === cell 14
+def do_postprocess(sub_df, thres=1):
+    sub = sub_df.copy()
+    if "stopped" not in sub.columns:
+        sub["stopped"] = False
+
+    for c, sub_stopped in sub.groupby("tripId"):
+        sub_stopped = sub_stopped.loc[sub_stopped["dist_prev"] < thres].copy()
+        sub_stopped["UnixTimeMillis_diff"] = sub_stopped["UnixTimeMillis"].diff()
+        sub_stopped["big_timeshift"] = sub_stopped["UnixTimeMillis_diff"] > 2_000
+        sub_stopped["time_group"] = sub_stopped["big_timeshift"].astype("int").cumsum()
+
+        for stop_group, d in sub_stopped.groupby("time_group"):
+            tstart, tstop = d["UnixTimeMillis"].min(), d["UnixTimeMillis"].max()
+            stopped_len = len(
+                sub.loc[
+                    (sub["UnixTimeMillis"] >= tstart) & (sub["UnixTimeMillis"] <= tstop)
+                ]
+            )
+            if stopped_len >= 20:
+                buffer = 800
+                latDegmean = sub.loc[
+                    (sub["UnixTimeMillis"] >= (tstart - buffer))
+                    & (sub["UnixTimeMillis"] <= (tstop + buffer))
+                ]["LatitudeDegrees"].mean()
+                lngDegmean = sub.loc[
+                    (sub["UnixTimeMillis"] >= (tstart - buffer))
+                    & (sub["UnixTimeMillis"] <= (tstop + buffer))
+                ]["LongitudeDegrees"].mean()
+
+                sub.loc[
+                    (sub["UnixTimeMillis"] >= tstart)
+                    & (sub["UnixTimeMillis"] <= tstop),
+                    "LatitudeDegrees",
+                ] = latDegmean
+                sub.loc[
+                    (sub["UnixTimeMillis"] >= tstart)
+                    & (sub["UnixTimeMillis"] <= tstop),
+                    "LongitudeDegrees",
+                ] = lngDegmean
+                sub.loc[
+                    (sub["UnixTimeMillis"] >= tstart)
+                    & (sub["UnixTimeMillis"] <= tstop),
+                    "stopped",
+                ] = True
+    sub["stopped"] = sub["stopped"].fillna(False)
+    return sub
+
+
+
+
+## === cell 15
+sub_pp = do_postprocess(sub_df2, thres=1)
+
+
+
+## === cell 16
+if "tripId" not in gts.columns:
+    gt_paths = glob.glob(
+        "../input/smartphone-decimeter-2022/train/*/*/ground_truth.csv"
+    )
+    gt_parts = []
+    for p in gt_paths:
+        tripID = "/".join(p.split("/")[-3:-1])
+        gt_df = pd.read_csv(p, low_memory=False)
+        gt_df["tripId"] = tripID
+        gt_parts.append(gt_df)
+    gts_with_tripid = pd.concat(gt_parts, ignore_index=True)
+else:
+    gts_with_tripid = gts
+
+baselines2_pp = do_postprocess(baselines2, thres=1)
+scores = []
+for tripID in baselines2_pp["tripId"].unique():
+    trip_pred = baselines2_pp.loc[
+        baselines2_pp["tripId"] == tripID, ["LatitudeDegrees", "LongitudeDegrees"]
+    ].reset_index(drop=True)
+    trip_gt = gts_with_tripid.loc[
+        gts_with_tripid["tripId"] == tripID, ["LatitudeDegrees", "LongitudeDegrees"]
+    ].reset_index(drop=True)
+    if len(trip_pred) == len(trip_gt) and len(trip_pred) > 0:
+        d = pandas_haversine_distance(trip_pred, trip_gt)
+        scores.append(np.mean([np.quantile(d, 0.50), np.quantile(d, 0.95)]))
+mean_score = float(np.mean(scores)) if len(scores) else float("nan")
+print(f"mean_score (train, baseline+pp) = {mean_score:.3f}")
+
+
+
+## === cell 17
+ss_keys = ss[["tripId", "UnixTimeMillis"]].copy()
+ss_keys["UnixTimeMillis"] = ss_keys["UnixTimeMillis"].astype(np.int64)
+
+sub_df_dedup = sub_df[
+    ["tripId", "UnixTimeMillis", "LatitudeDegrees", "LongitudeDegrees"]
+].copy()
+sub_df_dedup["UnixTimeMillis"] = sub_df_dedup["UnixTimeMillis"].astype(np.int64)
+sub_df_dedup = (
+    sub_df_dedup.sort_values(["tripId", "UnixTimeMillis"])
+    .drop_duplicates(subset=["tripId", "UnixTimeMillis"], keep="first")
+    .reset_index(drop=True)
+)
+
+sub_pp_dedup = sub_pp[
+    ["tripId", "UnixTimeMillis", "LatitudeDegrees", "LongitudeDegrees"]
+].copy()
+sub_pp_dedup["UnixTimeMillis"] = sub_pp_dedup["UnixTimeMillis"].astype(np.int64)
+sub_pp_dedup = (
+    sub_pp_dedup.sort_values(["tripId", "UnixTimeMillis"])
+    .drop_duplicates(subset=["tripId", "UnixTimeMillis"], keep="first")
+    .reset_index(drop=True)
+)
+
+
+def _merge_exact_or_nearest(keys_df, pred_df):
+    exact = keys_df.merge(pred_df, on=["tripId", "UnixTimeMillis"], how="left")
+    if not exact[["LatitudeDegrees", "LongitudeDegrees"]].isna().any().any():
+        return exact
+
+    out_parts = []
+    for tripID, k in keys_df.groupby("tripId", sort=False):
+        p = pred_df[pred_df["tripId"] == tripID].sort_values("UnixTimeMillis")
+        k = k.sort_values("UnixTimeMillis")
+        if len(p) == 0:
+            tmp = k.copy()
+            tmp["LatitudeDegrees"] = np.nan
+            tmp["LongitudeDegrees"] = np.nan
+            out_parts.append(tmp)
+            continue
+
+        tmp = pd.merge_asof(
+            k,
+            p[["UnixTimeMillis", "LatitudeDegrees", "LongitudeDegrees"]],
+            on="UnixTimeMillis",
+            direction="nearest",
+            tolerance=1500,
+        )
+        tmp["tripId"] = tripID
+        out_parts.append(tmp)
+
+    nearest = pd.concat(out_parts, ignore_index=True)
+    exact_mask = exact["LatitudeDegrees"].notna() & exact["LongitudeDegrees"].notna()
+    nearest.loc[exact_mask, ["LatitudeDegrees", "LongitudeDegrees"]] = exact.loc[
+        exact_mask, ["LatitudeDegrees", "LongitudeDegrees"]
+    ].to_numpy()
+    return nearest
+
+
+base_pred = _merge_exact_or_nearest(ss_keys, sub_df_dedup)
+pp_pred = _merge_exact_or_nearest(ss_keys, sub_pp_dedup)
+
+sub_out = base_pred.copy()
+mask_pp = pp_pred["LatitudeDegrees"].notna() & pp_pred["LongitudeDegrees"].notna()
+sub_out.loc[mask_pp, ["LatitudeDegrees", "LongitudeDegrees"]] = pp_pred.loc[
+    mask_pp, ["LatitudeDegrees", "LongitudeDegrees"]
+].to_numpy()
+
+sub_out = sub_out.sort_values(["tripId", "UnixTimeMillis"]).reset_index(drop=True)
+sub_out[["LatitudeDegrees", "LongitudeDegrees"]] = (
+    sub_out.groupby("tripId")[["LatitudeDegrees", "LongitudeDegrees"]].ffill().bfill()
+)
+
+sub_out = ss_keys.merge(sub_out, on=["tripId", "UnixTimeMillis"], how="left")
+
+if sub_out[["LatitudeDegrees", "LongitudeDegrees"]].isna().any().any():
+    nan_trip_mask = (
+        sub_out["LatitudeDegrees"].isna() | sub_out["LongitudeDegrees"].isna()
+    )
+    nan_trips = sub_out.loc[nan_trip_mask, "tripId"].unique().tolist()
+
+    first_base = (
+        sub_df_dedup.sort_values(["tripId", "UnixTimeMillis"])
+        .groupby("tripId")[["LatitudeDegrees", "LongitudeDegrees"]]
+        .first()
+    )
+
+    first_pp = (
+        sub_pp_dedup.sort_values(["tripId", "UnixTimeMillis"])
+        .groupby("tripId")[["LatitudeDegrees", "LongitudeDegrees"]]
+        .first()
+    )
+
+    for t in nan_trips:
+        tmask = (sub_out["tripId"] == t) & (
+            sub_out["LatitudeDegrees"].isna() | sub_out["LongitudeDegrees"].isna()
+        )
+        if t in first_base.index:
+            lat0 = float(first_base.loc[t, "LatitudeDegrees"])
+            lon0 = float(first_base.loc[t, "LongitudeDegrees"])
+            sub_out.loc[tmask, "LatitudeDegrees"] = lat0
+            sub_out.loc[tmask, "LongitudeDegrees"] = lon0
+        elif t in first_pp.index:
+            lat0 = float(first_pp.loc[t, "LatitudeDegrees"])
+            lon0 = float(first_pp.loc[t, "LongitudeDegrees"])
+            sub_out.loc[tmask, "LatitudeDegrees"] = lat0
+            sub_out.loc[tmask, "LongitudeDegrees"] = lon0
+
+if sub_out[["LatitudeDegrees", "LongitudeDegrees"]].isna().any().any():
+    global_source = pd.concat(
+        [
+            sub_df_dedup[["LatitudeDegrees", "LongitudeDegrees"]],
+            sub_pp_dedup[["LatitudeDegrees", "LongitudeDegrees"]],
+        ],
+        ignore_index=True,
+    ).dropna()
+
+    if len(global_source) == 0:
+        ss_coords = ss[["LatitudeDegrees", "LongitudeDegrees"]].dropna()
+        if len(ss_coords) > 0:
+            global_lat0 = float(ss_coords["LatitudeDegrees"].mean())
+            global_lon0 = float(ss_coords["LongitudeDegrees"].mean())
+        else:
+            global_lat0, global_lon0 = 0.0, 0.0
+    else:
+        global_lat0 = float(global_source.iloc[0]["LatitudeDegrees"])
+        global_lon0 = float(global_source.iloc[0]["LongitudeDegrees"])
+
+    nan_mask = sub_out["LatitudeDegrees"].isna() | sub_out["LongitudeDegrees"].isna()
+    sub_out.loc[nan_mask, "LatitudeDegrees"] = global_lat0
+    sub_out.loc[nan_mask, "LongitudeDegrees"] = global_lon0
+
+if sub_out[["LatitudeDegrees", "LongitudeDegrees"]].isna().any().any():
+    raise ValueError(
+        "Still have NaNs in submission lat/lon after base+overlay+ffill/bfill+fallback; cannot write valid submission."
+    )
+
+ss_out = pd.read_csv("../input/smartphone-decimeter-2022/sample_submission.csv")
+if "tripId" not in ss_out.columns and "phone" in ss_out.columns:
+    ss_out = ss_out.rename(columns={"phone": "tripId"}).copy()
+
+sub_out_final = ss_out[["tripId", "UnixTimeMillis"]].merge(
+    sub_out[["tripId", "UnixTimeMillis", "LatitudeDegrees", "LongitudeDegrees"]],
+    on=["tripId", "UnixTimeMillis"],
+    how="left",
+)
+
+sub_out_final = sub_out_final[
+    ["tripId", "UnixTimeMillis", "LatitudeDegrees", "LongitudeDegrees"]
+]
+sub_out_final.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with shape:", sub_out_final.shape)
+print("Submission columns:", list(sub_out_final.columns))
+print(
+    "Any remaining NaNs:",
+    sub_out_final[["LatitudeDegrees", "LongitudeDegrees"]].isna().any().to_dict(),
+)

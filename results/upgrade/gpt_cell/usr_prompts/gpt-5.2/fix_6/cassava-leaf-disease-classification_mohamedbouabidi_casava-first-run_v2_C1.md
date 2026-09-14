@@ -1,0 +1,471 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.9
+
+# 2. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+protobuf==6.33.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tf_keras==2.18.0
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+import os, cv2, json
+
+import sys
+import subprocess
+import importlib
+
+try:
+    import google.protobuf as _pb
+
+    _pb_ver = getattr(_pb, "__version__", "0")
+    _pb_major = int(_pb_ver.split(".")[0]) if _pb_ver and _pb_ver[0].isdigit() else 0
+    if _pb_major >= 5:
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "-q", "protobuf==4.25.3"]
+        )
+        importlib.invalidate_caches()
+        for _m in list(sys.modules):
+            if _m.startswith("google.protobuf"):
+                sys.modules.pop(_m, None)
+except Exception:
+    pass
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "2")
+
+import tensorflow as tf
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import datetime
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from PIL import Image
+from keras import layers
+from keras import models
+from keras import activations
+from keras import optimizers
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+
+from tensorflow.keras.preprocessing.image import (
+    ImageDataGenerator,
+    load_img,
+    img_to_array,
+)
+
+
+## === cell 1
+base_dir=('../input/cassava-leaf-disease-classification')
+os.listdir(base_dir)
+
+
+## === cell 2
+train_labels = pd.read_csv(os.path.join(base_dir, "train.csv"))
+train_labels.head()
+
+
+## === cell 3
+BATCH_SIZE = 20
+STEPS_PER_EPOCH = len(train_labels)*0.8 / BATCH_SIZE
+VALIDATION_STEPS = len(train_labels)*0.2 / BATCH_SIZE
+EPOCHS = 10
+TARGET_SIZE = 224
+
+
+## === cell 4
+train_labels.label = train_labels.label.astype('str')
+
+train_datagen = ImageDataGenerator(validation_split = 0.2,
+                                     rotation_range = 40,
+                                     zoom_range = 0.2,
+                                     horizontal_flip = True,
+                                     vertical_flip = True,
+                                     fill_mode = 'nearest',
+                                     shear_range = 0.2,
+                                     height_shift_range = 0.2,
+                                     width_shift_range = 0.2)
+
+train_generator = train_datagen.flow_from_dataframe(train_labels,
+                         directory = os.path.join(base_dir, "train_images"),
+                         subset = "training",
+                         x_col = "image_id",
+                         y_col = "label",
+                         target_size = (TARGET_SIZE, TARGET_SIZE),
+                         batch_size = BATCH_SIZE,
+                         class_mode = "sparse")
+
+
+validation_datagen = ImageDataGenerator(validation_split = 0.2)
+
+validation_generator = validation_datagen.flow_from_dataframe(train_labels,
+                         directory = os.path.join(base_dir, "train_images"),
+                         subset = "validation",
+                         x_col = "image_id",
+                         y_col = "label",
+                         target_size = (TARGET_SIZE, TARGET_SIZE),
+                         batch_size = BATCH_SIZE,
+                         class_mode = "sparse")
+
+
+## === cell 5
+from tensorflow.keras.applications import EfficientNetB0
+eff_base = EfficientNetB0(include_top = False, weights = None, input_shape = (TARGET_SIZE, TARGET_SIZE, 3))
+eff_base.summary()
+
+
+## === cell 6
+model = models.Sequential()
+
+model.add(eff_base)
+model.add(layers.GlobalAveragePooling2D())
+model.add(layers.Dense(5, activation='softmax',name='Output'))
+model.summary()
+
+
+## === cell 7
+model.compile(optimizer = 'Adam',
+                  loss = "sparse_categorical_crossentropy",
+                  metrics = ["acc"])
+
+
+## === cell 8
+model_save = ModelCheckpoint('./EffNetB0_512_8_best_weights.h5', 
+                             save_best_only = True, 
+                             save_weights_only = True,
+                             monitor = 'val_loss', 
+                             mode = 'min', verbose = 1)
+early_stop = EarlyStopping(monitor = 'val_loss', min_delta = 0.001, 
+                           patience = 5, mode = 'min', verbose = 1,
+                           restore_best_weights = True)
+reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.3, 
+                              patience = 2, min_delta = 0.001, 
+                              mode = 'min', verbose = 1)
+
+
+## --- ERROR in cell 8, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/1519299808.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[0;32m----> 1[0;31m model_save = ModelCheckpoint('./EffNetB0_512_8_best_weights.h5', 
+[0m[1;32m      2[0m                              [0msave_best_only[0m [0;34m=[0m [0;32mTrue[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      3[0m                              [0msave_weights_only[0m [0;34m=[0m [0;32mTrue[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      4[0m                              [0mmonitor[0m [0;34m=[0m [0;34m'val_loss'[0m[0;34m,[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      5[0m                              mode = 'min', verbose = 1)
+
+[0;32m/usr/local/lib/python3.11/dist-packages/keras/src/callbacks/model_checkpoint.py[0m in [0;36m__init__[0;34m(self, filepath, monitor, verbose, save_best_only, save_weights_only, mode, save_freq, initial_value_threshold)[0m
+[1;32m    182[0m         [0;32mif[0m [0msave_weights_only[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    183[0m             [0;32mif[0m [0;32mnot[0m [0mself[0m[0;34m.[0m[0mfilepath[0m[0;34m.[0m[0mendswith[0m[0;34m([0m[0;34m".weights.h5"[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 184[0;31m                 raise ValueError(
+[0m[1;32m    185[0m                     [0;34m"When using `save_weights_only=True` in `ModelCheckpoint`"[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    186[0m                     [0;34m", the filepath provided must end in `.weights.h5` "[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mValueError[0m: When using `save_weights_only=True` in `ModelCheckpoint`, the filepath provided must end in `.weights.h5` (Keras weights format). Received: filepath=./EffNetB0_512_8_best_weights.h5
+
+## === cell 9
+history = model.fit(
+    train_generator,
+    steps_per_epoch = STEPS_PER_EPOCH,
+    epochs = EPOCHS,
+    validation_data = validation_generator,
+    validation_steps = VALIDATION_STEPS,
+    callbacks = [model_save, early_stop, reduce_lr]
+)

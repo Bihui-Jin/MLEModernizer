@@ -1,0 +1,566 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.6
+
+# 2. Installed packages
+
+No external packages required in the script and installed.
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (84 lines)
+            sample_submission.csv (667 lines)
+            sample_submission.csv.zip (4.6 kB)
+            test.zip (259.0 MB)
+            train.zip (1.5 GB)
+            plant-seedlings-classification/
+                description.md (84 lines)
+                sample_submission.csv (667 lines)
+                ... and 3 other files
+                plant-seedlings-classification/
+                test/
+                    5db43df54.png (177.5 kB)
+                    09d34fe5b.png (156.0 kB)
+                    ... and 664 other files
+                    test/
+                train/
+                    Black-grass/
+                        2ed589264.png (44.6 kB)
+                        840a7ed59.png (708.1 kB)
+                        ... and 219 other files
+                    Charlock/
+                        ee4a02bf9.png (229.3 kB)
+                        e795c53c9.png (354.4 kB)
+                        ... and 322 other files
+                    ... and 11 other folders
+            test/
+                5db43df54.png (177.5 kB)
+                09d34fe5b.png (156.0 kB)
+                ... and 664 other files
+                test/
+            train/
+                Black-grass/
+                    2ed589264.png (44.6 kB)
+                    840a7ed59.png (708.1 kB)
+                    ... and 219 other files
+                Charlock/
+                    ee4a02bf9.png (229.3 kB)
+                    e795c53c9.png (354.4 kB)
+                    ... and 322 other files
+                ... and 11 other folders
+        input/
+            description.md (84 lines)
+            sample_submission.csv (667 lines)
+            sample_submission.csv.zip (4.6 kB)
+            test.zip (259.0 MB)
+            train.zip (1.5 GB)
+            plant-seedlings-classification/
+                description.md (84 lines)
+                sample_submission.csv (667 lines)
+                ... and 3 other files
+                plant-seedlings-classification/
+                test/
+                    5db43df54.png (177.5 kB)
+                    09d34fe5b.png (156.0 kB)
+                    ... and 664 other files
+                    test/
+                train/
+                    Black-grass/
+                        2ed589264.png (44.6 kB)
+                        840a7ed59.png (708.1 kB)
+                        ... and 219 other files
+                    Charlock/
+                        ee4a02bf9.png (229.3 kB)
+                        e795c53c9.png (354.4 kB)
+                        ... and 322 other files
+                    ... and 11 other folders
+            test/
+                5db43df54.png (177.5 kB)
+                09d34fe5b.png (156.0 kB)
+                ... and 664 other files
+                test/
+                    5db43df54.png (177.5 kB)
+                    09d34fe5b.png (156.0 kB)
+                    ... and 664 other files
+                    test/
+            train/
+                Black-grass/
+                    2ed589264.png (44.6 kB)
+                    840a7ed59.png (708.1 kB)
+                    ... and 219 other files
+                Charlock/
+                    ee4a02bf9.png (229.3 kB)
+                    e795c53c9.png (354.4 kB)
+                    ... and 322 other files
+                ... and 11 other folders
+        working/
+            plant-seedlings-classification/
+                description.md (84 lines)
+                sample_submission.csv (667 lines)
+                ... and 3 other files
+                plant-seedlings-classification/
+                test/
+                    5db43df54.png (177.5 kB)
+                    09d34fe5b.png (156.0 kB)
+                    ... and 664 other files
+                    test/
+                train/
+                    Black-grass/
+                        2ed589264.png (44.6 kB)
+                        840a7ed59.png (708.1 kB)
+                        ... and 219 other files
+                    Charlock/
+                        ee4a02bf9.png (229.3 kB)
+                        e795c53c9.png (354.4 kB)
+                        ... and 322 other files
+                    ... and 11 other folders
+```
+
+-> data/plant-seedlings-classification/sample_submission.csv has 666 rows and 2 columns.
+The columns are: file, species
+
+-> data/sample_submission.csv has 666 rows and 2 columns.
+The columns are: file, species
+
+-> input/plant-seedlings-classification/sample_submission.csv has 666 rows and 2 columns.
+The columns are: file, species
+
+-> input/sample_submission.csv has 666 rows and 2 columns.
+The columns are: file, species
+
+-> working/plant-seedlings-classification/sample_submission.csv has 666 rows and 2 columns.
+The columns are: file, species
+
+# 4. Code solution
+
+## === cell 0
+import os
+
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION", "2")
+
+try:
+    import google.protobuf  # noqa: F401
+
+    try:
+        from google.protobuf import __version__ as _pb_ver
+    except Exception:
+        _pb_ver = None
+
+    def _pb_major(ver):
+        try:
+            return int(str(ver).split(".")[0])
+        except Exception:
+            return None
+
+    if _pb_ver is None or (_pb_major(_pb_ver) is not None and _pb_major(_pb_ver) >= 4):
+        import sys
+        import subprocess
+
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "--quiet", "protobuf<4"]
+        )
+        os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+        os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "2"
+except Exception:
+    pass
+
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+
+import matplotlib.pyplot as plt
+
+get_ipython().run_line_magic("matplotlib", "inline")
+from sklearn.model_selection import train_test_split
+import cv2
+import tensorflow as tf
+import math
+from tensorflow.python.framework import ops
+import seaborn as sns
+
+print(os.listdir("../input"))
+
+
+## === cell 1
+def create_mask_for_plant(image):
+    image_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    sensitivity = 33
+    lower_hsv = np.array([60 - sensitivity, 100, 50])
+    upper_hsv = np.array([60 + sensitivity, 255, 255])
+
+    mask = cv2.inRange(image_hsv, lower_hsv, upper_hsv)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11,11))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    
+    return mask
+
+def segment_plant(image):
+    mask = create_mask_for_plant(image)
+    output = cv2.bitwise_and(image, image, mask = mask)
+    return output
+
+def sharpen_image(image):
+    image_blurred = cv2.GaussianBlur(image, (0, 0), 3)
+    image_sharp = cv2.addWeighted(image, 1.5, image_blurred, -0.5, 0)
+    return image_sharp
+
+
+## === cell 2
+root = '../input/train/Maize/3a6d4d007.png'
+img = cv2.imread(root)
+img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+img = cv2.resize(img,(128,128))
+image_segmented = segment_plant(img)
+image_sharpen = sharpen_image(image_segmented)
+plt.imshow(image_sharpen)
+
+
+## === cell 3
+root_candidates = [
+    "../input/plant-seedlings-classification/train",
+    "../input/plant-seedlings-classification/plant-seedlings-classification/train",
+    "../input/train",
+]
+root = next((p for p in root_candidates if os.path.isdir(p)), root_candidates[0])
+
+folders = [d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d))]
+X = []
+Y = []
+names = {}
+ptr = 0
+
+for folder in folders:
+    names[ptr] = folder
+    files = os.listdir(os.path.join(root, folder))
+    for file in files:
+        image_path = os.path.join(root, folder, file)
+        img = cv2.imread(image_path)
+        if img is None:
+            continue
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        image_segmented = segment_plant(img)
+        image_sharpen = sharpen_image(image_segmented)
+        img = cv2.resize(image_sharpen, (128, 128))
+        img = img / 255
+        X.append(img)
+        Y.append(ptr)
+    ptr += 1
+
+X = np.array(X)
+Y = np.array(Y)
+names
+
+
+## === cell 4
+def display_dataset(X,Y, h=128, w=128, rows=5, cols=2, display_labels=True):
+    f, ax = plt.subplots(cols, rows)
+    for i in range(rows):
+        for j in range(cols):
+            index=np.random.randint(0,X.shape[0])
+            ax[j,i].imshow(X[index].reshape(h,w,3), cmap='binary')
+            ax[j,i].set_title(Y[index])
+    plt.xticks()
+    plt.show()
+
+
+## === cell 5
+X = X.reshape(X.shape[0],-1)
+
+
+## === cell 6
+X.shape
+
+
+## === cell 7
+display_dataset(X, Y)
+
+
+## === cell 8
+X_train, X_test, Y_train, Y_test = train_test_split(X,Y, shuffle=True, test_size=0.1)
+
+
+## === cell 9
+display_dataset(X_train, Y_train)
+
+
+## === cell 10
+display_dataset(X_test, Y_test)
+
+
+## === cell 11
+def create_placeholders(n_x, n_y):
+    X = tf.placeholder(tf.float32, shape=[n_x, None], name='X')
+    Y = tf.placeholder(tf.float32, shape=[n_y, None], name='Y')
+    
+    return X, Y
+
+
+## === cell 12
+def initialize_parameters():
+    
+    tf.set_random_seed(1)                   # so that your "random" numbers match ours
+        
+    W1 = tf.get_variable("W1", [50, 49152], initializer=tf.contrib.layers.xavier_initializer(seed=1))
+    b1 = tf.get_variable("b1", [50, 1], initializer=tf.zeros_initializer())
+    W2 = tf.get_variable("W2", [15, 50],initializer=tf.contrib.layers.xavier_initializer(seed=1))
+    b2 = tf.get_variable("b2", [15, 1], initializer=tf.zeros_initializer())
+    W3 = tf.get_variable("W3", [12, 15], initializer=tf.contrib.layers.xavier_initializer(seed=1))
+    b3 = tf.get_variable("b3", [12, 1], initializer=tf.zeros_initializer())
+   
+    parameters = {"W1": W1,
+                  "b1": b1,
+                  "W2": W2,
+                  "b2": b2,
+                  "W3": W3,
+                  "b3": b3}
+    
+    return parameters
+
+
+## === cell 13
+def forward_propagation(X, parameters):
+    
+    W1 = parameters['W1']
+    b1 = parameters['b1']
+    W2 = parameters['W2']
+    b2 = parameters['b2']
+    W3 = parameters['W3']
+    b3 = parameters['b3']
+    
+    Z1 = tf.add(tf.matmul(W1, X), b1)  # Z1 = np.dot(W1, X) + b1
+    A1 = tf.nn.relu(Z1)                # A1 = relu(Z1)
+    Z2 = tf.add(tf.matmul(W2, A1), b2) # Z2 = np.dot(W2, a1) + b2
+    A2 = tf.nn.relu(Z2)                # A2 = relu(Z2)
+    Z3 = tf.add(tf.matmul(W3, A2), b3) # Z3 = np.dot(W3,Z2) + b3
+    
+    return Z3
+
+
+## === cell 14
+
+def compute_cost(Z3, Y):
+    logits = tf.transpose(Z3)
+    labels = tf.transpose(Y)
+    print(logits, labels)
+    cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels))
+    
+    return cost
+
+
+## === cell 15
+def random_mini_batches(X, Y, mini_batch_size = 64, seed = 0):
+    
+    m = X.shape[1]                  # number of training examples
+    mini_batches = []
+    np.random.seed(seed)
+    
+    permutation = list(np.random.permutation(m))
+    shuffled_X = X[:, permutation]
+    shuffled_Y = Y[:, permutation].reshape((Y.shape[0],m))
+
+    num_complete_minibatches = math.floor(m/mini_batch_size) # number of mini batches of size mini_batch_size in your partitionning
+    for k in range(0, num_complete_minibatches):
+        mini_batch_X = shuffled_X[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
+        mini_batch_Y = shuffled_Y[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
+        mini_batch = (mini_batch_X, mini_batch_Y)
+        mini_batches.append(mini_batch)
+    
+    if m % mini_batch_size != 0:
+        mini_batch_X = shuffled_X[:, num_complete_minibatches * mini_batch_size : m]
+        mini_batch_Y = shuffled_Y[:, num_complete_minibatches * mini_batch_size : m]
+        mini_batch = (mini_batch_X, mini_batch_Y)
+        mini_batches.append(mini_batch)
+    
+    return mini_batches
+
+
+## === cell 16
+def convert_to_one_hot(Y, C):
+    Y = np.eye(C)[Y.reshape(-1)].T
+    return Y
+
+
+## === cell 17
+def predict(X, parameters, pred_val=1):
+    
+    W1 = tf.convert_to_tensor(parameters["W1"])
+    b1 = tf.convert_to_tensor(parameters["b1"])
+    W2 = tf.convert_to_tensor(parameters["W2"])
+    b2 = tf.convert_to_tensor(parameters["b2"])
+    W3 = tf.convert_to_tensor(parameters["W3"])
+    b3 = tf.convert_to_tensor(parameters["b3"])
+    
+    params = {"W1": W1,
+              "b1": b1,
+              "W2": W2,
+              "b2": b2,
+              "W3": W3,
+              "b3": b3}
+    
+    x = tf.placeholder("float", [49152, pred_val])
+    
+    z3 = forward_propagation_for_predict(x, params)
+    p = tf.argmax(z3)
+    
+    sess = tf.Session()
+    prediction = sess.run(p, feed_dict = {x: X})
+        
+    return prediction
+
+
+## === cell 18
+def forward_propagation_for_predict(X, parameters):
+    
+    W1 = parameters['W1']
+    b1 = parameters['b1']
+    W2 = parameters['W2']
+    b2 = parameters['b2']
+    W3 = parameters['W3']
+    b3 = parameters['b3'] 
+    Z1 = tf.add(tf.matmul(W1, X), b1)                      # Z1 = np.dot(W1, X) + b1
+    A1 = tf.nn.relu(Z1)                                    # A1 = relu(Z1)
+    Z2 = tf.add(tf.matmul(W2, A1), b2)                     # Z2 = np.dot(W2, a1) + b2
+    A2 = tf.nn.relu(Z2)                                    # A2 = relu(Z2)
+    Z3 = tf.add(tf.matmul(W3, A2), b3)                     # Z3 = np.dot(W3,Z2) + b3
+    
+    return Z3
+
+
+## === cell 19
+def model(train_X, train_Y, test_X, test_Y, learning_rate = 0.0001,
+          num_epochs = 1000, minibatch_size = 32, print_cost = True):
+    """
+    Implements a three-layer tensorflow neural network: LINEAR->RELU->LINEAR->RELU->LINEAR->SOFTMAX.
+    """
+    
+    ops.reset_default_graph()  # to be able to rerun the model without overwriting tf variables
+    tf.set_random_seed(1)      # to keep consistent results
+    seed = 3                   # to keep consistent results
+    (n_x, m) = train_X.shape   # (n_x: input size, m : number of examples in the train set)
+    n_y = train_Y.shape[0]     # n_y : output size
+    costs = []                 # To keep track of the cost
+    
+    X, Y = create_placeholders(n_x, n_y)
+    
+    parameters = initialize_parameters()
+    
+    Z3 = forward_propagation(X, parameters)
+    
+    cost = compute_cost(Z3, Y)
+    
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+    
+    init = tf.global_variables_initializer()
+
+    with tf.Session() as sess:
+        
+        sess.run(init)
+        
+        for epoch in range(num_epochs):
+
+            epoch_cost = 0.                       # Defines a cost related to an epoch
+            num_minibatches = int(m / minibatch_size) # number of minibatches of size minibatch_size in the train set
+            seed = seed + 1
+            minibatches = random_mini_batches(train_X, train_Y, minibatch_size, seed)
+
+            for minibatch in minibatches:
+
+                (minibatch_X, minibatch_Y) = minibatch
+                
+                _ , minibatch_cost = sess.run([optimizer, cost], 
+                                             feed_dict={X: minibatch_X, Y: minibatch_Y})
+
+            epoch_cost += minibatch_cost / num_minibatches
+
+            if print_cost == True and epoch % 10 == 0:
+                print ("Cost after epoch %i: %f" % (epoch, epoch_cost))
+            if print_cost == True and epoch % 5 == 0:
+                costs.append(epoch_cost)
+                
+        plt.plot(np.squeeze(costs))
+        plt.ylabel('cost')
+        plt.xlabel('iterations (per tens)')
+        plt.title("Learning rate =" + str(learning_rate))
+        plt.show()
+
+        parameters = sess.run(parameters)
+        print ("Parameters have been trained!")
+
+        correct_prediction = tf.equal(tf.argmax(Z3), tf.argmax(Y))
+
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+
+        print ("Train Accuracy:", accuracy.eval({X: train_X, Y: train_Y}))
+        print ("Test Accuracy:", accuracy.eval({X: test_X, Y: test_Y}))
+        
+        return parameters
+
+
+## === cell 20
+num_classes = int(max(np.max(Y_train), np.max(Y_test))) + 1
+
+Y_train = convert_to_one_hot(Y_train, num_classes)
+Y_test = convert_to_one_hot(Y_test, num_classes)
+print(Y_train.shape, Y_test.shape)
+
+
+## === cell 21
+X_train=X_train.reshape(X_train.shape[0],-1).T
+X_test=X_test.reshape(X_test.shape[0],-1).T
+print(X_train.shape, X_test.shape)
+
+
+## === cell 23
+parameters1 = model(X_train, Y_train, X_test, Y_test, learning_rate=0.001, num_epochs=100)
+
+
+## --- ERROR in cell 23, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/2698456547.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[0;32m----> 1[0;31m [0mparameters1[0m [0;34m=[0m [0mmodel[0m[0;34m([0m[0mX_train[0m[0;34m,[0m [0mY_train[0m[0;34m,[0m [0mX_test[0m[0;34m,[0m [0mY_test[0m[0;34m,[0m [0mlearning_rate[0m[0;34m=[0m[0;36m0.001[0m[0;34m,[0m [0mnum_epochs[0m[0;34m=[0m[0;36m100[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m
+[0;32m/tmp/ipykernel_11/3857673744.py[0m in [0;36mmodel[0;34m(train_X, train_Y, test_X, test_Y, learning_rate, num_epochs, minibatch_size, print_cost)[0m
+[1;32m      6[0m [0;34m[0m[0m
+[1;32m      7[0m     [0mops[0m[0;34m.[0m[0mreset_default_graph[0m[0;34m([0m[0;34m)[0m  [0;31m# to be able to rerun the model without overwriting tf variables[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 8[0;31m     [0mtf[0m[0;34m.[0m[0mset_random_seed[0m[0;34m([0m[0;36m1[0m[0;34m)[0m      [0;31m# to keep consistent results[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      9[0m     [0mseed[0m [0;34m=[0m [0;36m3[0m                   [0;31m# to keep consistent results[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     10[0m     [0;34m([0m[0mn_x[0m[0;34m,[0m [0mm[0m[0;34m)[0m [0;34m=[0m [0mtrain_X[0m[0;34m.[0m[0mshape[0m   [0;31m# (n_x: input size, m : number of examples in the train set)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mAttributeError[0m: module 'tensorflow' has no attribute 'set_random_seed'
+
+## === cell 24
+root = '../input/train/Maize/3a6d4d007.png'
+imag = cv2.imread(root)
+imag = cv2.cvtColor(imag, cv2.COLOR_RGB2BGR)
+imag = cv2.resize(imag,(128,128))
+image_segmented = segment_plant(imag)
+image_sharpen = sharpen_image(image_segmented)
+imag = cv2.resize(image_sharpen,(128,128))
+imag = imag/255
+
+imb = imag.reshape(1, 128*128*3).T
+my_image_prediction = predict(imb, parameters1)
+plt.imshow(imb.reshape(128,128,3))
+print("Your algorithm predicts: y = " + str(names[int(np.squeeze(my_image_prediction))]))

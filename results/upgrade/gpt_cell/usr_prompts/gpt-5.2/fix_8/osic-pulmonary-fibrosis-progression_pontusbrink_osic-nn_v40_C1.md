@@ -1,0 +1,685 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pydicom==3.0.1
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-image==0.25.2
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-7.2407
+
+# 6. Current score
+
+-9.65041
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -8.45921) has done: 'Diagnosis: The crash happens in cell 4 when `plt.plot(losses, ...)` tries to convert PyTorch tensors in `losses`/`valLosses` to NumPy. Those tensors were appended during training without `.detach()`, so they still require gradients, and Matplotlib’s implicit conversion triggers `tensor.numpy()` which raises the shown error.  
+Patch summary: In cell 4, convert `losses` and `valLosses` to plain Python floats (or detached CPU tensors) before plotting, without changing training, model, or metric logic. This is a localized visualization fix that preserves semantics.  
+Updated cells: Only cell 4 is modified.  
+Compatibility notes for cell k+1: No interface/variable changes are introduced; `losses`/`valLosses` are only used for plotting in this cell, and all downstream variables (`submission`, `submission.csv`) are produced exactly as before.  
+Assumptions: `losses` and `valLosses` contain either PyTorch tensors or numeric values; converting them to floats for plotting is acceptable and does not affect training or predictions.'
+- What this solution (achieved -8.46221) has done: 'I make two minimal fixes that typically improve this competition score without changing your model or training loop: (1) ensure the model is actually training by using proper index-based slicing for KFold (your current `trainDataSet[train_index]` is not valid for array indices and silently breaks training behavior), and (2) align the submission’s `Confidence` with the metric by enforcing the required minimum of 70 (clipping), instead of outputting near-zero confidence for baseline rows (which is heavily penalized by the log term). These are small, metric-aligned corrections that should move your score upward toward the target without altering architecture, loss, or overall approach. The output remains `submission.csv` with the required columns and row count.'
+- What this solution (achieved -8.75142) has done: 'Your current gap to target is about 1.22 (you’re worse than target and higher is better), so we want a small, safe uplift without changing the model, loss, or training loop structure. The most score-relevant minimal change here is to calibrate the predicted `Confidence` toward the metric: overly large sigmas are penalized by the `-log(sigma)` term, and your model’s raw `(q80-q20)` can be much larger than optimal. I add one light post-processing step that scales confidence by a single global factor estimated from train predictions (using the same Laplace metric), then still apply the required `>=70` clip; this keeps semantics intact and usually nudges OSIC scores upward. Everything else (data, model, training, and submission format/path) remains unchanged and still writes `submission.csv`.'
+- What this solution (achieved -8.12263) has done: 'We’re currently below the target (−8.75142 vs −7.2407; higher is better), so we want a small, low-risk uplift without changing the model, loss, or training loop. The main lever left (still within your existing semantics) is better calibration of `Confidence` for the Laplace metric: your current grid-search scale is quite coarse and can miss the best region. I keep the exact same train-prediction-based calibration idea, but replace the coarse fixed grid with a lightweight two-stage refinement (coarse grid + local fine grid) and also guard against non-positive/NaN confidence before clipping to 70. This should nudge the score upward while keeping runtime well within limits and still producing a valid `submission.csv`.'
+- What this solution (achieved -9.65041) has done: 'Your score is still meaningfully below target (current −8.12263 vs target −7.2407; higher is better), so we want a small, low-risk uplift without changing the model, loss, or training loop structure. The most score-relevant lever remaining is confidence calibration: your current scaling minimizes NLL on the *entire* train set (in-sample), which can overfit sigma and hurt leaderboard score. I keep your exact calibration approach but compute the scale in an out-of-fold (KFold) way using your already-defined splits, then use the resulting single global scale for the test submission (still clipping confidence to ≥70 and preserving the baseline-row overwrite). This is a minimal change localized to post-training calibration/prediction and should move the score upward toward the target band.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+import torch as pt
+from torch.utils.data import Dataset, DataLoader, RandomSampler
+import torch.optim as optim
+import matplotlib.pyplot as plt
+import pydicom
+from sklearn.model_selection import KFold
+import seaborn as sns
+import pydicom
+from glob import glob
+import scipy.ndimage
+from skimage import morphology
+from skimage import measure
+from skimage.filters import threshold_otsu, median
+from scipy.ndimage import binary_fill_holes
+from skimage.segmentation import clear_border
+from scipy.stats import describe
+
+trainImagesPath = "/kaggle/input/osic-pulmonary-fibrosis-progression/train/"
+dtype = pt.float
+use_cuda = pt.cuda.is_available()
+device = pt.device("cuda:0" if use_cuda else "cpu")
+
+inputs = [
+    "PercentIn",
+    "AgeIn",
+    "WeekIn",
+    "min_FVC",
+    "SmokingStatus_Currently smokes",
+    "SmokingStatus_Ex-smoker",
+    "SmokingStatus_Never smoked",
+    "Sex_Male",
+    "Sex_Female",
+]
+
+test = pd.read_csv("/kaggle/input/osic-pulmonary-fibrosis-progression/test.csv")
+train = pd.read_csv("/kaggle/input/osic-pulmonary-fibrosis-progression/train.csv")
+subms = pd.read_csv(
+    "../input/osic-pulmonary-fibrosis-progression/sample_submission.csv"
+)
+subms["Patient"] = subms.Patient_Week.apply(lambda x: x.split("_")[0])
+subms["Weeks"] = subms.Patient_Week.apply(lambda x: int(x.split("_")[-1]))
+train["Split"] = "train"
+test["Split"] = "test"
+test["PatientDir"] = test.Patient.apply(
+    lambda x: "../input/osic-pulmonary-fibrosis-progression/test/" + x
+)
+train["PatientDir"] = train.Patient.apply(
+    lambda x: "../input/osic-pulmonary-fibrosis-progression/train/" + x
+)
+subms["PatientDir"] = subms.Patient.apply(
+    lambda x: "../input/osic-pulmonary-fibrosis-progression/train/" + x
+)
+subms = subms[["Patient", "Weeks", "Patient_Week"]]
+subms = subms.merge(test.drop("Weeks", axis=1), on="Patient")
+subms["Split"] = "subm"
+
+data = pd.concat([test, subms, train], axis=0)
+
+data["first_week"] = data.Weeks
+data["first_week"] = data.groupby("Patient")["first_week"].transform("min")
+data["first_week"] = data.Weeks - data.first_week
+data["min_FVC"] = data.groupby("Patient")["FVC"].transform("min")
+data["WeekIn"] = (data.first_week - data.first_week.min()) / (
+    data.first_week.max() - data.first_week.min()
+)
+data = pd.concat(
+    [data, pd.get_dummies(data.SmokingStatus, prefix="SmokingStatus")], axis=1
+)
+data = pd.concat([data, pd.get_dummies(data.Sex, prefix="Sex")], axis=1)
+train = data.loc[data.Split == "train"].copy()
+subms = data.loc[data.Split == "subm"].copy()
+test = data.loc[data.Split == "test"].copy()
+
+data.corr(numeric_only=True)
+
+
+
+## === cell 1
+print(data["PatientDir"])
+print((data.nunique()))
+
+
+
+
+## === cell 2
+class OSICDataSet(Dataset):
+    def __init__(self, data, mode="train"):
+        self.data = data.copy()
+        self.data["Smoke"] = self.data.SmokingStatus.replace(
+            {"Ex-smoker": 0.5, "Never smoked": 0, "Currently smokes": 1}
+        )
+        self.data["Gender"] = self.data.Sex.replace({"Male": 1, "Female": 0})
+        self.data["min_FVC"] = (self.data.min_FVC - data.min_FVC.min()) / (
+            data.min_FVC.max() - data.min_FVC.min()
+        )
+        self.data["WeekIn"] = (self.data.first_week - data.first_week.min()) / (
+            data.first_week.max() - data.first_week.min()
+        )
+        self.data["AgeIn"] = (self.data.Age - data.Age.min()) / (
+            data.Age.max() - data.Age.min()
+        )
+        self.data["PercentIn"] = (self.data.Percent - data.Percent.min()) / (
+            data.Percent.max() - data.Percent.min()
+        )
+        self.mode = mode
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        otherData = pt.from_numpy(self.data.iloc[idx][inputs].values.astype(np.float32))
+        if self.mode == "train":
+            targets = pt.from_numpy(
+                self.data.iloc[idx][["FVC"]].values.astype(np.float32)
+            )
+            return otherData, targets
+        return otherData  # TODO: Add image data
+
+
+class Model(pt.nn.Module):
+    def __init__(self):
+        super(Model, self).__init__()
+        self.start = pt.nn.Sequential(
+            pt.nn.Linear(len(inputs), 128),
+            pt.nn.ReLU(),
+            pt.nn.Linear(128, 256),
+            pt.nn.ReLU(),
+            pt.nn.Linear(256, 512),
+            pt.nn.ReLU(),
+            pt.nn.Linear(512, 1024),
+            pt.nn.ReLU(),
+            pt.nn.Linear(1024, 512),
+            pt.nn.ReLU(),
+            pt.nn.Linear(512, 256),
+            pt.nn.ReLU(),
+        )
+        self.left = pt.nn.Sequential(pt.nn.Linear(256, 128))
+        self.sigmoid = pt.nn.Sigmoid()
+        self.right = pt.nn.Sequential(pt.nn.Linear(256, 128))
+        self.last = pt.nn.Sequential(
+            pt.nn.Linear(128, 3),
+        )
+        self.lastRelu = pt.nn.Sequential(pt.nn.Linear(128, 3), pt.nn.ReLU())
+
+    def forward(self, x):
+        h = self.start(x)
+        l = self.left(h)
+        r = self.right(h)
+        h = l * self.sigmoid(r)
+        p1 = self.last(h)
+        p2 = self.lastRelu(h)
+        out = p1 + pt.cumsum(p2, 1)
+        return out
+
+
+model = Model()
+
+C1, C2 = pt.FloatTensor([70]), pt.FloatTensor([1000])
+
+
+def score(y_pred, y_true):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    fvc_pred = y_pred[:, 1]
+
+    sigma_clip = pt.max(sigma, C1.expand_as(sigma))
+    delta = pt.abs(y_true - fvc_pred)
+    delta = pt.min(delta, C2)
+    sq2 = pt.sqrt(pt.FloatTensor([2]))
+    metric = (delta / sigma_clip) * sq2 + pt.log(sigma_clip * sq2)
+    return pt.mean(metric)
+
+
+def pinballLoss(pred, label, quant):
+    err = label - pred
+    m = pt.mean(pt.max(quant * err, (quant - 1) * err))
+    return m
+
+
+def loss(pred, label):
+    quantiles = pt.FloatTensor([0.2, 0.5, 0.8])
+    return 0.8 * pinballLoss(pred, label, quantiles) + 0.2 * score(pred, label)
+
+
+
+
+## === cell 3
+trainDataSet = OSICDataSet(train)
+optimizer = optim.Adam(model.parameters(), lr=0.075, weight_decay=0.1, eps=0.001)
+losses = []
+valLosses = []
+nSplits = 5
+kf = KFold(n_splits=5)
+c = 0
+submDataSet = OSICDataSet(subms, "submission")
+inp = pt.from_numpy(submDataSet.data[inputs].values.astype(np.float32))
+stopping = 0
+
+for i in range(85):
+    for train_index, val_index in kf.split(trainDataSet):
+        train_x = pt.from_numpy(
+            trainDataSet.data.iloc[train_index][inputs].values.astype(np.float32)
+        )
+        train_y = pt.from_numpy(
+            trainDataSet.data.iloc[train_index][["FVC"]].values.astype(np.float32)
+        )
+        val_x = pt.from_numpy(
+            trainDataSet.data.iloc[val_index][inputs].values.astype(np.float32)
+        )
+        val_y = pt.from_numpy(
+            trainDataSet.data.iloc[val_index][["FVC"]].values.astype(np.float32)
+        )
+
+        optimizer.zero_grad()
+        pred = model(train_x)
+        los = loss(pred, train_y)
+        los.backward()
+
+        if c % 10 == 0:
+            pred = model(val_x)
+            valLos = loss(pred, val_y)
+            losses.append(los)
+            valLosses.append(valLos)
+            if len(valLosses) > 1 and valLosses[-1] < valLosses[-2]:
+                stopping += 1
+                if stopping > nSplits:
+                    i = 800
+                break
+        stopping = 0
+        optimizer.step()
+        c += 1
+
+
+
+## === cell 4
+sns.set(style="white", palette="muted", color_codes=True)
+
+_plot_losses = [
+    float(l.detach().cpu()) if isinstance(l, pt.Tensor) else float(l) for l in losses
+]
+_plot_valLosses = [
+    float(l.detach().cpu()) if isinstance(l, pt.Tensor) else float(l) for l in valLosses
+]
+
+plt.plot(_plot_losses, label="Train loss")
+plt.plot(_plot_valLosses, label="Val loss")
+plt.legend()
+plt.show()
+
+asd = pt.from_numpy(trainDataSet.data[inputs].values.astype(np.float32))
+pred = model(asd).detach()
+idxs = np.random.randint(0, len(trainDataSet), 100)
+plt.plot(
+    trainDataSet.data.iloc[idxs][["FVC"]].values.astype(np.float32),
+    label="ground truth",
+)
+plt.plot(pred[idxs, 0], label="q25")
+plt.plot(pred[idxs, 1], label="q50")
+plt.plot(pred[idxs, 2], label="q75")
+plt.legend(loc="best")
+plt.show()
+
+c_train = pred[:, 2] - pred[:, 0]
+f_train = pred[:, 1]
+
+fig, axes = plt.subplots(1, 2, figsize=(13, 6.5))
+sns.distplot(
+    c_train, color="g", kde=False, kde_kws={"shade": True}, ax=axes[0]
+).set_title("Predicted Confidence on train set")
+sns.distplot(
+    f_train, color="g", kde=False, kde_kws={"shade": True}, ax=axes[1]
+).set_title("Predicted FVC on train set")
+plt.show()
+
+
+def _laplace_nll_np(fvc_true, fvc_pred, sigma):
+    sigma_clip = np.maximum(sigma, 70.0)
+    delta = np.minimum(np.abs(fvc_true - fvc_pred), 1000.0)
+    return (np.sqrt(2.0) * delta / sigma_clip) + np.log(np.sqrt(2.0) * sigma_clip)
+
+
+fvc_true_all = trainDataSet.data["FVC"].values.astype(np.float32)
+x_all = pt.from_numpy(trainDataSet.data[inputs].values.astype(np.float32))
+
+oof_fvc_pred = np.zeros(len(trainDataSet), dtype=np.float32)
+oof_sigma_raw = np.zeros(len(trainDataSet), dtype=np.float32)
+
+for tr_idx, va_idx in KFold(n_splits=5, shuffle=True, random_state=42).split(
+    trainDataSet
+):
+    with pt.no_grad():
+        out_va = model(x_all[va_idx]).detach()
+    oof_fvc_pred[va_idx] = out_va[:, 1].cpu().numpy().astype(np.float32)
+    oof_sigma_raw[va_idx] = (
+        (out_va[:, 2] - out_va[:, 0]).cpu().numpy().astype(np.float32)
+    )
+
+oof_sigma_raw = np.nan_to_num(oof_sigma_raw, nan=0.0, posinf=0.0, neginf=0.0)
+oof_sigma_raw = np.maximum(oof_sigma_raw, 1e-6)
+
+coarse_scales = np.array(
+    [0.20, 0.30, 0.40, 0.50, 0.65, 0.80, 1.00, 1.25, 1.60, 2.00], dtype=np.float32
+)
+coarse_nlls = np.array(
+    [
+        _laplace_nll_np(fvc_true_all, oof_fvc_pred, oof_sigma_raw * s).mean()
+        for s in coarse_scales
+    ],
+    dtype=np.float32,
+)
+coarse_best_idx = int(np.argmin(coarse_nlls))
+coarse_best = float(coarse_scales[coarse_best_idx])
+
+low = max(0.05, coarse_best * 0.6)
+high = coarse_best * 1.6
+fine_scales = np.linspace(low, high, 41, dtype=np.float32)
+fine_nlls = np.array(
+    [
+        _laplace_nll_np(fvc_true_all, oof_fvc_pred, oof_sigma_raw * s).mean()
+        for s in fine_scales
+    ],
+    dtype=np.float32,
+)
+best_scale = float(fine_scales[int(np.argmin(fine_nlls))])
+
+print(
+    "Chosen confidence scale (OOF-calibrated, refined):",
+    best_scale,
+    "Coarse best:",
+    coarse_best,
+    "OOF NLL:",
+    float(np.min(fine_nlls)),
+)
+
+submDataSet = OSICDataSet(subms, "submission")
+inp = pt.from_numpy(submDataSet.data[inputs].values.astype(np.float32))
+out = model(inp).detach()
+confidence = (out[:, 2] - out[:, 0]) * best_scale
+fvc = out[:, 1]
+
+fig, axes = plt.subplots(1, 2, figsize=(13, 6.5))
+sns.distplot(
+    confidence, color="g", kde=False, kde_kws={"shade": True}, ax=axes[0]
+).set_title("Confidence on submission set")
+sns.distplot(fvc, color="g", kde=False, kde_kws={"shade": True}, ax=axes[1]).set_title(
+    "FVC on submision set"
+)
+plt.show()
+
+submDataSet.data["pFVC"] = fvc.cpu().numpy()
+submDataSet.data["cConf"] = confidence.cpu().numpy()
+
+submission = pd.DataFrame(
+    {
+        "Patient_Week": submDataSet.data.Patient_Week.values,
+        "FVC": fvc.cpu().numpy(),
+        "Confidence": confidence.cpu().numpy(),
+    }
+)
+
+otest = pd.read_csv("../input/osic-pulmonary-fibrosis-progression/test.csv")
+
+submission["Confidence"] = submission["Confidence"].astype(np.float32)
+submission["Confidence"] = np.nan_to_num(
+    submission["Confidence"], nan=0.0, posinf=0.0, neginf=0.0
+)
+submission["Confidence"] = np.maximum(submission["Confidence"], 1e-6)
+submission["Confidence"] = np.maximum(submission["Confidence"], 70.0)
+
+for i in range(len(otest)):
+    key = otest.Patient[i] + "_" + str(otest.Weeks[i])
+    submission.loc[submission["Patient_Week"] == key, "FVC"] = float(otest.FVC[i])
+    submission.loc[submission["Patient_Week"] == key, "Confidence"] = 70.0
+
+submission.to_csv("submission.csv", index=False)
+
+null_columns = submission.columns[submission.isnull().any()]
+print(submission.head())
+print(len(submission))
+print("Null columns:", list(null_columns))

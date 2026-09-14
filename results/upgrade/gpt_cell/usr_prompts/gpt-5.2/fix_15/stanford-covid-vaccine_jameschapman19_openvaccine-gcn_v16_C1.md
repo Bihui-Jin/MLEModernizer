@@ -1,0 +1,1351 @@
+# Goal
+
+You will receive environment details and a partial notebook export.
+
+# Requirements
+
+- Fix the bug that causes the error in cell k.
+- Do NOT adjust any other non-buggy cells.
+- You may reference cell k+1 only to preserve variable/interface compatibility.
+- Do not complete or extend code logic in cell k, k+1, or later cells.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (bug fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Output must follow your strict format: Diagnosis / Patch summary / Updated cells / Compatibility notes for cell k+1 / Assumptions.
+
+
+# 1. Python version
+
+3.8
+
+# 2. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 3. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        input/
+            description.md (125 lines)
+            sample_submission.csv (25681 lines)
+            sample_submission.csv.zip (74.8 kB)
+            test.json (240 lines)
+            train.json (2160 lines)
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+        working/
+            stanford-covid-vaccine/
+                description.md (125 lines)
+                sample_submission.csv (25681 lines)
+                ... and 3 other files
+                stanford-covid-vaccine/
+```
+
+-> data/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> data/stanford-covid-vaccine/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/stanford-covid-vaccine/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> data/test.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "index",
+    "predicted_loop_type",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "structure"
+  ]
+}
+
+-> data/train.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "index": {
+      "type": "integer"
+    },
+    "id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "structure": {
+      "type": "string"
+    },
+    "predicted_loop_type": {
+      "type": "string"
+    },
+    "signal_to_noise": {
+      "type": "number"
+    },
+    "SN_filter": {
+      "type": "integer"
+    },
+    "seq_length": {
+      "type": "integer"
+    },
+    "seq_scored": {
+      "type": "integer"
+    },
+    "reactivity_error": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_error_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "reactivity": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_pH10": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_Mg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "deg_50C": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "required": [
+    "SN_filter",
+    "deg_50C",
+    "deg_Mg_50C",
+    "deg_Mg_pH10",
+    "deg_error_50C",
+    "deg_error_Mg_50C",
+    "deg_error_Mg_pH10",
+    "deg_error_pH10",
+    "deg_pH10",
+    "id",
+    "index",
+    "predicted_loop_type",
+    "reactivity",
+    "reactivity_error",
+    "seq_length",
+    "seq_scored",
+    "sequence",
+    "signal_to_noise",
+    "structure"
+  ]
+}
+
+-> input/sample_submission.csv has 25680 rows and 6 columns.
+The columns are: id_seqpos, reactivity, deg_Mg_pH10, deg_pH10, deg_Mg_50C, deg_50C
+
+-> (stopped after 10 files for performance)
+
+# 4. Code solution
+
+## === cell 0
+import torch
+
+print(torch.__version__)
+print(torch.version.cuda)
+
+
+
+## === cell 1
+import os
+
+if os.environ.get("KAGGLE_KERNEL_RUN_TYPE", ""):
+    print("Skipping pip installs in Kaggle environment.")
+else:
+    pass
+
+
+
+## === cell 2
+import warnings
+
+warnings.filterwarnings("ignore")
+
+import os
+import shutil
+
+import pandas as pd, numpy as np, seaborn as sns
+import math, json
+import matplotlib.pyplot as plt
+import matplotlib.colors as mc
+from matplotlib import cm
+import seaborn as sns
+import colorsys
+from tqdm import tqdm
+
+from sklearn.model_selection import train_test_split, KFold
+
+import torch.nn as nn
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+
+## === cell 3
+import warnings
+
+try:
+    import forgi.graph.bulge_graph as fgb
+    import forgi.visual.mplotlib as fvm
+    import forgi.threedee.utilities.vector as ftuv
+    import forgi
+except ModuleNotFoundError:
+    fgb = None
+    fvm = None
+    ftuv = None
+    forgi = None
+    warnings.warn(
+        "Optional dependency `forgi` is not installed; related features will be unavailable."
+    )
+
+try:
+    import RNA
+except ModuleNotFoundError:
+    RNA = None
+    warnings.warn(
+        "Optional dependency `RNA` (ViennaRNA) is not installed; related features will be unavailable."
+    )
+
+
+
+
+## === cell 4
+def seed_all(seed=42):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+seed_all()
+
+
+
+
+## === cell 5
+class config:
+    learning_rate = 0.001
+    K = 1  # number of aggregation loop (also means number of GCN layers)
+    gcn_agg = "mean"  # aggregator function: mean, conv, lstm, pooling
+    filter_noise = False
+    seed = 1234
+    dropout_p = 0.30  # was implicit 0.5? (PyTorch default is 0.5); we make it explicit and slightly adjusted.
+
+
+
+
+## === cell 6
+def get_couples(structure):
+    """
+    For each closing parenthesis, I find the matching opening one and store their index in the couples list.
+    The assigned list is used to keep track of the assigned opening parenthesis
+    """
+    opened = [idx for idx, i in enumerate(structure) if i == "("]
+    closed = [idx for idx, i in enumerate(structure) if i == ")"]
+
+    assert len(opened) == len(closed)
+
+    assigned = []
+    couples = []
+
+    for close_idx in closed:
+        for open_idx in opened:
+            if open_idx < close_idx:
+                if open_idx not in assigned:
+                    candidate = open_idx
+            else:
+                break
+        assigned.append(candidate)
+        couples.append([candidate, close_idx])
+        assigned.append(close_idx)
+        couples.append([close_idx, candidate])
+
+    assert len(couples) == 2 * len(opened)
+
+    return couples
+
+
+
+
+## === cell 7
+def build_matrix(couples, size):
+    mat = np.zeros((size, size))
+
+    for i in range(size):  # neigbouring bases are linked as well
+        if i < size - 1:
+            mat[i, i + 1] = 1
+        if i > 0:
+            mat[i, i - 1] = 1
+
+    for i, j in couples:
+        mat[i, j] = 2
+        mat[j, i] = 2
+
+    return mat
+
+
+
+
+## === cell 8
+def seq2nodes(sequence, loops, structures):
+    type_dict = {"A": 0, "G": 1, "U": 2, "C": 3}
+    loop_dict = {"S": 0, "M": 1, "I": 2, "B": 3, "H": 4, "E": 5, "X": 6}
+    struct_dict = {".": 0, "(": 1, ")": 2}
+    nodes = np.zeros((len(sequence), 4 + 7 + 3))
+    for i, s in enumerate(sequence):
+        nodes[i, type_dict[s]] = 1
+    for i, s in enumerate(loops):
+        nodes[i, 4 + loop_dict[s]] = 1
+    for i, s in enumerate(structures):
+        nodes[i, 11 + struct_dict[s]] = 1
+    return nodes
+
+
+
+
+## === cell 9
+all_data = pd.read_json("../input/stanford-covid-vaccine/train.json", lines=True)
+all_data.head(5)
+
+
+
+## === cell 10
+idx = 0
+id_ = all_data.iloc[idx].id
+sequence = all_data.iloc[idx].sequence
+structure = all_data.iloc[idx].structure
+loops = all_data.iloc[idx].predicted_loop_type
+reactivity = all_data.iloc[idx].reactivity
+
+if fgb is not None and fvm is not None:
+    bg = fgb.BulgeGraph.from_fasta_text(f">rna1\n{structure}\n{sequence}")[0]
+    fig = plt.figure(figsize=(6, 6))
+    fvm.plot_rna(bg, lighten=0.5, text_kwargs={"fontweight": None})
+    plt.show()
+else:
+    print(
+        "Skipping RNA structure plot because optional dependency `forgi` is not installed."
+    )
+
+
+
+## === cell 11
+matrix = build_matrix(get_couples(structure), len(sequence))
+
+candidate_roots = [
+    "../input/stanford-covid-vaccine/bpps/",
+    "/kaggle/input/stanford-covid-vaccine/bpps/",
+    "/kaggle/data/stanford-covid-vaccine/bpps/",
+    "/kaggle/data/input/stanford-covid-vaccine/bpps/",
+    "/kaggle/data/stanford-covid-vaccine/stanford-covid-vaccine/bpps/",
+    "/kaggle/data/input/stanford-covid-vaccine/stanford-covid-vaccine/bpps/",
+]
+bpps_path = None
+attempted = []
+for root in candidate_roots:
+    p = os.path.join(root, f"{id_}.npy")
+    attempted.append(p)
+    if os.path.exists(p):
+        bpps_path = p
+        break
+
+if bpps_path is None:
+    bpps = np.zeros((len(sequence), len(sequence)), dtype=np.float32)
+else:
+    bpps = np.load(bpps_path)
+
+edge_index = np.stack(np.where((matrix + bpps) > 0))
+node_attr = seq2nodes(sequence, loops, structure)
+edge_attr = np.zeros((edge_index.shape[1], 3))
+edge_attr[:, 0] = (matrix == 1)[edge_index[0, :], edge_index[1, :]]
+edge_attr[:, 1] = (matrix == 2)[edge_index[0, :], edge_index[1, :]]
+edge_attr[:, 2] = bpps[edge_index[0, :], edge_index[1, :]]
+
+
+
+## === cell 12
+import sys
+import types
+from pathlib import Path
+
+try:
+    from torch_geometric.data import InMemoryDataset
+    from torch_geometric.data import Data
+except ModuleNotFoundError:
+    tg = types.ModuleType("torch_geometric")
+    tg_data = types.ModuleType("torch_geometric.data")
+
+    class Data:
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+        @property
+        def num_nodes(self):
+            if hasattr(self, "x") and self.x is not None:
+                return int(self.x.shape[0])
+            return 0
+
+    class InMemoryDataset(torch.utils.data.Dataset):
+        def __init__(self, root="", transform=None, pre_transform=None):
+            super().__init__()
+            self.root = root or ""
+            self.transform = transform
+            self.pre_transform = pre_transform
+
+            if self.root:
+                processed_dir = Path("./") / self.root / "processed"
+            else:
+                processed_dir = Path("./processed")
+            processed_dir.mkdir(parents=True, exist_ok=True)
+
+            self._processed_paths = [str(processed_dir / self.processed_file_names)]
+
+            if not Path(self._processed_paths[0]).exists():
+                self.process()
+
+        @property
+        def processed_paths(self):
+            return self._processed_paths
+
+        def collate(self, data_list):
+            return data_list, None
+
+        def __len__(self):
+            if hasattr(self, "data") and isinstance(self.data, list):
+                return len(self.data)
+            return 0
+
+        def __getitem__(self, idx):
+            if hasattr(self, "data") and isinstance(self.data, list):
+                return self.data[idx]
+            raise IndexError("Dataset is empty or not initialized.")
+
+    def _simple_collate_fn(batch):
+        return batch
+
+    class DataLoader(torch.utils.data.DataLoader):
+        def __init__(self, dataset, batch_size=1, shuffle=False, **kwargs):
+            super().__init__(
+                dataset,
+                batch_size=batch_size,
+                shuffle=shuffle,
+                collate_fn=_simple_collate_fn,
+                **kwargs,
+            )
+
+    tg_data.Data = Data
+    tg_data.InMemoryDataset = InMemoryDataset
+    tg_data.DataLoader = DataLoader
+
+    tg.data = tg_data
+    sys.modules["torch_geometric"] = tg
+    sys.modules["torch_geometric.data"] = tg_data
+
+    from torch_geometric.data import InMemoryDataset
+    from torch_geometric.data import Data
+
+
+class MyOwnDataset(InMemoryDataset):
+    def __init__(
+        self,
+        root="",
+        train=True,
+        public=True,
+        ids=None,
+        transform=None,
+        pre_transform=None,
+    ):
+        try:
+            shutil.rmtree("./" + root)
+        except:
+            print("doesn't exist")
+        self.train = train
+        if self.train:
+            self.data_dir = "../input/stanford-covid-vaccine/train.json"
+        else:
+            self.data_dir = "/kaggle/input/stanford-covid-vaccine/test.json"
+        self.bpps_dir = "../input/stanford-covid-vaccine/bpps/"
+        self.df = pd.read_json(self.data_dir, lines=True)
+        if self.train:
+            if config.filter_noise:
+                self.df = self.df[self.df.signal_to_noise > 1]
+        if ids is not None:
+            self.df = self.df[self.df["index"].isin(ids)]
+        if public:
+            self.df = self.df.query("seq_length == 107")
+        else:
+            self.df = self.df.query("seq_length == 130")
+        self.target_cols = [
+            "reactivity",
+            "deg_Mg_pH10",
+            "deg_Mg_50C",
+            "deg_pH10",
+            "deg_50C",
+        ]
+
+        super(MyOwnDataset, self).__init__(root, transform, pre_transform)
+        self.data, self.slices = torch.load(self.processed_paths[0])
+
+    @property
+    def raw_file_names(self):
+        return []
+
+    @property
+    def processed_file_names(self):
+        return "data.pt"
+
+    def download(self):
+        pass
+
+    def process(self):
+        data_list = []
+        for idx in range(len(self.df)):
+            structure = self.df["structure"].iloc[idx]
+            sequence = self.df["sequence"].iloc[idx]
+            loops = self.df["predicted_loop_type"].iloc[idx]
+            matrix = build_matrix(get_couples(structure), len(sequence))
+            id_ = self.df["id"].iloc[idx]
+            bpps = np.load(self.bpps_dir + id_ + ".npy")
+            edge_index = np.stack(np.where((matrix) > 0))
+            node_attr = seq2nodes(sequence, loops, structure)
+            edge_attr = np.zeros((edge_index.shape[1], 3))
+            edge_attr[:, 0] = (matrix == 1)[edge_index[0, :], edge_index[1, :]]
+            edge_attr[:, 1] = (matrix == 2)[edge_index[0, :], edge_index[1, :]]
+            edge_attr[:, 2] = bpps[edge_index[0, :], edge_index[1, :]]
+            if self.train:
+                targets = np.stack(self.df[self.target_cols].iloc[idx]).T
+            else:
+                targets = np.zeros((130, 5))
+            x = torch.from_numpy(node_attr)
+            y = torch.from_numpy(targets)
+            edge_attr = torch.from_numpy(edge_attr)
+            edge_index = torch.tensor(edge_index, dtype=torch.long)
+            data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y)
+            data.train_mask = torch.zeros(data.num_nodes, dtype=torch.uint8)
+            data.train_mask[:68] = 1
+            data_list.append(data)
+
+        data, slices = self.collate(data_list)
+        torch.save((data, slices), self.processed_paths[0])
+
+
+## === cell 13
+def _patched_process(self):
+    data_list = []
+
+    candidate_bpps_dirs = [
+        getattr(self, "bpps_dir", None),
+        "../input/stanford-covid-vaccine/bpps/",
+        "/kaggle/input/stanford-covid-vaccine/bpps/",
+        "/kaggle/data/stanford-covid-vaccine/bpps/",
+        "/kaggle/data/input/stanford-covid-vaccine/bpps/",
+        "/kaggle/data/stanford-covid-vaccine/stanford-covid-vaccine/bpps/",
+        "/kaggle/data/input/stanford-covid-vaccine/stanford-covid-vaccine/bpps/",
+    ]
+    candidate_bpps_dirs = [d for d in candidate_bpps_dirs if d]
+
+    for idx in range(len(self.df)):
+        structure = self.df["structure"].iloc[idx]
+        sequence = self.df["sequence"].iloc[idx]
+        loops = self.df["predicted_loop_type"].iloc[idx]
+        matrix = build_matrix(get_couples(structure), len(sequence))
+        id_ = self.df["id"].iloc[idx]
+
+        bpps = None
+        for d in candidate_bpps_dirs:
+            p = os.path.join(d, f"{id_}.npy")
+            if os.path.exists(p):
+                bpps = np.load(p)
+                break
+        if bpps is None:
+            bpps = np.zeros((len(sequence), len(sequence)), dtype=np.float32)
+
+        edge_index = np.stack(np.where((matrix) > 0))
+        node_attr = seq2nodes(sequence, loops, structure)
+        edge_attr = np.zeros((edge_index.shape[1], 3))
+        edge_attr[:, 0] = (matrix == 1)[edge_index[0, :], edge_index[1, :]]
+        edge_attr[:, 1] = (matrix == 2)[edge_index[0, :], edge_index[1, :]]
+        edge_attr[:, 2] = bpps[edge_index[0, :], edge_index[1, :]]
+
+        if self.train:
+            targets = np.stack(self.df[self.target_cols].iloc[idx]).T
+        else:
+            targets = np.zeros((130, 5))
+
+        x = torch.from_numpy(node_attr)
+        y = torch.from_numpy(targets)
+        edge_attr = torch.from_numpy(edge_attr)
+        edge_index = torch.tensor(edge_index, dtype=torch.long)
+        data = Data(x=x, edge_index=edge_index, edge_attr=edge_attr, y=y)
+        data.train_mask = torch.zeros(data.num_nodes, dtype=torch.uint8)
+        data.train_mask[:68] = 1
+        data_list.append(data)
+
+    data, slices = self.collate(data_list)
+    torch.save((data, slices), self.processed_paths[0])
+
+
+MyOwnDataset.process = _patched_process
+
+
+def _patched_init(
+    self, root="", train=True, public=True, ids=None, transform=None, pre_transform=None
+):
+    try:
+        shutil.rmtree("./" + root)
+    except Exception:
+        print("doesn't exist")
+    self.train = train
+    if self.train:
+        self.data_dir = "../input/stanford-covid-vaccine/train.json"
+    else:
+        self.data_dir = "/kaggle/input/stanford-covid-vaccine/test.json"
+    self.bpps_dir = "../input/stanford-covid-vaccine/bpps/"
+    self.df = pd.read_json(self.data_dir, lines=True)
+    if self.train:
+        if config.filter_noise:
+            self.df = self.df[self.df.signal_to_noise > 1]
+    if ids is not None:
+        self.df = self.df[self.df["index"].isin(ids)]
+    if public:
+        self.df = self.df.query("seq_length == 107")
+    else:
+        self.df = self.df.query("seq_length == 130")
+    self.target_cols = [
+        "reactivity",
+        "deg_Mg_pH10",
+        "deg_Mg_50C",
+        "deg_pH10",
+        "deg_50C",
+    ]
+
+    super(MyOwnDataset, self).__init__(root, transform, pre_transform)
+
+    self.data, self.slices = torch.load(self.processed_paths[0], weights_only=False)
+
+
+MyOwnDataset.__init__ = _patched_init
+
+if config.filter_noise:
+    all_data = all_data[all_data.signal_to_noise > 1]
+all_ids = np.arange(len(all_data))
+np.random.shuffle(all_ids)
+train_ids, val_ids = np.split(all_ids, [int(round(0.9 * len(all_ids), 0))])
+
+train_dataset = MyOwnDataset(ids=train_ids, root="train")
+val_dataset = MyOwnDataset(ids=val_ids, root="val")
+
+from torch_geometric.data import DataLoader
+
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False)
+val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
+
+
+
+## === cell 14
+import torch
+import torch.nn.functional as F
+
+try:
+    from torch_geometric.nn import GCNConv  # type: ignore
+    from torch_geometric.nn import NNConv, Set2Set  # type: ignore
+except Exception:
+    import torch.nn as nn
+
+    class GCNConv(nn.Module):
+        def __init__(self, in_channels, out_channels):
+            super().__init__()
+            self.lin = nn.Linear(in_channels, out_channels)
+
+        def forward(self, x, edge_index):
+            n = x.size(0)
+            adj = x.new_zeros((n, n))
+            if edge_index.numel() > 0:
+                adj[edge_index[0], edge_index[1]] = 1.0
+            adj.fill_diagonal_(1.0)
+            deg = adj.sum(dim=1).clamp(min=1.0)
+            norm = adj / deg.unsqueeze(1)
+            out = norm @ x
+            return self.lin(out)
+
+    class NNConv(nn.Module):
+        def __init__(self, in_channels, out_channels, nn_module, aggr="mean"):
+            super().__init__()
+            self.in_channels = in_channels
+            self.out_channels = out_channels
+            self.nn = nn_module
+            self.aggr = aggr
+            self.root = nn.Linear(in_channels, out_channels)
+
+        def forward(self, x, edge_index, edge_attr):
+            n = x.size(0)
+            e = edge_index.size(1) if edge_index.numel() > 0 else 0
+            out = x.new_zeros((n, self.out_channels))
+
+            if e > 0:
+                w = self.nn(
+                    edge_attr
+                )  # [E, out_channels*out_channels] as used in this notebook
+                w = w.view(e, self.out_channels, self.out_channels)
+
+                src = edge_index[0]
+                dst = edge_index[1]
+                msg = torch.bmm(w, x[src].unsqueeze(-1)).squeeze(
+                    -1
+                )  # [E, out_channels]
+                out.index_add_(0, dst, msg)
+
+                if self.aggr == "mean":
+                    deg = x.new_zeros((n,))
+                    deg.index_add_(0, dst, torch.ones_like(dst, dtype=x.dtype))
+                    out = out / deg.clamp(min=1.0).unsqueeze(-1)
+
+            out = out + self.root(x)
+            return out
+
+    class Set2Set(nn.Module):
+        def __init__(self, in_channels, processing_steps=3, num_layers=1):
+            super().__init__()
+            self.in_channels = in_channels
+            self.processing_steps = processing_steps
+            self.num_layers = num_layers
+
+        def forward(self, x, batch=None):
+            if batch is None:
+                return torch.cat(
+                    [x.mean(dim=0, keepdim=True), x.max(dim=0, keepdim=True).values],
+                    dim=-1,
+                )
+            out = []
+            for b in batch.unique(sorted=True):
+                xb = x[batch == b]
+                out.append(torch.cat([xb.mean(dim=0), xb.max(dim=0).values], dim=-1))
+            return torch.stack(out, dim=0)
+
+
+class GCNNet(torch.nn.Module):
+    def __init__(self, node_feats, channels, out_feats, edge_feats=1):
+        super(GCNNet, self).__init__()
+        self.conv1 = GCNConv(node_feats, channels)
+        self.conv2 = GCNConv(channels, channels)
+        self.conv3 = GCNConv(channels, channels)
+        self.conv4 = GCNConv(channels, channels)
+        self.conv5 = GCNConv(channels, channels)
+        self.conv9 = GCNConv(channels, out_feats)
+
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, p=config.dropout_p, training=self.training)
+        x = self.conv2(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, p=config.dropout_p, training=self.training)
+        x = self.conv3(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, p=config.dropout_p, training=self.training)
+        x = self.conv4(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, p=config.dropout_p, training=self.training)
+        x = self.conv5(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, p=config.dropout_p, training=self.training)
+        x = self.conv9(x, edge_index)
+        return x
+
+
+import torch.nn.functional as F
+from torch.nn import Sequential, Linear, ReLU, GRU
+
+
+class MPNNet(torch.nn.Module):
+    def __init__(self, node_feats, channels, out_feats, loops=1, edge_feats=1):
+        super(MPNNet, self).__init__()
+        self.lin0 = torch.nn.Linear(node_feats, channels)
+        self.loops = loops
+        nn_ = Sequential(
+            Linear(edge_feats, 64), ReLU(), Linear(64, channels * channels)
+        )
+        self.conv = NNConv(channels, channels, nn_, aggr="mean")
+        self.gru = GRU(channels, channels)
+
+        self.lin1 = torch.nn.Linear(channels, channels)
+        self.lin2 = torch.nn.Linear(channels, out_feats)
+
+    def forward(self, data):
+        out = F.relu(self.lin0(data.x))
+        h = out.unsqueeze(0)
+
+        for i in range(self.loops):
+            m = F.relu(self.conv(out, data.edge_index, data.edge_attr))
+            out, h = self.gru(m.unsqueeze(0), h)
+            out = out.squeeze(0)
+
+        out = F.relu(self.lin1(out))
+        out = self.lin2(out)
+        return out
+
+
+## === cell 15
+seed_all(config.seed)
+
+sample0 = train_dataset[0]
+node_feats = int(sample0.x.shape[1])
+out_feats = int(sample0.y.shape[1])
+edge_feats = int(sample0.edge_attr.shape[1])
+
+model = MPNNet(node_feats, 32, out_feats, loops=10, edge_feats=edge_feats).double()
+print(sum(p.numel() for p in model.parameters()))
+optimizer = torch.optim.Adam(model.parameters())
+
+
+## === cell 16
+class MCRMSELoss(torch.nn.Module):
+    def __init__(self):
+        super(MCRMSELoss, self).__init__()
+
+    def forward(self, x, y):
+        x = x[:, :3]
+        y = y[:, :3]
+        msq_error = torch.mean((x - y) ** 2, 0)
+        loss = torch.mean(torch.sqrt(msq_error))
+        return loss
+
+
+
+
+## === cell 17
+class AverageMeter:
+    """
+    Computes and stores the average and current value
+    """
+
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+
+
+
+## === cell 18
+from torch.nn import MSELoss
+import gc
+
+loss_fn = MCRMSELoss()
+
+
+def train(model, optimizer, train_loader):
+    model.train()
+    train_loss = AverageMeter()
+    for batch_idx, data in enumerate(
+        train_loader
+    ):  # Iterate in batches over the training dataset.
+        out = model(data.to(device))  # Perform a single forward pass.
+        loss = loss_fn(out[data.train_mask], data.y)  # Compute the loss.
+        loss.backward()  # Derive gradients.
+        optimizer.step()  # Update parameters based on gradients.
+        optimizer.zero_grad()
+        train_loss.update(loss.item())
+    return train_loss.avg
+
+
+def test(model, val_loader):
+    model.eval()
+    val_loss = AverageMeter()
+    for batch_idx, data in enumerate(
+        val_loader
+    ):  # Iterate in batches over the training/test dataset.
+        out = model(data.to(device))
+        loss = loss_fn(out[data.train_mask], data.y)
+        val_loss.update(
+            loss.item()
+        )  # Compute the loss. # Check against ground-truth labels.
+    return val_loss.avg
+
+
+
+
+## === cell 19
+def train_loop(model, epochs=1):
+    model.to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+    train_loss = []
+    val_loss = []
+    for epoch in range(1, epochs + 1):
+        train_acc = train(model, optimizer, train_loader)
+        val_acc = test(model, val_loader)
+        train_loss.append(train_acc)
+        val_loss.append(val_acc)
+        print(
+            f"Epoch: {epoch:03d}, Train Acc: {train_acc:.4f}, Test Acc: {val_acc:.4f}"
+        )
+    return model, train_loss, val_loss
+
+
+
+
+## === cell 20
+model, train_loss, val_loss = train_loop(model, epochs=50)
+
+
+
+
+## --- ERROR in cell 20, traceback:
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+[0;32m/tmp/ipykernel_11/3257225323.py[0m in [0;36m<cell line: 0>[0;34m()[0m
+[0;32m----> 1[0;31m [0mmodel[0m[0;34m,[0m [0mtrain_loss[0m[0;34m,[0m [0mval_loss[0m [0;34m=[0m [0mtrain_loop[0m[0;34m([0m[0mmodel[0m[0;34m,[0m [0mepochs[0m[0;34m=[0m[0;36m50[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      2[0m [0;34m[0m[0m
+[1;32m      3[0m [0;34m[0m[0m
+
+[0;32m/tmp/ipykernel_11/2047562215.py[0m in [0;36mtrain_loop[0;34m(model, epochs)[0m
+[1;32m      5[0m     [0mval_loss[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m[0;34m[0m[0m
+[1;32m      6[0m     [0;32mfor[0m [0mepoch[0m [0;32min[0m [0mrange[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0mepochs[0m [0;34m+[0m [0;36m1[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0;34m[0m[0m
+[0;32m----> 7[0;31m         [0mtrain_acc[0m [0;34m=[0m [0mtrain[0m[0;34m([0m[0mmodel[0m[0;34m,[0m [0moptimizer[0m[0;34m,[0m [0mtrain_loader[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m      8[0m         [0mval_acc[0m [0;34m=[0m [0mtest[0m[0;34m([0m[0mmodel[0m[0;34m,[0m [0mval_loader[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m      9[0m         [0mtrain_loss[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0mtrain_acc[0m[0;34m)[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m/tmp/ipykernel_11/1118625647.py[0m in [0;36mtrain[0;34m(model, optimizer, train_loader)[0m
+[1;32m     11[0m         [0mtrain_loader[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     12[0m     ):  # Iterate in batches over the training dataset.
+[0;32m---> 13[0;31m         [0mout[0m [0;34m=[0m [0mmodel[0m[0;34m([0m[0mdata[0m[0;34m.[0m[0mto[0m[0;34m([0m[0mdevice[0m[0;34m)[0m[0;34m)[0m  [0;31m# Perform a single forward pass.[0m[0;34m[0m[0;34m[0m[0m
+[0m[1;32m     14[0m         [0mloss[0m [0;34m=[0m [0mloss_fn[0m[0;34m([0m[0mout[0m[0;34m[[0m[0mdata[0m[0;34m.[0m[0mtrain_mask[0m[0;34m][0m[0;34m,[0m [0mdata[0m[0;34m.[0m[0my[0m[0;34m)[0m  [0;31m# Compute the loss.[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     15[0m         [0mloss[0m[0;34m.[0m[0mbackward[0m[0;34m([0m[0;34m)[0m  [0;31m# Derive gradients.[0m[0;34m[0m[0;34m[0m[0m
+
+[0;31mAttributeError[0m: 'list' object has no attribute 'to'
+
+## === cell 21
+def custom_plot_rna(cg, coloring, ax=None):
+    """
+    Edited from https://github.com/ViennaRNA/forgi/blob/master/forgi/visual/mplotlib.py
+    """
+    RNA.cvar.rna_plot_type = 1
+    coords = []
+    bp_string = cg.to_dotbracket_string()
+    if ax is None:
+        ax = plt.gca()
+    vrna_coords = RNA.get_xy_coordinates(bp_string)
+
+    for i, _ in enumerate(bp_string):
+        coord = (vrna_coords.get(i).X, vrna_coords.get(i).Y)
+        coords.append(coord)
+    coords = np.array(coords)
+
+    for i, coord in enumerate(coords):
+        if i < len(coloring):
+            c = cm.coolwarm(coloring[i])
+        else:
+            c = "grey"
+        h, l, s = colorsys.rgb_to_hls(*mc.to_rgb(c))
+        c = colorsys.hls_to_rgb(h, l, s)
+        circle = plt.Circle((coord[0], coord[1]), color=c)
+        ax.add_artist(circle)
+
+    datalim = (
+        (
+            min(list(coords[:, 0]) + [ax.get_xlim()[0]]),
+            min(list(coords[:, 1]) + [ax.get_ylim()[0]]),
+        ),
+        (
+            max(list(coords[:, 0]) + [ax.get_xlim()[1]]),
+            max(list(coords[:, 1]) + [ax.get_ylim()[1]]),
+        ),
+    )
+
+    ax.set_aspect("equal", "datalim")
+    ax.update_datalim(datalim)
+    ax.autoscale_view()
+    ax.set_axis_off()
+
+    return (ax, coords)
+
+
+def plot_structure_with_target_var(idx):
+    sequence = all_data.iloc[idx].sequence
+    structure = all_data.iloc[idx].structure
+
+    fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(16, 4))
+    coloring = all_data.iloc[idx].reactivity
+    coloring = [
+        (c - min(all_data.reactivity[idx]))
+        / (max(all_data.reactivity[idx]) - min(all_data.reactivity[idx]))
+        for c in coloring
+    ]
+    bg = fgb.BulgeGraph.from_fasta_text(f">rna1\n{structure}\n{sequence}")[0]
+    custom_plot_rna(bg, coloring, ax=ax[0])
+    ax[0].set_title("reactivity", fontsize=16)
+
+    coloring = all_data.iloc[idx].deg_Mg_pH10
+    coloring = [
+        (c - min(all_data.deg_Mg_pH10[idx]))
+        / (max(all_data.deg_Mg_pH10[idx]) - min(all_data.deg_Mg_pH10[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[1])
+    ax[1].set_title("deg_Mg_pH10", fontsize=16)
+
+    coloring = all_data.iloc[idx].deg_pH10
+    coloring = [
+        (c - min(all_data.deg_pH10[idx]))
+        / (max(all_data.deg_pH10[idx]) - min(all_data.deg_pH10[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[2])
+    ax[2].set_title("deg_pH10", fontsize=16)
+
+    coloring = all_data.iloc[idx].deg_Mg_50C
+    coloring = [
+        (c - min(all_data.deg_Mg_50C[idx]))
+        / (max(all_data.deg_Mg_50C[idx]) - min(all_data.deg_Mg_50C[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[3])
+    ax[3].set_title("deg_Mg_50C", fontsize=16)
+
+    coloring = all_data.iloc[idx].deg_50C
+    coloring = [
+        (c - min(all_data.deg_50C[idx]))
+        / (max(all_data.deg_50C[idx]) - min(all_data.deg_50C[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[4])
+    ax[4].set_title("deg_50C", fontsize=16)
+
+    plt.show()
+
+
+def plot_structure_with_predicted_var(idx):
+    sequence = all_data.iloc[idx].sequence
+    structure = all_data.iloc[idx].structure
+    try:
+        data = train_dataset[idx]
+    except:
+        data = val_dataset[idx]
+    preds = model(data.to(device)).detach().cpu().numpy()
+    fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(16, 4))
+
+    coloring = preds[:, 0].tolist()
+    coloring = [
+        (c - min(all_data.reactivity[idx]))
+        / (max(all_data.reactivity[idx]) - min(all_data.reactivity[idx]))
+        for c in coloring
+    ]
+    bg = fgb.BulgeGraph.from_fasta_text(f">rna1\n{structure}\n{sequence}")[0]
+    custom_plot_rna(bg, coloring, ax=ax[0])
+    ax[0].set_title("reactivity", fontsize=16)
+
+    coloring = preds[:, 1].tolist()
+    coloring = [
+        (c - min(all_data.deg_Mg_pH10[idx]))
+        / (max(all_data.deg_Mg_pH10[idx]) - min(all_data.deg_Mg_pH10[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[1])
+    ax[1].set_title("deg_Mg_pH10", fontsize=16)
+
+    coloring = preds[:, 2].tolist()
+    coloring = [
+        (c - min(all_data.deg_pH10[idx]))
+        / (max(all_data.deg_pH10[idx]) - min(all_data.deg_pH10[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[2])
+    ax[2].set_title("deg_pH10", fontsize=16)
+
+    coloring = preds[:, 3].tolist()
+    coloring = [
+        (c - min(all_data.deg_Mg_50C[idx]))
+        / (max(all_data.deg_Mg_50C[idx]) - min(all_data.deg_Mg_50C[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[3])
+    ax[3].set_title("deg_Mg_50C", fontsize=16)
+
+    coloring = preds[:, 4].tolist()
+    coloring = [
+        (c - min(all_data.deg_50C[idx]))
+        / (max(all_data.deg_50C[idx]) - min(all_data.deg_50C[idx]))
+        for c in coloring
+    ]
+    custom_plot_rna(bg, coloring, ax=ax[4])
+    ax[4].set_title("deg_50C", fontsize=16)
+
+    plt.show()

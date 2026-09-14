@@ -1,0 +1,990 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+scipy==1.15.3
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+tf_keras==2.18.0
+tqdm==4.67.1
+wandb==0.21.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-6.8426
+
+# 6. Current score
+
+-8.56153
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -8.39439) has done: 'I fix the root import/runtime failure coming from `wandb`/protobuf by making W&B optional and safely disabled by default in this Kaggle environment, which also prevents the downstream `NameError`s (since cell 0 never finished). I also remove the hard dependency on an external `pfutils` module by inlining minimal equivalents (data loading/feature engineering, KFold splitting, model builder, and a Keras `Sequence` generator) that preserve the same core semantics your notebook expects. Finally, I ensure the script always writes a valid `submission.csv` with the exact required columns and row alignment with `sample_submission.csv`, so you get a valid Kaggle submission end-to-end.'
+- What this solution (achieved -8.39073) has done: 'I fix the runtime crash in the first cell caused by an incompatible `wandb`/protobuf import by fully disabling W&B by default and never importing it unless explicitly enabled, which keeps the rest of the pipeline intact. Then I make a minimal, score-improving correction to the submission post-processing: the current code incorrectly takes `abs()` of the FVC predictions (which can flip negative predictions to positive and harm accuracy); instead we only enforce positivity/clipping on the uncertainty (sigma) while leaving the FVC mean unconstrained. This change preserves the trained model and loss, but aligns inference with the metric and should move the score upward toward the target band. The script still train the same way and always write a valid `submission.csv` with the required columns and row order.'
+- What this solution (achieved -8.5417) has done: 'I fix the early runtime crash (`MessageFactory.GetPrototype`) by fully preventing `wandb` (and any protobuf-dependent W&B code) from importing unless explicitly enabled, since it’s not needed for training/submission here. Then I make a minimal, score-improving calibration tweak aligned with the competition metric: learn a single global multiplier for the predicted uncertainty (`Confidence`) using out-of-fold validation predictions, and apply it to test predictions (with the required `>=70` clipping). This keeps your model, loss, folds, and training loop intact while nudging the Laplace log-likelihood upward toward the target by better matching sigma scale to residuals. The script still run end-to-end and always write a valid `submission.csv` with the correct columns and row order.'
+- What this solution (achieved -8.65993) has done: 'I fix the runtime crash in the first cell by preventing `wandb` (which is incompatible with the current protobuf runtime in this environment) from being imported at all unless explicitly enabled, instead of attempting the import and failing before the notebook can proceed. Then I keep your existing training, CV, and sigma-multiplier calibration logic intact, but make fold assignment deterministic-yet-shuffled (seeded) at the patient level so each fold is a more representative mix; this is a minimal change that typically improves generalization and should move the score upward toward your target. Finally, I ensure the pipeline always reaches the submission-writing step and emits a valid `submission.csv` with the correct columns and row order.'
+- What this solution (achieved -8.56153) has done: 'I fix the immediate runtime crash in cell 0 by hard-disabling `wandb` imports (the protobuf incompatibility is triggered even by attempting to import W&B in this environment), so the notebook runs end-to-end again. Then, to move the score upward toward your target with minimal semantic change, I correct the fold construction used by `get_fold_indices()` to match the intended deterministic-but-shuffled patient-level assignment already used during training; previously `fold_pos` could be inconsistent with the actual fold splits (and would break non-generator mode). Finally, I keep your existing sigma-multiplier calibration intact and ensure the submission is always written as `submission.csv` with the required columns and row order.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import math
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+
+from tensorflow.keras import layers, regularizers
+from tensorflow.keras.utils import Sequence
+
+from tqdm import tqdm
+
+os.environ["PYTHONHASHSEED"] = "0"
+np.random.seed(0)
+tf.random.set_seed(0)
+
+WANDB = False
+WandbCallback = None
+wandb = None
+if os.environ.get("WANDB_ENABLE", "0") == "1":
+    try:
+        import wandb  # type: ignore
+        from wandb.keras import WandbCallback  # type: ignore
+
+        WANDB = True
+    except Exception:
+        WANDB = False
+        WandbCallback = None
+        wandb = None
+
+SUBMIT = True
+DATA_GENERATOR = True
+TRAIN_ON_BACKWARD_WEEKS = False
+PSEUDO_TEST_PATIENTS = 0
+
+BASE_PATH = "/kaggle/input/osic-pulmonary-fibrosis-progression"
+TRAIN_CSV = os.path.join(BASE_PATH, "train.csv")
+TEST_CSV = os.path.join(BASE_PATH, "test.csv")
+SAMPLE_SUB_CSV = os.path.join(BASE_PATH, "sample_submission.csv")
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+if SUBMIT:
+    PSEUDO_TEST_PATIENTS = 0
+    WANDB = False
+
+
+
+## === cell 2
+FOLDS = 5
+BATCH_SIZE = 128
+NUMBER_FEATURES = 9
+HIDDEN_LAYERS = [64, 64]
+PREDICT_SLOPE = False
+
+VALUE_GAUSSIAN_NOISE_ON_FVC = 140
+GAUSSIAN_NOISE_CORRELATED = True
+VALUE_GAUSSIAN_NOISE_ON_META = 0.3
+
+ACTIVATION_FUNCTION = "swish"
+MODIFIED_LOSS = True
+
+DROP_OUT_RATE = 0
+DROP_OUT_LAYERS = []
+
+EPOCHS = 250
+
+L2_REGULARIZATION = False
+REGULARIZATION_CONSTANT = 0.0001
+
+INPUT_NORMALIZATION = True
+OUTPUT_NORMALIZATION = True
+
+LEARNING_RATE_SCHEDULER = "exp"  # 'exp', 'cos' or None
+MAX_LEARNING_RATE = 0.001
+COSINE_CYCLES = 5
+EPOCHS_PER_OOM_DECAY = 150
+
+MODEL_NAME = "Submitalotoflosd"
+
+config = dict(
+    NUMBER_FEATURES=NUMBER_FEATURES,
+    L2_REGULARIZATION=L2_REGULARIZATION,
+    INPUT_NORMALIZATION=INPUT_NORMALIZATION,
+    ACTIVATION_FUNCTION=ACTIVATION_FUNCTION,
+    DROP_OUT_RATE=DROP_OUT_RATE,
+    OUTPUT_NORMALIZATION=OUTPUT_NORMALIZATION,
+    EPOCHS=EPOCHS,
+    MAX_LEARNING_RATE=MAX_LEARNING_RATE,
+    MODIFIED_LOSS=MODIFIED_LOSS,
+    VALUE_GAUSSIAN_NOISE_ON_META=VALUE_GAUSSIAN_NOISE_ON_META,
+    COSINE_CYCLES=COSINE_CYCLES,
+    MODEL_NAME=MODEL_NAME,
+    LEARNING_RATE_SCHEDULER=LEARNING_RATE_SCHEDULER,
+    VALUE_GAUSSIAN_NOISE_ON_FVC=VALUE_GAUSSIAN_NOISE_ON_FVC,
+    PREDICT_SLOPE=PREDICT_SLOPE,
+    HIDDEN_LAYERS=HIDDEN_LAYERS,
+    REGULARIZATION_CONSTANT=REGULARIZATION_CONSTANT,
+    EPOCHS_PER_OOM_DECAY=EPOCHS_PER_OOM_DECAY,
+    DROP_OUT_LAYERS=DROP_OUT_LAYERS,
+    BATCH_SIZE=BATCH_SIZE,
+    GAUSSIAN_NOISE_CORRELATED=GAUSSIAN_NOISE_CORRELATED,
+)
+
+
+
+
+## === cell 3
+def _onehot_smoking(df: pd.DataFrame) -> pd.DataFrame:
+    for col in ["Currently smokes", "Ex-smoker", "Never smoked"]:
+        if col not in df.columns:
+            df[col] = 0.0
+    if "SmokingStatus" in df.columns:
+        df["Currently smokes"] = (df["SmokingStatus"] == "Currently smokes").astype(
+            float
+        )
+        df["Ex-smoker"] = (df["SmokingStatus"] == "Ex-smoker").astype(float)
+        df["Never smoked"] = (df["SmokingStatus"] == "Never smoked").astype(float)
+    return df
+
+
+def _encode_sex(df: pd.DataFrame) -> pd.DataFrame:
+    if "Sex" in df.columns:
+        df["Sex"] = (df["Sex"].astype(str).str.lower() == "male").astype(float)
+    return df
+
+
+def get_fold_indices(folds: int, train_df: pd.DataFrame, seed: int = 0):
+    pats = train_df["Patient"].values
+    unique_pats = pd.unique(pats)
+
+    rng = np.random.RandomState(seed)
+    shuffled = unique_pats.copy()
+    rng.shuffle(shuffled)
+    fold_id_by_patient = {p: (i % folds) for i, p in enumerate(shuffled)}
+
+    fold_pos = [0]
+    for f in range(folds):
+        fold_rows = np.where(np.array([fold_id_by_patient[p] for p in pats]) == f)[0]
+        fold_pos.append(fold_pos[-1] + len(fold_rows))
+    return fold_pos
+
+
+def get_exponential_decay_lr_callback(cfg: dict):
+    max_lr = float(cfg["MAX_LEARNING_RATE"])
+    decay_epochs = int(cfg.get("EPOCHS_PER_OOM_DECAY", 150))
+
+    def schedule(epoch, lr):
+        return max_lr * (10 ** (-(epoch / max(decay_epochs, 1))))
+
+    return tf.keras.callbacks.LearningRateScheduler(schedule, verbose=0)
+
+
+def get_cosine_annealing_lr_callback(cfg: dict):
+    max_lr = float(cfg["MAX_LEARNING_RATE"])
+    epochs = int(cfg["EPOCHS"])
+    cycles = int(cfg.get("COSINE_CYCLES", 5))
+
+    def schedule(epoch, lr):
+        if epochs <= 1:
+            return max_lr
+        t = epoch / (epochs - 1)
+        return max_lr * 0.5 * (1 + math.cos(2 * math.pi * cycles * t))
+
+    return tf.keras.callbacks.LearningRateScheduler(schedule, verbose=0)
+
+
+def _laplace_nll_loss(y_true, y_pred):
+    fvc_true = y_true[:, 0:1]
+    fvc_pred = y_pred[:, 0:1]
+    sigma = y_pred[:, 1:2]
+    sigma = tf.maximum(tf.abs(sigma), 70.0)
+    delta = tf.minimum(tf.abs(fvc_true - fvc_pred), 1000.0)
+    sq2 = tf.constant(np.sqrt(2.0), dtype=tf.float32)
+    metric = -(sq2 * delta / sigma) - tf.math.log(sq2 * sigma)
+    return -tf.reduce_mean(metric)
+
+
+def build_model(cfg: dict):
+    n_in = int(cfg["NUMBER_FEATURES"])
+    inp = layers.Input(shape=(n_in,), name="input_features")
+
+    x = inp
+    if cfg.get("INPUT_NORMALIZATION", True):
+        x = layers.LayerNormalization()(x)
+
+    if (
+        cfg.get("VALUE_GAUSSIAN_NOISE_ON_META", 0)
+        and cfg["VALUE_GAUSSIAN_NOISE_ON_META"] > 0
+    ):
+        x = layers.GaussianNoise(float(cfg["VALUE_GAUSSIAN_NOISE_ON_META"]))(x)
+
+    if (
+        cfg.get("VALUE_GAUSSIAN_NOISE_ON_FVC", 0)
+        and cfg["VALUE_GAUSSIAN_NOISE_ON_FVC"] > 0
+    ):
+
+        def add_fvc_noise(t):
+            noise = tf.random.normal(
+                shape=(tf.shape(t)[0], 1),
+                stddev=float(cfg["VALUE_GAUSSIAN_NOISE_ON_FVC"]),
+            )
+            left = t[:, :1]
+            mid = t[:, 1:2] + noise
+            right = t[:, 2:]
+            return tf.concat([left, mid, right], axis=1)
+
+        x = layers.Lambda(add_fvc_noise)(x)
+
+    reg = None
+    if cfg.get("L2_REGULARIZATION", False):
+        reg = regularizers.l2(float(cfg.get("REGULARIZATION_CONSTANT", 1e-4)))
+
+    for i, units in enumerate(cfg["HIDDEN_LAYERS"]):
+        x = layers.Dense(
+            int(units), activation=cfg["ACTIVATION_FUNCTION"], kernel_regularizer=reg
+        )(x)
+        if i in cfg.get("DROP_OUT_LAYERS", []):
+            x = layers.Dropout(float(cfg.get("DROP_OUT_RATE", 0.0)))(x)
+
+    out = layers.Dense(2, activation=None, name="pred")(x)
+
+    model = tf.keras.Model(inputs=inp, outputs=out)
+    opt = tf.keras.optimizers.Adam(learning_rate=float(cfg["MAX_LEARNING_RATE"]))
+
+    if cfg.get("MODIFIED_LOSS", True):
+        loss = _laplace_nll_loss
+    else:
+        loss = "mse"
+
+    model.compile(optimizer=opt, loss=loss)
+    return model
+
+
+def get_train_data(
+    train_csv_path: str,
+    pseudo_test_patients: int,
+    input_normalization: bool,
+    train_on_backward_weeks: bool,
+):
+    train = pd.read_csv(train_csv_path)
+    train = train.sort_values(["Patient", "Weeks"]).reset_index(drop=True)
+    train = _encode_sex(train)
+    train = _onehot_smoking(train)
+
+    g = train.groupby("Patient")
+    rows = []
+    for p, pdf in g:
+        pdf = pdf.sort_values("Weeks")
+        base = pdf.iloc[0]
+        for _, r in pdf.iterrows():
+            weekdiff = float(r["Weeks"] - base["Weeks"])
+            if (not train_on_backward_weeks) and weekdiff < 0:
+                continue
+            rows.append(
+                dict(
+                    Patient=p,
+                    Weeks=float(base["Weeks"]),
+                    FVC=float(base["FVC"]),
+                    Percent=float(base["Percent"]),
+                    Age=float(base["Age"]),
+                    Sex=float(base["Sex"]),
+                    **{
+                        "Currently smokes": float(base["Currently smokes"]),
+                        "Ex-smoker": float(base["Ex-smoker"]),
+                        "Never smoked": float(base["Never smoked"]),
+                    },
+                    Weekdiff_target=weekdiff,
+                    TargetFVC=float(r["FVC"]),
+                )
+            )
+    train_pairs = pd.DataFrame(rows)
+
+    feats = train_pairs[
+        [
+            "Weeks",
+            "FVC",
+            "Percent",
+            "Age",
+            "Sex",
+            "Currently smokes",
+            "Ex-smoker",
+            "Never smoked",
+            "Weekdiff_target",
+        ]
+    ].astype(float)
+    if input_normalization:
+        mu = feats.mean(axis=0)
+        sig = feats.std(axis=0).replace(0, 1.0)
+        feats = (feats - mu) / sig
+        train_pairs.attrs["mu"] = mu
+        train_pairs.attrs["sig"] = sig
+
+    data = {"input_features": feats}
+    labels = pd.DataFrame(
+        {
+            "TargetFVC": train_pairs["TargetFVC"].astype(float),
+            "Dummy": np.zeros(len(train_pairs), dtype=float),
+        }
+    )
+    return train_pairs, data, labels
+
+
+def get_test_data(test_csv_path: str, input_normalization: bool):
+    test = pd.read_csv(test_csv_path)
+    test = test.sort_values(["Patient", "Weeks"]).reset_index(drop=True)
+    test = _encode_sex(test)
+    test = _onehot_smoking(test)
+
+    submission = pd.read_csv(SAMPLE_SUB_CSV)
+    pw = submission["Patient_Week"].str.split("_", expand=True)
+    submission_pat = pw[0].values
+    submission_week = pw[1].astype(int).values
+
+    base_map = test.set_index("Patient").to_dict(orient="index")
+
+    rows = []
+    for p, w in zip(submission_pat, submission_week):
+        base = base_map[p]
+        weekdiff = float(w - base["Weeks"])
+        rows.append(
+            dict(
+                Patient=p,
+                Weeks=float(base["Weeks"]),
+                FVC=float(base["FVC"]),
+                Percent=float(base["Percent"]),
+                Age=float(base["Age"]),
+                Sex=float(base["Sex"]),
+                **{
+                    "Currently smokes": float(base.get("Currently smokes", 0.0)),
+                    "Ex-smoker": float(base.get("Ex-smoker", 0.0)),
+                    "Never smoked": float(base.get("Never smoked", 0.0)),
+                },
+                Weekdiff_target=weekdiff,
+            )
+        )
+    test_pairs = pd.DataFrame(rows)
+    feats = test_pairs[
+        [
+            "Weeks",
+            "FVC",
+            "Percent",
+            "Age",
+            "Sex",
+            "Currently smokes",
+            "Ex-smoker",
+            "Never smoked",
+            "Weekdiff_target",
+        ]
+    ].astype(float)
+
+    return feats, submission
+
+
+def get_pseudo_test_data(
+    train_csv_path: str, pseudo_test_patients: int, input_normalization: bool
+):
+    train = (
+        pd.read_csv(train_csv_path)
+        .sort_values(["Patient", "Weeks"])
+        .reset_index(drop=True)
+    )
+    pats = pd.unique(train["Patient"])
+    pts = pats[: int(pseudo_test_patients)]
+    pseudo = train[train["Patient"].isin(pts)].copy()
+    rows = []
+    checks = []
+    for p, pdf in pseudo.groupby("Patient"):
+        pdf = pdf.sort_values("Weeks")
+        base = pdf.iloc[0]
+        target = pdf.iloc[-1]
+        weekdiff = float(target["Weeks"] - base["Weeks"])
+        rows.append(
+            dict(
+                Patient=p,
+                Weeks=float(base["Weeks"]),
+                FVC=float(base["FVC"]),
+                Percent=float(base["Percent"]),
+                Age=float(base["Age"]),
+                Sex=float((str(base["Sex"]).lower() == "male")),
+                SmokingStatus=str(base["SmokingStatus"]),
+                Weekdiff_target=weekdiff,
+            )
+        )
+        checks.append(dict(Patient=p, TargetFVC=float(target["FVC"])))
+    test_pairs = pd.DataFrame(rows)
+    test_pairs = _encode_sex(test_pairs)
+    test_pairs = _onehot_smoking(test_pairs)
+    feats = test_pairs[
+        [
+            "Weeks",
+            "FVC",
+            "Percent",
+            "Age",
+            "Sex",
+            "Currently smokes",
+            "Ex-smoker",
+            "Never smoked",
+            "Weekdiff_target",
+        ]
+    ].astype(float)
+    check = pd.DataFrame(checks)
+    return feats, check
+
+
+class DataGenerator(Sequence):
+    def __init__(self, list_IDs, cfg, validation=False):
+        self.list_IDs = list_IDs
+        self.cfg = cfg
+        self.validation = validation
+        self.X = np.load("train_data.npy")
+        self.y = np.load("train_labels.npy")
+        self.batch_size = int(cfg["BATCH_SIZE"])
+
+    def __len__(self):
+        return int(np.ceil(len(self.list_IDs) / self.batch_size))
+
+    def __getitem__(self, index):
+        inds = self.list_IDs[index * self.batch_size : (index + 1) * self.batch_size]
+        Xb = self.X[inds].astype(np.float32)
+        yb = self.y[inds].astype(np.float32)
+        return Xb, yb
+
+
+
+
+## === cell 4
+if SUBMIT:
+    test_data, submission = get_test_data(TEST_CSV, INPUT_NORMALIZATION)
+
+train, data, labels = get_train_data(
+    TRAIN_CSV, PSEUDO_TEST_PATIENTS, INPUT_NORMALIZATION, TRAIN_ON_BACKWARD_WEEKS
+)
+
+if INPUT_NORMALIZATION:
+    mu = train.attrs.get("mu", None)
+    sig = train.attrs.get("sig", None)
+    if mu is not None and sig is not None and SUBMIT:
+        test_data = (test_data - mu) / sig
+
+if PSEUDO_TEST_PATIENTS > 0:
+    test_data, test_check = get_pseudo_test_data(
+        TRAIN_CSV, PSEUDO_TEST_PATIENTS, INPUT_NORMALIZATION
+    )
+
+
+
+## === cell 5
+model = build_model(config)
+model.summary()
+
+
+
+## === cell 6
+fold_pos = get_fold_indices(FOLDS, train, seed=0)
+print(fold_pos)
+
+
+
+## === cell 7
+if DATA_GENERATOR:
+    train_data = train[
+        [
+            "Weeks",
+            "FVC",
+            "Percent",
+            "Age",
+            "Sex",
+            "Currently smokes",
+            "Ex-smoker",
+            "Never smoked",
+            "Weekdiff_target",
+        ]
+    ]
+    train_labels = labels[["TargetFVC", "Dummy"]]
+    np.save("train_data.npy", train_data.to_numpy(dtype=np.float32))
+    np.save("train_labels.npy", train_labels.to_numpy(dtype=np.float32))
+
+
+
+
+## === cell 8
+def _laplace_metric_np(fvc_true, fvc_pred, sigma):
+    sigma_clip = np.maximum(np.abs(sigma), 70.0)
+    delta = np.minimum(np.abs(fvc_true - fvc_pred), 1000.0)
+    sq2 = np.sqrt(2.0)
+    metric = -(sq2 * delta / sigma_clip) - np.log(sq2 * sigma_clip)
+    return metric
+
+
+def _calibrate_sigma_multiplier(fvc_true, fvc_pred, sigma_pred):
+    base_sigma = np.maximum(np.abs(sigma_pred), 70.0)
+    fvc_true = np.asarray(fvc_true, dtype=np.float32)
+    fvc_pred = np.asarray(fvc_pred, dtype=np.float32)
+
+    ks = np.array([0.5, 0.7, 0.85, 1.0, 1.15, 1.3, 1.5, 1.8, 2.2], dtype=np.float32)
+    best_k = 1.0
+    best_score = -1e18
+    for k in ks:
+        m = _laplace_metric_np(fvc_true, fvc_pred, base_sigma * k).mean()
+        if m > best_score:
+            best_score = m
+            best_k = float(k)
+    return best_k, float(best_score)
+
+
+predictions = []
+
+oof_fvc_pred = np.zeros(len(train), dtype=np.float32)
+oof_sigma_pred = np.zeros(len(train), dtype=np.float32)
+
+patients = train["Patient"].values
+unique_patients = pd.unique(patients)
+
+rng = np.random.RandomState(0)
+shuffled_patients = unique_patients.copy()
+rng.shuffle(shuffled_patients)
+fold_id_by_patient = {p: (i % FOLDS) for i, p in enumerate(shuffled_patients)}
+fold_ids = np.array([fold_id_by_patient[p] for p in patients])
+
+for fold in range(FOLDS):
+    if DATA_GENERATOR:
+        train_ID = np.where(fold_ids != fold)[0].tolist()
+        val_ID = np.where(fold_ids == fold)[0].tolist()
+        training_generator = DataGenerator(train_ID, config)
+        validation_generator = DataGenerator(val_ID, config, validation=True)
+    else:
+        feats = data["input_features"]
+        x_train = pd.concat(
+            [feats.iloc[: fold_pos[fold]], feats.iloc[fold_pos[fold + 1] :]], axis=0
+        )
+        y_train = pd.concat(
+            [labels.iloc[: fold_pos[fold]], labels.iloc[fold_pos[fold + 1] :]], axis=0
+        )
+        x_val = feats.iloc[fold_pos[fold] : fold_pos[fold + 1]]
+        y_val = labels.iloc[fold_pos[fold] : fold_pos[fold + 1]]
+
+    model = build_model(config)
+
+    sv = tf.keras.callbacks.ModelCheckpoint(
+        f"fold-{fold}.weights.h5",
+        monitor="val_loss",
+        verbose=0,
+        save_best_only=True,
+        save_weights_only=True,
+        mode="min",
+        save_freq="epoch",
+    )
+    callbacks = [sv]
+    if LEARNING_RATE_SCHEDULER == "exp":
+        callbacks.append(get_exponential_decay_lr_callback(config))
+    if LEARNING_RATE_SCHEDULER == "cos":
+        callbacks.append(get_cosine_annealing_lr_callback(config))
+
+    print(fold + 1, "of", FOLDS)
+    if WANDB and wandb is not None and WandbCallback is not None:
+        name = MODEL_NAME + "-F{}".format(fold + 1)
+        config.update({"fold": fold + 1})
+        wandb.init(project="pulfib", name=name, config=config)
+        callbacks.append(WandbCallback())
+
+    if DATA_GENERATOR:
+        _ = model.fit(
+            training_generator,
+            validation_data=validation_generator,
+            epochs=EPOCHS,
+            verbose=0,
+            callbacks=callbacks,
+        )
+    else:
+        _ = model.fit(
+            x_train.to_numpy(dtype=np.float32),
+            y_train.to_numpy(dtype=np.float32),
+            validation_data=(
+                x_val.to_numpy(dtype=np.float32),
+                y_val.to_numpy(dtype=np.float32),
+            ),
+            epochs=EPOCHS,
+            verbose=0,
+            callbacks=callbacks,
+        )
+
+    model.load_weights(f"fold-{fold}.weights.h5")
+
+    val_idx = np.where(fold_ids == fold)[0]
+    val_feats = data["input_features"].iloc[val_idx].to_numpy(dtype=np.float32)
+    val_preds = model.predict(val_feats, batch_size=256, verbose=0).astype(np.float32)
+    oof_fvc_pred[val_idx] = val_preds[:, 0]
+    oof_sigma_pred[val_idx] = val_preds[:, 1]
+
+    if SUBMIT or PSEUDO_TEST_PATIENTS > 0:
+        preds = model.predict(
+            test_data.to_numpy(dtype=np.float32), batch_size=256, verbose=0
+        )
+        predictions.append(preds.astype(np.float32))
+
+    if WANDB and wandb is not None:
+        wandb.finish()
+
+sigma_multiplier = 1.0
+if MODIFIED_LOSS:
+    fvc_true_oof = labels["TargetFVC"].to_numpy(dtype=np.float32)
+    sigma_multiplier, oof_metric = _calibrate_sigma_multiplier(
+        fvc_true_oof, oof_fvc_pred, oof_sigma_pred
+    )
+    print("OOF sigma_multiplier:", sigma_multiplier, "OOF mean metric:", oof_metric)
+
+
+
+## === cell 9
+if SUBMIT:
+    if len(predictions) == 0:
+        raise RuntimeError(
+            "No predictions were generated; check training loop and SUBMIT flag."
+        )
+
+    if PREDICT_SLOPE:
+        preds = np.mean(predictions, axis=0)
+        pw = submission["Patient_Week"].str.split("_", expand=True)
+        weeks = pw[1].astype(int).values
+        weekdiff = test_data["Weekdiff_target"].values.astype(np.float32)
+        base_fvc = test_data["FVC"].values.astype(np.float32)
+        submission["FVC"] = (
+            base_fvc + preds[:, 0].astype(np.float32) * weekdiff
+        ).astype(np.float32)
+        submission["Confidence"] = np.abs(
+            preds[:, 1].astype(np.float32) * weekdiff
+        ).astype(np.float32)
+    else:
+        preds = np.array(predictions, dtype=np.float32)  # [F, N, 2]
+
+        fvc_mean = np.mean(preds[:, :, 0], axis=0)  # [N]
+        sigma_raw = np.abs(preds[:, :, 1])  # [F, N]
+        sigma_var = np.power(sigma_raw, 2)  # average variances
+        sigma = np.sqrt(np.mean(sigma_var, axis=0))  # [N]
+
+        submission["FVC"] = fvc_mean.astype(np.float32)
+        submission["Confidence"] = sigma.astype(np.float32)
+
+    submission["Confidence"] = (
+        submission["Confidence"].values.astype(np.float32) * float(sigma_multiplier)
+    ).astype(np.float32)
+    submission["Confidence"] = np.maximum(submission["Confidence"].values, 70.0)
+
+    submission[["Patient_Week", "FVC", "Confidence"]].to_csv(
+        "submission.csv", index=False
+    )
+    print("Wrote submission.csv with shape:", submission.shape)
+
+
+
+## === cell 10
+import matplotlib.pyplot as plt
+from scipy.stats import gmean
+
+if PSEUDO_TEST_PATIENTS > 0 and len(predictions) > 0:
+    result = []
+    for i in range(-20, 20):
+        postprocess = np.abs(np.array(predictions))
+        if i == 0:
+            postprocess[:, :, 1] = gmean(postprocess[:, :, 1], axis=0)
+            postprocess = np.mean(postprocess, axis=0)
+        else:
+            postprocess[:, :, 1] = np.power(postprocess[:, :, 1], i)
+            postprocess = np.mean(postprocess, axis=0)
+            postprocess[:, 1] = np.power(postprocess[:, 1], 1 / i)
+
+        FVC_true = test_check["TargetFVC"].values
+        FVC_pred = postprocess[:, 0]
+        sigma = postprocess[:, 1]
+
+        sigma_clip = np.maximum(np.abs(sigma), 70)
+        delta = np.abs(FVC_true - FVC_pred)
+        delta = np.minimum(delta, 1000)
+
+        sq2 = np.sqrt(2)
+        loss = (delta / sigma_clip) * sq2 + np.log(sigma_clip * sq2)
+        result.append(np.mean(loss))
+
+    plt.plot(np.arange(-20, 20), result)
+    plt.show()

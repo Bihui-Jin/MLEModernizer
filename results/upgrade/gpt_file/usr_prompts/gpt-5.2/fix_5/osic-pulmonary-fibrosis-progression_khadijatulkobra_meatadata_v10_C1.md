@@ -1,0 +1,779 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pydicom==3.0.1
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-image==0.25.2
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-6.898518445550549
+
+# 6. Current score
+
+-7.659
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -7.61035) has done: 'I fix the pandas `DataFrame.append` removal by replacing it with `pd.concat`, which unblocks the test feature dataframe creation. I also fix the missing pretrained weight file by making the code search for a `.pth` inside `../input` and, if none exists, safely fall back to a deterministic baseline linear extrapolation using the patient’s available training slope (no model/architecture rewrite, just a robust inference fallback so a submission is always produced). Finally, I make confidence always valid for the competition metric by clipping it to at least 70 and ensure the submission rows align exactly to `sample_submission.csv` order and columns.'
+- What this solution (achieved -8.8872) has done: 'Your current score (-7.61035) is worse than the target (-6.8985), so we should improve (increase) the metric with minimal risk. The biggest safe gain without changing your model/training is to make the fallback (used when no `.pth` is found) better match the competition’s setup by using patient-specific trends estimated from training and a more realistic uncertainty: compute a per-patient slope from train, and for test patients (unseen), use the median slope within clinically similar groups (Sex/SmokingStatus) instead of defaulting to 0. Then set `Confidence` to a patient-level residual scale estimated from training (clipped to >=70) rather than a constant 250, which directly targets the Laplace log-likelihood metric. These changes keep the same overall pipeline (still deterministic fallback inference) but should move the score upward toward the target while still producing a valid `submission.csv`.'
+- What this solution (achieved -8.33362) has done: 'Your current score (-8.8872) is below target (-6.8985), so we should increase the metric with minimal risk while keeping the same fallback approach. The biggest safe improvement is to better match the competition’s evaluation by (1) predicting the *final three weeks* per patient from `sample_submission.csv` using a patient-level linear trend fitted on train, and (2) setting `Confidence` to the *expected absolute error* for those horizons (week offsets) instead of a generic residual MAE, then clipping to ≥70. This keeps the same core logic (linear per-patient extrapolation + group fallback; no model/training changes) but makes the confidence more calibrated to the Laplace log-likelihood metric and avoids wasting effort on unscored weeks. I also ensure the output rows align exactly to `sample_submission.csv` order to prevent silent row-misalignment score drops.'
+- What this solution (achieved -7.659) has done: 'Your current score (-8.33362) is below the target (-6.8985), so we should improve (increase) the metric with minimal risk while keeping your core approach (patient-linear extrapolation fallback + horizon-based confidence). The biggest safe gain is to better calibrate predictions by shrinking extreme per-patient slopes toward a reliable group/global slope (reduces large errors that get clipped at 1000 and hurt the log-likelihood), without changing the model/training logic. I also make the confidence calibration consistent with the Laplace metric by using a per-horizon *expected sigma* estimate (median absolute error × sqrt(2)), then clipping to ≥70 as required. Finally, I keep submission row alignment identical to `sample_submission.csv` as you already do.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import pydicom
+import os
+import scipy.ndimage
+import matplotlib.pyplot as plt
+import sklearn
+from sklearn.preprocessing import normalize
+from tqdm.auto import tqdm
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from skimage import measure, morphology
+from sklearn.preprocessing import normalize
+
+from torch.utils.data import DataLoader
+from torch.utils.data import TensorDataset
+
+
+
+
+## === cell 1
+def csv_preprocess(data):
+
+    data["Healthy-FVC"] = round((data["FVC"] * 100) / data["Percent"])
+    FE = []
+    FE.append("Healthy-FVC")
+
+    COLS = ["Sex", "SmokingStatus"]
+    for col in COLS:
+        for mod in data[col].unique():
+            FE.append(mod)
+            data[mod] = (data[col] == mod).astype(int)
+
+    data = data[["Patient", "Weeks", "FVC", "Age"] + FE]
+    data = data.sort_values(["Patient", "Weeks"], ascending=True).reset_index(drop=True)
+
+    FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+    rename_col = {"Weeks": "base_Weeks", "FVC": "base_FVC"}
+    data = data.rename(columns=rename_col)
+
+    npData = pd.DataFrame(
+        columns=["Patient", "base_Weeks", "base_FVC", "Age"]
+        + FE1
+        + ["Week", "Healthy-FVC", "actual_FVC"]
+    )
+
+    for pid in data["Patient"].unique():
+        weeks = data.loc[data["Patient"] == pid].base_Weeks
+        fvc = data.loc[data["Patient"] == pid].base_FVC
+        index = data.loc[data["Patient"] == pid].index
+        weeks.reset_index(inplace=True, drop=True)
+        fvc.reset_index(inplace=True, drop=True)
+        for k in range(len(weeks)):
+            npData = pd.concat([npData, data.loc[data.index == index[0]]], sort=False)
+            npData.iloc[-1, npData.columns.get_loc("Week")] = weeks[k]
+            npData.iloc[-1, npData.columns.get_loc("actual_FVC")] = fvc[k]
+    npData.reset_index(inplace=True, drop=True)
+    npData = npData.fillna(0)
+
+    return npData
+
+
+
+
+## === cell 2
+class SIGMA(nn.Module):
+    def __init__(self):
+        super(SIGMA, self).__init__()
+        self.data_net1 = nn.Sequential(
+            nn.Linear(10, 42),
+            nn.ReLU(),
+            nn.Linear(42, 64),
+            nn.ReLU(),
+            nn.Linear(64, 118),
+            nn.ReLU(),
+        )
+        self.data_net2 = nn.Sequential(
+            nn.Linear(128, 256), nn.ReLU(), nn.Linear(256, 502), nn.ReLU()
+        )
+        self.data_net3 = nn.Sequential(
+            nn.Linear(512, 256), nn.ReLU(), nn.Linear(256, 118), nn.ReLU()
+        )
+        self.data_net4 = nn.Sequential(
+            nn.Linear(748, 256),
+            nn.ReLU(),
+            nn.Linear(256, 64),
+            nn.ReLU(),
+            nn.Linear(64, 3),
+            nn.ReLU(),
+        )
+
+    def forward(self, data_i):
+        out1 = self.data_net1(data_i)
+        out2 = torch.cat((data_i, out1), dim=-1)
+        out2 = self.data_net2(out2)
+        out3 = torch.cat((data_i, out2), dim=-1)
+        out3 = self.data_net3(out3)
+        out4 = torch.cat((data_i, out1, out2, out3), dim=-1)
+        out = self.data_net4(out4)
+        return out
+
+
+
+
+## === cell 3
+C1, C2 = torch.tensor(70, dtype=torch.float32), torch.tensor(1000, dtype=torch.float32)
+
+
+def score(y_true, y_pred):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    fvc_pred = y_pred[:, 1]
+    delta = (y_true[:, 0] - fvc_pred).abs()
+    sq2 = torch.tensor(2.0).sqrt()
+    metric = (delta / sigma) * sq2 + (sigma * sq2).log()
+    return (metric).mean()
+
+
+def closs(y_true, y_pred):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    e = torch.abs(y_true - y_pred[:, 1])
+    loss = torch.abs(sigma - e)
+    return loss
+
+
+def quartile_loss(y_true, y_pred):
+    loss = score(y_true, y_pred)
+    return loss
+
+
+
+
+## === cell 4
+def make_eval_data(npEval, model, device="cuda"):
+    x_features = npEval[
+        [
+            "base_Weeks",
+            "base_FVC",
+            "Age",
+            "Male",
+            "Female",
+            "Ex-smoker",
+            "Never smoked",
+            "Currently smokes",
+            "Week",
+            "Healthy-FVC",
+        ]
+    ]
+    x_features = torch.tensor(x_features.values).float()
+    x_patientids_name = npEval[["Patient"]].values
+
+    if model is None:
+        raise ValueError(
+            "Model is None; cannot run make_eval_data(). Use the baseline fallback instead."
+        )
+
+    if torch.cuda.is_available() and device == "cuda":
+        model.to("cuda")
+    model.eval()
+    predictions = []
+    for i, patientid in enumerate(x_patientids_name):
+        x_feature = x_features[i].unsqueeze(0)
+        if torch.cuda.is_available() and device == "cuda":
+            x_feature = x_feature.cuda()
+        with torch.no_grad():
+            prediction = model(x_feature)
+        predictions.append(prediction.to("cpu").detach().numpy()[0])
+
+    predictions = np.array(predictions)
+    npEval["FVC"] = predictions[:, 1]
+    npEval["Confidence"] = predictions[:, 2] - predictions[:, 0]
+
+    return npEval
+
+
+
+
+## === cell 5
+DATA_DIR = "../input/osic-pulmonary-fibrosis-progression"
+
+data_train = pd.read_csv(os.path.join(DATA_DIR, "train.csv"))
+data_test = pd.read_csv(os.path.join(DATA_DIR, "test.csv"))
+submission = pd.read_csv(os.path.join(DATA_DIR, "sample_submission.csv"))
+
+
+
+## === cell 6
+submission["Patient"] = submission["Patient_Week"].apply(lambda x: x.split("_")[0])
+submission["Weeks"] = (
+    submission["Patient_Week"].apply(lambda x: x.split("_")[1]).astype(int)
+)
+submission = submission.sort_values(
+    by=["Patient", "Weeks"], ascending=True
+).reset_index(drop=True)
+
+
+
+## === cell 7
+merge = (
+    pd.merge(data_test, submission, on=["Patient"], how="left")
+    .sort_values(["Patient", "Weeks_y"])
+    .reset_index(drop=True)
+)
+merge = merge.drop(["FVC_y"], axis=1)
+merge = merge.rename(
+    columns={"FVC_x": "base_FVC", "Weeks_y": "Week", "Weeks_x": "base_Weeks"}
+)
+
+del data_test
+
+data_test = merge.loc[
+    :,
+    [
+        "Patient",
+        "base_Weeks",
+        "base_FVC",
+        "Percent",
+        "Age",
+        "Sex",
+        "SmokingStatus",
+        "Week",
+    ],
+]
+submission_skel = merge.loc[:, ["Patient_Week"]].copy()
+
+
+
+## === cell 8
+data = data_test.copy()
+data["Healthy-FVC"] = round((data["base_FVC"] * 100) / data["Percent"])
+FE = []
+FE.append("Healthy-FVC")
+
+COLS = ["Sex", "SmokingStatus"]
+for col in COLS:
+    for mod in data[col].unique():
+        FE.append(mod)
+        data[mod] = (data[col] == mod).astype(int)
+
+FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+npData = pd.DataFrame(
+    columns=["Patient", "base_Weeks", "base_FVC", "Age", "Healthy-FVC"] + FE1 + ["Week"]
+)
+
+npData = pd.concat([npData, data], ignore_index=True, sort=True)
+npData = npData.fillna(0)
+
+del data_test, data
+data_test = npData[
+    [
+        "Patient",
+        "base_Weeks",
+        "base_FVC",
+        "Age",
+        "Healthy-FVC",
+        "Male",
+        "Female",
+        "Ex-smoker",
+        "Never smoked",
+        "Currently smokes",
+        "Week",
+    ]
+].copy()
+del npData
+
+
+
+
+## === cell 9
+def find_any_pth_under_input():
+    base = "../input"
+    matches = []
+    for root, _, files in os.walk(base):
+        for fn in files:
+            if fn.lower().endswith(".pth"):
+                matches.append(os.path.join(root, fn))
+    return sorted(matches)
+
+
+def _fit_patient_linear_stats(train_df):
+    train_simple = train_df[["Patient", "Weeks", "FVC", "Sex", "SmokingStatus"]].copy()
+    train_simple["Sex"] = train_simple["Sex"].astype(str)
+    train_simple["SmokingStatus"] = train_simple["SmokingStatus"].astype(str)
+
+    rows = []
+    for pid, g in train_simple.groupby("Patient"):
+        g = g.sort_values("Weeks")
+        w = g["Weeks"].values.astype(np.float64)
+        y = g["FVC"].values.astype(np.float64)
+        sex = g["Sex"].iloc[0]
+        smk = g["SmokingStatus"].iloc[0]
+        if len(g) >= 2 and np.std(w) > 1e-9:
+            b = np.cov(w, y, bias=True)[0, 1] / (np.var(w) + 1e-12)
+            a = float(np.mean(y) - b * np.mean(w))
+            yhat = a + b * w
+            resid = y - yhat
+            resid_mae = float(np.mean(np.abs(resid)))
+        else:
+            b = 0.0
+            resid_mae = float(np.mean(np.abs(y - np.mean(y)))) if len(y) else 0.0
+        rows.append((pid, sex, smk, float(b), float(resid_mae)))
+
+    stats = pd.DataFrame(
+        rows, columns=["Patient", "Sex", "SmokingStatus", "slope", "resid_mae"]
+    )
+    return stats
+
+
+def _calibrate_horizon_mae_from_train(train_df, stats_df):
+    """
+    Metric-driven calibration:
+    - competition uses Laplace log-likelihood with sigma (>=70)
+    - for Laplace, E[|err|] ~= sigma / sqrt(2)  => sigma ~= E[|err|] * sqrt(2)
+    We estimate horizon->median(|err|) under the same linear prediction rule, then convert to sigma.
+    """
+    stats_map = stats_df.set_index("Patient")[["slope"]]
+
+    base = (
+        train_df.sort_values(["Patient", "Weeks"])
+        .groupby("Patient", as_index=False)
+        .first()[["Patient", "Weeks", "FVC"]]
+        .rename(columns={"Weeks": "base_Weeks", "FVC": "base_FVC"})
+    )
+
+    df = train_df.merge(base, on="Patient", how="left")
+    df = df.merge(stats_map, on="Patient", how="left")
+    df["slope"] = df["slope"].fillna(0.0).astype(np.float64)
+
+    df["horizon"] = (
+        df["Weeks"].astype(np.float64) - df["base_Weeks"].astype(np.float64)
+    ).abs()
+    df["pred"] = df["base_FVC"].astype(np.float64) + df["slope"] * (
+        df["Weeks"].astype(np.float64) - df["base_Weeks"].astype(np.float64)
+    )
+    df["abs_err"] = (df["FVC"].astype(np.float64) - df["pred"]).abs()
+
+    bins = np.array([0, 4, 8, 12, 20, 30, 40, 60, 80, 120, 1e9], dtype=np.float64)
+    labels = np.arange(len(bins) - 1)
+    df["hbin"] = pd.cut(
+        df["horizon"], bins=bins, labels=labels, include_lowest=True
+    ).astype(int)
+
+    mae_by_bin = df.groupby("hbin")["abs_err"].median()
+    global_mae = float(df["abs_err"].median()) if len(df) else 250.0
+
+    return {"bins": bins, "mae_by_bin": mae_by_bin.to_dict(), "global_mae": global_mae}
+
+
+def baseline_predict_from_train(data_test_df, train_df):
+    """
+    Deterministic fallback (same core logic: linear extrapolation):
+    - Small improvement toward target score: shrink noisy/extreme per-patient slopes toward group/global medians.
+      This typically reduces big horizon errors and improves Laplace log-likelihood.
+    - Small metric-aligned improvement: convert horizon MAE into Laplace sigma via sqrt(2), then clip to >=70.
+    """
+    stats = _fit_patient_linear_stats(train_df)
+    calib = _calibrate_horizon_mae_from_train(train_df, stats)
+
+    slope_by_patient = stats.set_index("Patient")["slope"]
+    group_slope = stats.groupby(["Sex", "SmokingStatus"])["slope"].median()
+    global_slope = float(stats["slope"].median()) if len(stats) else 0.0
+
+    alpha_patient = 0.70  # 1.0=no shrink; 0.0=all group/global
+
+    out = data_test_df.copy()
+
+    def infer_sex(row):
+        if "Male" in row and float(row["Male"]) == 1.0:
+            return "Male"
+        if "Female" in row and float(row["Female"]) == 1.0:
+            return "Female"
+        return "Unknown"
+
+    def infer_smk(row):
+        if "Ex-smoker" in row and float(row["Ex-smoker"]) == 1.0:
+            return "Ex-smoker"
+        if "Never smoked" in row and float(row["Never smoked"]) == 1.0:
+            return "Never smoked"
+        if "Currently smokes" in row and float(row["Currently smokes"]) == 1.0:
+            return "Currently smokes"
+        return "Unknown"
+
+    sex = out.apply(infer_sex, axis=1)
+    smk = out.apply(infer_smk, axis=1)
+
+    patient_slope = out["Patient"].map(slope_by_patient)
+    group_slope_val = pd.Series(
+        [group_slope.get((s, t), np.nan) for s, t in zip(sex, smk)], index=out.index
+    )
+    fallback = group_slope_val.fillna(global_slope).astype(np.float64)
+
+    raw = patient_slope.astype(np.float64)
+    slope = raw.where(raw.notna(), fallback)
+    slope = slope.where(
+        raw.isna(), alpha_patient * raw + (1.0 - alpha_patient) * fallback
+    )
+    slope = slope.fillna(global_slope).astype(np.float64)
+
+    base_w = out["base_Weeks"].astype(np.float64).values
+    base_f = out["base_FVC"].astype(np.float64).values
+    w = out["Week"].astype(np.float64).values
+    pred = base_f + slope.values * (w - base_w)
+
+    horizon = np.abs(w - base_w).astype(np.float64)
+    bins = calib["bins"]
+    mae_by_bin = calib["mae_by_bin"]
+    global_mae = float(calib["global_mae"])
+
+    hbin = np.digitize(horizon, bins[1:], right=True)  # 0..len(bins)-2
+    mae = np.array([mae_by_bin.get(int(b), global_mae) for b in hbin], dtype=np.float64)
+
+    sigma = mae * np.sqrt(2.0)
+
+    out["FVC"] = pred
+    out["Confidence"] = np.maximum(sigma, 70.0)
+    return out
+
+
+pth_candidates = find_any_pth_under_input()
+
+model = None
+loaded_weight_path = None
+if len(pth_candidates) > 0:
+    try:
+        model = SIGMA()
+        loaded_weight_path = pth_candidates[0]
+        state = torch.load(loaded_weight_path, map_location="cpu")
+        model.load_state_dict(state)
+    except Exception:
+        model = None
+        loaded_weight_path = None
+
+if model is not None:
+    test = make_eval_data(
+        data_test.copy(), model, device="cuda" if torch.cuda.is_available() else "cpu"
+    )
+else:
+    test = baseline_predict_from_train(data_test.copy(), data_train)
+
+
+
+## === cell 10
+for nid in test.Patient.unique():
+    idx = test[(test.Patient == nid) & (test.Week == test.base_Weeks)].index.values
+    if len(idx) > 0:
+        test.iloc[idx[0], test.columns.get_loc("FVC")] = test.iloc[
+            idx[0], test.columns.get_loc("base_FVC")
+        ]
+        test.iloc[idx[0], test.columns.get_loc("Confidence")] = 70.0
+
+test["Confidence"] = pd.to_numeric(test["Confidence"], errors="coerce").fillna(70.0)
+test.loc[test.Confidence < 70, "Confidence"] = 70.0
+
+test["FVC"] = (
+    pd.to_numeric(test["FVC"], errors="coerce").fillna(test["base_FVC"]).astype(float)
+)
+
+
+
+## === cell 11
+final = submission_skel.copy().reset_index(drop=True)
+test = test.reset_index(drop=True)
+
+if len(final) != len(test):
+    raise RuntimeError(
+        f"Row count mismatch: submission_skel={len(final)} vs preds={len(test)}"
+    )
+
+final["FVC"] = test["FVC"].values
+final["Confidence"] = test["Confidence"].values
+
+final = final[["Patient_Week", "FVC", "Confidence"]]
+final.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with shape:", final.shape)
+if loaded_weight_path is not None:
+    print("Loaded weights from:", loaded_weight_path)
+else:
+    print("No .pth weights found/loaded; used deterministic baseline fallback.")

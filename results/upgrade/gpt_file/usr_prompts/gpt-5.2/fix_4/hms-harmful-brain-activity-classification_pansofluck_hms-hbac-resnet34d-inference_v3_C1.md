@@ -1,0 +1,726 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect and classify harmful brain activity in electroencephalography (EEG) data: seizure (SZ), generalized periodic discharges (GPD), lateralized periodic discharges (LPD), lateralized rhythmic delta activity (LRDA), generalized rhythmic delta activity (GRDA), or "other".
+
+## Metric
+Kullback Liebler divergence between the predicted probability and the observed target.
+
+## Submission Format
+For each `eeg_id` in the test set, you must predict a probability for each of the `vote` columns. The file should contain a header and have the following format:
+
+```
+eeg_id,seizure_vote,lpd_vote,gpd_vote,lrda_vote,grda_vote,other_vote\
+0,0.166,0.166,0.167,0.167,0.167,0.167\
+1,0.166,0.166,0.167,0.167,0.167,0.167\
+etc.
+```
+
+Your total predicted probabilities for each row must sum to one or your submission will fail.
+
+## Dataset
+**train.csv** Metadata for the train set. The expert annotators reviewed 50 second long EEG samples plus matched spectrograms covering 10 a minute window centered at the same time and labeled the central 10 seconds. Many of these samples overlapped and have been consolidated. `train.csv` provides the metadata that allows you to extract the original subsets that the raters annotated.
+
+- `eeg_id` - A unique identifier for the entire EEG recording.
+- `eeg_sub_id` - An ID for the specific 50 second long subsample this row's labels apply to.
+- `eeg_label_offset_seconds` - The time between the beginning of the consolidated EEG and this subsample.
+- `spectrogram_id` - A unique identifier for the entire EEG recording.
+- `spectrogram_sub_id` - An ID for the specific 10 minute subsample this row's labels apply to.
+- `spectogram_label_offset_seconds` - The time between the beginning of the consolidated spectrogram and this subsample.
+- `label_id` - An ID for this set of labels.
+- `patient_id` - An ID for the patient who donated the data.
+- `expert_consensus` - The consensus annotator label. Provided for convenience only.
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The count of annotator votes for a given brain activity class. The full names of the activity classes are as follows: `lpd`: lateralized periodic discharges, `gpd`: generalized periodic discharges, `lrd`: lateralized rhythmic delta activity, and `grda`: generalized rhythmic delta activity . A detailed explanations of these patterns is [available here.](https://www.acns.org/UserFiles/file/ACNSStandardizedCriticalCareEEGTerminology_rev2021.pdf)
+
+**test.csv** Metadata for the test set. As there are no overlapping samples in the test set, many columns in the train metadata don't apply.
+
+- `eeg_id`
+- `spectrogram_id`
+- `patient_id`
+
+**sample_submission.csv**
+
+- `eeg_id`
+- `[seizure/lpd/gpd/lrda/grda/other]_vote` - The target columns. Your predictions must be probabilities. Note that the test samples had between 3 and 20 annotators.
+
+**train_eegs/** EEG data from one or more overlapping samples. Use the metadata in train.csv to select specific annotated subsets. The column names are [the names of the individual electrode locations for EEG leads](https://en.wikipedia.org/wiki/10%E2%80%9320_system_%28EEG%29), with one exception. The EKG column is for an electrocardiogram lead that records data from the heart. All of the EEG data (for both train and test) was collected at a frequency of 200 samples per second.
+
+**test_eegs/** Exactly 50 seconds of EEG data.
+
+train_spectrograms/ Spectrograms assembled EEG data. Use the metadata in train.csv to select specific annotated subsets. The column names indicate the frequency in hertz and the recording regions of the EEG electrodes. The latter are abbreviated as LL = left lateral; RL = right lateral; LP = left parasagittal; RP = right parasagittal.
+
+**test_spectrograms/** Spectrograms assembled using exactly 10 minutes of EEG data.
+
+**example_figures/** Larger copies of the example case images used on the overview tab.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+PyYAML==6.0.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        input/
+            description.md (166 lines)
+            example_figures.zip (14.8 MB)
+            sample_submission.csv (9851 lines)
+            sample_submission.csv.zip (19.0 kB)
+            test.csv (9851 lines)
+            test.csv.zip (22.8 kB)
+            test_eegs.zip (1.5 GB)
+            test_spectrograms.zip (346.5 MB)
+            train.csv (96951 lines)
+            train.csv.zip (1.6 MB)
+            train_eegs.zip (14.4 GB)
+            train_spectrograms.zip (3.2 GB)
+            example_figures/
+                Sample01.pdf (914.3 kB)
+                Sample02.pdf (703.4 kB)
+                ... and 18 other files
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+            test_eegs/
+                1001717358.parquet (3.1 MB)
+                1003353736.parquet (972.5 kB)
+                ... and 1691 other files
+            test_spectrograms/
+                1002209002.parquet (713.8 kB)
+                1005228554.parquet (648.5 kB)
+                ... and 1112 other files
+            train_eegs/
+                1000913311.parquet (980.2 kB)
+                1001369401.parquet (1.2 MB)
+                ... and 15394 other files
+            train_spectrograms/
+                1000086677.parquet (564.7 kB)
+                1000189855.parquet (672.7 kB)
+                ... and 10022 other files
+        working/
+            hms-harmful-brain-activity-classification/
+                description.md (166 lines)
+                example_figures.zip (14.8 MB)
+                ... and 10 other files
+                example_figures/
+                    Sample01.pdf (914.3 kB)
+                    Sample02.pdf (703.4 kB)
+                    ... and 18 other files
+                hms-harmful-brain-activity-classification/
+                test_eegs/
+                    1001717358.parquet (3.1 MB)
+                    1003353736.parquet (972.5 kB)
+                    ... and 1691 other files
+                test_spectrograms/
+                    1002209002.parquet (713.8 kB)
+                    1005228554.parquet (648.5 kB)
+                    ... and 1112 other files
+                train_eegs/
+                    1000913311.parquet (980.2 kB)
+                    1001369401.parquet (1.2 MB)
+                    ... and 15394 other files
+                train_spectrograms/
+                    1000086677.parquet (564.7 kB)
+                    1000189855.parquet (672.7 kB)
+                    ... and 10022 other files
+```
+
+-> data/hms-harmful-brain-activity-classification/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/hms-harmful-brain-activity-classification/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/hms-harmful-brain-activity-classification/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/sample_submission.csv has 9850 rows and 7 columns.
+The columns are: eeg_id, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> data/test.csv has 9850 rows and 3 columns.
+The columns are: spectrogram_id, eeg_id, patient_id
+
+-> data/train.csv has 96950 rows and 15 columns.
+The columns are: eeg_id, eeg_sub_id, eeg_label_offset_seconds, spectrogram_id, spectrogram_sub_id, spectrogram_label_offset_seconds, label_id, patient_id, expert_consensus, seizure_vote, lpd_vote, gpd_vote, lrda_vote, grda_vote, other_vote
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.5744040164959602
+
+# 6. Current score
+
+1.40995
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.40995) has done: 'I make the pipeline robust to missing pretrained fold weights by falling back to a valid baseline submission (uniform probabilities) so the notebook always produces `submission.csv` end-to-end. I also fix the `MergeError` by avoiding a strict one-to-one merge/validate and instead aligning predictions to `sample_submission` order via a mapping keyed by `eeg_id`, which is safe even if duplicates exist. These changes are score-neutral when weights are available (the original inference path is preserved), and they ensure a valid CSV is always written with rows summing to 1. Finally, I keep the same core model/dataset/inference logic untouched when weights exist.'
+- What this solution (achieved 1.40995) has done: 'Your current score (1.40995, lower-is-better) suggests the notebook is falling back to the uniform-probability baseline at inference time, which usually happens when the fold weight files aren’t found/loaded. The smallest change that should move you toward the target is to correctly resolve the real weights directory inside the provided dataset tree and to make the weight-loading robust to the common checkpoint formats (raw `state_dict` vs nested dict). I keep the same model, preprocessing, inference loop, and ensembling; the only changes are (1) broader weight-path discovery (including nested input/data locations) and (2) safer checkpoint parsing so weights actually load, avoiding the uniform fallback. This should improve the KL score substantially without changing the core approach.'
+
+# 9. Code solution
+
+## === cell 0
+import sys
+import os
+import gc
+import copy
+import yaml
+import random
+import shutil
+from time import time
+import typing as tp
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from tqdm.notebook import tqdm
+from sklearn.model_selection import StratifiedGroupKFold
+
+import torch
+from torch import nn
+from torch import optim
+from torch.optim import lr_scheduler
+from torch.cuda import amp
+
+import timm
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+
+
+## === cell 1
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+
+
+## === cell 2
+ROOT = Path.cwd().parent
+INPUT = ROOT / "input"
+OUTPUT = ROOT / "output"
+SRC = ROOT / "src"
+
+DATA = INPUT / "hms-harmful-brain-activity-classification"
+TRAIN_SPEC = DATA / "train_spectrograms"
+TEST_SPEC = DATA / "test_spectrograms"
+
+TRAINED_MODEL = INPUT / "hms-hbac-resnet34-baseline"
+
+TMP = ROOT / "tmp"
+TRAIN_SPEC_SPLIT = TMP / "train_spectrograms_split"
+TEST_SPEC_SPLIT = TMP / "test_spectrograms_split"
+TMP.mkdir(exist_ok=True)
+TRAIN_SPEC_SPLIT.mkdir(exist_ok=True)
+TEST_SPEC_SPLIT.mkdir(exist_ok=True)
+
+RANDAM_SEED = 1086
+CLASSES = [
+    "seizure_vote",
+    "lpd_vote",
+    "gpd_vote",
+    "lrda_vote",
+    "grda_vote",
+    "other_vote",
+]
+N_CLASSES = len(CLASSES)
+FOLDS = [0, 1, 2, 3, 4]
+N_FOLDS = len(FOLDS)
+
+
+
+
+## === cell 3
+def resolve_trained_model_dir(preferred: Path) -> tp.Optional[Path]:
+    """
+    Change rationale (score-relevant, minimal):
+    Your current score strongly indicates we are falling back to uniform predictions
+    because the fold weight files are not being found. Kaggle datasets are often
+    nested under INPUT/ or INPUT/data/ or inside the competition folder.
+    This expands the search locations without changing any modeling logic.
+    """
+    if preferred is not None and preferred.exists():
+        return preferred
+
+    search_roots: tp.List[Path] = []
+    if INPUT.exists():
+        search_roots.append(INPUT)
+        if (INPUT / "data").exists():
+            search_roots.append(INPUT / "data")
+        if (INPUT / "hms-harmful-brain-activity-classification").exists():
+            search_roots.append(INPUT / "hms-harmful-brain-activity-classification")
+        if (INPUT / "data" / "hms-harmful-brain-activity-classification").exists():
+            search_roots.append(
+                INPUT / "data" / "hms-harmful-brain-activity-classification"
+            )
+
+    candidates: tp.List[Path] = []
+    for root in search_roots:
+        for p in root.iterdir():
+            if p.is_dir() and (p / "best_model_fold0.pth").exists():
+                candidates.append(p)
+        for p in root.iterdir():
+            if p.is_dir():
+                for q in p.iterdir():
+                    if q.is_dir() and (q / "best_model_fold0.pth").exists():
+                        candidates.append(q)
+
+    seen = set()
+    uniq_candidates = []
+    for c in candidates:
+        if str(c) not in seen:
+            uniq_candidates.append(c)
+            seen.add(str(c))
+    candidates = uniq_candidates
+
+    if len(candidates) == 1:
+        return candidates[0]
+    if len(candidates) > 1:
+        for p in candidates:
+            name = p.name.lower()
+            if (
+                ("resnest" in name)
+                or ("resnet" in name)
+                or ("baseline" in name)
+                or ("hbac" in name)
+            ):
+                return p
+        return candidates[0]
+
+    return None
+
+
+TRAINED_MODEL = resolve_trained_model_dir(TRAINED_MODEL)
+print("Resolved TRAINED_MODEL directory:", TRAINED_MODEL)
+
+
+
+## === cell 4
+test = pd.read_csv(DATA / "test.csv")
+sample_sub = pd.read_csv(DATA / "sample_submission.csv")
+
+assert "eeg_id" in test.columns
+assert "eeg_id" in sample_sub.columns
+assert list(sample_sub.columns) == ["eeg_id"] + CLASSES
+
+
+
+## === cell 5
+existing = set(p.stem for p in TEST_SPEC_SPLIT.glob("*.npy"))
+need = [int(s) for s in test["spectrogram_id"].values if str(s) not in existing]
+
+for spec_id in tqdm(need, desc="Caching test spectrograms to .npy"):
+    spec = pd.read_parquet(TEST_SPEC / f"{spec_id}.parquet")
+    spec_arr = spec.fillna(0).values[:, 1:].T.astype("float32")  # (Hz, Time)
+    spec_arr = np.nan_to_num(spec_arr, nan=0.0, posinf=0.0, neginf=0.0)
+    np.save(TEST_SPEC_SPLIT / f"{spec_id}.npy", spec_arr)
+
+print(
+    f"Cached/available test spectrograms: {len(list(TEST_SPEC_SPLIT.glob('*.npy')))} / {len(test)}"
+)
+
+
+
+
+## === cell 6
+class HMSHBACSpecModel(nn.Module):
+    def __init__(
+        self,
+        model_name: str,
+        pretrained: bool,
+        in_channels: int,
+        num_classes: int,
+    ):
+        super().__init__()
+        self.model = timm.create_model(
+            model_name=model_name,
+            pretrained=pretrained,
+            num_classes=num_classes,
+            in_chans=in_channels,
+        )
+
+    def forward(self, x):
+        h = self.model(x)
+        return h
+
+
+
+
+## === cell 7
+FilePath = tp.Union[str, Path]
+Label = tp.Union[int, float, np.ndarray]
+
+
+class HMSHBACSpecDataset(torch.utils.data.Dataset):
+    def __init__(
+        self,
+        image_paths: tp.Sequence[FilePath],
+        labels: tp.Sequence[Label],
+        transform: A.Compose,
+    ):
+        self.image_paths = image_paths
+        self.labels = labels
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, index: int):
+        img_path = self.image_paths[index]
+        label = self.labels[index]
+
+        img = np.load(img_path)  # (Hz, Time)
+
+        img = np.clip(img, np.exp(-4), np.exp(8))
+        img = np.log(img)
+        img = np.nan_to_num(img, nan=0.0, posinf=0.0, neginf=0.0)
+
+        eps = 1e-6
+        img_mean = img.mean(axis=(0, 1))
+        img = img - img_mean
+        img_std = img.std(axis=(0, 1))
+        img = img / (img_std + eps)
+
+        img = img[..., None]  # (Hz, Time, 1)
+        img = self._apply_transform(img)
+
+        return {"data": img, "target": label}
+
+    def _apply_transform(self, img: np.ndarray):
+        transformed = self.transform(image=img)
+        img = transformed["image"]
+        return img
+
+
+
+
+## === cell 8
+class CFG:
+    model_name = "resnest50d_4s2x40d"
+    img_size = 512
+    max_epoch = 7
+    batch_size = 32
+    lr = 1.0e-03
+    weight_decay = 1.0e-02
+    es_patience = 5
+    seed = 1086
+    deterministic = True
+    enable_amp = True
+    device = "cuda"
+
+
+
+
+## === cell 9
+def to_device(
+    tensors: tp.Union[tp.Tuple[torch.Tensor], tp.Dict[str, torch.Tensor]],
+    device: torch.device,
+    *args,
+    **kwargs,
+):
+    if isinstance(tensors, tuple):
+        return (t.to(device, *args, **kwargs) for t in tensors)
+    elif isinstance(tensors, dict):
+        return {k: t.to(device, *args, **kwargs) for k, t in tensors.items()}
+    else:
+        return tensors.to(device, *args, **kwargs)
+
+
+def get_test_path_label(test: pd.DataFrame):
+    img_paths = []
+    labels = np.full((len(test), N_CLASSES), -1, dtype="float32")
+    for spec_id in test["spectrogram_id"].values:
+        img_path = TEST_SPEC_SPLIT / f"{spec_id}.npy"
+        img_paths.append(img_path)
+
+    test_data = {"image_paths": img_paths, "labels": [l for l in labels]}
+    return test_data
+
+
+def get_test_transforms(CFG):
+    test_transform = A.Compose(
+        [
+            A.Resize(p=1.0, height=CFG.img_size, width=CFG.img_size),
+            ToTensorV2(p=1.0),
+        ]
+    )
+    return test_transform
+
+
+
+
+## === cell 10
+def run_inference_loop(model, loader, device):
+    model.to(device)
+    model.eval()
+    pred_list = []
+    with torch.no_grad():
+        for batch in tqdm(loader, desc="infer", leave=False):
+            x = to_device(batch["data"], device)
+            y = model(x)
+            pred_list.append(y.softmax(dim=1).detach().cpu().numpy())
+    pred_arr = np.concatenate(pred_list, axis=0)
+    del pred_list
+    return pred_arr
+
+
+
+
+## === cell 11
+test_path_label = get_test_path_label(test)
+test_transform = get_test_transforms(CFG)
+test_dataset = HMSHBACSpecDataset(**test_path_label, transform=test_transform)
+
+test_loader = torch.utils.data.DataLoader(
+    test_dataset,
+    batch_size=CFG.batch_size,
+    num_workers=2,
+    shuffle=False,
+    drop_last=False,
+    pin_memory=True,
+)
+
+device = torch.device(CFG.device if torch.cuda.is_available() else "cpu")
+print("Inference device:", device)
+
+
+
+
+## === cell 12
+def trained_weights_available(
+    trained_model_dir: tp.Optional[Path], n_folds: int
+) -> bool:
+    if trained_model_dir is None:
+        return False
+    for fold_id in range(n_folds):
+        if not (trained_model_dir / f"best_model_fold{fold_id}.pth").exists():
+            return False
+    return True
+
+
+def extract_state_dict(ckpt: tp.Any) -> tp.Dict[str, torch.Tensor]:
+    """
+    Change rationale (score-relevant, minimal):
+    Some checkpoints save as {'state_dict': ...} or {'model': ...} rather than a raw
+    state_dict. If we fail to load, we silently fall back to uniform predictions,
+    causing poor KL. This keeps the same weights, just loads them correctly.
+    """
+    if isinstance(ckpt, dict):
+        for k in ("state_dict", "model_state_dict", "model", "net", "weights"):
+            if k in ckpt and isinstance(ckpt[k], dict):
+                return ckpt[k]
+    if isinstance(ckpt, dict):
+        if all(isinstance(v, torch.Tensor) for v in ckpt.values()):
+            return ckpt
+    raise ValueError(
+        f"Unrecognized checkpoint format with type={type(ckpt)} and keys={list(ckpt.keys())[:10] if isinstance(ckpt, dict) else 'NA'}"
+    )
+
+
+have_weights = trained_weights_available(TRAINED_MODEL, N_FOLDS)
+print("Have all fold weights:", have_weights)
+
+if have_weights:
+    test_preds_arr = np.zeros((N_FOLDS, len(test), N_CLASSES), dtype=np.float32)
+
+    for fold_id in range(N_FOLDS):
+        print(f"\n[fold {fold_id}]")
+
+        model_path = TRAINED_MODEL / f"best_model_fold{fold_id}.pth"
+
+        model = HMSHBACSpecModel(
+            model_name=CFG.model_name,
+            pretrained=False,
+            num_classes=N_CLASSES,
+            in_channels=1,
+        )
+
+        ckpt = torch.load(model_path, map_location=device, weights_only=False)
+        state_dict = extract_state_dict(ckpt)
+        model.load_state_dict(state_dict, strict=True)
+
+        test_pred_fold = run_inference_loop(model, test_loader, device)
+        test_preds_arr[fold_id] = test_pred_fold
+
+        del model, ckpt, state_dict, test_pred_fold
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        gc.collect()
+
+    test_pred = test_preds_arr.mean(axis=0)
+else:
+    test_pred = np.full((len(test), N_CLASSES), 1.0 / N_CLASSES, dtype=np.float32)
+
+
+
+## === cell 13
+test_pred = np.nan_to_num(
+    test_pred, nan=1.0 / N_CLASSES, posinf=1.0 / N_CLASSES, neginf=1.0 / N_CLASSES
+)
+row_sum = test_pred.sum(axis=1, keepdims=True)
+row_sum = np.where(row_sum <= 0, 1.0, row_sum)
+test_pred = test_pred / row_sum
+
+test_pred_df = pd.DataFrame(test_pred, columns=CLASSES)
+test_pred_df.insert(0, "eeg_id", test["eeg_id"].values)
+
+
+
+## === cell 14
+pred_map = test_pred_df.drop_duplicates(subset=["eeg_id"], keep="first").set_index(
+    "eeg_id"
+)[CLASSES]
+aligned = pred_map.reindex(sample_sub["eeg_id"].values)
+
+sub = pd.concat([sample_sub[["eeg_id"]].copy(), aligned.reset_index(drop=True)], axis=1)
+
+missing = sub[CLASSES].isna().any(axis=1)
+if missing.any():
+    sub.loc[missing, CLASSES] = 1.0 / N_CLASSES
+
+probs = sub[CLASSES].to_numpy(dtype=np.float32)
+probs = np.nan_to_num(
+    probs, nan=1.0 / N_CLASSES, posinf=1.0 / N_CLASSES, neginf=1.0 / N_CLASSES
+)
+probs = probs / probs.sum(axis=1, keepdims=True)
+sub[CLASSES] = probs
+
+sub.to_csv("submission.csv", index=False)
+
+print("submission.csv written. shape=", sub.shape)
+print(sub.head())
+print("Row-sum stats:", sub[CLASSES].sum(axis=1).min(), sub[CLASSES].sum(axis=1).max())
+assert len(sub) == len(
+    sample_sub
+), "Submission and sample_submission must have the same length."
+assert np.allclose(
+    sub[CLASSES].sum(axis=1).values, 1.0, atol=1e-4
+), "Each row must sum to 1."

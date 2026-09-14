@@ -1,0 +1,782 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+from torchvision import models, transforms
+from torchvision.transforms import v2
+from tqdm import tqdm
+from PIL import Image
+import pandas as pd
+import numpy as np
+import torch
+import os
+import glob
+import random
+
+
+
+## === cell 1
+test_data_directory_candidates = [
+    "/kaggle/input/cassava-leaf-disease-classification/test_images",
+    "/kaggle/data/cassava-leaf-disease-classification/test_images",
+    "/kaggle/input/test_images",
+    "/kaggle/data/test_images",
+]
+test_data_directory = next(
+    (p for p in test_data_directory_candidates if os.path.isdir(p)), None
+)
+if test_data_directory is None:
+    raise FileNotFoundError(
+        "Could not find test_images directory. Tried:\n"
+        + "\n".join(test_data_directory_candidates)
+    )
+
+train_image_directory_candidates = [
+    "/kaggle/input/cassava-leaf-disease-classification/train_images",
+    "/kaggle/data/cassava-leaf-disease-classification/train_images",
+    "/kaggle/input/train_images",
+    "/kaggle/data/train_images",
+]
+train_image_directory = next(
+    (p for p in train_image_directory_candidates if os.path.isdir(p)), None
+)
+if train_image_directory is None:
+    raise FileNotFoundError(
+        "Could not find train_images directory (needed for head-only training). Tried:\n"
+        + "\n".join(train_image_directory_candidates)
+    )
+
+sample_sub_candidates = [
+    "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv",
+    "/kaggle/data/cassava-leaf-disease-classification/sample_submission.csv",
+    "/kaggle/input/sample_submission.csv",
+    "/kaggle/data/sample_submission.csv",
+]
+sample_sub_path = next((p for p in sample_sub_candidates if os.path.isfile(p)), None)
+if sample_sub_path is None:
+    raise FileNotFoundError(
+        "Could not find sample_submission.csv. Tried:\n"
+        + "\n".join(sample_sub_candidates)
+    )
+
+train_csv_candidates = [
+    "/kaggle/input/cassava-leaf-disease-classification/train.csv",
+    "/kaggle/data/cassava-leaf-disease-classification/train.csv",
+    "/kaggle/input/train.csv",
+    "/kaggle/data/train.csv",
+]
+train_csv_path = next((p for p in train_csv_candidates if os.path.isfile(p)), None)
+if train_csv_path is None:
+    raise FileNotFoundError(
+        "Could not find train.csv (needed for head-only training / fallback). Tried:\n"
+        + "\n".join(train_csv_candidates)
+    )
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+num_classes = 5
+
+en_model_path = "/kaggle/input/efficientnetv2-large-test/pytorch/default/4/efficientnet_v2_l_480_8591_ISP_CBP.pth"
+en_image_size = 480
+
+vit_model_path = (
+    "/kaggle/input/vit_l_cassava/pytorch/default/6/vit_h_14_518_8860_base.pth"
+)
+vit_image_size = 518
+
+model_select = "vit"
+
+if model_select == "vit":
+    model_image_size = vit_image_size
+if model_select == "en":
+    model_image_size = en_image_size
+
+seed = 42
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+if device.type == "cuda":
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
+
+
+
+
+## === cell 2
+def invert_square_pad(img):
+    width, height = img.size
+
+    center_width, center_height = width // 2, height // 2
+    top_left = img.crop((0, 0, center_width, center_height))
+    top_right = img.crop((center_width, 0, width, center_height))
+    bottom_left = img.crop((0, center_height, center_width, height))
+    bottom_right = img.crop((center_width, center_height, width, height))
+
+    top_combined = Image.new("RGB", (width, center_height))
+    top_combined.paste(bottom_right, (0, 0))
+    top_combined.paste(bottom_left, (center_width, 0))
+
+    bottom_combined = Image.new("RGB", (width, center_height))
+    bottom_combined.paste(top_right, (0, 0))
+    bottom_combined.paste(top_left, (center_width, 0))
+
+    flipped_img = Image.new("RGB", (width, height))
+    flipped_img.paste(top_combined, (0, 0))
+    flipped_img.paste(bottom_combined, (0, center_height))
+
+    img = flipped_img.copy()
+    del top_combined, bottom_combined, flipped_img
+
+    max_side = max(width, height)
+    padding = (
+        (max_side - width) // 2,  # left
+        (max_side - height) // 2,  # top
+        (max_side - width) - (max_side - width) // 2,  # right
+        (max_side - height) - (max_side - height) // 2,  # bottom
+    )
+
+    padded_img = transforms.functional.pad(img, padding, padding_mode="reflect")
+
+    return padded_img
+
+
+def resize_max_side(img, size):
+    width, height = img.size
+
+    if max(width, height) <= size:
+        return img
+
+    if width > height:
+        new_width = size
+        new_height = int(size * height / width)
+    else:
+        new_height = size
+        new_width = int(size * width / height)
+
+    return transforms.functional.resize(img, (new_height, new_width))
+
+
+def pad_to_square(img):
+    width, height = img.size
+    max_side = max(width, height)
+    padding = (
+        (max_side - width) // 2,
+        (max_side - height) // 2,
+        (max_side - width) - (max_side - width) // 2,
+        (max_side - height) - (max_side - height) // 2,
+    )  # left, top, right, bottom
+
+    padded_img = transforms.functional.pad(img, padding, padding_mode="reflect")
+
+    return padded_img
+
+
+
+
+## === cell 3
+val_transforms = transforms.Compose(
+    [
+        v2.Lambda(lambda img: resize_max_side(img, 800)),
+        v2.Lambda(pad_to_square),
+        v2.ToImage(),
+        v2.ToDtype(torch.float32, scale=True),  # outputs float in [0,1]
+        v2.Resize((model_image_size, model_image_size)),
+        v2.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),  # maps to [-1,1]
+    ]
+)
+
+
+
+
+## === cell 4
+def _find_first_existing_file(candidates):
+    for p in candidates:
+        if p and os.path.isfile(p):
+            return p
+    return None
+
+
+def _glob_first(patterns):
+    for pat in patterns:
+        hits = glob.glob(pat, recursive=True)
+        hits = [h for h in hits if os.path.isfile(h)]
+        if hits:
+            return sorted(hits)[0]
+    return None
+
+
+vit_candidates = [
+    vit_model_path,
+    _glob_first(
+        [
+            "/kaggle/input/**/vit*_*.pth",
+            "/kaggle/input/**/vit*h*14*.pth",
+            "/kaggle/data/**/vit*_*.pth",
+            "/kaggle/data/**/vit*h*14*.pth",
+        ]
+    ),
+]
+
+en_candidates = [
+    en_model_path,
+    _glob_first(
+        [
+            "/kaggle/input/**/efficientnet*_v2*_l*.pth",
+            "/kaggle/input/**/efficientnet*v2*l*.pth",
+            "/kaggle/data/**/efficientnet*_v2*_l*.pth",
+            "/kaggle/data/**/efficientnet*v2*l*.pth",
+        ]
+    ),
+]
+
+resolved_vit_path = _find_first_existing_file(vit_candidates)
+resolved_en_path = _find_first_existing_file(en_candidates)
+
+use_custom_weights = False
+if model_select == "vit" and resolved_vit_path is not None:
+    use_custom_weights = True
+if model_select == "en" and resolved_en_path is not None:
+    use_custom_weights = True
+
+if model_select == "vit":
+    try:
+        vit_weights = models.ViT_H_14_Weights.IMAGENET1K_SWAG_E2E_V1
+    except Exception:
+        vit_weights = None
+
+    vit_model = models.vit_h_14(weights=vit_weights, image_size=vit_image_size)
+    if use_custom_weights:
+        vit_model.heads.head = torch.nn.Linear(
+            vit_model.heads.head.in_features, num_classes
+        )
+        state = torch.load(resolved_vit_path, map_location="cpu")
+        if (
+            isinstance(state, dict)
+            and "state_dict" in state
+            and isinstance(state["state_dict"], dict)
+        ):
+            state = state["state_dict"]
+        vit_model.load_state_dict(state, strict=True)
+    else:
+        vit_model.heads.head = torch.nn.Linear(
+            vit_model.heads.head.in_features, num_classes
+        )
+
+    vit_model.to(device)
+    vit_model.eval()
+
+if model_select == "en":
+    try:
+        en_weights = models.EfficientNet_V2_L_Weights.IMAGENET1K_V1
+    except Exception:
+        en_weights = None
+
+    en_model = models.efficientnet_v2_l(weights=en_weights)
+    if use_custom_weights:
+        en_model.classifier[1] = torch.nn.Linear(
+            en_model.classifier[1].in_features, num_classes
+        )
+        state = torch.load(resolved_en_path, map_location="cpu")
+        if (
+            isinstance(state, dict)
+            and "state_dict" in state
+            and isinstance(state["state_dict"], dict)
+        ):
+            state = state["state_dict"]
+        en_model.load_state_dict(state, strict=True)
+    else:
+        en_model.classifier[1] = torch.nn.Linear(
+            en_model.classifier[1].in_features, num_classes
+        )
+
+    en_model.to(device)
+    en_model.eval()
+
+print(
+    f"Using model_select={model_select}, device={device}, image_size={model_image_size}, use_custom_weights={use_custom_weights}"
+)
+print(f"Resolved weights: vit={resolved_vit_path}, en={resolved_en_path}")
+
+
+
+## === cell 5
+train_df = pd.read_csv(train_csv_path)
+majority_label = int(train_df["label"].value_counts().idxmax())
+
+if not use_custom_weights:
+    max_train_images = 5000  # chosen to be safe under the time limit on CPU/GPU
+    train_pairs = list(
+        zip(
+            train_df["image_id"].astype(str).tolist(),
+            train_df["label"].astype(int).tolist(),
+        )
+    )
+    train_pairs = train_pairs[: min(len(train_pairs), max_train_images)]
+
+    if model_select == "vit":
+        model = vit_model
+        for p in model.parameters():
+            p.requires_grad = False
+        for p in model.heads.head.parameters():
+            p.requires_grad = True
+        head_params = list(model.heads.head.parameters())
+    else:
+        model = en_model
+        for p in model.parameters():
+            p.requires_grad = False
+        for p in model.classifier[1].parameters():
+            p.requires_grad = True
+        head_params = list(model.classifier[1].parameters())
+
+    model.train()
+    optimizer = torch.optim.AdamW(head_params, lr=1e-3, weight_decay=1e-4)
+    criterion = torch.nn.CrossEntropyLoss()
+
+    batch_size = 16 if device.type == "cuda" else 8
+    epoch_losses = []
+    idx = 0
+    while idx < len(train_pairs):
+        batch = train_pairs[idx : idx + batch_size]
+        idx += batch_size
+
+        images = []
+        labels = []
+        for img_id, lab in batch:
+            img_path = os.path.join(train_image_directory, img_id)
+            try:
+                img = Image.open(img_path).convert("RGB")
+                images.append(val_transforms(img))
+                labels.append(lab)
+            except Exception:
+                continue
+
+        if not images:
+            continue
+
+        x = torch.stack(images, dim=0)
+        if device.type == "cuda":
+            x = x.pin_memory().to(device, non_blocking=True)
+        else:
+            x = x.to(device)
+        y = torch.tensor(labels, dtype=torch.long, device=device)
+
+        optimizer.zero_grad(set_to_none=True)
+        logits = model(x)
+        loss = criterion(logits, y)
+        loss.backward()
+        optimizer.step()
+
+        epoch_losses.append(float(loss.detach().cpu().item()))
+
+    model.eval()
+    print(
+        f"Head-only training done (no custom weights). Trained_on={len(train_pairs)} images, "
+        f"mean_loss={np.mean(epoch_losses) if epoch_losses else float('nan'):.4f}"
+    )
+
+
+
+## === cell 6
+sample_df = pd.read_csv(sample_sub_path)
+test_image_ids = sample_df["image_id"].astype(str).tolist()
+
+predictions = []
+image_ids = []
+
+default_label_on_error = majority_label
+
+from torch.utils.data import Dataset, DataLoader
+
+
+class TestImageDataset(Dataset):
+    def __init__(self, image_ids, root_dir, transform):
+        self.image_ids = image_ids
+        self.root_dir = root_dir
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.image_ids)
+
+    def __getitem__(self, idx):
+        img_name = self.image_ids[idx]
+        img_path = os.path.join(self.root_dir, img_name)
+        try:
+            img = Image.open(img_path).convert("RGB")
+            x = self.transform(img)
+            ok = True
+        except Exception:
+            x = torch.zeros(
+                (3, model_image_size, model_image_size), dtype=torch.float32
+            )
+            ok = False
+        return img_name, x, ok
+
+
+def _collate(batch):
+    names, xs, oks = zip(*batch)
+    return list(names), torch.stack(xs, 0), torch.tensor(oks, dtype=torch.bool)
+
+
+num_workers = min(4, (os.cpu_count() or 2))
+pin_memory = device.type == "cuda"
+
+infer_bs = 16 if device.type == "cuda" else 8
+
+test_ds = TestImageDataset(test_image_ids, test_data_directory, val_transforms)
+test_loader = DataLoader(
+    test_ds,
+    batch_size=infer_bs,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=pin_memory,
+    persistent_workers=(num_workers > 0),
+    prefetch_factor=2 if num_workers > 0 else None,
+    collate_fn=_collate,
+)
+
+model = vit_model if model_select == "vit" else en_model
+model.eval()
+
+with torch.inference_mode():
+    for names, xb, okb in tqdm(
+        test_loader, desc="Test", total=(len(test_ds) + infer_bs - 1) // infer_bs
+    ):
+        image_ids.extend(names)
+
+        batch_preds = torch.full(
+            (len(names),), int(default_label_on_error), dtype=torch.int64
+        )
+
+        if okb.any():
+            if device.type == "cuda":
+                xb = xb.pin_memory().to(device, non_blocking=True)
+            else:
+                xb = xb.to(device)
+
+            logits = model(xb)
+            pred = torch.argmax(logits, dim=1).to("cpu", dtype=torch.int64)
+            batch_preds[okb] = pred[okb]
+
+        predictions.extend(batch_preds.tolist())
+
+
+
+## === cell 7
+submission_df = pd.DataFrame({"image_id": image_ids, "label": predictions})
+
+if submission_df.shape[0] != sample_df.shape[0]:
+    raise ValueError(
+        f"Submission row count {submission_df.shape[0]} != sample_submission row count {sample_df.shape[0]}"
+    )
+if list(submission_df.columns) != ["image_id", "label"]:
+    raise ValueError(
+        f"Submission columns are {list(submission_df.columns)}; expected ['image_id','label']"
+    )
+
+submission_df.to_csv("submission.csv", index=False)
+print("Submission file created: submission.csv")
+print(submission_df.head())
+print(f"majority_label_used={majority_label}, use_custom_weights={use_custom_weights}")

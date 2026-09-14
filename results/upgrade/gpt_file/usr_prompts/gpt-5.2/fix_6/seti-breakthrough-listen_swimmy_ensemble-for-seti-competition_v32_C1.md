@@ -1,0 +1,583 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Identify technosignature signals in cadence snippets taken from a digital spectrometer.
+
+## Metric
+Area under the ROC curve between the predicted probability and the observed target.
+
+## Submission Format
+For each `id` in the test set, you must predict a probability for the `target` variable. The file should contain a header and have the following format:
+
+```
+id,target
+00034abb3629,0.5
+0004be0baf70,0.5
+0005be4d0752,0.5
+etc.
+
+```
+
+## Dataset
+The data is from a digital spectrometer, which takes incoming raw data from the telescope (amounting to hundreds of TB per day) and performs a Fourier Transform to generate a spectrogram. These spectrograms, also referred to as filterbank files, or dynamic spectra, consist of measurements of signal intensity as a function of frequency and time.
+
+Below is an example of an FM radio signal. This is not from the GBT, but from a small antenna attached to a software defined radio dongle (a $20 piece of kit that you can plug into your laptop to pick up signals). The data we get from the GBT are very similar, but split into larger numbers of frequency channels, covering a much broader instantaneous frequency range, and with much better sensitivity.
+
+![frequency-time-plot](https://prod-files-secure.s3.us-west-2.amazonaws.com/667f1cbf-826f-4641-a321-96054292638d/b59a57f3-11a7-4493-8268-55c3fa632f7e/Untitled.png)
+
+The screenshot above shows frequency on the horizontal axis (running from around 88.2 to 89.8 MHz) and time on the vertical axis. The bright orange feature at 88.5 MHz is the FM signal from KQED, a radio station in the San Francisco Bay Area. The solid yellow blocks on either side (one highlighted by the pointer in the screenshot) are the KQED “HD radio” signal (the same data as the FM signal, but encoded digitally). Additional FM stations are visible at different frequencies, including another obvious FM signal (without the corresponding digital sidebands) at 89.5 MHz.
+
+The spectrometer generates similar spectrograms to the one shown above, but typically spanning several GHz of the radio spectrum (rather than the approx. 2 MHz shown above). The data are stored either as filterbank format or HDF5 format files, but essentially are arrays of intensity as a function of frequency and time, accompanied by headers containing metadata such as the direction the telescope was pointed in, the frequency scale, and so on. We generate over 1 PB of spectrograms per year; individual filterbank files can be tens of GB in size. We have discarded the majority of the metadata and are simply presenting numpy arrays consisting of small regions of the spectrograms that we refer to as “snippets”.
+
+The spectrometer is searching for candidate signatures of extraterrestrial technology - so-called technosignatures. The main obstacle to doing so is that our own human technology (not just radio stations, but wifi routers, cellphones, and even electronics that are not deliberately designed to transmit radio signals) also gives off radio signals. We refer to these human-generated signals as “radio frequency interference”, or RFI.
+
+One method we use to isolate candidate technosignatures from RFI is to look for signals that appear to be coming from particular positions on the sky. Typically we do this by alternating observations of our primary target star with observations of three nearby stars: 5 minutes on star “A”, then 5 minutes on star “B”, then back to star “A” for 5 minutes, then “C”, then back to “A”, then finishing with 5 minutes on star “D”. One set of six observations (ABACAD) is referred to as a “cadence”. Since we're just giving you a small range of frequencies for each cadence, we refer to the datasets you'll be analyzing as “cadence snippets”.
+
+An example of an extraterrestrial signal:
+
+![voyager-signal](https://storage.googleapis.com/kaggle-media/competitions/SETI-Berkeley/Screen%20Shot%202021-05-03%20at%2011.39.42.png)
+
+As the plot title suggests, this is the Voyager 1 spacecraft. Even though it's 20 billion kilometers from Earth, it's picked up clearly by the GBT. The first, third, and fifth panels are the “A” target (the spacecraft, in this case). The yellow diagonal line is the radio signal coming from Voyager. It's detected when we point at the spacecraft, and it disappears when we point away. It's a diagonal line in this plot because the relative motion of the Earth and the spacecraft imparts a Doppler drift, causing the frequency to change over time. As it happens, that's another possible way to reject RFI, which has a higher tendency to remain at a fixed frequency over time.
+
+While it would be nice to train our algorithms entirely on observations of interplanetary spacecraft, there are not many examples of them, and we also want to be able to find a wider range of signal types. So we've turned to simulating technosignature candidates.
+
+We've taken tens of thousands of cadence snippets, which we're calling the haystack, and we've hidden needles among them. Some of these needles look similar to the Voyager 1 signal above and should be easy to detect, even with classical detection algorithms. Others are hidden in noisy regions of the spectrum and will be harder, even though they might be relatively obvious on visual inspection:
+
+![needle-signal](https://storage.googleapis.com/kaggle-media/competitions/SETI-Berkeley/Screen%20Shot%202021-05-03%20at%2011.34.06.png)
+
+After we perform the signal injections, we normalize each snippet, so you probably can't identify most of the needles just by looking for excess energy in the corresponding array. You'll likely need a more subtle algorithm that looks for patterns that appear only in the on-target observations.
+
+Not all of the “needle” signals look like diagonal lines, and they may not be present for the entirety of all three “A” observations, but what they do have in common is that they are only present in some or all of the “A” observations (panels 1, 3, and 5 in the cadence snippets). Your challenge is to train an algorithm to find as many needles as you can, while minimizing the number of false positives from the haystack.
+
+- **train/** - a training set of cadence snippet files stored in `numpy` `float16` format (v1.20.1), one file per cadence snippet `id`, with corresponding labels found in the `train_labels.csv` file. Each file has dimension `(6, 273, 256)`, with the 1st dimension representing the 6 positions of the cadence, and the 2nd and 3rd dimensions representing the 2D spectrogram.
+- **test/** - the test set cadence snippet files; you must predict whether or not the cadence contains a "needle", which is the `target` for this competition
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train_labels** - targets corresponding (by `id`) to the cadence snippet files found in the `train/` folder
+- **old_leaky_data** - full pre-relaunch data, including test labels; you should not assume this data is helpful (it may or may not be).
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (112 lines)
+            old_leaky_data.zip (23.6 GB)
+            sample_submission.csv (6001 lines)
+            sample_submission.csv.zip (60.0 kB)
+            test.zip (4.5 GB)
+            train.zip (4.7 GB)
+            train_labels.csv (54001 lines)
+            train_labels.csv.zip (529.5 kB)
+            old_leaky_data/
+                test_labels_old.csv (35848 lines)
+                train_labels_old.csv (50166 lines)
+                test_old/
+                    0/
+                        00034db451c4.npy (838.8 kB)
+                        0006316b5ca0.npy (838.8 kB)
+                        ... and 2197 other files
+                    1/
+                        10038983cab1.npy (838.8 kB)
+                        100865aff453.npy (838.8 kB)
+                        ... and 2278 other files
+                    ... and 14 other folders
+                train_old/
+                    0/
+                        00034abb3629.npy (838.8 kB)
+                        0004300a0b9b.npy (838.8 kB)
+                        ... and 3143 other files
+                    1/
+                        1000e00b26db.npy (838.8 kB)
+                        100148224705.npy (838.8 kB)
+                        ... and 3142 other files
+                    ... and 14 other folders
+            seti-breakthrough-listen/
+                description.md (112 lines)
+                old_leaky_data.zip (23.6 GB)
+                ... and 6 other files
+                old_leaky_data/
+                    test_labels_old.csv (35848 lines)
+                    train_labels_old.csv (50166 lines)
+                    test_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    train_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                seti-breakthrough-listen/
+                test/
+                    0/
+                        0016fd6c09d476d.npy (838.8 kB)
+                        0017643c1c5c254.npy (838.8 kB)
+                        ... and 374 other files
+                    1/
+                        1001ca1d08f9235.npy (838.8 kB)
+                        1016de9cec2dc8a.npy (838.8 kB)
+                        ... and 353 other files
+                    ... and 15 other folders
+                train/
+                    0/
+                        0000799a2b2c42d.npy (838.8 kB)
+                        00042890562ff68.npy (838.8 kB)
+                        ... and 3335 other files
+                    1/
+                        100105755d4c5b1.npy (838.8 kB)
+                        1001a55ebce86f2.npy (838.8 kB)
+                        ... and 3392 other files
+                    ... and 15 other folders
+            test/
+                0/
+                    0016fd6c09d476d.npy (838.8 kB)
+                    0017643c1c5c254.npy (838.8 kB)
+                    ... and 374 other files
+                1/
+                    1001ca1d08f9235.npy (838.8 kB)
+                    1016de9cec2dc8a.npy (838.8 kB)
+                    ... and 353 other files
+                ... and 15 other folders
+            train/
+                0/
+                    0000799a2b2c42d.npy (838.8 kB)
+                    00042890562ff68.npy (838.8 kB)
+                    ... and 3335 other files
+                1/
+                    100105755d4c5b1.npy (838.8 kB)
+                    1001a55ebce86f2.npy (838.8 kB)
+                    ... and 3392 other files
+                ... and 15 other folders
+        input/
+            description.md (112 lines)
+            old_leaky_data.zip (23.6 GB)
+            sample_submission.csv (6001 lines)
+            sample_submission.csv.zip (60.0 kB)
+            test.zip (4.5 GB)
+            train.zip (4.7 GB)
+            train_labels.csv (54001 lines)
+            train_labels.csv.zip (529.5 kB)
+            old_leaky_data/
+                test_labels_old.csv (35848 lines)
+                train_labels_old.csv (50166 lines)
+                test_old/
+                    0/
+                        00034db451c4.npy (838.8 kB)
+                        0006316b5ca0.npy (838.8 kB)
+                        ... and 2197 other files
+                    1/
+                        10038983cab1.npy (838.8 kB)
+                        100865aff453.npy (838.8 kB)
+                        ... and 2278 other files
+                    ... and 14 other folders
+                train_old/
+                    0/
+                        00034abb3629.npy (838.8 kB)
+                        0004300a0b9b.npy (838.8 kB)
+                        ... and 3143 other files
+                    1/
+                        1000e00b26db.npy (838.8 kB)
+                        100148224705.npy (838.8 kB)
+                        ... and 3142 other files
+                    ... and 14 other folders
+            seti-breakthrough-listen/
+                description.md (112 lines)
+                old_leaky_data.zip (23.6 GB)
+                ... and 6 other files
+                old_leaky_data/
+                    test_labels_old.csv (35848 lines)
+                    train_labels_old.csv (50166 lines)
+                    test_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    train_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                seti-breakthrough-listen/
+                test/
+                    0/
+                        0016fd6c09d476d.npy (838.8 kB)
+                        0017643c1c5c254.npy (838.8 kB)
+                        ... and 374 other files
+                    1/
+                        1001ca1d08f9235.npy (838.8 kB)
+                        1016de9cec2dc8a.npy (838.8 kB)
+                        ... and 353 other files
+                    ... and 15 other folders
+                train/
+                    0/
+                        0000799a2b2c42d.npy (838.8 kB)
+                        00042890562ff68.npy (838.8 kB)
+                        ... and 3335 other files
+                    1/
+                        100105755d4c5b1.npy (838.8 kB)
+                        1001a55ebce86f2.npy (838.8 kB)
+                        ... and 3392 other files
+                    ... and 15 other folders
+            test/
+                0/
+                    0016fd6c09d476d.npy (838.8 kB)
+                    0017643c1c5c254.npy (838.8 kB)
+                    ... and 374 other files
+                1/
+                    1001ca1d08f9235.npy (838.8 kB)
+                    1016de9cec2dc8a.npy (838.8 kB)
+                    ... and 353 other files
+                ... and 15 other folders
+            train/
+                0/
+                    0000799a2b2c42d.npy (838.8 kB)
+                    00042890562ff68.npy (838.8 kB)
+                    ... and 3335 other files
+                1/
+                    100105755d4c5b1.npy (838.8 kB)
+                    1001a55ebce86f2.npy (838.8 kB)
+                    ... and 3392 other files
+                ... and 15 other folders
+        working/
+            seti-breakthrough-listen/
+                description.md (112 lines)
+                old_leaky_data.zip (23.6 GB)
+                ... and 6 other files
+                old_leaky_data/
+                    test_labels_old.csv (35848 lines)
+                    train_labels_old.csv (50166 lines)
+                    test_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    train_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                seti-breakthrough-listen/
+                test/
+                    0/
+                        0016fd6c09d476d.npy (838.8 kB)
+                        0017643c1c5c254.npy (838.8 kB)
+                        ... and 374 other files
+                    1/
+                        1001ca1d08f9235.npy (838.8 kB)
+                        1016de9cec2dc8a.npy (838.8 kB)
+                        ... and 353 other files
+                    ... and 15 other folders
+                train/
+                    0/
+                        0000799a2b2c42d.npy (838.8 kB)
+                        00042890562ff68.npy (838.8 kB)
+                        ... and 3335 other files
+                    1/
+                        100105755d4c5b1.npy (838.8 kB)
+                        1001a55ebce86f2.npy (838.8 kB)
+                        ... and 3392 other files
+                    ... and 15 other folders
+```
+
+-> data/old_leaky_data/test_labels_old.csv has 35847 rows and 2 columns.
+The columns are: id, target
+
+-> data/old_leaky_data/train_labels_old.csv has 50165 rows and 2 columns.
+The columns are: id, target
+
+-> data/sample_submission.csv has 6000 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/old_leaky_data/test_labels_old.csv has 35847 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/old_leaky_data/train_labels_old.csv has 50165 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/sample_submission.csv has 6000 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/train_labels.csv has 54000 rows and 2 columns.
+The columns are: id, target
+
+-> data/train_labels.csv has 54000 rows and 2 columns.
+The columns are: id, target
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+
+
+## === cell 1
+BASE_INPUT = "/kaggle/input"
+TRAIN_LABELS_PATH = os.path.join(BASE_INPUT, "train_labels.csv")
+TRAIN_DIR = os.path.join(BASE_INPUT, "train")
+TEST_DIR = os.path.join(BASE_INPUT, "test")
+SAMPLE_SUB_PATH = os.path.join(BASE_INPUT, "sample_submission.csv")
+
+assert os.path.exists(TRAIN_LABELS_PATH), f"Missing {TRAIN_LABELS_PATH}"
+assert os.path.isdir(TRAIN_DIR), f"Missing {TRAIN_DIR}"
+assert os.path.isdir(TEST_DIR), f"Missing {TEST_DIR}"
+assert os.path.exists(SAMPLE_SUB_PATH), f"Missing {SAMPLE_SUB_PATH}"
+
+train_labels = pd.read_csv(TRAIN_LABELS_PATH)
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+
+train_labels.head(), sample_sub.head()
+
+
+
+
+## === cell 2
+def build_id_to_path(root_dir: str) -> dict:
+    id2p = {}
+    for dirpath, dirnames, filenames in os.walk(root_dir):
+        for fn in filenames:
+            if fn.endswith(".npy"):
+                _id = fn[:-4]
+                id2p[_id] = os.path.join(dirpath, fn)
+    return id2p
+
+
+train_id_to_path = build_id_to_path(TRAIN_DIR)
+test_id_to_path = build_id_to_path(TEST_DIR)
+
+print("Train files found:", len(train_id_to_path))
+print("Test files found:", len(test_id_to_path))
+
+
+
+
+## === cell 3
+def _quantiles_linear_from_flat(x_flat: np.ndarray, qs) -> np.ndarray:
+    n = x_flat.size
+    if n == 0:
+        return np.array([np.nan] * len(qs), dtype=np.float32)
+
+    qs = np.asarray(qs, dtype=np.float64)
+    pos = (n - 1) * qs
+    lo = np.floor(pos).astype(np.int64)
+    hi = np.ceil(pos).astype(np.int64)
+
+    idx = np.unique(np.concatenate((lo, hi)))
+    part = np.partition(x_flat, idx)
+
+    v_lo = part[lo]
+    v_hi = part[hi]
+    frac = (pos - lo).astype(np.float64)
+    out = (v_lo + (v_hi - v_lo) * frac).astype(np.float32)
+    return out
+
+
+def extract_features(x: np.ndarray) -> np.ndarray:
+    x = x.astype(np.float32, copy=False)
+
+    panel_mean = x.mean(axis=(1, 2), dtype=np.float32)
+    panel_std = x.std(axis=(1, 2), dtype=np.float32)
+
+    a = x[[0, 2, 4]]
+    bcd = x[[1, 3, 5]]
+
+    a_mean = np.float32(a.mean(dtype=np.float32))
+    bcd_mean = np.float32(bcd.mean(dtype=np.float32))
+    a_std = np.float32(a.std(dtype=np.float32))
+    bcd_std = np.float32(bcd.std(dtype=np.float32))
+
+    xf = x.reshape(-1)
+
+    q95, q99 = _quantiles_linear_from_flat(xf, (0.95, 0.99))
+    xmax = np.float32(xf.max())
+
+    l2 = np.float32(np.sqrt(np.dot(xf, xf) / xf.size))
+    abs_mean = np.float32(np.abs(xf).mean(dtype=np.float32))
+
+    feats = np.concatenate(
+        [
+            panel_mean,  # 6
+            panel_std,  # 6
+            np.array(
+                [
+                    a_mean - bcd_mean,
+                    a_std - bcd_std,
+                    q95,
+                    q99,
+                    xmax,
+                    l2,
+                    abs_mean,
+                ],
+                dtype=np.float32,
+            ),
+        ]
+    )
+    return feats
+
+
+tmp_id = train_labels["id"].iloc[0]
+tmp_x = np.load(train_id_to_path[tmp_id], mmap_mode="r")
+print(tmp_x.shape, tmp_x.dtype, extract_features(tmp_x).shape)
+
+
+
+## === cell 4
+import multiprocessing as mp
+
+train_ids = train_labels["id"].to_numpy()
+train_targets = train_labels["target"].to_numpy()
+
+used_paths = []
+used_y = []
+
+_get = train_id_to_path.get
+_append_p = used_paths.append
+_append_y = used_y.append
+for _id, _t in zip(train_ids, train_targets):
+    p = _get(_id)
+    if p is not None:
+        _append_p(p)
+        _append_y(_t)
+
+y = np.asarray(used_y, dtype=np.int64)
+
+_first_path = used_paths[0]
+_tmp = np.load(_first_path, mmap_mode="r")
+n_feats = extract_features(_tmp).shape[0]
+
+
+def _featurize_path(p: str) -> np.ndarray:
+    x = np.load(p, mmap_mode="r")
+    return extract_features(x)
+
+
+cpu = os.cpu_count() or 2
+n_workers = min(8, cpu)
+chunksize = 128
+
+X = np.empty((len(used_paths), n_feats), dtype=np.float32)
+
+try:
+    ctx = mp.get_context("fork")
+except ValueError:
+    ctx = mp.get_context("spawn")
+
+with ctx.Pool(processes=n_workers) as pool:
+    for i, feats in enumerate(
+        pool.imap(_featurize_path, used_paths, chunksize=chunksize)
+    ):
+        X[i] = feats
+
+print("X shape:", X.shape, "y shape:", y.shape, "positive rate:", float(y.mean()))
+
+
+
+## === cell 5
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+clf = Pipeline(
+    steps=[
+        ("scaler", StandardScaler()),
+        (
+            "lr",
+            LogisticRegression(
+                solver="lbfgs",
+                max_iter=500,
+                n_jobs=None,
+                C=1.0,
+                class_weight=None,
+                random_state=42,
+            ),
+        ),
+    ]
+)
+
+clf.fit(X, y)
+
+
+
+## === cell 6
+test_ids = sample_sub["id"].to_numpy()
+
+have_idx = []
+have_paths = []
+
+_get_t = test_id_to_path.get
+_append_i = have_idx.append
+_append_tp = have_paths.append
+for i, _id in enumerate(test_ids):
+    p = _get_t(_id)
+    if p is not None:
+        _append_i(i)
+        _append_tp(p)
+
+have_idx = np.asarray(have_idx, dtype=np.int64)
+
+X_test = np.empty((len(have_paths), n_feats), dtype=np.float32)
+with ctx.Pool(processes=n_workers) as pool:
+    for j, feats in enumerate(
+        pool.imap(_featurize_path, have_paths, chunksize=chunksize)
+    ):
+        X_test[j] = feats
+
+preds = np.full(len(test_ids), 0.5, dtype=np.float32)
+preds_have = clf.predict_proba(X_test)[:, 1].astype(np.float32, copy=False)
+preds[have_idx] = preds_have
+
+preds = np.clip(preds, 0.0, 1.0)
+
+submission = pd.DataFrame({"id": test_ids, "target": preds})
+submission.head(), submission["target"].describe()
+
+
+
+## === cell 7
+out_path = "submission.csv"
+submission.to_csv(out_path, index=False)
+
+check = pd.read_csv(out_path)
+assert list(check.columns) == ["id", "target"]
+assert len(check) == len(sample_sub)
+print(f"Wrote {out_path} with shape {check.shape}")
+print(check.head())

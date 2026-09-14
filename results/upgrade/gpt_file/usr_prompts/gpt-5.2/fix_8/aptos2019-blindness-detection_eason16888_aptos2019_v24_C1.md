@@ -1,0 +1,697 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8612962593545803
+
+# 6. Current score
+
+0.74143
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I remove the failing `pip install tensorflow-addons` and the `tensorflow_addons` import that triggers the protobuf `MessageFactory.GetPrototype` error, because it is not used anywhere in your inference-only pipeline. I also make the script self-contained by re-importing all required libraries in the first cell so `tf`, `pd`, etc. are always defined, and I fix the broken cell numbering/order while preserving your model architecture and preprocessing logic. Since your code references a non-existent external weights file, I instead use EfficientNetB1 with ImageNet weights (same architecture) so the notebook can produce meaningful predictions and a valid `submission.csv` end-to-end. Finally, I ensure inference uses the same normalization as your `preprocessing` function (divide by 255) and read `test.csv` (not `sample_submission.csv`) for the id list, keeping the required submission columns unchanged.'
+- What this solution (achieved 0.71135) has done: 'The protobuf `MessageFactory.GetPrototype` crash happens during TensorFlow import due to an incompatible protobuf runtime in this environment, so the only viable way to make this run end-to-end is to remove TensorFlow usage entirely. To keep the pipeline’s semantics (image preprocessing → model → 0–4 prediction → submission) while remaining minimal and stable, I replace the TF model inference with a lightweight OpenCV feature extractor plus a scikit-learn multiclass classifier trained on `train.csv`, which is available locally. This also resolves the current score of 0.0 (from a hard crash) by producing real predictions aligned to the evaluation labels (0–4). The script keeps your Ben Graham-style preprocessing and writes a valid `submission.csv` with the required columns.'
+- What this solution (achieved 0.72139) has done: 'Your current pipeline is already producing a valid submission and is far below the target (0.71135 vs 0.8613), so we should make small, legitimate improvements that better align the predictions with quadratic weighted kappa without changing the overall approach (Ben Graham preprocessing → simple features → scikit-learn classifier). The most direct, minimal lever here is handling the strong class imbalance: logistic regression is likely biased toward the majority class, which hurts kappa. I add `class_weight="balanced"` to the same multinomial logistic regression (same model family, same training loop) to reduce that bias. I also switch the solver explicitly to `lbfgs` (standard for multinomial) to make optimization more stable without changing semantics, keeping everything else identical and still writing `submission.csv`.'
+- What this solution (achieved 0.7389) has done: 'The timeout is dominated by single-threaded image preprocessing/feature extraction over ~3.3k train + 367 test images and by redundant per-image conversions/reshapes inside feature extraction. I keep the exact same preprocessing, features, model, and threshold optimization, but make feature building faster by (1) parallelizing image read+preprocess+feature extraction with a deterministic thread pool (OpenCV releases the GIL), (2) reducing per-image overhead by computing means/stds without extra reshapes and by using OpenCV histograms, and (3) avoiding repeated constant allocations (e.g., class indices). These changes are mathematically equivalent (same operations, just reorganized/cached) and should cut wall time substantially while preserving predictions up to negligible float noise.'
+- What this solution (achieved 0.74143) has done: 'We’re substantially below the target (0.7389 vs 0.8613), so the smallest legitimate lever to move QWK upward without changing your core pipeline is to calibrate the final discrete mapping. Your current thresholds are tuned on a single 80/20 split and can be noisy; instead, we learn thresholds out-of-fold (OOF) across a few stratified folds using the same model and the same “expected class” continuous score, then average those thresholds for a stabler mapping. This keeps the same feature extraction, the same LogisticRegression pipeline, and the same threshold-search method, but reduces variance and usually improves QWK on this competition. Finally, we refit once on full data and apply the averaged thresholds to test, still producing a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import gc
+import cv2
+import numpy as np
+import pandas as pd
+
+np.random.seed(42)
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
+
+
+## === cell 1
+"""
+    Config
+"""
+IMG_SIZE = 224
+BATCH_SIZE = 16  # kept for compatibility; not used in this non-TF pipeline
+
+
+def crop_image_from_gray(img, tol=7):
+    if img.ndim == 2:
+        mask = img > tol
+        return img[np.ix_(mask.any(1), mask.any(0))]
+    elif img.ndim == 3:
+        gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        mask = gray_img > tol
+
+        check_shape = img[:, :, 0][np.ix_(mask.any(1), mask.any(0))].shape[0]
+        if check_shape == 0:
+            return img
+        else:
+            img1 = img[:, :, 0][np.ix_(mask.any(1), mask.any(0))]
+            img2 = img[:, :, 1][np.ix_(mask.any(1), mask.any(0))]
+            img3 = img[:, :, 2][np.ix_(mask.any(1), mask.any(0))]
+            img = np.stack([img1, img2, img3], axis=-1)
+        return img
+
+
+def load_ben_color(image, sigmaX=10):
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = crop_image_from_gray(image).astype("uint8")
+    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
+    image = cv2.addWeighted(image, 4, cv2.GaussianBlur(image, (0, 0), sigmaX), -4, 128)
+    return image
+
+
+"""
+    Preprocessing for ImageDataGenerator since ImageDataGenerator reads images in rgb mode, while opencv in bgr
+"""
+
+
+def preprocessing(image, sigmaX=10):
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    image = crop_image_from_gray(image).astype("uint8")
+    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
+    image = cv2.addWeighted(image, 4, cv2.GaussianBlur(image, (0, 0), sigmaX), -4, 128)
+    return image.astype("float32") / 255.0
+
+
+
+
+## === cell 2
+def extract_features_from_ben_rgb(img_rgb_uint8):
+    img_u8 = img_rgb_uint8
+
+    img_f = img_u8.astype(np.float32) * (1.0 / 255.0)
+    mean_rgb = img_f.mean(axis=(0, 1))
+    std_rgb = img_f.std(axis=(0, 1))
+
+    hsv_u8 = cv2.cvtColor(img_u8, cv2.COLOR_RGB2HSV)
+    hsv = hsv_u8.astype(np.float32) * (1.0 / 255.0)
+    mean_hsv = hsv.mean(axis=(0, 1))
+    std_hsv = hsv.std(axis=(0, 1))
+
+    gray_u8 = cv2.cvtColor(img_u8, cv2.COLOR_RGB2GRAY)
+    gray = gray_u8.astype(np.float32) * (1.0 / 255.0)
+
+    edges_u8 = cv2.Canny(gray_u8, 50, 150)
+    edges = edges_u8.astype(np.float32) * (1.0 / 255.0)
+
+    n_pix = float(gray.size)
+    bin_w_gray = 1.0 / 16.0
+    bin_w_edge = 1.0 / 8.0
+
+    gray_hist = (
+        cv2.calcHist([gray], [0], None, [16], [0.0, 1.0])
+        .reshape(-1)
+        .astype(np.float32, copy=False)
+    )
+    edge_hist = (
+        cv2.calcHist([edges], [0], None, [8], [0.0, 1.0])
+        .reshape(-1)
+        .astype(np.float32, copy=False)
+    )
+
+    gray_hist = gray_hist / (n_pix * bin_w_gray)
+    edge_hist = edge_hist / (n_pix * bin_w_edge)
+
+    thumb_u8 = cv2.resize(img_u8, (16, 16), interpolation=cv2.INTER_AREA)
+    thumb_flat = (thumb_u8.astype(np.float32) * (1.0 / 255.0)).reshape(-1)
+
+    feat = np.concatenate(
+        [
+            mean_rgb.astype(np.float32, copy=False),
+            std_rgb.astype(np.float32, copy=False),
+            mean_hsv.astype(np.float32, copy=False),
+            std_hsv.astype(np.float32, copy=False),
+            gray_hist,
+            edge_hist,
+            thumb_flat.astype(np.float32, copy=False),
+        ],
+        axis=0,
+    ).astype(np.float32, copy=False)
+    return feat
+
+
+
+
+## === cell 3
+DATA_ROOT_CANDIDATES = [
+    "/kaggle/input/aptos2019-blindness-detection",
+    "../input/aptos2019-blindness-detection",
+    "/kaggle/data/aptos2019-blindness-detection",
+]
+DATA_ROOT = None
+for p in DATA_ROOT_CANDIDATES:
+    if os.path.exists(p):
+        DATA_ROOT = p
+        break
+if DATA_ROOT is None:
+    raise FileNotFoundError(
+        "Could not find aptos2019-blindness-detection dataset directory in expected locations."
+    )
+
+train_csv_path = os.path.join(DATA_ROOT, "train.csv")
+test_csv_path = os.path.join(DATA_ROOT, "test.csv")
+sample_sub_path = os.path.join(DATA_ROOT, "sample_submission.csv")
+train_img_dir = os.path.join(DATA_ROOT, "train_images")
+test_img_dir = os.path.join(DATA_ROOT, "test_images")
+
+train_df = pd.read_csv(train_csv_path)
+test_df = pd.read_csv(test_csv_path)
+sub_df = pd.read_csv(sample_sub_path)
+
+sub_df = sub_df.drop(columns=["diagnosis"], errors="ignore")
+sub_df = sub_df.merge(test_df[["id_code"]], on="id_code", how="right")
+
+print("DATA_ROOT:", DATA_ROOT)
+print(
+    "Train rows:",
+    len(train_df),
+    "Test rows:",
+    len(test_df),
+    "Submission rows:",
+    len(sub_df),
+)
+
+
+
+## === cell 4
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold, StratifiedShuffleSplit
+
+from concurrent.futures import ThreadPoolExecutor
+
+_QWK_W_CACHE = {}
+
+
+def _qwk_weights(n_classes):
+    W = _QWK_W_CACHE.get(n_classes)
+    if W is None:
+        i = np.arange(n_classes, dtype=np.float64)
+        W = ((i[:, None] - i[None, :]) ** 2) / ((n_classes - 1) ** 2)
+        _QWK_W_CACHE[n_classes] = W
+    return W
+
+
+def quadratic_weighted_kappa(y_true, y_pred, n_classes=5):
+    y_true = np.asarray(y_true, dtype=np.int64)
+    y_pred = np.asarray(y_pred, dtype=np.int64)
+    y_true = np.clip(y_true, 0, n_classes - 1)
+    y_pred = np.clip(y_pred, 0, n_classes - 1)
+
+    idx = y_true * n_classes + y_pred
+    O = (
+        np.bincount(idx, minlength=n_classes * n_classes)
+        .reshape(n_classes, n_classes)
+        .astype(np.float64, copy=False)
+    )
+
+    act_hist = np.bincount(y_true, minlength=n_classes).astype(np.float64, copy=False)
+    pred_hist = np.bincount(y_pred, minlength=n_classes).astype(np.float64, copy=False)
+
+    E = np.outer(act_hist, pred_hist)
+    E = E / E.sum() * O.sum()
+
+    W = _qwk_weights(n_classes)
+
+    num = (W * O).sum()
+    den = (W * E).sum()
+    return 1.0 - num / den if den > 0 else 0.0
+
+
+def apply_thresholds(x, thresholds):
+    t0, t1, t2, t3 = thresholds
+    return np.where(
+        x < t0,
+        0,
+        np.where(x < t1, 1, np.where(x < t2, 2, np.where(x < t3, 3, 4))),
+    ).astype(int)
+
+
+def fit_thresholds_qwk(x_cont, y_true, n_classes=5, n_iters=6):
+    x_cont = np.asarray(x_cont, dtype=np.float64)
+    y_true = np.asarray(y_true, dtype=np.int64)
+
+    qs = np.quantile(x_cont, [0.2, 0.4, 0.6, 0.8]).tolist()
+    thr = np.array(sorted(qs), dtype=np.float64)
+
+    xmin, xmax = float(x_cont.min()), float(x_cont.max())
+    grid = np.linspace(xmin, xmax, 200, dtype=np.float64)
+
+    W = _qwk_weights(n_classes)
+    act_hist = np.bincount(
+        np.clip(y_true, 0, n_classes - 1), minlength=n_classes
+    ).astype(np.float64)
+    N = float(y_true.size)
+
+    def qwk_fast(y_pred_int):
+        y_pred_int = np.asarray(y_pred_int, dtype=np.int64)
+        y_pred_int = np.clip(y_pred_int, 0, n_classes - 1)
+
+        idx = y_true * n_classes + y_pred_int
+        O = (
+            np.bincount(idx, minlength=n_classes * n_classes)
+            .reshape(n_classes, n_classes)
+            .astype(np.float64, copy=False)
+        )
+
+        pred_hist = np.bincount(y_pred_int, minlength=n_classes).astype(
+            np.float64, copy=False
+        )
+        E = np.outer(act_hist, pred_hist)
+        E = E / E.sum() * N
+
+        num = (W * O).sum()
+        den = (W * E).sum()
+        return 1.0 - num / den if den > 0 else 0.0
+
+    best_thr = thr.copy()
+    best_score = qwk_fast(apply_thresholds(x_cont, best_thr))
+
+    for _ in range(n_iters):
+        for k in range(4):
+            candidate_best = best_thr.copy()
+            candidate_score = best_score
+
+            low = xmin if k == 0 else candidate_best[k - 1] + 1e-6
+            high = xmax if k == 3 else candidate_best[k + 1] - 1e-6
+            if low >= high:
+                continue
+
+            subgrid = grid[(grid > low) & (grid < high)]
+            if subgrid.size == 0:
+                continue
+
+            for val in subgrid:
+                cand = candidate_best.copy()
+                cand[k] = val
+                sc = qwk_fast(apply_thresholds(x_cont, cand))
+                if sc > candidate_score:
+                    candidate_score = sc
+                    candidate_best = cand
+
+            best_thr = candidate_best
+            best_score = candidate_score
+
+    return best_thr, best_score
+
+
+MAX_TRAIN_SAMPLES = None  # use all
+
+train_ids_all = train_df["id_code"].values
+y_all = train_df["diagnosis"].astype(int).values
+
+if MAX_TRAIN_SAMPLES is not None and len(train_ids_all) > MAX_TRAIN_SAMPLES:
+    train_ids_all = train_ids_all[:MAX_TRAIN_SAMPLES]
+    y_all = y_all[:MAX_TRAIN_SAMPLES]
+
+
+def build_features(ids, labels=None, img_dir=None, report_every=500, tag="train"):
+    n = len(ids)
+    feat_dim = 804
+    X = np.empty((n, feat_dim), dtype=np.float32)
+    y_out = np.empty((n,), dtype=np.int64) if labels is not None else None
+
+    def _one(i_img_id):
+        i, img_id = i_img_id
+        img_path = os.path.join(img_dir, f"{img_id}.png")
+        img_bgr = cv2.imread(img_path)
+        if img_bgr is None:
+            return i, None
+        img_rgb = load_ben_color(img_bgr)
+        feat = extract_features_from_ben_rgb(img_rgb)
+        lab = int(labels[i]) if labels is not None else None
+        return i, (feat, lab)
+
+    max_workers = min(8, (os.cpu_count() or 4))
+    bad = 0
+    done = 0
+
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        for i, out in ex.map(_one, enumerate(ids), chunksize=32):
+            if out is None:
+                bad += 1
+            else:
+                feat, lab = out
+                X[i] = feat
+                if y_out is not None:
+                    y_out[i] = lab
+            done += 1
+            if report_every is not None and done % report_every == 0:
+                print(f"Processed {tag} images: {done}/{n}")
+
+    if bad > 0:
+        print(f"WARNING: {bad} {tag} images could not be read and were skipped.")
+        keep_mask = np.isfinite(X).all(axis=1)
+        X = X[keep_mask]
+        if y_out is not None:
+            y_out = y_out[keep_mask]
+
+    if labels is not None:
+        return X, y_out.astype(int, copy=False)
+    return X
+
+
+print("Building ALL train features once (reused for CV/val/full-train)...")
+all_ids = train_df["id_code"].values
+all_y = train_df["diagnosis"].astype(int).values
+X_all, y_all_built = build_features(
+    all_ids, labels=all_y, img_dir=train_img_dir, report_every=500, tag="all-train"
+)
+
+if X_all.shape[0] != len(all_ids):
+    raise RuntimeError(
+        "Some training images could not be read; for strict split consistency, this script expects all train images readable."
+    )
+
+CLASS_IDX = np.arange(5, dtype=np.float64)
+
+
+def make_clf():
+    return Pipeline(
+        steps=[
+            ("scaler", StandardScaler(with_mean=True, with_std=True)),
+            (
+                "lr",
+                LogisticRegression(
+                    class_weight="balanced",
+                    solver="lbfgs",
+                    max_iter=3000,
+                    multi_class="multinomial",
+                    n_jobs=-1,
+                    C=2.0,
+                    random_state=42,
+                ),
+            ),
+        ]
+    )
+
+
+N_SPLITS = 5
+skf = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=42)
+
+thr_list = []
+fold_scores = []
+
+print(
+    f"Fitting {N_SPLITS}-fold OOF thresholds (same model, same threshold optimizer)..."
+)
+for fold, (tr_idx, va_idx) in enumerate(skf.split(X_all, y_all_built), start=1):
+    clf_fold = make_clf()
+    clf_fold.fit(X_all[tr_idx], y_all_built[tr_idx])
+
+    va_proba = clf_fold.predict_proba(X_all[va_idx])
+    va_exp = (va_proba * CLASS_IDX[None, :]).sum(axis=1)
+
+    thr_fold, thr_qwk = fit_thresholds_qwk(
+        va_exp, y_all_built[va_idx], n_classes=5, n_iters=6
+    )
+    va_pred_thr = apply_thresholds(va_exp, thr_fold)
+    va_qwk_thr = quadratic_weighted_kappa(y_all_built[va_idx], va_pred_thr, n_classes=5)
+
+    thr_list.append(thr_fold)
+    fold_scores.append(va_qwk_thr)
+    print(f"  Fold {fold}: QWK(thr)={va_qwk_thr:.6f}, thresholds={thr_fold.tolist()}")
+
+thr_arr = np.vstack(thr_list)
+thr = np.mean(thr_arr, axis=0)
+thr = np.sort(thr)  # ensure monotonic
+print("OOF mean thresholds:", thr.tolist())
+print(
+    "OOF fold QWK mean:",
+    float(np.mean(fold_scores)),
+    "std:",
+    float(np.std(fold_scores)),
+)
+
+sss = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+train_idx, val_idx = next(sss.split(all_ids, y_all_built))
+X_train, y_train = X_all[train_idx], y_all_built[train_idx]
+X_val, y_val = X_all[val_idx], y_all_built[val_idx]
+
+clf_check = make_clf()
+clf_check.fit(X_train, y_train)
+val_proba = clf_check.predict_proba(X_val)
+val_exp = (val_proba * CLASS_IDX[None, :]).sum(axis=1)
+val_pred_thr = apply_thresholds(val_exp, thr)
+val_qwk_thr = quadratic_weighted_kappa(y_val, val_pred_thr, n_classes=5)
+print(
+    "Single split (for reference) Val QWK using OOF-mean thresholds:",
+    float(val_qwk_thr),
+)
+
+gc.collect()
+
+
+
+## === cell 5
+print("Refitting model on full training data and predicting test...")
+clf = make_clf()
+clf.fit(X_all, y_all_built)
+gc.collect()
+
+id_code = sub_df["id_code"].values
+
+feat_dim = 804
+X_test = np.empty((len(id_code), feat_dim), dtype=np.float32)
+
+
+def _one_test(i_img_id):
+    i, img_id = i_img_id
+    img_path = os.path.join(test_img_dir, f"{img_id}.png")
+    img_bgr = cv2.imread(img_path)
+    if img_bgr is None:
+        return i, None
+    img_rgb = load_ben_color(img_bgr)
+    return i, extract_features_from_ben_rgb(img_rgb)
+
+
+max_workers = min(8, (os.cpu_count() or 4))
+bad = 0
+done = 0
+with ThreadPoolExecutor(max_workers=max_workers) as ex:
+    for i, feat in ex.map(_one_test, enumerate(id_code), chunksize=32):
+        if feat is None:
+            bad += 1
+        else:
+            X_test[i] = feat
+        done += 1
+        if done % 100 == 0:
+            print(f"Processed test images: {done}/{len(id_code)}")
+
+if bad > 0:
+    raise FileNotFoundError(
+        f"Could not read {bad} test images (see paths under {test_img_dir})."
+    )
+
+proba = clf.predict_proba(X_test)
+exp_test = (proba * CLASS_IDX[None, :]).sum(axis=1)
+test_prediction = apply_thresholds(exp_test, thr).astype(np.int64)
+
+
+
+## === cell 6
+sub_df["diagnosis"] = test_prediction.astype("int64")
+sub_path = "submission.csv"
+sub_df[["id_code", "diagnosis"]].to_csv(sub_path, index=False)
+
+unique, counts = np.unique(test_prediction, return_counts=True)
+print(dict(zip(unique.tolist(), counts.tolist())))
+print(f"Saved {sub_path} with shape {sub_df.shape}")
+print("Done!")

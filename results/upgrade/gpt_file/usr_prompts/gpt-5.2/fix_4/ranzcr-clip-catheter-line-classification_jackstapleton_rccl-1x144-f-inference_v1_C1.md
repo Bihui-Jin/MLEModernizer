@@ -1,0 +1,763 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect the presence and position of catheters and lines on chest x-rays.
+
+## Metric
+Area under the ROC curve for each label, with the final score being the average of the individual AUCs of each predicted column.
+
+## Submission Format
+For each ID in the test set, you must predict a probability for all target variables. The file should contain a header and have the following format:
+```
+StudyInstanceUID,ETT - Abnormal,ETT - Borderline,ETT - Normal,NGT - Abnormal,NGT - Borderline,NGT - Incompletely Imaged,NGT - Normal,CVC - Abnormal,CVC - Borderline,CVC - Normal,Swan Ganz Catheter Present
+1.2.826.0.1.3680043.8.498.62451881164053375557257228990443168843,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.83721761279899623084220697845011427274,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.12732270010839808189235995393981377825,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.11769539755086084996287023095028033598,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.87838627504097587943394933987052577153,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.53211840524738036417560823327351887819,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.93555795394184819372299157360228027866,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.52241894131170494723503100795076463919,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.36500167484503936720548852591033878284,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.86199852603457900780565655267977637728,0,0,0,0,0,0,0,0,0,0,0
+```
+
+## Dataset
+`train.csv` contains image IDs, binary labels, and patient IDs.
+
+TFRecords are available for both train and test.
+
+We've also included `train_annotations.csv`. These are segmentation annotations for training samples that have them. They are included solely as additional information for competitors.
+
+- train.csv - contains image IDs, binary labels, and patient IDs.
+- sample_submission.csv - a sample submission file in the correct format
+- test - test images
+- train - training images
+
+### Columns
+- `StudyInstanceUID` - unique ID for each image
+- `ETT - Abnormal` - endotracheal tube placement abnormal
+- `ETT - Borderline` - endotracheal tube placement borderline abnormal
+- `ETT - Normal` - endotracheal tube placement normal
+- `NGT - Abnormal` - nasogastric tube placement abnormal
+- `NGT - Borderline` - nasogastric tube placement borderline abnormal
+- `NGT - Incompletely Imaged` - nasogastric tube placement inconclusive due to imaging
+- `NGT - Normal` - nasogastric tube placement borderline normal
+- `CVC - Abnormal` - central venous catheter placement abnormal
+- `CVC - Borderline` - central venous catheter placement borderline abnormal
+- `CVC - Normal` - central venous catheter placement normal
+- `Swan Ganz Catheter Present`
+- `PatientID` - unique ID for each patient in the dataset
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+        input/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+        working/
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+```
+
+-> data/ranzcr-clip-catheter-line-classification/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/ranzcr-clip-catheter-line-classification/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/ranzcr-clip-catheter-line-classification/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> data/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8370631752274111
+
+# 6. Current score
+
+0.5
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5) has done: 'I fix the runtime failure by making the weight-loading robust: search common Kaggle input locations for the expected `.pt` files and load them with `map_location` so it works on CPU/GPU. If the external weights are not present, the code still run end-to-end by falling back to a safe baseline prediction derived from `train.csv` label prevalences (score be lower than a real model, but it produce a valid submission instead of crashing). I also fix the submission column mismatch by writing predictions into the exact columns from `sample_submission.csv` (your current sample file has only 9 target columns), ensuring the output CSV is valid. Core model/inference logic is preserved; the only behavioral change is the necessary fallback when checkpoints are missing.'
+- What this solution (achieved 0.5) has done: 'Your current 0.5 score strongly suggests you are always hitting the “no checkpoints found” fallback (constant priors), which is typically near-random for mean AUC. To move toward the 0.837 target without changing core model logic, I (1) expand checkpoint discovery to specifically search for your `rccl-1x144-f-train` directory and accept common filename variants, and (2) instantiate a fresh model per checkpoint so repeated `load_state_dict` calls can’t silently leave mixed weights if a load partially fails. I also make the output dimension handling robust by reading the true set of competition target columns from `train.csv` and ensuring the submission includes any missing columns (your `sample_submission.csv` appears truncated in this environment), which prevents accidental column-drop that can tank score. If checkpoints still aren’t present, the code still produce a valid `submission.csv` exactly as before.'
+- What this solution (achieved 0.5) has done: 'Your 0.5 score indicates you’re still effectively submitting near-constant predictions (either because checkpoints aren’t being found/loaded, or because predictions aren’t aligned to the exact 11 competition targets). I make two minimal, score-relevant fixes: (1) ensure we always load the *correct* 11 target columns and submission schema by deriving columns from `train.csv` (not the possibly-truncated `sample_submission.csv`) and adding any missing columns in the right order, and (2) strengthen checkpoint discovery/loading to handle common checkpoint formats (plain `state_dict`, wrapped dict with `state_dict`, or `model_state_dict`) and common filename/root variants so the real trained model is used rather than the fallback priors. These changes preserve your model and inference logic; they only prevent silent fallback/misalignment that can collapse AUC to ~0.5. The script still always produce a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+import torch
+from torch import nn, optim
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader as DL
+import torch.nn.functional as F
+
+import gc
+import os
+import cv2
+from time import time
+
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+seed = 42
+np.random.seed(seed)
+torch.manual_seed(seed)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(seed)
+
+
+
+## === cell 1
+BASE_INPUT = "../input/ranzcr-clip-catheter-line-classification"
+TRAIN_CSV = os.path.join(BASE_INPUT, "train.csv")
+SAMPLE_SUB = os.path.join(BASE_INPUT, "sample_submission.csv")
+TEST_DIR = os.path.join(BASE_INPUT, "test")
+
+ALT_BASE_INPUT = "/kaggle/input/ranzcr-clip-catheter-line-classification"
+if not os.path.exists(SAMPLE_SUB) and os.path.exists(ALT_BASE_INPUT):
+    BASE_INPUT = ALT_BASE_INPUT
+    TRAIN_CSV = os.path.join(BASE_INPUT, "train.csv")
+    SAMPLE_SUB = os.path.join(BASE_INPUT, "sample_submission.csv")
+    TEST_DIR = os.path.join(BASE_INPUT, "test")
+
+
+
+
+## === cell 2
+def breaker():
+    print("\n" + 50 * "-" + "\n")
+
+
+def head(x, no_of_ele=5):
+    print(x[:no_of_ele])
+
+
+def getImages(file_path=None, file_names=None, size=None):
+    images = []
+    for name in file_names:
+        try:
+            image = cv2.imread(
+                os.path.join(file_path, name + ".jpg"), cv2.IMREAD_GRAYSCALE
+            ).astype("float64")
+        except AttributeError:
+            print(os.path.join(file_path, name + ".jpg"))
+            image = np.zeros((size, size), dtype="float64")
+        if size:
+            image = cv2.resize(
+                image, dsize=(size, size), interpolation=cv2.INTER_LANCZOS4
+            )
+        cv2.normalize(src=image, dst=image, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX)
+        images.append(image.reshape(1, size, size))
+    return np.array(images)
+
+
+
+
+## === cell 3
+def find_existing_checkpoint(rel_path):
+    """
+    Improvement toward target: broaden checkpoint discovery so we actually load trained weights
+    instead of always falling back to constant priors (which tends to score ~0.5 AUC).
+    This does not change model architecture/inference; it only increases the chance of finding files.
+    """
+    candidates = []
+    if rel_path:
+        candidates.extend(
+            [
+                rel_path,
+                os.path.join(
+                    "../input",
+                    os.path.basename(os.path.dirname(rel_path)),
+                    os.path.basename(rel_path),
+                ),
+                os.path.join(
+                    "/kaggle/input",
+                    os.path.basename(os.path.dirname(rel_path)),
+                    os.path.basename(rel_path),
+                ),
+            ]
+        )
+
+    if rel_path:
+        base = os.path.basename(rel_path)
+        candidates.extend(
+            [
+                os.path.join("../input/rccl-1x144-f-train", base),
+                os.path.join("/kaggle/input/rccl-1x144-f-train", base),
+                os.path.join("../input/rccl-1x144-f-train/rccl-1x144-f-train", base),
+                os.path.join(
+                    "/kaggle/input/rccl-1x144-f-train/rccl-1x144-f-train", base
+                ),
+            ]
+        )
+
+    if rel_path:
+        base = os.path.basename(rel_path)
+        root, ext = os.path.splitext(base)
+        variants = list(
+            dict.fromkeys(
+                [
+                    base,
+                    root + ".pt",
+                    root + ".pth",
+                    root.lower() + ".pt",
+                    root.lower() + ".pth",
+                ]
+            )
+        )
+        for v in variants:
+            candidates.extend(
+                [
+                    os.path.join("../input/rccl-1x144-f-train", v),
+                    os.path.join("/kaggle/input/rccl-1x144-f-train", v),
+                    os.path.join("../input/rccl-1x144-f-train/rccl-1x144-f-train", v),
+                    os.path.join(
+                        "/kaggle/input/rccl-1x144-f-train/rccl-1x144-f-train", v
+                    ),
+                ]
+            )
+
+    for p in candidates:
+        if p and os.path.exists(p):
+            return p
+
+    base_dirs = ["../input", "/kaggle/input"]
+    target_name = os.path.basename(rel_path) if rel_path else None
+
+    name_variants = []
+    if target_name:
+        root, ext = os.path.splitext(target_name)
+        name_variants.extend([target_name, target_name.lower()])
+        name_variants.extend(
+            [root + ".pt", root + ".pth", root.lower() + ".pt", root.lower() + ".pth"]
+        )
+        name_variants.append(target_name.replace("Epoch_", "epoch_"))
+        name_variants.append(target_name.replace("Epoch_", "Epoch"))
+        name_variants = list(dict.fromkeys(name_variants))
+
+    for bd in base_dirs:
+        if os.path.exists(bd) and target_name:
+            for rootdir, dirs, files in os.walk(bd):
+                for nv in name_variants:
+                    if nv in files:
+                        return os.path.join(rootdir, nv)
+    return None
+
+
+
+
+## === cell 4
+def get_train_priors(train_csv_path, target_cols):
+    """
+    Fallback baseline: use label prevalence to fill probabilities if checkpoints are missing.
+    Ensures a valid submission is produced end-to-end.
+    """
+    tr = pd.read_csv(train_csv_path)
+    priors = tr[target_cols].mean(axis=0).astype("float64").values
+    priors = np.clip(priors, 1e-6, 1 - 1e-6)
+    return priors
+
+
+
+
+## === cell 5
+start_time = time()
+
+ss = pd.read_csv(SAMPLE_SUB)
+
+ts_img_names = ss["StudyInstanceUID"].values
+ts_images = getImages(TEST_DIR + "/", ts_img_names, size=144)
+
+breaker()
+print("Time Taken to read data : {:.2f} minutes".format((time() - start_time) / 60))
+breaker()
+
+
+
+## === cell 6
+train_df = pd.read_csv(TRAIN_CSV)
+true_target_cols = [
+    c for c in train_df.columns if c not in ["StudyInstanceUID", "PatientID"]
+]
+
+for c in true_target_cols:
+    if c not in ss.columns:
+        ss[c] = 0.0
+
+target_cols = true_target_cols
+n_targets = len(target_cols)
+print("Using target columns from train.csv:", n_targets)
+print(target_cols)
+
+
+
+
+## === cell 7
+class Dataset(Dataset):
+    def __init__(this, X=None, y=None, mode="train"):
+        this.mode = mode
+        this.X = X
+        if mode == "train":
+            this.y = y
+
+    def __len__(this):
+        return this.X.shape[0]
+
+    def __getitem__(this, idx):
+        if this.mode == "train":
+            return torch.FloatTensor(this.X[idx]), torch.FloatTensor(this.y[idx])
+        else:
+            return torch.FloatTensor(this.X[idx])
+
+
+
+
+## === cell 8
+ORIG_OL = 11
+
+
+
+
+## === cell 9
+def slice_or_pad_predictions(pred, out_dim, pad_values=None):
+    """
+    Fix: if model outputs 11 but required targets differ, align by slicing/padding.
+    Padding uses train priors (if provided) rather than zeros to avoid unnecessary score loss.
+    """
+    if pred.shape[1] == out_dim:
+        return pred
+    if pred.shape[1] > out_dim:
+        return pred[:, :out_dim]
+    if pad_values is None:
+        pad_values = np.zeros((out_dim - pred.shape[1],), dtype=pred.dtype)
+    pad_values = pad_values.astype(pred.dtype)
+    pad = np.tile(pad_values.reshape(1, -1), (pred.shape[0], 1))
+    return np.concatenate([pred, pad], axis=1)
+
+
+
+
+## === cell 10
+class CFG:
+    tr_batch_size = 128  # Alos va_batch_size
+    ts_batch_size = 128
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    in_channels = 1
+    OL = ORIG_OL
+
+    def __init__(
+        this, filter_sizes=[64, 128, 256, 512], HL=[4096, 4096], epochs=50, n_folds=5
+    ):
+        this.filter_sizes = filter_sizes
+        this.HL = HL
+        this.epochs = epochs
+        this.n_folds = n_folds
+
+
+
+
+## === cell 11
+cfg = CFG(filter_sizes=[64, 128, 256, 512], HL=[4096, 4096], epochs=50, n_folds=5)
+
+
+
+
+## === cell 12
+class CNN(nn.Module):
+    def __init__(
+        this,
+        in_channels=1,
+        filter_sizes=None,
+        HL=None,
+        OL=None,
+        use_DP=False,
+        DP1=0.2,
+        DP2=0.5,
+    ):
+        super(CNN, this).__init__()
+
+        this.use_DP = use_DP
+
+        this.DP1 = nn.Dropout(p=0.2)
+        this.DP2 = nn.Dropout(p=0.5)
+
+        this.MP_ = nn.MaxPool2d(kernel_size=2)
+
+        this.CN1 = nn.Conv2d(
+            in_channels=in_channels,
+            out_channels=filter_sizes[0],
+            kernel_size=3,
+            stride=1,
+            padding=1,
+        )
+        this.BN1 = nn.BatchNorm2d(num_features=filter_sizes[0], eps=1e-5)
+
+        this.CN2 = nn.Conv2d(
+            in_channels=filter_sizes[0],
+            out_channels=filter_sizes[1],
+            kernel_size=3,
+            stride=1,
+            padding=1,
+        )
+        this.BN2 = nn.BatchNorm2d(num_features=filter_sizes[1], eps=1e-5)
+
+        this.CN3 = nn.Conv2d(
+            in_channels=filter_sizes[1],
+            out_channels=filter_sizes[2],
+            kernel_size=3,
+            stride=1,
+            padding=1,
+        )
+        this.BN3 = nn.BatchNorm2d(num_features=filter_sizes[2], eps=1e-5)
+
+        this.CN4 = nn.Conv2d(
+            in_channels=filter_sizes[2],
+            out_channels=filter_sizes[3],
+            kernel_size=3,
+            stride=1,
+            padding=1,
+        )
+        this.BN4 = nn.BatchNorm2d(num_features=filter_sizes[3], eps=1e-5)
+
+        this.CN5 = nn.Conv2d(
+            in_channels=filter_sizes[3],
+            out_channels=filter_sizes[3],
+            kernel_size=3,
+            stride=1,
+            padding=1,
+        )
+        this.BN5 = nn.BatchNorm2d(num_features=filter_sizes[3], eps=1e-5)
+
+        this.CN6 = nn.Conv2d(
+            in_channels=filter_sizes[3],
+            out_channels=filter_sizes[3],
+            kernel_size=3,
+            stride=1,
+            padding=1,
+        )
+        this.BN6 = nn.BatchNorm2d(num_features=filter_sizes[3], eps=1e-5)
+
+        this.FC1 = nn.Linear(in_features=filter_sizes[3] * 2 * 2, out_features=HL[0])
+        this.FC2 = nn.Linear(in_features=HL[0], out_features=HL[1])
+        this.FC3 = nn.Linear(in_features=HL[1], out_features=OL)
+
+    def getOptimizer(this, A_S=True, lr=1e-3, wd=0):
+        if A_S:
+            return optim.Adam(this.parameters(), lr=lr, weight_decay=wd)
+        else:
+            return optim.SGD(this.parameters(), lr=lr, momentum=0.9, weight_decay=wd)
+
+    def getStepLR(this, optimizer=None, step_size=5, gamma=0.1):
+        return optim.lr_scheduler.StepLR(
+            optimizer=optimizer, step_size=step_size, gamma=gamma
+        )
+
+    def getMultiStepLR(this, optimizer=None, milestones=None, gamma=0.1):
+        return optim.lr_scheduler.MultiStepLR(
+            optimizer=optimizer, milestones=milestones, gamma=gamma
+        )
+
+    def getPlateauLR(this, optimizer=None, patience=5, eps=1e-6):
+        return optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer=optimizer, patience=patience, eps=eps, verbose=True
+        )
+
+    def forward(this, x):
+        if not this.use_DP:
+            x = F.relu(this.MP_(this.BN1(this.CN1(x))))
+            x = F.relu(this.MP_(this.BN2(this.CN2(x))))
+            x = F.relu(this.MP_(this.BN3(this.CN3(x))))
+            x = F.relu(this.MP_(this.BN4(this.CN4(x))))
+            x = F.relu(this.MP_(this.BN5(this.CN5(x))))
+            x = F.relu(this.MP_(this.BN6(this.CN6(x))))
+
+            x = x.view(x.shape[0], -1)
+
+            x = F.relu(this.FC1(x))
+            x = F.relu(this.FC2(x))
+            x = this.FC3(x)
+
+            return x
+        else:
+            x = F.relu(this.MP_(this.BN1(this.CN1(x))))
+            x = F.relu(this.MP_(this.BN2(this.CN2(x))))
+            x = F.relu(this.MP_(this.BN3(this.CN3(x))))
+            x = F.relu(this.MP_(this.BN4(this.CN4(x))))
+            x = F.relu(this.MP_(this.BN5(this.CN5(x))))
+            x = F.relu(this.MP_(this.BN6(this.CN6(x))))
+
+            x = x.view(x.shape[0], -1)
+
+            x = F.relu(this.DP2(this.FC1(x)))
+            x = F.relu(this.DP2(this.FC2(x)))
+            x = this.FC3(x)
+
+            return x
+
+
+
+
+## === cell 13
+def safe_load_state_dict(model, ckpt_path, device):
+    """
+    Score-relevant robustness: support common checkpoint wrappers so we don't silently fail
+    and fall back to priors (which yields ~0.5). Keeps architecture/inference identical.
+    """
+    if ckpt_path is None or (not os.path.exists(ckpt_path)):
+        return False
+    state = torch.load(ckpt_path, map_location=device)
+
+    if (
+        isinstance(state, dict)
+        and "state_dict" in state
+        and isinstance(state["state_dict"], dict)
+    ):
+        state_dict = state["state_dict"]
+    elif (
+        isinstance(state, dict)
+        and "model_state_dict" in state
+        and isinstance(state["model_state_dict"], dict)
+    ):
+        state_dict = state["model_state_dict"]
+    else:
+        state_dict = state
+
+    if isinstance(state_dict, dict):
+        keys = list(state_dict.keys())
+        if len(keys) > 0 and keys[0].startswith("module."):
+            state_dict = {k.replace("module.", "", 1): v for k, v in state_dict.items()}
+
+    model.load_state_dict(state_dict, strict=True)
+    return True
+
+
+
+
+## === cell 14
+def predict_(model=None, dataloader=None, device=None, path=None):
+    ckpt = find_existing_checkpoint(path) if path else None
+    ok = safe_load_state_dict(model, ckpt, device) if ckpt else False
+
+    model.to(device)
+    model.eval()
+
+    y_pred = torch.zeros(0, ORIG_OL, device=device)
+
+    for X in dataloader:
+        X = X.to(device)
+        with torch.no_grad():
+            Pred = torch.sigmoid(model(X))
+        y_pred = torch.cat((y_pred, Pred), dim=0)
+
+    return y_pred.detach().cpu().numpy(), ok, ckpt
+
+
+
+
+## === cell 15
+ts_data_setup = Dataset(ts_images, None, "test")
+ts_data = DL(ts_data_setup, batch_size=cfg.ts_batch_size, shuffle=False)
+
+priors_full = get_train_priors(TRAIN_CSV, target_cols)
+
+paths = [
+    "../input/rccl-1x144-f-train/Epoch_19.pt",
+    "../input/rccl-1x144-f-train/Epoch_20.pt",
+    "../input/rccl-1x144-f-train/Epoch_23.pt",
+    "../input/rccl-1x144-f-train/Epoch_25.pt",
+]
+
+preds = []
+loaded_any = False
+
+for p in paths:
+    model = CNN(
+        in_channels=cfg.in_channels, filter_sizes=cfg.filter_sizes, HL=cfg.HL, OL=cfg.OL
+    )
+    pred, ok, used = predict_(
+        model=model, dataloader=ts_data, device=cfg.device, path=p
+    )
+    if ok:
+        loaded_any = True
+        preds.append(pred)
+        print(f"Loaded checkpoint: {used}")
+    else:
+        print(f"Checkpoint not found/loaded for: {p}")
+
+if loaded_any:
+    y_pred = np.mean(preds, axis=0)
+    y_pred = np.clip(y_pred, 1e-15, 1 - 1e-15)
+    y_pred = slice_or_pad_predictions(
+        y_pred,
+        n_targets,
+        pad_values=priors_full[max(0, ORIG_OL) :] if n_targets > ORIG_OL else None,
+    )
+else:
+    y_pred = np.tile(priors_full.reshape(1, -1), (len(ts_img_names), 1))
+
+sub = ss[["StudyInstanceUID"] + target_cols].copy()
+sub.loc[:, target_cols] = y_pred
+sub.to_csv("./submission.csv", index=False)
+
+print(sub.head(5))
+print("Saved submission to ./submission.csv with shape:", sub.shape)
+print("Loaded any checkpoints:", loaded_any)
+if loaded_any:
+    print("Ensembled checkpoints used:", len(preds))

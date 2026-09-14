@@ -1,0 +1,350 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of dogs, predict the breed of each image.
+
+## Metric
+Multi Class Log Loss.
+
+## Submission Format
+For each image in the test set, you must predict a probability for each of the different breeds. The file should contain a header and have the following format:
+```
+id,affenpinscher,afghan_hound,..,yorkshire_terrier
+000621fb3cbb32d8935728e48679680e,0.0083,0.0,...,0.0083
+etc.
+```
+
+## Dataset Description
+- `train.zip` - the training set, you are provided the breed for these dogs
+- `test.zip` - the test set, you must predict the probability of each breed for each image
+- `sample_submission.csv` - a sample submission file in the correct format
+- `labels.csv` - the breeds for the images in the train set
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+fastai==2.8.5
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (169 lines)
+            labels.csv (9200 lines)
+            labels.csv.zip (201.6 kB)
+            sample_submission.csv (1024 lines)
+            sample_submission.csv.zip (32.1 kB)
+            test.zip (36.4 MB)
+            train.zip (324.7 MB)
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+            test/
+                bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                ... and 1021 other files
+                test/
+            train/
+                868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                ... and 9197 other files
+                train/
+        input/
+            description.md (169 lines)
+            labels.csv (9200 lines)
+            labels.csv.zip (201.6 kB)
+            sample_submission.csv (1024 lines)
+            sample_submission.csv.zip (32.1 kB)
+            test.zip (36.4 MB)
+            train.zip (324.7 MB)
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+            test/
+                bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                ... and 1021 other files
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+            train/
+                868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                ... and 9197 other files
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+        working/
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+```
+
+-> data/dog-breed-identification/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> data/dog-breed-identification/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> data/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> data/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> input/dog-breed-identification/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> input/dog-breed-identification/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.39742
+
+# 6. Current score
+
+3.80976
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 3.80061) has done: 'To move log-loss down toward your target with minimal core-logic changes, I fix two issues that typically inflate multiclass logloss here: (1) `get_preds` from fastai already returns probabilities by default for classification, so applying an extra `softmax` can distort calibration; and (2) the submission must follow the exact class-column order from `sample_submission.csv` and the exact test `id` ordering, otherwise you can get a worse score even with good predictions. I also switch the metric shown during training to `error_rate` (fastai’s default for classification) only for monitoring, and keep the model/training loop the same. Finally, I add a tiny probability clamp/renormalization to avoid any accidental zeros/ones that can hurt logloss numerically without changing the model.'
+- What this solution (achieved 3.80976) has done: 'I fix the submission column mismatch by mapping FastAI’s class names to the exact `sample_submission.csv` headers (the issue is underscores vs hyphens for a few breeds), while keeping the model, training loop, and prediction generation unchanged. I also make the test `id` extraction consistent with the sample file (use filename stems) and ensure the final DataFrame is ordered exactly like the sample submission. Finally, I keep the small probability clamp+renormalization to avoid numerical logloss issues and guarantee a valid `submission.csv` is written end-to-end.'
+
+# 9. Code solution
+
+## === cell 0
+from fastai.vision.all import *
+import pandas as pd
+import numpy as np
+import torch
+import os
+import re
+
+set_seed(42, reproducible=True)
+
+
+
+## === cell 1
+labels = pd.read_csv("../input/dog-breed-identification/labels.csv")
+labels
+
+
+
+## === cell 2
+labels["breed"].value_counts().plot(kind="hist")
+
+
+
+## === cell 3
+from sklearn.model_selection import StratifiedShuffleSplit
+
+split = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+train_ids, valid_ids = next(split.split(labels, labels["breed"]))
+labels["is_valid"] = [i in valid_ids for i in range(len(labels))]
+
+labels["id"] = labels["id"].apply(lambda x: x + ".jpg")
+
+
+
+## === cell 4
+path = "../input/dog-breed-identification/train"
+
+
+def get_dls(size, bs):
+    return ImageDataLoaders.from_df(
+        labels,
+        path,
+        item_tfms=Resize(460, method="squeeze"),
+        batch_tfms=[*aug_transforms(size=size), Normalize.from_stats(*imagenet_stats)],
+        bs=bs,
+        val_bs=bs,
+        valid_col="is_valid",
+    )
+
+
+dls = get_dls(400, 64)
+
+
+
+## === cell 5
+dls.show_batch()
+
+
+
+## === cell 6
+label_count = labels["breed"].value_counts()
+n_samples = labels.shape[0]
+n_classes = len(dls.vocab)
+weights = [n_samples / (n_classes * label_count[label]) for label in dls.vocab]
+weights = tensor(weights)
+
+
+
+## === cell 7
+learn = cnn_learner(
+    dls,
+    resnet50,
+    loss_func=nn.CrossEntropyLoss(weight=weights),
+    metrics=error_rate,
+    path=".",
+).to_fp16()
+
+
+
+## === cell 8
+learn.lr_find()
+
+
+
+## === cell 9
+learn.fit_one_cycle(10, 1e-3)
+
+
+
+## === cell 10
+test_files = get_image_files("../input/dog-breed-identification/test")
+test_dl = dls.test_dl(test_files)
+
+
+
+## === cell 11
+preds, _ = learn.get_preds(dl=test_dl)
+
+
+
+## === cell 12
+sample = pd.read_csv("../input/dog-breed-identification/sample_submission.csv")
+class_cols = sample.columns.tolist()[1:]
+
+vocab = list(dls.vocab)
+
+vocab_to_sample = {}
+for v in vocab:
+    if v in class_cols:
+        vocab_to_sample[v] = v
+    else:
+        v_alt = v.replace("-", "_")
+        if v_alt in class_cols:
+            vocab_to_sample[v] = v_alt
+        else:
+            vocab_to_sample[v] = None
+
+unmapped = [v for v, m in vocab_to_sample.items() if m is None]
+if unmapped:
+    raise ValueError(
+        "Could not map some vocab classes to sample_submission columns.\n"
+        f"Unmapped: {unmapped[:30]}{'...' if len(unmapped) > 30 else ''}"
+    )
+
+pred_df = pd.DataFrame(preds.cpu().numpy(), columns=vocab).rename(
+    columns=vocab_to_sample
+)
+
+pred_df.insert(0, "id", [p.stem for p in test_files])
+
+pred_df = sample[["id"]].merge(pred_df, on="id", how="left")
+
+if pred_df[class_cols].isna().any().any():
+    bad = pred_df.loc[pred_df[class_cols].isna().any(axis=1), "id"].head(10).tolist()
+    raise ValueError(
+        "Found missing predictions after merging with sample ids. "
+        f"Example missing ids: {bad}"
+    )
+
+pred_df = pred_df[["id"] + class_cols]
+
+eps = 1e-7
+probs = pred_df[class_cols].to_numpy(dtype=np.float64)
+probs = np.clip(probs, eps, 1.0 - eps)
+probs = probs / probs.sum(axis=1, keepdims=True)
+pred_df[class_cols] = probs
+
+pred_df.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with shape:", pred_df.shape)
+print(pred_df.head())
+
+
+
+## === cell 13
+assert os.path.exists("submission.csv")
+check = pd.read_csv("submission.csv")
+assert check.shape == sample.shape
+assert list(check.columns) == list(sample.columns)
+assert np.allclose(check[class_cols].sum(axis=1).values, 1.0, atol=1e-6)
+check.head()

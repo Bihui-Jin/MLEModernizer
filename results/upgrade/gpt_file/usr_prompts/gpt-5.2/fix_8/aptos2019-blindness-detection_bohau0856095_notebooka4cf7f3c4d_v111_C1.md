@@ -1,0 +1,792 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.6144767469649086
+
+# 6. Current score
+
+-0.01698
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'I fix the model construction to be compatible with the installed `timm==1.0.19` (the EfficientNet attribute names changed, causing the `act1` error) while keeping the exact same architecture/forward logic. I also make device selection safe by falling back to CPU when CUDA isn’t available (your environment has no NVIDIA driver), which fixes the runtime crash during `.to(device)`. Finally, I ensure the inference loop actually runs end-to-end and always writes a non-empty `submission.csv` with the required `id_code,diagnosis` columns. These changes are execution/stability fixes and should not alter intended modeling semantics beyond negligible numeric differences.'
+- What this solution (achieved 0.0) has done: 'I first fix the hard failure caused by trying to load a non-existent weights file by adding a safe fallback that uses the model’s randomly initialized weights when the checkpoint is missing, so the notebook always produces a submission.csv. Next, I fix the device/dtype mismatch that caused the CUDA tensor vs CPU weights runtime error by ensuring both model and inputs are on the same device and by forcing CPU execution in Kaggle environments without a usable GPU driver. Finally, I keep the existing model/forward logic and post-processing unchanged, and ensure the submission is aligned to `sample_submission.csv` and written with the required `id_code,diagnosis` columns.'
+- What this solution (achieved 0.01112) has done: 'Your 0.0 score is coming from using randomly initialized weights (the `../input/weights/1.pth` checkpoint doesn’t exist), so predictions are effectively random. To move the score upward toward the 0.614 target while preserving your model and inference logic, I switch to using the built-in pretrained EfficientNet weights (`pretrained=True`) as a safe, minimal fallback when the external checkpoint is missing. I also fix a small but important forward bug where `block0` is fed `x1` instead of the activated stem output, which keeps the intended EfficientNet feature flow and improves inference quality without changing your architecture. Everything else (thresholding, `combine3output`, transforms, submission formatting) stays the same and the script still writes a valid `submission.csv`.'
+- What this solution (achieved 0.04135) has done: 'Your current score is far below the target, so the smallest safe way to move it upward is to improve the inference-time mapping from your model’s three heads to the final 0–4 label, without changing the model architecture or any training logic. Right now `combine3output` mistakenly turns the ordinal head into a 5-class argmax over 4 logits, which makes that head essentially uninformative and hurts kappa. I fix this by converting the ordinal head’s 4 sigmoid outputs into a proper 5-class distribution and then taking its expected class (or argmax), while keeping the same averaging-with-regression-and-classifier idea. Everything else (pretrained fallback, transforms, file paths, and submission formatting) stays the same and the script still write a valid `submission.csv`.'
+- What this solution (achieved -0.13501) has done: 'Your current score (0.04135) is far below the target (0.61448), so we should move it upward with the smallest changes that preserve your model and inference approach. The biggest remaining issue is that your `ordinal2class_prob()` incorrectly applies a `softmax` to values that are already meant to be a probability distribution, which distorts the ordinal head and harms the final combined prediction. I remove that `softmax` and add a tiny numeric normalization (clamp + renorm) so the expected-class computation is well-behaved, while keeping the exact same three-head averaging logic. Everything else (model, transforms, checkpoint fallback, submission formatting) stays the same.'
+- What this solution (achieved 0.12099) has done: 'Your score is far below the target (higher is better), so the smallest safe move upward is to fix a key inference bug: the three-head outputs are unpacked in the wrong order in the test loop, so regression/classification/ordinal heads are mixed up and predictions become effectively broken. I only change the inference unpacking to match the model’s `forward()` return order, and I add a tiny safety clamp in `combine3output` to keep outputs within valid label range (no change to core model/logic). Everything else (model definition, transforms, thresholds, pretrained fallback, and submission formatting) stays the same, and it still write a valid `submission.csv`.'
+- What this solution (achieved -0.01698) has done: 'Your current score (0.12099) is far below the target (0.61448), so we should cautiously improve inference quality without changing the model architecture or training approach. The biggest low-risk gain is to use the same preprocessing you already defined for fundus images (trim + 4:3 crop) during test inference; right now you define it as `transform1` but never use it, which creates a train/test-style preprocessing mismatch and hurts kappa. I switch the inference pipeline to apply `transform1` before the EfficientNet normalization/resize (`transform2`), keeping your model, heads, and `combine3output` logic unchanged. I also add a tiny safety fallback to handle rare image read errors by predicting 0, so the submission is always complete and valid.'
+
+# 9. Code solution
+
+## === cell 0
+import random
+import time
+import math
+import numpy as np
+import pandas as pd
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.parameter import Parameter
+import torch.optim as optim
+from torch.utils.data import DataLoader
+import torchvision.transforms as transforms
+from torchvision.transforms import functional as FT
+from PIL import Image, ImageChops
+import cv2
+
+from sklearn.metrics import cohen_kappa_score
+import timm
+import os
+import warnings
+
+
+def _select_device():
+    if torch.cuda.is_available():
+        try:
+            _ = torch.tensor([1.0], device="cuda")
+            return "cuda:0"
+        except Exception:
+            return "cpu"
+    return "cpu"
+
+
+device = _select_device()
+print("Using device:", device)
+
+
+
+## === cell 1
+import torch
+import torch.nn as nn
+import torchvision
+import csv
+import timm
+import time
+import glob
+import copy
+import os
+import json
+import cv2
+import numpy as np
+import pickle
+import torch.optim as optim
+import torch
+import torch.nn.functional as F
+from torch import nn as nn
+from torch.optim import lr_scheduler
+from timm.models import *
+from torch.utils.data import Dataset, DataLoader, random_split
+from torchvision import transforms, utils, models, datasets
+from PIL import Image
+from PIL import Image, ImageEnhance, ImageOps
+from torchvision.models._utils import IntermediateLayerGetter
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
+from torchvision.ops.feature_pyramid_network import (
+    FeaturePyramidNetwork,
+    LastLevelMaxPool,
+)
+from torchvision.models.detection import FasterRCNN
+from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+from torchvision.ops.misc import FrozenBatchNorm2d as TVFrozenBatchNorm2d
+from torchvision.models.detection.rpn import AnchorGenerator
+from torchvision.ops import misc as misc_nn_ops
+from torch import Tensor, Size
+from torch.jit.annotations import List, Optional, Tuple
+from torch.nn.parameter import Parameter
+import warnings
+
+
+def gem(x, p=3, eps=1e-6):
+    return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1.0 / p)
+
+
+class GeM(nn.Module):
+    def __init__(self, p=3, eps=1e-6, flatten=False):
+        super(GeM, self).__init__()
+        self.p = Parameter(torch.ones(1) * p)
+        self.eps = eps
+        self.flatten = flatten
+
+    def forward(self, x):
+        x = gem(x, p=self.p, eps=self.eps)
+        if self.flatten:
+            x = x.flatten(1)
+        return x
+
+    def __repr__(self):
+        return (
+            self.__class__.__name__
+            + "("
+            + "p="
+            + "{:.4f}".format(self.p.data.tolist()[0])
+            + ", "
+            + "eps="
+            + str(self.eps)
+            + ")"
+        )
+
+
+class FrozenBatchNorm2d(torch.nn.Module):
+    """
+    BatchNorm2d where the batch statistics and the affine parameters are fixed
+    """
+
+    def __init__(self, num_features: int, eps: float = 1e-5, n: Optional[int] = None):
+        if n is not None:
+            warnings.warn(
+                "`n` argument is deprecated and has been renamed `num_features`",
+                DeprecationWarning,
+            )
+            num_features = n
+        super(FrozenBatchNorm2d, self).__init__()
+        self.eps = eps
+        self.register_buffer("weight", torch.ones(num_features))
+        self.register_buffer("bias", torch.zeros(num_features))
+        self.register_buffer("running_mean", torch.zeros(num_features))
+        self.register_buffer("running_var", torch.ones(num_features))
+
+    def _load_from_state_dict(
+        self,
+        state_dict: dict,
+        prefix: str,
+        local_metadata: dict,
+        strict: bool,
+        missing_keys: List[str],
+        unexpected_keys: List[str],
+        error_msgs: List[str],
+    ):
+        num_batches_tracked_key = prefix + "num_batches_tracked"
+        if num_batches_tracked_key in state_dict:
+            del state_dict[num_batches_tracked_key]
+
+        super(FrozenBatchNorm2d, self)._load_from_state_dict(
+            state_dict,
+            prefix,
+            local_metadata,
+            strict,
+            missing_keys,
+            unexpected_keys,
+            error_msgs,
+        )
+
+    def forward(self, x: Tensor) -> Tensor:
+        w = self.weight.reshape(1, -1, 1, 1)
+        b = self.bias.reshape(1, -1, 1, 1)
+        rv = self.running_var.reshape(1, -1, 1, 1)
+        rm = self.running_mean.reshape(1, -1, 1, 1)
+        scale = w * (rv + self.eps).rsqrt()
+        bias = b - rm * scale
+        return x * scale + bias
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.weight.shape[0]}, eps={self.eps})"
+
+
+class Linear(nn.Linear):
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        if torch.jit.is_scripting():
+            bias = self.bias.to(dtype=input.dtype) if self.bias is not None else None
+            return F.linear(input, self.weight.to(dtype=input.dtype), bias=bias)
+        else:
+            return F.linear(input, self.weight, self.bias)
+
+
+class backboneNet_efficient(nn.Module):
+    def __init__(self):
+        super(backboneNet_efficient, self).__init__()
+
+        net = timm.create_model("tf_efficientnet_b4_ns", pretrained=True)
+
+        layers_to_train = ["blocks"]
+        for name, parameter in net.named_parameters():
+            if all([not name.startswith(layer) for layer in layers_to_train]):
+                parameter.requires_grad_(False)
+
+        self.num_features = 1792
+        self.conv_stem = net.conv_stem
+        self.bn1 = net.bn1
+
+        if hasattr(net, "act1"):
+            self.act1 = net.act1
+        elif hasattr(net, "activation"):
+            self.act1 = net.activation
+        elif hasattr(net, "act"):
+            self.act1 = net.act
+        else:
+            self.act1 = nn.Identity()
+
+        self.block0 = net.blocks[0]
+        self.block1 = net.blocks[1]
+        self.block2 = net.blocks[2]
+        self.block3 = net.blocks[3]
+        self.block4 = net.blocks[4]
+        self.block5 = net.blocks[5]
+        self.block6 = net.blocks[6]
+        self.conv_head = net.conv_head
+        self.bn2 = net.bn2
+
+        if hasattr(net, "act2"):
+            self.act2 = net.act2
+        elif hasattr(net, "activation"):
+            self.act2 = net.activation
+        elif hasattr(net, "act"):
+            self.act2 = net.act
+        else:
+            self.act2 = nn.Identity()
+
+        self.global_pool = net.global_pool
+        self.drop_rate = 0.4
+
+        self.rg_cls = Linear(self.num_features, 1, bias=True)
+        self.cls_cls = Linear(self.num_features, 5, bias=True)
+        self.ord_cls = Linear(self.num_features, 4, bias=True)
+
+    def forward(self, x):
+        x1 = self.conv_stem(x)
+        x2 = self.bn1(x1)
+        x3 = self.act1(x2)
+
+        x4 = self.block0(x3)
+        x5 = self.block1(x4)
+        x6 = self.block2(x5)
+        x7 = self.block3(x6)
+        x8 = self.block4(x7)
+        x9 = self.block5(x8)
+        x10 = self.block6(x9)
+
+        x11 = self.conv_head(x10)
+        x12 = self.bn2(x11)
+        x13 = self.act2(x12)
+        x14 = self.global_pool(x13)
+
+        if self.drop_rate > 0.0:
+            x14 = F.dropout(x14, p=self.drop_rate, training=self.training)
+
+        x15 = self.rg_cls(x14)
+        x16 = self.cls_cls(x14)
+        x17 = self.ord_cls(x14)
+
+        return x15, x16, x17
+
+
+
+
+## === cell 2
+threshold = [0.75, 1.5, 2.5, 3.5]
+
+
+def regress2class(out):
+    prediction = 0
+    for i in range(4):
+        prediction += (out.data >= threshold[i]).squeeze().cpu().item()
+    return prediction
+
+
+def ordinal2class_prob(out):
+    pred_prob = torch.zeros(out.size(0), 5, device=out.device)
+    pred_prob[:, 0] = (1 - out[:, 0]).squeeze()
+    pred_prob[:, 1] = (out[:, 0] * (1 - out[:, 1])).squeeze()
+    pred_prob[:, 2] = (out[:, 1] * (1 - out[:, 2])).squeeze()
+    pred_prob[:, 3] = (out[:, 2] * (1 - out[:, 3])).squeeze()
+    pred_prob[:, 4] = out[:, 3].squeeze()
+
+    pred_prob = pred_prob.clamp_min(0.0)
+    pred_prob = pred_prob / (pred_prob.sum(dim=1, keepdim=True).clamp_min(1e-12))
+    return pred_prob
+
+
+def regress2class_prob(out):
+    pred_prob = torch.zeros((out.size(0), 5), device=out.device)
+
+    for i in range(out.size(0)):
+        if out[i] < 4.0:
+            l1 = int(math.floor(out[i].item()))
+            l2 = int(math.ceil(out[i].item()))
+            pred_prob[i][l1] = 1 - (out[i] - l1)
+            pred_prob[i][l2] = 1 - (l2 - out[i])
+        else:
+            pred_prob[i][4] = 1.0
+
+    return pred_prob
+
+
+def combine3output(r_out, c_out, o_out):
+    R = regress2class(r_out.data)
+
+    _, C = torch.max(c_out.data, 1)
+    C = C.squeeze().item()
+
+    o_sig = torch.sigmoid(o_out.data)
+    o_prob = ordinal2class_prob(o_sig)
+    O = torch.sum(
+        o_prob * torch.arange(5, device=o_prob.device).float().view(1, -1), dim=1
+    )
+    O = O.squeeze().item()
+
+    P = (R + C + O) / 3.0
+    P = int(round(P))
+    P = max(0, min(4, P))
+    return P
+
+
+
+
+## === cell 3
+def gem(x, p=3, eps=1e-6):
+    return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1.0 / p)
+
+
+class GeM(nn.Module):
+    def __init__(self, p=3, eps=1e-6, flatten=False):
+        super(GeM, self).__init__()
+        self.p = Parameter(torch.ones(1) * p)
+        self.eps = eps
+        self.flatten = flatten
+
+    def forward(self, x):
+        x = gem(x, p=self.p, eps=self.eps)
+        if self.flatten:
+            x = x.flatten(1)
+        return x
+
+    def __repr__(self):
+        return (
+            self.__class__.__name__
+            + "("
+            + "p="
+            + "{:.4f}".format(self.p.data.tolist()[0])
+            + ", "
+            + "eps="
+            + str(self.eps)
+            + ")"
+        )
+
+
+class Regressor(nn.Module):
+    def __init__(self):
+        super(Regressor, self).__init__()
+
+        self.backbone = timm.models.tf_efficientnet_b5_ns(pretrained=False)
+        self.backbone.global_pool = GeM(flatten=True)
+        self.regressor = nn.Linear(1000, 1)
+
+    def forward(self, x):
+        x = self.backbone(x)
+        out = self.regressor(x)
+        out = torch.sigmoid(out) * 4.5
+
+        return out
+
+
+class ThreeStage_Model(nn.Module):
+    def __init__(self, backbone=None):
+        super(ThreeStage_Model, self).__init__()
+
+        self.backbone = timm.models.tf_efficientnet_b4_ns(pretrained=False)
+        self.backbone.global_pool = GeM(flatten=True)
+
+        self.classifier = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 5),
+        )
+
+        self.regressor = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 1),
+        )
+
+        self.ordinal = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(1000, 500),
+            nn.SiLU(),
+            nn.Linear(500, 4),
+        )
+
+        self.final_regressor = nn.Sequential(
+            nn.SiLU(),
+            nn.Linear(10, 1),
+        )
+
+    def forward(self, x, final=False):
+        x = self.backbone(x)
+
+        c_out = self.classifier(x)
+        r_out = self.regressor(x)
+        o_out = self.ordinal(x)
+
+        if final:
+            out = torch.cat((c_out, r_out, o_out), 1)
+            out = self.final_regressor(out)
+            out = torch.sigmoid(out) * 4.5
+            return out
+        else:
+            r_out = torch.sigmoid(r_out) * 4.5
+            o_out = torch.sigmoid(o_out)
+            return c_out, r_out, o_out
+
+
+
+
+## === cell 4
+class photometric_distort(object):
+    def __call__(self, image):
+        distortions = [
+            FT.adjust_brightness,
+            FT.adjust_contrast,
+            FT.adjust_saturation,
+            FT.adjust_hue,
+        ]
+
+        random.shuffle(distortions)
+
+        for d in distortions:
+            if random.random() < 0.5:
+                if d.__name__ == "adjust_hue":
+                    adjust_factor = random.uniform(-16 / 255.0, 16 / 255.0)
+                else:
+                    adjust_factor = random.uniform(0.7, 1.3)
+                image = d(image, adjust_factor)
+
+        return image
+
+
+class cropTo4_3(object):
+    def __call__(self, image):
+        w, h = image.size
+
+        if (w / h) >= (4 / 3):
+            new_h = h
+            new_w = int(h * 4 / 3)
+        else:
+            new_h = int(w * 3 / 4)
+            new_w = w
+
+        left = (w - new_w) / 2
+        top = (h - new_h) / 2
+        right = left + new_w
+        bottom = top + new_h
+
+        return image.crop((left, top, right, bottom))
+
+
+class trim(object):
+    def __call__(self, image):
+        bg = Image.new(image.mode, image.size, image.getpixel((0, 0)))
+        diff = ImageChops.difference(image, bg)
+        diff = ImageChops.add(diff, diff, 2.0, -10)
+        bbox = diff.getbbox()
+        if bbox:
+            return image.crop(bbox)
+        return image
+
+
+
+
+## === cell 5
+test_df = pd.read_csv("../input/aptos2019-blindness-detection/test.csv")
+test_ids = np.squeeze(test_df.values)
+
+transform1 = transforms.Compose(
+    [
+        trim(),
+        cropTo4_3(),
+        transforms.Resize((288, 384)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.384, 0.258, 0.174], std=[0.124, 0.089, 0.094]),
+    ]
+)
+
+transform2 = transforms.Compose(
+    [
+        transforms.Resize((280, 280)),
+        transforms.CenterCrop(256),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]
+)
+
+net2 = backboneNet_efficient()
+
+ckpt_path = "../input/weights/1.pth"
+if os.path.exists(ckpt_path):
+    state = torch.load(ckpt_path, map_location="cpu")
+    net2.load_state_dict(state, strict=True)
+    print("Loaded weights:", ckpt_path)
+else:
+    warnings.warn(
+        f"Checkpoint not found at {ckpt_path}. Using timm pretrained EfficientNet weights as fallback."
+    )
+
+net2 = net2.to(device)
+net2.eval()
+
+
+
+## === cell 6
+submission = []
+test_img_dir = "../input/aptos2019-blindness-detection/test_images"
+
+with torch.no_grad():
+    for i, idx in enumerate(test_ids):
+        if i % 25 == 0:
+            print("Predicting", i, "/", len(test_ids))
+        image_name = os.path.join(test_img_dir, f"{idx}.png")
+
+        try:
+            img = Image.open(image_name).convert("RGB")
+        except Exception as e:
+            warnings.warn(
+                f"Failed to read {image_name} due to {e}. Using diagnosis=0 fallback."
+            )
+            submission.append([idx, 0])
+            continue
+
+        img_fundus = transforms.ToPILImage()(
+            transform1(img)
+        )  # back to PIL so we can reuse transform2 as-is
+        img2 = transform2(img_fundus).unsqueeze(0).to(device)
+
+        r_out, c_out, o_out = net2(img2)
+        pred2 = combine3output(r_out, c_out, o_out)
+
+        submission.append([idx, pred2])
+
+submission = np.array(submission, dtype=object)
+
+
+
+## === cell 7
+df = pd.DataFrame(submission, columns=["id_code", "diagnosis"])
+df["diagnosis"] = df["diagnosis"].astype(int).clip(0, 4)
+
+sample_sub = pd.read_csv("../input/aptos2019-blindness-detection/sample_submission.csv")
+df = sample_sub[["id_code"]].merge(df, on="id_code", how="left")
+df["diagnosis"] = df["diagnosis"].fillna(0).astype(int)
+
+df.to_csv("submission.csv", index=False)
+print(df.head())
+print("Wrote submission.csv with shape:", df.shape)
+print("Saved to:", os.path.abspath("submission.csv"))

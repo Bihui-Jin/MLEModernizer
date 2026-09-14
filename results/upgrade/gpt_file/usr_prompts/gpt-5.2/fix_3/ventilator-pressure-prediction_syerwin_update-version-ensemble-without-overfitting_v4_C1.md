@@ -1,0 +1,466 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.143255832967316
+
+# 6. Current score
+
+1.19556
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.33749) has done: 'Your notebook currently fails because it tries to read multiple external Kaggle “../input/…” submission files that are not present in this environment, so `pred` is never created and later cells crash. I replace that missing-ensemble dependency with a minimal, self-contained baseline that trains a scikit-learn regressor on your existing feature engineering, predicts pressure for the test set, then applies the same pressure grid rounding/clipping you already compute (so evaluation semantics match the competition’s discrete pressure levels). I also fix the cell numbering (start at 1) and ensure the submission is written as a valid `.csv` with the required `id,pressure` columns. Changes are limited to removing the unavailable blending inputs and producing a legitimate model-based prediction so you can obtain a non-empty, scoreable submission.'
+- What this solution (achieved 1.19556) has done: 'I keep your exact modeling approach (feature engineering + RobustScaler + HistGradientBoostingRegressor with MAE loss) but make two minimal, score-relevant fixes: (1) evaluate and train only on the inspiratory phase (`u_out==0`), because Kaggle’s MAE is computed only there, and (2) prevent the model from learning/being penalized on expiratory rows by directly setting test predictions to 0 when `u_out==1`. Additionally, I align the pressure “grid snapping” to the known discrete pressure levels by using a robust median step estimate and rounding predictions to the nearest observed pressure value (still using only training pressures, no leakage). These changes are small, preserve core logic, and typically move MAE substantially closer to your target without altering the overall pipeline structure.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import gc
+import numpy as np
+import pandas as pd
+
+from sklearn.preprocessing import RobustScaler
+from sklearn.ensemble import HistGradientBoostingRegressor
+
+
+
+## === cell 1
+TRAIN_PATH = "../input/ventilator-pressure-prediction/train.csv"
+TEST_PATH = "../input/ventilator-pressure-prediction/test.csv"
+SAMPLE_SUB_PATH = "../input/ventilator-pressure-prediction/sample_submission.csv"
+
+train_df = pd.read_csv(TRAIN_PATH)
+test_df = pd.read_csv(TEST_PATH)
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+
+print(train_df.shape, test_df.shape, sample_sub.shape)
+print(train_df.columns)
+
+
+
+
+## === cell 2
+def add_features(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    df["cross"] = df["u_in"] * df["u_out"]
+    df["cross2"] = df["time_step"] * df["u_out"]
+
+    df["area"] = df["time_step"] * df["u_in"]
+    df["area"] = df.groupby("breath_id")["area"].cumsum()
+
+    df["time_step_cumsum"] = df.groupby(["breath_id"])["time_step"].cumsum()
+    df["u_in_cumsum"] = (df["u_in"]).groupby(df["breath_id"]).cumsum()
+
+    df["u_in_lag1"] = df.groupby("breath_id")["u_in"].shift(1)
+    df["u_out_lag1"] = df.groupby("breath_id")["u_out"].shift(1)
+    df["u_in_lag_back1"] = df.groupby("breath_id")["u_in"].shift(-1)
+    df["u_out_lag_back1"] = df.groupby("breath_id")["u_out"].shift(-1)
+
+    df["u_in_lag2"] = df.groupby("breath_id")["u_in"].shift(2)
+    df["u_out_lag2"] = df.groupby("breath_id")["u_out"].shift(2)
+    df["u_in_lag_back2"] = df.groupby("breath_id")["u_in"].shift(-2)
+    df["u_out_lag_back2"] = df.groupby("breath_id")["u_out"].shift(-2)
+
+    df["u_in_lag3"] = df.groupby("breath_id")["u_in"].shift(3)
+    df["u_out_lag3"] = df.groupby("breath_id")["u_out"].shift(3)
+    df["u_in_lag_back3"] = df.groupby("breath_id")["u_in"].shift(-3)
+    df["u_out_lag_back3"] = df.groupby("breath_id")["u_out"].shift(-3)
+
+    df["u_in_lag4"] = df.groupby("breath_id")["u_in"].shift(4)
+    df["u_out_lag4"] = df.groupby("breath_id")["u_out"].shift(4)
+    df["u_in_lag_back4"] = df.groupby("breath_id")["u_in"].shift(-4)
+    df["u_out_lag_back4"] = df.groupby("breath_id")["u_out"].shift(-4)
+
+    df = df.fillna(0)
+
+    df["breath_id__u_in__max"] = df.groupby(["breath_id"])["u_in"].transform("max")
+    df["breath_id__u_in__mean"] = df.groupby(["breath_id"])["u_in"].transform("mean")
+    df["breath_id__u_in__diffmax"] = (
+        df.groupby(["breath_id"])["u_in"].transform("max") - df["u_in"]
+    )
+    df["breath_id__u_in__diffmean"] = (
+        df.groupby(["breath_id"])["u_in"].transform("mean") - df["u_in"]
+    )
+
+    df["u_in_diff1"] = df["u_in"] - df["u_in_lag1"]
+    df["u_out_diff1"] = df["u_out"] - df["u_out_lag1"]
+    df["u_in_diff2"] = df["u_in"] - df["u_in_lag2"]
+    df["u_out_diff2"] = df["u_out"] - df["u_out_lag2"]
+    df["u_in_diff3"] = df["u_in"] - df["u_in_lag3"]
+    df["u_out_diff3"] = df["u_out"] - df["u_out_lag3"]
+    df["u_in_diff4"] = df["u_in"] - df["u_in_lag4"]
+    df["u_out_diff4"] = df["u_out"] - df["u_out_lag4"]
+
+    df["one"] = 1
+    df["count"] = (df["one"]).groupby(df["breath_id"]).cumsum()
+    df["u_in_cummean"] = df["u_in_cumsum"] / df["count"]
+
+    df["breath_id_lag"] = df["breath_id"].shift(1).fillna(0)
+    df["breath_id_lag2"] = df["breath_id"].shift(2).fillna(0)
+    df["breath_id_lagsame"] = np.select(
+        [df["breath_id_lag"] == df["breath_id"]], [1], 0
+    )
+    df["breath_id_lag2same"] = np.select(
+        [df["breath_id_lag2"] == df["breath_id"]], [1], 0
+    )
+    df["breath_id__u_in_lag"] = df["u_in"].shift(1).fillna(0)
+    df["breath_id__u_in_lag"] = df["breath_id__u_in_lag"] * df["breath_id_lagsame"]
+    df["breath_id__u_in_lag2"] = df["u_in"].shift(2).fillna(0)
+    df["breath_id__u_in_lag2"] = df["breath_id__u_in_lag2"] * df["breath_id_lag2same"]
+
+    df["time_step_diff"] = df.groupby("breath_id")["time_step"].diff().fillna(0)
+
+    df["ewm_u_in_mean"] = (
+        df.groupby("breath_id")["u_in"]
+        .ewm(halflife=9)
+        .mean()
+        .reset_index(level=0, drop=True)
+    )
+
+    df[["15_in_sum", "15_in_min", "15_in_max", "15_in_mean"]] = (
+        df.groupby("breath_id")["u_in"]
+        .rolling(window=15, min_periods=1)
+        .agg(
+            {
+                "15_in_sum": "sum",
+                "15_in_min": "min",
+                "15_in_max": "max",
+                "15_in_mean": "mean",
+            }
+        )
+        .reset_index(level=0, drop=True)
+    )
+
+    df["u_in_lagback_diff1"] = df["u_in"] - df["u_in_lag_back1"]
+    df["u_out_lagback_diff1"] = df["u_out"] - df["u_out_lag_back1"]
+    df["u_in_lagback_diff2"] = df["u_in"] - df["u_in_lag_back2"]
+    df["u_out_lagback_diff2"] = df["u_out"] - df["u_out_lag_back2"]
+
+    df["R"] = df["R"].astype(str)
+    df["C"] = df["C"].astype(str)
+    df["R__C"] = df["R"].astype(str) + "__" + df["C"].astype(str)
+    df = pd.get_dummies(df)
+
+    return df
+
+
+
+
+## === cell 3
+print("Train features...")
+train_feat = add_features(train_df)
+
+print("Test features...")
+test_feat = add_features(test_df)
+
+test_ids = test_df["id"].values
+test_u_out = test_df["u_out"].values.astype(np.int8)
+
+del test_df
+gc.collect()
+
+print("train_feat:", train_feat.shape, "test_feat:", test_feat.shape)
+
+
+
+## === cell 4
+insp_mask_1d = train_feat["u_out"].values == 0
+
+y_train_all = train_feat["pressure"].to_numpy().astype(np.float32)
+
+drop_cols = [
+    "pressure",
+    "id",
+    "breath_id",
+    "one",
+    "count",
+    "breath_id_lag",
+    "breath_id_lag2",
+    "breath_id_lagsame",
+    "breath_id_lag2same",
+]
+
+X_train_df = train_feat.drop(drop_cols, axis=1)
+X_test_df = test_feat.drop(
+    [c for c in drop_cols if c != "pressure"], axis=1, errors="ignore"
+)
+
+X_test_df = X_test_df.reindex(columns=X_train_df.columns, fill_value=0)
+
+print(f"X_train_df: {X_train_df.shape} \nX_test_df: {X_test_df.shape}")
+
+del test_feat
+gc.collect()
+
+
+
+## === cell 5
+scaler = RobustScaler()
+X_train_all = scaler.fit_transform(X_train_df)
+X_test_all = scaler.transform(X_test_df)
+
+X_train_2d = X_train_all[insp_mask_1d]
+y_train_1d = y_train_all[insp_mask_1d]
+
+X_test_2d = X_test_all  # we will post-process expiratory rows after predicting
+
+print(
+    "X_train_2d (inspiratory):",
+    X_train_2d.shape,
+    "y_train_1d:",
+    y_train_1d.shape,
+    "X_test_2d:",
+    X_test_2d.shape,
+)
+
+del X_train_df, X_test_df, X_train_all, X_test_all, train_feat
+gc.collect()
+
+
+
+## === cell 6
+pressure_all = y_train_1d.reshape(-1, 1).astype("float32")
+
+P_MIN = float(np.min(pressure_all))
+P_MAX = float(np.max(pressure_all))
+
+unique_pressures = np.unique(pressure_all.ravel())
+if unique_pressures.shape[0] >= 2:
+    diffs = np.diff(unique_pressures)
+    P_STEP = float(np.round(np.median(diffs), 6))
+else:
+    P_STEP = 0.0
+
+print("Min pressure:", P_MIN)
+print("Max pressure:", P_MAX)
+print("Pressure step:", P_STEP)
+print("Unique values:", unique_pressures.shape[0])
+
+del pressure_all
+gc.collect()
+
+
+
+## === cell 7
+model = HistGradientBoostingRegressor(
+    loss="absolute_error",
+    learning_rate=0.05,
+    max_depth=6,
+    max_iter=300,
+    random_state=42,
+)
+model.fit(X_train_2d, y_train_1d)
+
+test_pred = model.predict(X_test_2d).astype(np.float32)
+print("test_pred:", test_pred.shape, test_pred[:5])
+
+
+
+## === cell 8
+submission = sample_sub.copy()
+
+if len(test_pred) != len(submission):
+    raise ValueError(
+        f"Prediction length {len(test_pred)} does not match submission length {len(submission)}"
+    )
+
+test_pred_adj = test_pred.copy()
+test_pred_adj[test_u_out == 1] = 0.0
+
+if unique_pressures.shape[0] > 1:
+    idx = np.searchsorted(unique_pressures, test_pred_adj, side="left")
+    idx = np.clip(idx, 0, unique_pressures.shape[0] - 1)
+    idx0 = np.clip(idx - 1, 0, unique_pressures.shape[0] - 1)
+
+    left = unique_pressures[idx0]
+    right = unique_pressures[idx]
+    choose_right = np.abs(test_pred_adj - right) <= np.abs(test_pred_adj - left)
+    snapped = np.where(choose_right, right, left).astype(np.float32)
+else:
+    snapped = test_pred_adj
+
+snapped = np.clip(snapped, P_MIN, P_MAX)
+
+submission["pressure"] = snapped
+submission = submission[["id", "pressure"]]
+submission.to_csv("submission.csv", index=False)
+
+print(submission.head())
+print("Wrote submission.csv with shape:", submission.shape)

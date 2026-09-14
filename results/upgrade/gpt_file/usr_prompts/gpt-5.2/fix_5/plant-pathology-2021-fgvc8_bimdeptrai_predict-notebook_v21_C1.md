@@ -1,0 +1,489 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+
+from sklearn.preprocessing import MultiLabelBinarizer
+from PIL import Image
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+
+print("Setup OK (TensorFlow intentionally not imported).")
+
+
+
+
+## === cell 1
+def first_existing(*paths):
+    for p in paths:
+        if p and os.path.exists(p):
+            return p
+    return None
+
+
+TRAIN_CSV = first_existing(
+    "../input/plant-pathology-2021-fgvc8/train.csv",
+    "/kaggle/input/plant-pathology-2021-fgvc8/train.csv",
+    "/kaggle/data/plant-pathology-2021-fgvc8/train.csv",
+    "/kaggle/data/train.csv",
+)
+SAMPLE_SUB = first_existing(
+    "../input/plant-pathology-2021-fgvc8/sample_submission.csv",
+    "/kaggle/input/plant-pathology-2021-fgvc8/sample_submission.csv",
+    "/kaggle/data/plant-pathology-2021-fgvc8/sample_submission.csv",
+    "/kaggle/data/sample_submission.csv",
+)
+TEST_DIR = first_existing(
+    "../input/plant-pathology-2021-fgvc8/test_images",
+    "/kaggle/input/plant-pathology-2021-fgvc8/test_images",
+    "/kaggle/data/plant-pathology-2021-fgvc8/test_images",
+    "/kaggle/data/test_images",
+)
+TRAIN_DIR = first_existing(
+    "../input/plant-pathology-2021-fgvc8/train_images",
+    "/kaggle/input/plant-pathology-2021-fgvc8/train_images",
+    "/kaggle/data/plant-pathology-2021-fgvc8/train_images",
+    "/kaggle/data/train_images",
+)
+
+if TRAIN_CSV is None or SAMPLE_SUB is None or TEST_DIR is None or TRAIN_DIR is None:
+    raise FileNotFoundError(
+        f"Could not resolve dataset paths. TRAIN_CSV={TRAIN_CSV}, SAMPLE_SUB={SAMPLE_SUB}, "
+        f"TEST_DIR={TEST_DIR}, TRAIN_DIR={TRAIN_DIR}"
+    )
+
+train = pd.read_csv(TRAIN_CSV)
+submissions = pd.read_csv(SAMPLE_SUB)
+
+print("Resolved paths:")
+print("TRAIN_CSV:", TRAIN_CSV)
+print("SAMPLE_SUB:", SAMPLE_SUB)
+print("TRAIN_DIR:", TRAIN_DIR)
+print("TEST_DIR:", TEST_DIR)
+print(train.shape, submissions.shape)
+train.head()
+
+
+
+## === cell 2
+label_split = train.labels.apply(lambda x: x.split())
+mlb = MultiLabelBinarizer()
+mlb.fit(label_split)
+class_names = list(mlb.classes_)
+
+labels_df = pd.DataFrame(mlb.transform(label_split), columns=class_names)
+print("Num classes:", len(class_names))
+print("Classes:", class_names)
+
+
+
+## === cell 3
+h_target = 384
+w_target = 384
+batch_size = 32
+
+
+def iter_image_batches(df, directory, target_size=(384, 384), batch_size=32):
+    """
+    PIL-based batch loader; yields (batch_images, batch_indices).
+    Images are float32 in [0,1], shape (bs, H, W, 3).
+    """
+    H, W = target_size
+    n = len(df)
+    for start in range(0, n, batch_size):
+        end = min(n, start + batch_size)
+        bs = end - start
+        batch = np.empty((bs, H, W, 3), dtype=np.float32)
+        idxs = np.arange(start, end, dtype=np.int64)
+
+        for i, fname in enumerate(df["image"].iloc[start:end].tolist()):
+            path = os.path.join(directory, fname)
+            try:
+                with Image.open(path) as im:
+                    im = im.convert("RGB")
+                    im = im.resize((W, H), resample=Image.BILINEAR)
+                    arr = np.asarray(im, dtype=np.float32) / 255.0
+            except Exception:
+                arr = np.zeros((H, W, 3), dtype=np.float32)
+            batch[i] = arr
+
+        yield batch, idxs
+
+
+print("PIL-based generator ready.")
+
+
+
+
+## === cell 4
+def squash(x):
+    return 1.0 / (1.0 + np.exp(-x))
+
+
+def heuristic_scores_from_batch(batch, class_names):
+    """
+    Core logic preserved: same simple image statistics -> class score -> sigmoid mapping.
+    Returns probs of shape (bs, n_classes).
+    """
+    bs = batch.shape[0]
+    n_classes = len(class_names)
+    out = np.zeros((bs, n_classes), dtype=np.float32)
+
+    mean = batch.mean(axis=(1, 2, 3))  # (bs,)
+    std = batch.std(axis=(1, 2, 3))  # (bs,)
+    g = batch[:, :, :, 1].mean(axis=(1, 2))
+    rb = 0.5 * (
+        batch[:, :, :, 0].mean(axis=(1, 2)) + batch[:, :, :, 2].mean(axis=(1, 2))
+    )
+    green = g - rb
+
+    for j, cname in enumerate(class_names):
+        lc = cname.lower()
+        score = -1.0 + 0.0 * mean
+
+        if lc == "healthy":
+            score = 3.0 * green - 2.0 * std + 0.5 * (0.5 - np.abs(mean - 0.5))
+        elif "rust" in lc:
+            score = 2.0 * (mean - 0.45) + 1.0 * std - 1.0 * green
+        elif "scab" in lc:
+            score = 1.5 * std + 0.5 * (mean - 0.5) - 0.5 * green
+        elif "frog" in lc:
+            score = 1.0 * std - 0.2 * mean
+        elif "complex" in lc:
+            score = 1.2 * std + 0.8 * np.abs(mean - 0.5)
+        elif "powdery" in lc:
+            score = 1.0 * (mean - 0.5) + 0.8 * std
+        else:
+            score = 0.5 * std - 0.5 * np.abs(mean - 0.5)
+
+        out[:, j] = squash(score).astype(np.float32)
+
+    return out
+
+
+def macro_f1(y_true, y_pred_bin, eps=1e-9):
+    f1s = []
+    for k in range(y_true.shape[1]):
+        yt = y_true[:, k]
+        yp = y_pred_bin[:, k]
+        tp = np.sum((yt == 1) & (yp == 1))
+        fp = np.sum((yt == 0) & (yp == 1))
+        fn = np.sum((yt == 1) & (yp == 0))
+        f1 = (2 * tp) / (2 * tp + fp + fn + eps)
+        f1s.append(f1)
+    return float(np.mean(f1s))
+
+
+n_train = len(train)
+idxs = np.arange(n_train)
+rng = np.random.RandomState(SEED)
+rng.shuffle(idxs)
+split = int(0.85 * n_train)
+tr_idx, va_idx = idxs[:split], idxs[split:]
+
+train_va = train.iloc[va_idx].reset_index(drop=True)
+y_va = labels_df.iloc[va_idx].to_numpy(dtype=np.int8)
+
+va_probs = np.zeros((len(train_va), len(class_names)), dtype=np.float32)
+seen = 0
+for batch, batch_idxs in iter_image_batches(
+    train_va, TRAIN_DIR, target_size=(h_target, w_target), batch_size=batch_size
+):
+    probs = heuristic_scores_from_batch(batch, class_names)
+    va_probs[batch_idxs] = probs
+    seen += len(batch_idxs)
+
+print("Computed validation probs:", va_probs.shape)
+
+
+def logit(p, eps=1e-6):
+    p = np.clip(p, eps, 1 - eps)
+    return np.log(p / (1 - p))
+
+
+logits = logit(va_probs)
+scales = np.array([0.7, 0.85, 1.0, 1.15, 1.3], dtype=np.float32)
+
+best = {"score": -1.0, "scale": 1.0, "th": None}
+th_grid = np.linspace(0.10, 0.90, 81, dtype=np.float32)
+
+for s in scales:
+    p_s = squash(logits * s)
+    ths = np.full((len(class_names),), 0.3, dtype=np.float32)
+    for k in range(len(class_names)):
+        yk = y_va[:, k]
+        if int(yk.sum()) < 5:
+            continue
+        best_f1_k = -1.0
+        best_t_k = 0.3
+        pk = p_s[:, k]
+        for t in th_grid:
+            yp = (pk >= t).astype(np.int8)
+            tp = np.sum((yk == 1) & (yp == 1))
+            fp = np.sum((yk == 0) & (yp == 1))
+            fn = np.sum((yk == 1) & (yp == 0))
+            f1 = (2 * tp) / (2 * tp + fp + fn + 1e-9)
+            if f1 > best_f1_k:
+                best_f1_k = f1
+                best_t_k = float(t)
+        ths[k] = best_t_k
+
+    y_pred_bin = (p_s >= ths[None, :]).astype(np.int8)
+    score = macro_f1(y_va, y_pred_bin)
+
+    if score > best["score"]:
+        best = {"score": score, "scale": float(s), "th": ths}
+
+print("Validation macro-F1 (calibration only):", best["score"])
+print("Best scale:", best["scale"])
+print("Example thresholds (first 10):", best["th"][:10].round(3))
+
+
+
+## === cell 5
+n_test = len(submissions)
+n_classes = len(class_names)
+
+preds = np.zeros((n_test, n_classes), dtype=np.float32)
+
+seen = 0
+for batch, batch_idxs in iter_image_batches(
+    submissions, TEST_DIR, target_size=(h_target, w_target), batch_size=batch_size
+):
+    probs = heuristic_scores_from_batch(batch, class_names)
+
+    probs = squash(logit(probs) * best["scale"]).astype(np.float32)
+
+    preds[batch_idxs] = probs
+    seen += len(batch_idxs)
+
+print("Preds shape:", preds.shape)
+
+
+
+## === cell 6
+ths = best["th"].astype(np.float32)
+healthy_idx = class_names.index("healthy") if "healthy" in class_names else None
+
+out_labels = []
+for i in range(n_test):
+    p = preds[i]
+
+    chosen = [class_names[j] for j in range(n_classes) if p[j] >= ths[j]]
+
+    if len(chosen) == 0:
+        lab = class_names[int(np.argmax(p))]
+    else:
+        if healthy_idx is not None and "healthy" in chosen:
+            if p[healthy_idx] >= (np.max(p) - 1e-6) and len(chosen) == 1:
+                lab = "healthy"
+            elif p[healthy_idx] >= (np.max(p) - 1e-6) and len(chosen) > 1:
+                lab = "healthy"
+            else:
+                chosen = [c for c in chosen if c != "healthy"]
+                if len(chosen) == 0:
+                    lab = "healthy"
+                else:
+                    lab = " ".join(chosen)
+        else:
+            lab = " ".join(chosen)
+
+    out_labels.append(lab)
+
+submissions_out = submissions.copy()
+submissions_out["labels"] = out_labels
+submissions_out = submissions_out[["image", "labels"]]
+submissions_out.to_csv("submission.csv", index=False)
+
+print(submissions_out.head())
+print("Wrote submission.csv with shape:", submissions_out.shape)
+
+
+
+## === cell 7
+assert os.path.exists("submission.csv")
+chk = pd.read_csv("submission.csv")
+assert list(chk.columns) == ["image", "labels"]
+assert len(chk) == len(submissions_out)
+chk.head()

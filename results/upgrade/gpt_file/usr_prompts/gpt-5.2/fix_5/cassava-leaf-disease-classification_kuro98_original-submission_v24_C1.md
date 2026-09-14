@@ -1,0 +1,552 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8958899969779389
+
+# 6. Current score
+
+0.24253
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.05531) has done: 'I fix the missing model file issue by loading a ViT model available in the Kaggle environment (via `torchvision`) and keep the same inference + softmax + TTA semantics. I also fix submission-length/ordering problems by turning off `shuffle` for the test DataLoader and by aligning predictions to `sample_submission.csv`’s `image_id` order (dropping any accidental duplicates/missing). Finally, I make TTA deterministic at inference by using deterministic geometric transforms (flip/rotations) instead of random augmentations, which keeps the intended TTA behavior but avoids RNG-related instability and improves accuracy vs random TTA. The result run end-to-end and write a valid `submission.csv` with the correct number of rows and columns.'
+- What this solution (achieved 0.24215) has done: 'I fix the runtime error by making the ViT input resolution match what the torchvision `vit_b_16` model expects (224×224) instead of 384×384, keeping the same model and inference/TTA logic. I also switch to using the official preprocessing transform from the ViT weights to ensure the resize/crop/normalize exactly matches what the pretrained backbone expects (this is a small, metric-aligned calibration change that should improve accuracy versus the current mismatched pipeline). Finally, I keep the test loader deterministic and ensure the submission is aligned to `sample_submission.csv` and written as `submission.csv`.'
+- What this solution (achieved 0.05531) has done: 'I fix the crash by filtering `os.listdir(test_dir)` to include only actual image files (the Kaggle dataset contains a nested `test_images/` directory that was being treated as an image). I also add a small, safe path fallback that automatically switches into the nested directory if present, without changing your inference/TTA/model logic. Finally, I keep the submission alignment to `sample_submission.csv` and ensure `submission.csv` is always written with the correct row count and columns.'
+- What this solution (achieved 0.24253) has done: 'I fix the test image directory auto-detection so it never accidentally descends into a non-existent nested `test_images/test_images` path (which is why you currently get “No image files found”). I also make the dataset robust by (a) falling back to `sample_submission.csv`’s `image_id` list if the directory listing is empty/misaligned and (b) always using full image paths for loading. These changes are execution/stability fixes and do not alter your core model/inference/TTA logic; they ensure the pipeline runs end-to-end and always writes a correctly ordered `submission.csv` with 2676 rows.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+import pandas as pd
+import torch
+from PIL import Image
+from torch.backends import cudnn
+from torch.utils.data import DataLoader
+from torchvision.datasets import VisionDataset
+from torchvision.transforms import v2
+
+
+
+## === cell 1
+torch.manual_seed(3407)
+torch.cuda.manual_seed(3407)
+
+cudnn.deterministic = True
+cudnn.benchmark = False
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
+
+test_dir = "/kaggle/input/cassava-leaf-disease-classification/test_images/"
+sample_path = "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+
+
+def _has_images(d):
+    if not os.path.isdir(d):
+        return False
+    exts = {".jpg", ".jpeg", ".png", ".bmp"}
+    try:
+        for fn in os.listdir(d):
+            fp = os.path.join(d, fn)
+            if os.path.isfile(fp) and os.path.splitext(fn.lower())[1] in exts:
+                return True
+    except FileNotFoundError:
+        return False
+    return False
+
+
+if os.path.isdir(test_dir):
+    nested_test_dir = os.path.join(test_dir, "test_images")
+    if (not _has_images(test_dir)) and _has_images(nested_test_dir):
+        test_dir = nested_test_dir
+
+print("Resolved test_dir:", test_dir)
+
+img_size = 224
+
+batch_size = 16
+num_workers = 4
+num_classes = 5
+tta = True
+
+from torchvision.models import vit_b_16, ViT_B_16_Weights
+
+weights = ViT_B_16_Weights.IMAGENET1K_V1
+model = vit_b_16(weights=weights)
+model.heads.head = torch.nn.Linear(model.heads.head.in_features, num_classes)
+model.to(device)
+
+
+
+
+## === cell 2
+class CassavaDataset(VisionDataset):
+    """Custom dataset for the Cassava test data (no labels)."""
+
+    def __init__(self, data_dir, transform=None, ttas=None, sample_csv_path=None):
+        super().__init__(root=data_dir)
+        self.transform = transform
+        self.ttas = ttas
+        self.cc = v2.CenterCrop((500, 500))
+
+        exts = {".jpg", ".jpeg", ".png", ".bmp"}
+        files = []
+        if os.path.isdir(data_dir):
+            for fn in os.listdir(data_dir):
+                fp = os.path.join(data_dir, fn)
+                if os.path.isfile(fp) and os.path.splitext(fn.lower())[1] in exts:
+                    files.append(fn)
+
+        if (
+            (len(files) == 0)
+            and (sample_csv_path is not None)
+            and os.path.isfile(sample_csv_path)
+        ):
+            sample = pd.read_csv(sample_csv_path)
+            if "image_id" in sample.columns:
+                files = sample["image_id"].astype(str).tolist()
+
+        self.images = sorted(files)
+
+        if len(self.images) == 0:
+            raise RuntimeError(f"No image files found in: {data_dir}")
+
+    def __getitem__(self, idx):
+        filename = self.images[idx]
+        img_path = os.path.join(self.root, filename)
+        img = Image.open(img_path).convert("RGB")
+        img = self.cc(img)
+
+        if self.ttas is not None and self.transform is not None:
+            img = [self.transform(t(img)) for t in self.ttas]
+        elif self.transform:
+            img = self.transform(img)
+
+        return img, filename
+
+    def __len__(self):
+        return len(self.images)
+
+
+
+
+## === cell 3
+test_transforms = weights.transforms()
+
+if tta:
+    from torchvision.transforms import functional as F
+
+    class _Identity:
+        def __call__(self, x):
+            return x
+
+    class _HFlip:
+        def __call__(self, x):
+            return F.hflip(x)
+
+    class _VFlip:
+        def __call__(self, x):
+            return F.vflip(x)
+
+    class _Rot90:
+        def __call__(self, x):
+            return F.rotate(x, 90)
+
+    class _Rot180:
+        def __call__(self, x):
+            return F.rotate(x, 180)
+
+    class _Rot270:
+        def __call__(self, x):
+            return F.rotate(x, 270)
+
+    ttas = [_Identity(), _HFlip(), _VFlip(), _Rot90(), _Rot180(), _Rot270()]
+else:
+    ttas = None
+
+test_dataset = CassavaDataset(
+    test_dir, transform=test_transforms, ttas=ttas, sample_csv_path=sample_path
+)
+
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=batch_size,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=True,
+)
+
+normalizer = torch.nn.Softmax(dim=1)
+
+
+
+## === cell 4
+all_names = []
+all_preds = []
+
+model.eval()
+
+with torch.no_grad():
+    for batch_idx, (inputs, filenames) in enumerate(test_loader):
+        if tta:
+            inputs_cat = torch.cat(inputs, dim=0).to(device, non_blocking=True)
+            preds = normalizer(model(inputs_cat))
+
+            b = len(filenames)
+            num_ttas = len(inputs)
+            preds = preds.view(num_ttas, b, -1).mean(dim=0)
+            pred_labels = torch.argmax(preds, dim=1).tolist()
+        else:
+            inputs = inputs.to(device, non_blocking=True)
+            preds = normalizer(model(inputs))
+            pred_labels = torch.argmax(preds, dim=1).tolist()
+
+        all_names.extend(list(filenames))
+        all_preds.extend(pred_labels)
+
+
+
+## === cell 5
+sample = pd.read_csv(sample_path)
+
+pred_df = pd.DataFrame({"image_id": all_names, "label": all_preds})
+pred_df = pred_df.drop_duplicates(subset=["image_id"], keep="first")
+
+merged = sample[["image_id"]].merge(pred_df, on="image_id", how="left")
+merged["label"] = merged["label"].fillna(0).astype(int)
+
+my_submission = merged[["image_id", "label"]]
+my_submission.to_csv("submission.csv", index=False)
+
+print("Wrote submission.csv with rows:", len(my_submission))
+print(my_submission.head())
+
+
+
+## === cell 6
+my_submission

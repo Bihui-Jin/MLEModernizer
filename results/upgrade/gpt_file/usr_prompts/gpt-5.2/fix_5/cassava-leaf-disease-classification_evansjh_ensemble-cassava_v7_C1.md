@@ -1,0 +1,676 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import glob
+import warnings
+from collections import Counter
+
+import numpy as np
+import pandas as pd
+
+warnings.filterwarnings("ignore")
+np.random.seed(42)
+
+test_image_dir = "/kaggle/input/cassava-leaf-disease-classification/test_images"
+train_image_dir = "/kaggle/input/cassava-leaf-disease-classification/train_images"
+sample_path = "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+train_csv_path = "/kaggle/input/cassava-leaf-disease-classification/train.csv"
+
+sample_csv = pd.read_csv(sample_path)
+train_df = pd.read_csv(train_csv_path)
+
+print("sample_csv shape:", sample_csv.shape)
+print("train_df shape:", train_df.shape)
+print("test_image_dir exists:", os.path.isdir(test_image_dir))
+print("train_image_dir exists:", os.path.isdir(train_image_dir))
+
+
+
+## === cell 1
+model_path_1 = (
+    "/kaggle/input/combinedmodel3/tensorflow2/default/1/BestModel_3454_8937.h5"
+)
+model_path_2 = (
+    "/kaggle/input/combinedmodel3/tensorflow2/default/1/best_model_0.37458707.h5"
+)
+model_path_3 = (
+    "/kaggle/input/combinedmodel3/tensorflow2/default/1/googlenet_inceptionv3.h5"
+)
+model_path_4 = (
+    "/kaggle/input/bestmodel_550_2/tensorflow2/default/1/BestModel_3577_8940.h5"
+)
+model_path_5 = (
+    "/kaggle/input/bestmodel_8878/tensorflow2/default/1/BestModel_8878_0358.h5"
+)
+model_path_6 = "/kaggle/input/bestmodel_8875/tensorflow2/default/1/BestModel_8875.h5"
+
+models_info = [
+    (model_path_1, (550, 550)),
+    (model_path_2, (512, 512)),
+    (model_path_3, (448, 448)),
+    (model_path_6, (512, 512)),
+]
+
+
+
+## === cell 2
+class_labels = {
+    0: "Cassava Bacterial Blight (CBB)",
+    1: "Cassava Brown Streak Disease (CBSD)",
+    2: "Cassava Green Mottle (CGM)",
+    3: "Cassava Mosaic Disease (CMD)",
+    4: "Healthy",
+}
+
+import tensorflow as tf
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+tf.random.set_seed(42)
+
+
+@tf.function(reduce_retracing=True)
+def _tf_decode_resize_flatten(image_bytes, height, width):
+    img = tf.io.decode_jpeg(image_bytes, channels=3)
+    img = tf.image.resize(
+        img, [height, width], method=tf.image.ResizeMethod.BILINEAR, antialias=False
+    )
+    img = tf.cast(img, tf.float32) / 255.0
+    return tf.reshape(img, [-1])
+
+
+@tf.function(reduce_retracing=True)
+def _tf_read_decode_resize_flatten(path, height, width):
+    b = tf.io.read_file(path)
+    return _tf_decode_resize_flatten(b, height, width)
+
+
+def _features_memmap_paths(cache_prefix, size, n, dim):
+    w, h = int(size[0]), int(size[1])
+    base = f"/kaggle/working/{cache_prefix}_{w}x{h}_n{n}_d{dim}"
+    mm_path = base + "_X.dat"
+    ok_path = base + "_ok.npy"
+    return mm_path, ok_path
+
+
+def _build_feature_matrix_memmap(paths, size, cache_prefix, batch_size=64):
+    """
+    Build (or reuse) a memmap feature matrix for given image paths and size.
+    Correctness: features are exactly resize->RGB->/255->flatten.
+    Speed: batched tf.data decode/resize with parallelism + contiguous memmap writes.
+    """
+    h, w = int(size[1]), int(size[0])
+    dim = h * w * 3
+    n = len(paths)
+    mm_path, ok_path = _features_memmap_paths(cache_prefix, size, n, dim)
+
+    if os.path.exists(mm_path) and os.path.exists(ok_path):
+        Xmm = np.memmap(mm_path, mode="r", dtype=np.float32, shape=(n, dim))
+        ok = np.load(ok_path)
+        if ok.shape == (n,):
+            return Xmm, ok
+
+    Xmm = np.memmap(mm_path, mode="w+", dtype=np.float32, shape=(n, dim))
+    ok = np.zeros((n,), dtype=np.bool_)
+
+    idx = np.arange(n, dtype=np.int32)
+    paths_arr = np.asarray(paths, dtype=np.str_)
+
+    ds = tf.data.Dataset.from_tensor_slices((idx, paths_arr))
+
+    def _map_fn(i, p):
+        x = _tf_read_decode_resize_flatten(p, h, w)
+        return i, x
+
+    ds = ds.map(_map_fn, num_parallel_calls=tf.data.AUTOTUNE, deterministic=True)
+    ds = ds.batch(batch_size, drop_remainder=False).prefetch(tf.data.AUTOTUNE)
+
+    for ib, xb in ds:
+        ib_np = ib.numpy()
+        xb_np = xb.numpy()  # float32, shape (B, dim)
+        Xmm[ib_np, :] = xb_np
+        ok[ib_np] = True
+
+    Xmm.flush()
+    np.save(ok_path, ok)
+    Xmm = np.memmap(mm_path, mode="r", dtype=np.float32, shape=(n, dim))
+    return Xmm, ok
+
+
+def train_sklearn_ensemble(
+    train_df, train_image_dir, sizes, per_size_max_samples=5000, random_state=42
+):
+    """
+    Train one LogisticRegression per input size (acts as one 'model' in the ensemble).
+    Core logic unchanged; optimized by:
+      - avoiding per-image python TF calls (batched tf.data),
+      - caching per (prefix,size,n,dim) to avoid recompute across runs/cells.
+    """
+    loaded_models = []
+
+    df = train_df.copy()
+    df["path"] = df["image_id"].apply(lambda x: os.path.join(train_image_dir, x))
+    paths = df["path"].to_list()
+    exists_mask = np.fromiter(
+        (os.path.exists(p) for p in paths), dtype=np.bool_, count=len(paths)
+    )
+    df = df.loc[exists_mask].reset_index(drop=True)
+
+    if len(df) == 0:
+        return loaded_models
+
+    for size in sizes:
+        if per_size_max_samples is not None and len(df) > per_size_max_samples:
+            df_sample, _ = train_test_split(
+                df,
+                train_size=per_size_max_samples,
+                random_state=random_state,
+                stratify=df["label"],
+            )
+        else:
+            df_sample = df
+
+        sample_paths = df_sample["path"].to_list()
+        y_all = df_sample["label"].to_numpy(dtype=np.int64, copy=False)
+
+        Xmm, ok = _build_feature_matrix_memmap(
+            sample_paths, size, cache_prefix="train", batch_size=64
+        )
+        if ok.sum() < 50:
+            continue
+
+        X = Xmm[ok]
+        y = y_all[ok]
+
+        clf = LogisticRegression(
+            multi_class="multinomial",
+            solver="lbfgs",
+            max_iter=200,
+            n_jobs=1,
+            random_state=random_state,
+        )
+        clf.fit(X, y)
+
+        loaded_models.append((clf, size, f"sklearn_logreg_{size[0]}x{size[1]}"))
+        print(
+            f"Trained sklearn model for size={size} on n={len(y)} samples, dim={X.shape[1]}"
+        )
+
+    return loaded_models
+
+
+def predict_one_image_ensemble(image_path, models):
+    """
+    Preserved for API compatibility; main path below uses batched inference for speed.
+    """
+    model_predictions = []
+    confidence_scores = {}
+
+    for model, input_size, _path in models:
+        try:
+            b = tf.io.read_file(image_path)
+            flat = _tf_decode_resize_flatten(b, int(input_size[1]), int(input_size[0]))
+            feat = flat.numpy()
+        except Exception:
+            continue
+
+        proba = model.predict_proba(feat.reshape(1, -1))[0]
+        predicted_class = int(np.argmax(proba))
+        confidence_score = float(proba[predicted_class])
+
+        model_predictions.append(predicted_class)
+        confidence_scores.setdefault(predicted_class, []).append(confidence_score)
+
+    if len(model_predictions) == 0:
+        return None  # caller will fallback
+
+    class_votes = Counter(model_predictions)
+    most_common = class_votes.most_common()
+    final_predicted_class = most_common[0][0]
+
+    if len(most_common) > 1 and most_common[0][1] == most_common[1][1]:
+        tied_classes = [cls for cls, count in most_common if count == most_common[0][1]]
+        final_predicted_class = max(
+            tied_classes,
+            key=lambda cls: sum(confidence_scores.get(cls, [0.0]))
+            / max(1, len(confidence_scores.get(cls, []))),
+        )
+
+    return final_predicted_class
+
+
+sizes = [info[1] for info in models_info]
+loaded_models = train_sklearn_ensemble(
+    train_df=train_df,
+    train_image_dir=train_image_dir,
+    sizes=sizes,
+    per_size_max_samples=5000,  # unchanged
+    random_state=42,
+)
+
+print(f"Loaded {len(loaded_models)} models.")
+for _, s, p in loaded_models:
+    print(" model:", p, "size:", s)
+
+
+
+## === cell 3
+available_test_images = (
+    set(os.listdir(test_image_dir)) if os.path.isdir(test_image_dir) else set()
+)
+majority_label = int(train_df["label"].value_counts().idxmax())
+
+if len(loaded_models) == 0:
+    print(
+        "No models trained; writing fallback submission with majority label =",
+        majority_label,
+    )
+    submission_df = sample_csv.copy()
+    submission_df["label"] = majority_label
+else:
+    test_ids = sample_csv["image_id"].to_list()
+    test_paths = [os.path.join(test_image_dir, iid) for iid in test_ids]
+
+    present = np.fromiter(
+        (iid in available_test_images for iid in test_ids),
+        dtype=np.bool_,
+        count=len(test_ids),
+    )
+    n_test = len(test_ids)
+
+    per_model_pred = []
+    per_model_conf = []
+
+    for model, size, _name in loaded_models:
+        Xmm, ok = _build_feature_matrix_memmap(
+            test_paths, size, cache_prefix="test", batch_size=64
+        )
+
+        ok2 = ok & present
+
+        preds = np.full((n_test,), -1, dtype=np.int16)
+        confs = np.zeros((n_test,), dtype=np.float32)
+
+        if ok2.any():
+            proba = model.predict_proba(Xmm[ok2])
+            pcls = np.argmax(proba, axis=1).astype(np.int16, copy=False)
+            pconf = proba[np.arange(proba.shape[0]), pcls].astype(
+                np.float32, copy=False
+            )
+            idx = np.flatnonzero(ok2)
+            preds[idx] = pcls
+            confs[idx] = pconf
+
+        per_model_pred.append(preds)
+        per_model_conf.append(confs)
+
+    per_model_pred = np.stack(per_model_pred, axis=0)  # (m, n)
+    per_model_conf = np.stack(per_model_conf, axis=0)  # (m, n)
+
+    final_labels = np.full((n_test,), majority_label, dtype=np.int64)
+
+    bad_pred = 0
+    missing = int((~present).sum())
+
+    for j in range(n_test):
+        if not present[j]:
+            continue
+
+        preds_j = per_model_pred[:, j]
+        good = preds_j >= 0
+        if not np.any(good):
+            bad_pred += 1
+            continue
+
+        pj = preds_j[good].astype(np.int64, copy=False)
+        cj = per_model_conf[:, j][good]
+
+        counts = np.bincount(pj, minlength=5)
+        maxc = counts.max()
+        tied = np.flatnonzero(counts == maxc)
+
+        if tied.size == 1:
+            final_labels[j] = int(tied[0])
+        else:
+            best_cls = None
+            best_avg = -1.0
+            for cls in tied:
+                mask = pj == cls
+                avg = float(cj[mask].mean()) if np.any(mask) else 0.0
+                if avg > best_avg:
+                    best_avg = avg
+                    best_cls = int(cls)
+            final_labels[j] = best_cls if best_cls is not None else majority_label
+
+    if missing:
+        print(
+            f"Warning: {missing} images from sample_submission were not found in test_image_dir."
+        )
+    if bad_pred:
+        print(
+            f"Warning: {bad_pred} images failed feature extraction; used majority fallback for those."
+        )
+
+    submission_df = pd.DataFrame(
+        {"image_id": test_ids, "label": final_labels.astype(int)}
+    )
+
+submission_df = submission_df[["image_id", "label"]]
+submission_df = sample_csv[["image_id"]].merge(submission_df, on="image_id", how="left")
+submission_df["label"] = submission_df["label"].fillna(majority_label).astype(int)
+
+submission_path = "/kaggle/working/submission.csv"
+submission_df.to_csv(submission_path, index=False)
+
+print("Wrote:", submission_path)
+print(submission_df.head())
+print(
+    "Rows:", len(submission_df), " Unique images:", submission_df["image_id"].nunique()
+)
+
+
+
+## === cell 4
+submission_df

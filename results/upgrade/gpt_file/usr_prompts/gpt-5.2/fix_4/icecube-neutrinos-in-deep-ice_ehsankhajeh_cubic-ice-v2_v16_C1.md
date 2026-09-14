@@ -1,0 +1,664 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a neutrino particle's direction. 
+
+## Metric
+Mean angular error between the predicted and true event origins.
+
+## Submission Format
+For each `event_id` in the test set, you must predict the `azimuth` and `zenith`. The file should contain a header and have the following format:
+
+```
+event_id,azimuth,zenith
+730,1,1
+769,1,1
+774,1,1
+etc.
+```
+
+## Dataset 
+[train/test]_meta.parquet
+
+-   `batch_id` (`int`): the ID of the batch the event was placed into.
+-   `event_id` (`int`): the event ID.
+-   `[first/last]_pulse_index` (`int`): index of the first/last row in the features dataframe belonging to this event.
+-   `[azimuth/zenith]` (`float32`): the [azimuth/zenith] angle in radians of the neutrino. A value between 0 and 2*pi for the azimuth and 0 and pi for zenith. The target columns. Not provided for the test set. The direction vector represented by zenith and azimuth points to where the neutrino came from.
+-   NB: Other quantities regarding the event, such as the interaction point in `x, y, z` (vertex position), the neutrino energy, or the interaction type and kinematics are not included in the dataset.
+
+[train/test]/batch_[n].parquet Each batch contains tens of thousands of events. Each event may contain thousands of pulses, each of which is the digitized output from a photomultiplier tube and occupies one row.
+
+-   `event_id` (`int`): the event ID. Saved as the index column in parquet.
+-   `time` (`int`): the time of the pulse in nanoseconds in the current event time window. The absolute time of a pulse has no relevance, and only the relative time with respect to other pulses within an event is of relevance.
+-   `sensor_id` (`int`): the ID of which of the 5160 IceCube photomultiplier sensors recorded this pulse.
+-   `charge` (`float32`): An estimate of the amount of light in the pulse, in units of photoelectrons (p.e.). A physical photon does not exactly result in a measurement of 1 p.e. but rather can take values spread around 1 p.e. As an example, a pulse with charge 2.7 p.e. could quite likely be the result of two or three photons hitting the photomultiplier tube around the same time. This data has `float16` precision but is stored as `float32` due to limitations of the version of pyarrow the data was prepared with.
+-   `auxiliary` (`bool`): If `True`, the pulse was not fully digitized, is of lower quality, and was more likely to originate from noise. If `False`, then this pulse was contributed to the trigger decision and the pulse was fully digitized.
+
+sample_submission.parquet An example submission with the correct columns and properly ordered event IDs. The sample submission is provided in the parquet format so it can be read quickly but *your final submission must be a csv*.
+
+`sensor_geometry.csv` The `x`, `y`, and `z` positions for each of the 5160 IceCube sensors. The row index corresponds to the `sensor_idx` feature of pulses. The `x`, `y`, and `z` coordinates are in units of meters, with the origin at the center of the IceCube detector. The coordinate system is right-handed, and the z-axis points upwards when standing at the South Pole. You can convert from these coordinates to `azimuth` and `zenith` with the following formulas (here the vector (x,y,z) is normalized):
+
+```
+x = cos(azimuth) * sin(zenith)
+y = sin(azimuth) * sin(zenith)
+z = cos(zenith)
+
+```
+
+# 2. Python version
+
+3.11
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+pyarrow==19.0.1
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (231 lines)
+            sample_submission.csv (13200001 lines)
+            sample_submission.csv.zip (35.3 MB)
+            sensor_geometry.csv (5161 lines)
+            sensor_geometry.csv.zip (36.0 kB)
+            test.zip (9.3 GB)
+            test_meta.parquet (172.5 MB)
+            train.zip (83.9 GB)
+            train_meta.parquet (3.5 GB)
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+            test/
+                batch_104.parquet (172.9 MB)
+                batch_128.parquet (172.7 MB)
+                ... and 64 other files
+                test/
+            train/
+                batch_1.parquet (172.1 MB)
+                batch_10.parquet (173.4 MB)
+                ... and 592 other files
+                train/
+        input/
+            description.md (231 lines)
+            sample_submission.csv (13200001 lines)
+            sample_submission.csv.zip (35.3 MB)
+            sensor_geometry.csv (5161 lines)
+            sensor_geometry.csv.zip (36.0 kB)
+            test.zip (9.3 GB)
+            test_meta.parquet (172.5 MB)
+            train.zip (83.9 GB)
+            train_meta.parquet (3.5 GB)
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+            test/
+                batch_104.parquet (172.9 MB)
+                batch_128.parquet (172.7 MB)
+                ... and 64 other files
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+            train/
+                batch_1.parquet (172.1 MB)
+                batch_10.parquet (173.4 MB)
+                ... and 592 other files
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+        working/
+            icecube-neutrinos-in-deep-ice/
+                description.md (231 lines)
+                sample_submission.csv (13200001 lines)
+                ... and 7 other files
+                icecube-neutrinos-in-deep-ice/
+                test/
+                    batch_104.parquet (172.9 MB)
+                    batch_128.parquet (172.7 MB)
+                    ... and 64 other files
+                    test/
+                train/
+                    batch_1.parquet (172.1 MB)
+                    batch_10.parquet (173.4 MB)
+                    ... and 592 other files
+                    train/
+```
+
+-> data/icecube-neutrinos-in-deep-ice/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> data/icecube-neutrinos-in-deep-ice/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> data/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> data/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> input/icecube-neutrinos-in-deep-ice/sample_submission.csv has 13200000 rows and 3 columns.
+The columns are: event_id, azimuth, zenith
+
+-> input/icecube-neutrinos-in-deep-ice/sensor_geometry.csv has 5160 rows and 4 columns.
+The columns are: sensor_id, x, y, z
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+1.571286
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import gc
+import time
+
+import numpy as np
+import pandas as pd
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+print("TF:", tf.__version__)
+print("Pandas:", pd.__version__)
+
+
+
+## === cell 1
+batch_id = 100
+home_dir = "/kaggle/input/icecube-neutrinos-in-deep-ice/"
+train_file = f"train/batch_{batch_id}.parquet"
+train_meta = "train_meta.parquet"
+test_file = None
+test_meta = "test_meta.parquet"
+
+
+
+
+## === cell 2
+def load_train_data(path):
+    df = pd.read_parquet(path, engine="pyarrow")
+    df.insert(0, df.index.name, df.index, True)
+    df = df.reset_index(drop=True)
+    return df
+
+
+path = os.path.join(home_dir, train_file)
+df_train_data = load_train_data(path)
+print(df_train_data.head())
+print(df_train_data.shape)
+
+
+
+
+## === cell 3
+def load_train_meta(path, batch_id):
+    df = pd.read_parquet(path, engine="pyarrow")
+    df = df[df["batch_id"] == batch_id].reset_index(drop=True)
+    return df
+
+
+path = os.path.join(home_dir, train_meta)
+df_train_meta = load_train_meta(path, batch_id=batch_id)
+print(df_train_meta.head())
+print(df_train_meta.shape)
+
+
+
+## === cell 4
+csv_path = "sensor_geometry.csv"
+geom_file_path = os.path.join(home_dir, csv_path)
+df_sen_geom = pd.read_csv(geom_file_path)
+
+if "sensor_id" in df_sen_geom.columns:
+    df_sen_geom = df_sen_geom.set_index("sensor_id", drop=False)
+
+df_sen_geom = df_sen_geom.rename(
+    columns={"x": "x-dimension [m]", "y": "y-dimension [m]", "z": "z-dimension [m]"}
+)
+print(df_sen_geom.head())
+print(df_sen_geom.shape)
+
+_sensor_ids = df_sen_geom.index.to_numpy()
+_max_sensor_id = int(_sensor_ids.max()) if len(_sensor_ids) else 0
+_geom_lut = np.zeros((_max_sensor_id + 1, 3), dtype=np.float32)
+_geom_lut[_sensor_ids.astype(np.int64), 0] = df_sen_geom["x-dimension [m]"].to_numpy(
+    np.float32, copy=False
+)
+_geom_lut[_sensor_ids.astype(np.int64), 1] = df_sen_geom["y-dimension [m]"].to_numpy(
+    np.float32, copy=False
+)
+_geom_lut[_sensor_ids.astype(np.int64), 2] = df_sen_geom["z-dimension [m]"].to_numpy(
+    np.float32, copy=False
+)
+
+
+
+
+## === cell 5
+def preprocess_train_data_fast(
+    df_train_data, df_train_meta_data, num_samples, number_of_sensors
+):
+    n = min(num_samples, len(df_train_meta_data))
+
+    targets = df_train_meta_data.loc[: n - 1, ["azimuth", "zenith"]].to_numpy(
+        dtype=np.float32, copy=False
+    )
+
+    fp = df_train_meta_data.loc[: n - 1, "first_pulse_index"].to_numpy(
+        np.int64, copy=False
+    )
+    lp = df_train_meta_data.loc[: n - 1, "last_pulse_index"].to_numpy(
+        np.int64, copy=False
+    )
+    lengths = (lp - fp).astype(np.int64, copy=False)
+
+    offsets = np.arange(number_of_sensors, dtype=np.int64)[None, :]
+    idx = fp[:, None] + offsets  # (n, number_of_sensors)
+
+    valid = offsets < lengths[:, None]
+
+    idx_safe = idx.copy()
+    idx_safe[~valid] = 0
+
+    cols = ["sensor_id", "time", "charge", "auxiliary"]
+    arr = df_train_data[cols].to_numpy(copy=False)
+
+    gathered = arr[idx_safe]  # (n, number_of_sensors, 4)
+    sensor_id = gathered[..., 0].astype(np.int64, copy=False)
+    pulse_time = gathered[..., 1].astype(np.float32, copy=False)
+    charge = gathered[..., 2].astype(np.float32, copy=False)
+    auxiliary = gathered[..., 3].astype(np.float32, copy=False)
+
+    sensor_id = np.where(valid, sensor_id, 0)
+    pulse_time = np.where(valid, pulse_time, 0.0)
+    charge = np.where(valid, charge, 0.0)
+    auxiliary = np.where(valid, auxiliary, 0.0)
+
+    pulses = np.stack(
+        [sensor_id.astype(np.float32), pulse_time, charge, auxiliary], axis=-1
+    ).astype(np.float32)
+    return pulses, targets
+
+
+num_samples = 2000  # Total number of samples
+number_of_sensors = 5  # number of sensors at each sample
+train_pulses, targets = preprocess_train_data_fast(
+    df_train_data,
+    df_train_meta,
+    num_samples=num_samples,
+    number_of_sensors=number_of_sensors,
+)
+
+
+
+
+## === cell 6
+def vectorize_fast(pulses_4, geom_lut):
+    sensor_id = pulses_4[..., 0].astype(np.int64, copy=False)
+    max_id = geom_lut.shape[0] - 1
+    sid_safe = np.clip(sensor_id, 0, max_id)
+
+    xyz = geom_lut[sid_safe]  # (N,S,3); sid=0 maps to zeros as desired
+    oob = (sensor_id < 0) | (sensor_id > max_id)
+    if np.any(oob):
+        xyz = xyz.copy()
+        xyz[oob] = 0.0
+
+    out = np.concatenate(
+        [xyz, pulses_4[..., 1:4].astype(np.float32, copy=False)], axis=-1
+    ).astype(np.float32, copy=False)
+    return out
+
+
+samples = vectorize_fast(train_pulses, _geom_lut)
+
+num_train_samples = int(0.7 * num_samples)
+num_val_samples = int(0.25 * num_samples)
+num_test_samples = num_samples - num_train_samples - num_val_samples
+
+print("num of train samples:", num_train_samples)
+print("num of val samples:", num_val_samples)
+print("num of test samples:", num_test_samples)
+
+train_samples = samples[:num_train_samples].astype("float32", copy=False)
+train_targets = targets[:num_train_samples]
+
+val_samples = samples[num_train_samples : num_train_samples + num_val_samples].astype(
+    "float32", copy=False
+)
+val_targets = targets[num_train_samples : num_train_samples + num_val_samples]
+
+test_samples = samples[num_train_samples + num_val_samples :].astype(
+    "float32", copy=False
+)
+test_targets = targets[num_train_samples + num_val_samples :]
+
+del df_train_data, train_pulses, targets
+gc.collect()
+
+
+
+## === cell 7
+import matplotlib.pyplot as plt
+
+plt.scatter(range(samples.shape[0]), samples[:, 0, 5])
+
+
+
+## === cell 8
+train_targets = np.asarray(train_targets).astype("float32", copy=False)
+val_targets = np.asarray(val_targets).astype("float32", copy=False)
+test_targets = np.asarray(test_targets).astype("float32", copy=False)
+
+
+
+## === cell 9
+tf.keras.backend.clear_session()
+
+
+def model_build_and_train(
+    train_samples, train_targets, val_samples, val_targets, number_of_sensors
+):
+    inputs = keras.Input(shape=(number_of_sensors, 6))
+    x = layers.Flatten()(inputs)
+    x = layers.Dense(4, activation="relu")(x)
+    x = layers.Dropout(0.5)(x)
+    outputs = layers.Dense(2)(x)
+    model = keras.Model(inputs=inputs, outputs=outputs)
+
+    callbacks_list = [
+        keras.callbacks.ModelCheckpoint(
+            filepath="checkpoint_path.keras",
+            monitor="val_loss",
+            save_best_only=True,
+        )
+    ]
+    model.compile(optimizer=keras.optimizers.RMSprop(1e-5), loss="mse", metrics=["mae"])
+
+    history = model.fit(
+        train_samples,
+        train_targets,
+        validation_data=(val_samples, val_targets),
+        callbacks=callbacks_list,
+        epochs=20,
+        batch_size=64,
+        verbose=1,
+    )
+    return model, history
+
+
+model, history = model_build_and_train(
+    train_samples,
+    train_targets,
+    val_samples,
+    val_targets,
+    number_of_sensors=number_of_sensors,
+)
+
+
+
+## === cell 10
+model = keras.models.load_model("checkpoint_path.keras")
+print("Model performance on Validation samples: ")
+model.evaluate(val_samples, val_targets, verbose=1)
+print("Model performance on Test samples: ")
+model.evaluate(test_samples, test_targets, verbose=1)
+print("Prediction vs True value")
+print(
+    f"prediction:{model.predict(test_samples, verbose=0)[0]}, True value: {test_targets[0]}"
+)
+print(model.predict(test_samples, verbose=0)[0:10])
+
+
+
+## === cell 11
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(25, 6))
+plt.suptitle("Network Performance", fontsize=30)
+plt.subplots_adjust(wspace=0.3, hspace=0.4)
+history_dict = history.history
+keys = ["loss", "mae", "val_loss", "val_mae"]
+
+for i in range(2):
+    plt.subplot(1, 2, i + 1)
+    plt.ylabel(keys[i])
+    plt.xlabel("Epochs")
+    plt.plot(
+        range(1, len(history_dict[keys[i]]) + 1),
+        history_dict[keys[i]],
+        "bo",
+        label="Training",
+    )
+    plt.plot(
+        range(1, len(history_dict[keys[i + 2]]) + 1),
+        history_dict[keys[i + 2]],
+        "b",
+        label="Validation",
+    )
+    plt.legend()
+
+
+
+
+## === cell 12
+def load_test_meta(path):
+    df = pd.read_parquet(path, engine="pyarrow")
+    return df
+
+
+path = os.path.join(home_dir, test_meta)
+df_test_meta_all = load_test_meta(path)
+print(df_test_meta_all.head())
+print("Unique test batches:", df_test_meta_all["batch_id"].nunique())
+
+
+
+
+## === cell 13
+def load_test_data(path):
+    df = pd.read_parquet(path, engine="pyarrow")
+    df.insert(0, df.index.name, df.index, True)
+    df = df.reset_index(drop=True)
+    return df
+
+
+def preprocess_test_batch_to_vec(
+    df_test_data, df_test_meta, number_of_sensors, geom_lut
+):
+    event_ids = df_test_meta["event_id"].to_numpy(np.int64, copy=False)
+
+    fp = df_test_meta["first_pulse_index"].to_numpy(np.int64, copy=False)
+    lp = df_test_meta["last_pulse_index"].to_numpy(np.int64, copy=False)
+    lengths = (lp - fp).astype(np.int64, copy=False)
+
+    offsets = np.arange(number_of_sensors, dtype=np.int64)[None, :]
+    idx = fp[:, None] + offsets
+    valid = offsets < lengths[:, None]
+    idx_safe = idx.copy()
+    idx_safe[~valid] = 0
+
+    cols = ["sensor_id", "time", "charge", "auxiliary"]
+    arr = df_test_data[cols].to_numpy(copy=False)
+    gathered = arr[idx_safe]  # (N,S,4)
+
+    sensor_id = gathered[..., 0].astype(np.int64, copy=False)
+    pulse_time = gathered[..., 1].astype(np.float32, copy=False)
+    charge = gathered[..., 2].astype(np.float32, copy=False)
+    auxiliary = gathered[..., 3].astype(np.float32, copy=False)
+
+    sensor_id = np.where(valid, sensor_id, 0)
+    pulse_time = np.where(valid, pulse_time, 0.0)
+    charge = np.where(valid, charge, 0.0)
+    auxiliary = np.where(valid, auxiliary, 0.0)
+
+    max_id = geom_lut.shape[0] - 1
+    sid_safe = np.clip(sensor_id, 0, max_id)
+    xyz = geom_lut[sid_safe]
+    oob = (sensor_id < 0) | (sensor_id > max_id)
+    if np.any(oob):
+        xyz = xyz.copy()
+        xyz[oob] = 0.0
+
+    test_vec = np.concatenate(
+        [xyz, pulse_time[..., None], charge[..., None], auxiliary[..., None]], axis=-1
+    ).astype(np.float32, copy=False)
+    return event_ids, test_vec
+
+
+all_results = []
+batch_ids = df_test_meta_all["batch_id"].unique()
+batch_ids.sort()
+
+t0 = time.time()
+for k, test_batch_id in enumerate(batch_ids, start=1):
+    test_file = f"test/batch_{int(test_batch_id)}.parquet"
+    df_test_meta = df_test_meta_all[
+        df_test_meta_all["batch_id"] == test_batch_id
+    ].reset_index(drop=True)
+
+    path = os.path.join(home_dir, test_file)
+    df_test_data = load_test_data(path)
+
+    test_event_ids, test_vec = preprocess_test_batch_to_vec(
+        df_test_data,
+        df_test_meta,
+        number_of_sensors=number_of_sensors,
+        geom_lut=_geom_lut,
+    )
+
+    test_predict = model.predict(test_vec, verbose=0)
+
+    batch_df = pd.DataFrame(
+        {
+            "event_id": test_event_ids.astype(np.int64, copy=False),
+            "azimuth": test_predict[:, 0].astype(np.float32, copy=False),
+            "zenith": test_predict[:, 1].astype(np.float32, copy=False),
+        }
+    )
+    all_results.append(batch_df)
+
+    del df_test_data, df_test_meta, test_vec, test_predict, batch_df, test_event_ids
+    gc.collect()
+
+    if k % 5 == 0 or k == len(batch_ids):
+        print(f"Processed {k}/{len(batch_ids)} test batches in {time.time() - t0:.1f}s")
+
+test_result_df = pd.concat(all_results, axis=0, ignore_index=True)
+print("Total predicted rows:", len(test_result_df))
+print(test_result_df.head())
+
+del all_results
+gc.collect()
+
+
+
+## === cell 14
+test_result_df = test_result_df.drop_duplicates("event_id", keep="first")
+
+ordered_event_ids = df_test_meta_all["event_id"].to_numpy(np.int64, copy=False)
+
+pred_map = test_result_df.set_index("event_id")[["azimuth", "zenith"]]
+
+submission = pred_map.reindex(ordered_event_ids)
+submission = submission.fillna(0.0).astype(np.float32)
+submission.insert(0, "event_id", ordered_event_ids)
+
+submission.to_csv("submission.csv", index=False)
+print(submission.head())
+print("Wrote submission.csv with rows:", len(submission))
+print(
+    "Missing preds (after fill):",
+    submission[["azimuth", "zenith"]].isna().sum().to_dict(),
+)

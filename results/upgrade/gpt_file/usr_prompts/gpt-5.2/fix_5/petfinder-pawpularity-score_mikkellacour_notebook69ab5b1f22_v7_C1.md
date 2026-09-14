@@ -1,0 +1,480 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict engagement with a pet's profile based on the photograph for that profile.
+
+## Metric
+Root mean squared error.
+
+## Submission Format
+For each `Id` in the test set, you must predict a probability for the target variable, `Pawpularity`. The file should contain a header and have the following format:
+
+```
+Id, Pawpularity
+0008dbfb52aa1dc6ee51ee02adf13537, 99.24
+0014a7b528f1682f0cf3b73a991c17a0, 61.71
+0019c1388dfcd30ac8b112fb4250c251, 6.23
+00307b779c82716b240a24f028b0031b, 9.43
+00320c6dd5b4223c62a9670110d47911, 70.89
+etc.
+```
+
+## Dataset
+- **train/** - Folder containing training set photos of the form **{id}.jpg**, where **{id}** is a unique Pet Profile ID.
+- **train.csv** - Metadata (described below) for each photo in the training set as well as the target, the photo's Pawpularity score. The Id column gives the photo's unique Pet Profile ID corresponding the photo's file name.
+
+The train.csv and test.csv files contain metadata for photos in the training set and test set, respectively. Each pet photo is labeled with the value of 1 (Yes) or 0 (No) for each of the following features:
+
+- **Focus** - Pet stands out against uncluttered background, not too close / far.
+- **Eyes** - Both eyes are facing front or near-front, with at least 1 eye / pupil decently clear.
+- **Face** - Decently clear face, facing front or near-front.
+- **Near** - Single pet taking up significant portion of photo (roughly over 50% of photo width or height).
+- **Action** - Pet in the middle of an action (e.g., jumping).
+- **Accessory** - Accompanying physical or digital accessory / prop (i.e. toy, digital sticker), excluding collar and leash.
+- **Group** - More than 1 pet in the photo.
+- **Collage** - Digitally-retouched photo (i.e. with digital photo frame, combination of multiple photos).
+- **Human** - Human in the photo.
+- **Occlusion** - Specific undesirable objects blocking part of the pet (i.e. human, cage or fence). Note that not all blocking objects are considered occlusion.
+- **Info** - Custom-added text or labels (i.e. pet name, description).
+- **Blur** - Noticeably out of focus or noisy, especially for the pet's eyes and face. For Blur entries, "Eyes" column is always set to 0.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (132 lines)
+            sample_submission.csv (993 lines)
+            sample_submission.csv.zip (22.7 kB)
+            test.csv (993 lines)
+            test.csv.zip (22.5 kB)
+            test.zip (102.2 MB)
+            train.csv (8921 lines)
+            train.csv.zip (213.0 kB)
+            train.zip (926.9 MB)
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+            test/
+                a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                ... and 990 other files
+                test/
+            train/
+                e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                ... and 8918 other files
+                train/
+        input/
+            description.md (132 lines)
+            sample_submission.csv (993 lines)
+            sample_submission.csv.zip (22.7 kB)
+            test.csv (993 lines)
+            test.csv.zip (22.5 kB)
+            test.zip (102.2 MB)
+            train.csv (8921 lines)
+            train.csv.zip (213.0 kB)
+            train.zip (926.9 MB)
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+            test/
+                a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                ... and 990 other files
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+            train/
+                e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                ... and 8918 other files
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+        working/
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+```
+
+-> data/petfinder-pawpularity-score/sample_submission.csv has 992 rows and 2 columns.
+The columns are: Id, Pawpularity
+
+-> data/petfinder-pawpularity-score/test.csv has 992 rows and 13 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur
+
+-> data/petfinder-pawpularity-score/train.csv has 8920 rows and 14 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur, Pawpularity
+
+-> data/sample_submission.csv has 992 rows and 2 columns.
+The columns are: Id, Pawpularity
+
+-> data/test.csv has 992 rows and 13 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur
+
+-> data/train.csv has 8920 rows and 14 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur, Pawpularity
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+
+import matplotlib.pyplot as plt
+
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras.applications import ResNet101
+from tensorflow.keras.applications.resnet import preprocess_input
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.layers import Dense, Concatenate, Input, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.callbacks import EarlyStopping
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+
+try:
+    tf.config.experimental.enable_op_determinism()
+except Exception:
+    pass
+
+try:
+    gpus = tf.config.list_physical_devices("GPU")
+    for g in gpus:
+        tf.config.experimental.set_memory_growth(g, True)
+except Exception:
+    pass
+
+try:
+    tf.config.optimizer.set_jit(True)
+except Exception:
+    pass
+
+tf_data_options = tf.data.Options()
+tf_data_options.experimental_deterministic = True
+
+print("TF version:", tf.__version__)
+
+
+
+## === cell 1
+BASE_PATH = "/kaggle/input/petfinder-pawpularity-score"
+train_csv = os.path.join(BASE_PATH, "train.csv")
+test_csv = os.path.join(BASE_PATH, "test.csv")
+train_img_dir = os.path.join(BASE_PATH, "train")
+test_img_dir = os.path.join(BASE_PATH, "test")
+
+df_train = pd.read_csv(train_csv)
+df_test = pd.read_csv(test_csv)
+
+meta_cols = [
+    "Subject Focus",
+    "Eyes",
+    "Face",
+    "Near",
+    "Action",
+    "Accessory",
+    "Group",
+    "Collage",
+    "Human",
+    "Occlusion",
+    "Info",
+    "Blur",
+]
+
+assert "Id" in df_train.columns and "Pawpularity" in df_train.columns
+assert all(c in df_train.columns for c in meta_cols)
+assert all(c in df_test.columns for c in meta_cols)
+
+print(df_train.shape, df_test.shape)
+
+
+
+## === cell 2
+backbone = ResNet101(
+    weights="imagenet", include_top=False, pooling="avg", input_shape=(224, 224, 3)
+)
+
+
+def _build_image_dataset(paths, batch_size):
+    paths_ds = tf.data.Dataset.from_tensor_slices(paths)
+
+    def _load(path):
+        img_bytes = tf.io.read_file(path)
+        img = tf.image.decode_jpeg(img_bytes, channels=3)
+        img = tf.image.resize(img, [224, 224], method=tf.image.ResizeMethod.BILINEAR)
+        img = tf.cast(img, tf.float32)
+        img = preprocess_input(img)
+        return img
+
+    AUTOTUNE = tf.data.AUTOTUNE
+    ds = (
+        paths_ds.map(_load, num_parallel_calls=AUTOTUNE, deterministic=True)
+        .apply(tf.data.experimental.ignore_errors())
+        .batch(batch_size, drop_remainder=False)
+        .cache()
+        .prefetch(AUTOTUNE)
+    )
+    ds = ds.with_options(tf_data_options)
+    return ds
+
+
+def extract_image_features(ids, image_dir, batch_size=32, cache_prefix=None):
+    paths = [os.path.join(image_dir, f"{img_id}.jpg") for img_id in ids]
+
+    if cache_prefix is not None:
+        ids_path = f"{cache_prefix}_ids.npy"
+        feats_path = f"{cache_prefix}_feats.npy"
+        if os.path.exists(ids_path) and os.path.exists(feats_path):
+            cached_ids = np.load(ids_path, allow_pickle=True).tolist()
+            if cached_ids == ids:
+                cached_feats = np.load(feats_path, mmap_mode="r")
+                return ids, np.asarray(cached_feats, dtype=np.float32)
+
+    ds = _build_image_dataset(paths, batch_size=batch_size)
+
+    feats = backbone.predict(ds, verbose=1)
+    feats = np.asarray(feats, dtype=np.float32)
+
+    if feats.shape[0] != len(ids):
+        kept_n = feats.shape[0]
+        kept_ids = ids[:kept_n]
+    else:
+        kept_ids = ids
+
+    if cache_prefix is not None:
+        np.save(f"{cache_prefix}_ids.npy", np.asarray(kept_ids, dtype=object))
+        np.save(f"{cache_prefix}_feats.npy", feats)
+
+    return kept_ids, feats
+
+
+train_ids = df_train["Id"].tolist()
+train_ids_kept, image_features = extract_image_features(
+    train_ids,
+    train_img_dir,
+    batch_size=64,
+    cache_prefix="/kaggle/working/resnet101_train",
+)
+
+if len(train_ids_kept) != len(train_ids):
+    idx = {k: i for i, k in enumerate(train_ids_kept)}
+    df_train_kept = df_train[df_train["Id"].isin(idx)].copy()
+    df_train_kept["_ord"] = df_train_kept["Id"].map(idx).astype(np.int32)
+    df_train_kept = (
+        df_train_kept.sort_values("_ord").drop(columns=["_ord"]).reset_index(drop=True)
+    )
+else:
+    df_train_kept = df_train
+
+features = df_train_kept[meta_cols].values.astype(np.float32, copy=False)
+responses = df_train_kept["Pawpularity"].values.astype(np.float32, copy=False)
+
+print("Train image_features:", image_features.shape)
+print("Train meta features:", features.shape)
+print("Train responses:", responses.shape)
+
+
+
+## === cell 3
+test_ids = df_test["Id"].tolist()
+test_ids_kept, image_features_test = extract_image_features(
+    test_ids,
+    test_img_dir,
+    batch_size=64,
+    cache_prefix="/kaggle/working/resnet101_test",
+)
+
+if len(test_ids_kept) != len(test_ids):
+    idx = {k: i for i, k in enumerate(test_ids_kept)}
+    df_test_kept = df_test[df_test["Id"].isin(idx)].copy()
+    df_test_kept["_ord"] = df_test_kept["Id"].map(idx).astype(np.int32)
+    df_test_kept = (
+        df_test_kept.sort_values("_ord").drop(columns=["_ord"]).reset_index(drop=True)
+    )
+else:
+    df_test_kept = df_test
+
+features_test = df_test_kept[meta_cols].values.astype(np.float32, copy=False)
+
+print("Test image_features:", image_features_test.shape)
+print("Test meta features:", features_test.shape)
+
+
+
+## === cell 4
+X_images_train, X_images_test, X_features_train, X_features_test, y_train, y_test = (
+    train_test_split(
+        image_features, features, responses, test_size=0.2, random_state=42
+    )
+)
+
+image_input = Input(shape=(image_features.shape[1],))
+x = Dense(256, activation="relu")(image_input)
+
+feature_input = Input(shape=(12,))
+y = Dense(64, activation="relu")(feature_input)
+
+combined = Concatenate()([x, y])
+z = Dense(256, activation="relu")(combined)
+z = Dropout(0.2)(z)
+z = Dense(512, activation="relu")(z)
+z = Dropout(0.2)(z)
+z = Dense(128, activation="relu")(z)
+z = Dropout(0.2)(z)
+z = Dense(48, activation="relu")(z)
+z = Dropout(0.2)(z)
+z = Dense(10, activation="relu")(z)
+z = Dropout(0.3)(z)
+output = Dense(1, activation="sigmoid")(z)
+
+batch_size = 100
+epochs = 1000
+early_stop = EarlyStopping(
+    monitor="val_loss",
+    min_delta=0.00001,
+    patience=20,
+    verbose=1,
+    mode="auto",
+    restore_best_weights=True,
+    start_from_epoch=3,
+)
+
+y_train_100 = y_train / 100.0
+y_test_100 = y_test / 100.0
+
+model = Model(inputs=[image_input, feature_input], outputs=output)
+model.compile(optimizer="adam", loss="mean_squared_error", metrics=["mae"])
+
+X_images_train = np.ascontiguousarray(X_images_train, dtype=np.float32)
+X_features_train = np.ascontiguousarray(X_features_train, dtype=np.float32)
+y_train_100 = np.ascontiguousarray(y_train_100, dtype=np.float32)
+
+X_images_test = np.ascontiguousarray(X_images_test, dtype=np.float32)
+X_features_test = np.ascontiguousarray(X_features_test, dtype=np.float32)
+y_test_100 = np.ascontiguousarray(y_test_100, dtype=np.float32)
+
+history = model.fit(
+    [X_images_train, X_features_train],
+    y_train_100,
+    epochs=epochs,
+    batch_size=batch_size,
+    validation_split=0.2,
+    shuffle=True,
+    callbacks=[early_stop],
+)
+
+loss, mae = model.evaluate([X_images_test, X_features_test], y_test_100, verbose=0)
+print(f"Test Loss (MSE on scaled target): {loss}, Test MAE (scaled): {mae}")
+
+
+
+## === cell 5
+predictions_val = model.predict(
+    [X_images_test, X_features_test], batch_size=128, verbose=0
+)
+
+plt.figure(figsize=(8, 8))
+plt.scatter(y_test, predictions_val.flatten() * 100, alpha=0.5, color="blue")
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], lw=2, color="red")
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.title("Actual vs. Predicted Values")
+plt.grid(True)
+plt.show()
+
+
+
+## === cell 6
+print("RMSE:", (np.sqrt(loss) * 100))
+
+
+
+## === cell 7
+image_features_test = np.ascontiguousarray(image_features_test, dtype=np.float32)
+features_test = np.ascontiguousarray(features_test, dtype=np.float32)
+
+prediction = model.predict(
+    [image_features_test, features_test], batch_size=128, verbose=1
+).astype(np.float32)
+prediction = prediction.flatten() * 100.0
+
+prediction = np.clip(prediction, 0.0, 100.0)
+
+submission = pd.DataFrame({"Id": df_test_kept["Id"].values, "Pawpularity": prediction})
+
+print("Submission shape:", submission.shape)
+submission.to_csv("submission.csv", index=False)
+print("Wrote submission.csv")

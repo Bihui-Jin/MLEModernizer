@@ -1,0 +1,476 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+protobuf==6.33.0
+sklearn-pandas==2.2.0
+tensorflow==2.18.0
+tensorflow-cloud==0.1.5
+tensorflow-datasets==4.9.9
+tensorflow_decision_forests==1.11.0
+tensorflow-hub==0.16.1
+tensorflow-io==0.37.1
+tensorflow-io-gcs-filesystem==0.37.1
+tensorflow-metadata==1.17.2
+tensorflow-probability==0.25.0
+tensorflow-text==2.18.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.609398609851919
+
+# 6. Current score
+
+0.12743
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.11809) has done: 'I fix the runtime crash by pinning TensorFlow to use the pure-Python protobuf implementation (this avoids the `MessageFactory.GetPrototype` error caused by protobuf 6.x with some TF/Keras model loads). I also make model loading robust by falling back to a light baseline model if the external `../input/tryagain/model_name.h5` path doesn’t exist, so the notebook always produces a valid `submission.csv`. Finally, I correct the image-to-array conversion and add proper `rescale` preprocessing so inference matches typical training input expectations, improving the chance of a reasonable score while keeping the overall approach (load model → loop over test images → argmax) unchanged.'
+- What this solution (achieved 0.10351) has done: 'I fix the protobuf/TensorFlow crash by removing the incompatible protobuf workaround and instead making model loading safe under TF 2.18 + protobuf 6 (load with `safe_mode=False` when needed, and fall back to a baseline). I also correct preprocessing to match MobileNetV2 expectations (don’t divide by 255 when using `mobilenet_v2.preprocess_input`), which should substantially improve accuracy versus the current near-random predictions. Finally, I keep the same overall approach (load/build model → loop test images → argmax → write `submission.csv`) while ensuring the submission is always written with the correct columns.'
+- What this solution (achieved 0.11584) has done: 'I fix the protobuf/TensorFlow crash (`MessageFactory` has no `GetPrototype`) by forcing TensorFlow to use the pure-Python protobuf implementation *before* importing `tensorflow`, which is the reliable workaround in TF 2.18 + protobuf 6 on Kaggle. I keep your core logic intact (load model if possible → otherwise use MobileNetV2 ImageNet backbone → loop over test images → argmax) and only adjust environment setup/import order so the code runs end-to-end. I also make the model-load fallback slightly more robust by catching the exact failure and proceeding to the baseline model, ensuring a valid `submission.csv` is always written. This should both unblock execution and (since your preprocessing is already aligned with MobileNetV2) move accuracy upward from near-random toward the target band.'
+- What this solution (achieved 0.10762) has done: 'I fix the TensorFlow/protobuf crash by forcing the Python protobuf runtime earlier and also setting `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` before any TensorFlow/Keras import in the same cell that imports TF (some Kaggle runners re-order execution). Then I make model loading and baseline construction robust to that failure by catching the protobuf-related exception and proceeding directly to the MobileNetV2 fallback so the pipeline always reaches submission writing. Finally, I keep your inference loop and preprocessing semantics unchanged (MobileNetV2 `preprocess_input` + argmax) while ensuring the submission CSV is always created with the correct columns and row count.'
+- What this solution (achieved 0.11024) has done: 'I fix the protobuf/TensorFlow crash by forcing the pure-Python protobuf runtime *before any TensorFlow import* and by importing `google.protobuf` early so the environment variable is actually honored in this Kaggle TF 2.18 + protobuf 6 setup. Then I keep your exact load-or-fallback logic, but also add one more safe fallback (`tf.keras.models.load_model`) to avoid a hard failure path during model deserialization. Finally, I ensure inference always runs by validating the test image path and writing a correctly formatted `submission.csv` with the sample submission’s row order unchanged (score-neutral but stability-critical).'
+- What this solution (achieved 0.14723) has done: 'I fix the protobuf/TensorFlow crash by ensuring the pure-Python protobuf runtime is selected *before* TensorFlow is ever imported, and by forcing a clean import order (including setting `TF_USE_LEGACY_KERAS=1` which is often necessary for TF 2.18 + protobuf 6 stability). Then I keep your same “load model if exists else MobileNetV2 baseline” logic, but make the baseline explicitly runnable without triggering the protobuf descriptor path that’s failing. Finally, I keep your same inference loop and submission formatting, ensuring `submission.csv` is always written with the sample submission’s ordering.'
+- What this solution (achieved 0.12743) has done: 'I fix the protobuf/TensorFlow crash by enforcing the pure-Python protobuf runtime **before any TensorFlow-related import happens** and by adding a small “import guard” that forces a clean import order in TF 2.18 + protobuf 6. Then I keep your exact core flow (load model if exists → else MobileNetV2 baseline → loop test images → argmax) but make the baseline model compile-free and inference-safe to avoid triggering the same descriptor path. Finally, I ensure the submission is always written as `/kaggle/working/submission.csv` with the sample submission row order unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "2"
+os.environ["TF_USE_LEGACY_KERAS"] = "1"
+
+import google.protobuf  # noqa: F401
+
+import numpy as np
+import pandas as pd
+
+for dirname, _, filenames in os.walk("/kaggle/input"):
+    for filename in filenames[:5]:
+        print(os.path.join(dirname, filename))
+
+
+
+## === cell 1
+import tensorflow as tf
+from tensorflow import keras
+
+tf.random.set_seed(42)
+np.random.seed(42)
+
+INPUT_DIR = "/kaggle/input/cassava-leaf-disease-classification"
+SAMPLE_PATH = f"{INPUT_DIR}/sample_submission.csv"
+TEST_IMG_DIR = f"{INPUT_DIR}/test_images"
+SUB_PATH = "/kaggle/working/submission.csv"
+
+MODEL_PATH = "../input/tryagain/model_name.h5"
+
+sample_sub = pd.read_csv(SAMPLE_PATH)
+
+TARGET_SIZE = 224
+
+
+def build_baseline_model():
+    base = keras.applications.MobileNetV2(
+        input_shape=(TARGET_SIZE, TARGET_SIZE, 3),
+        include_top=False,
+        weights="imagenet",
+        pooling="avg",
+    )
+    x_in = keras.Input(shape=(TARGET_SIZE, TARGET_SIZE, 3))
+    x = keras.applications.mobilenet_v2.preprocess_input(x_in)
+    x = base(x, training=False)
+    x = keras.layers.Dense(5, activation="softmax")(x)
+    model = keras.Model(x_in, x)
+    return model
+
+
+def load_or_build_model():
+    """
+    Core logic unchanged: load a model if available; otherwise fall back to an ImageNet-backed model.
+    FIX: Make loading robust under TF 2.18 + protobuf 6 by trying multiple safe load routes.
+    """
+    if tf.io.gfile.exists(MODEL_PATH):
+        try:
+            return keras.models.load_model(MODEL_PATH, compile=False, safe_mode=False)
+        except TypeError:
+            try:
+                return keras.models.load_model(MODEL_PATH, compile=False)
+            except Exception as e:
+                print(
+                    f"Model load failed at {MODEL_PATH} with error:\n{e}\nFalling back to baseline model."
+                )
+        except Exception as e:
+            print(
+                f"keras.models.load_model failed with error:\n{e}\nTrying tf.keras.models.load_model..."
+            )
+            try:
+                return tf.keras.models.load_model(
+                    MODEL_PATH, compile=False, safe_mode=False
+                )
+            except Exception as e2:
+                print(
+                    f"tf.keras.models.load_model also failed with error:\n{e2}\nFalling back to baseline model."
+                )
+    else:
+        print(f"Model path not found: {MODEL_PATH}\nFalling back to baseline model.")
+
+    return build_baseline_model()
+
+
+try:
+    model = load_or_build_model()
+except Exception as e:
+    print(
+        f"Unexpected failure while creating/loading model:\n{e}\nUsing baseline model."
+    )
+    model = build_baseline_model()
+
+_ = model(tf.zeros([1, TARGET_SIZE, TARGET_SIZE, 3], dtype=tf.float32), training=False)
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 2
+preds = []
+
+use_mobilenet_preproc = True
+
+if not tf.io.gfile.exists(TEST_IMG_DIR):
+    raise FileNotFoundError(f"TEST_IMG_DIR not found: {TEST_IMG_DIR}")
+
+for image_id in sample_sub["image_id"].astype(str).values:
+    img_path = os.path.join(TEST_IMG_DIR, image_id)
+
+    img = keras.preprocessing.image.load_img(
+        img_path, target_size=(TARGET_SIZE, TARGET_SIZE)
+    )
+    arr = keras.preprocessing.image.img_to_array(img).astype(np.float32)
+
+    if use_mobilenet_preproc:
+        arr = keras.applications.mobilenet_v2.preprocess_input(arr)
+    else:
+        arr = arr / 255.0
+
+    arr = np.expand_dims(arr, axis=0)
+    prediction = model.predict(arr, verbose=0)
+    preds.append(int(np.argmax(prediction, axis=1)[0]))
+
+my_submission = pd.DataFrame({"image_id": sample_sub["image_id"], "label": preds})
+my_submission.to_csv(SUB_PATH, index=False)
+print(f"Wrote submission to: {SUB_PATH} with shape {my_submission.shape}")
+print(my_submission.head())

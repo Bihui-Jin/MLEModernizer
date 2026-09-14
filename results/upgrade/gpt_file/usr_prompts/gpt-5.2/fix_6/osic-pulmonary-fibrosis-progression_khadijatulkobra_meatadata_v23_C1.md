@@ -1,0 +1,709 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pydicom==3.0.1
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-image==0.25.2
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+scipy==1.15.3
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-6.930800387972361
+
+# 6. Current score
+
+-7.62814
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -16.21033) has done: 'The crash happens because the expanded test feature frame never carries `Patient_Week`, so later alignment to `sample_submission` fails. I minimally propagate `Patient_Week` from the merged submission expansion into `data_test_features`, and ensure `make_eval_data()` preserves it in its output. I also fix the assignment of `final_sub[["FVC","Confidence"]]` (it currently creates a tuple of Series rather than a 2-column DataFrame), keeping the same prediction logic and confidence clipping so the pipeline runs end-to-end and writes a valid `submission.csv`.'
+- What this solution (achieved -8.78501) has done: 'Your current score is far below the target, so we should improve it with minimal, low-risk changes that don’t alter the model architecture or training loop. The biggest gain here is to make inference match the competition metric requirement: the Laplace metric uses a *clipped* sigma (≥70) and benefits from reasonable calibration, so we (1) enforce a valid, positive confidence everywhere and (2) apply a single global confidence scaling factor fitted on the training set (using out-of-fold-style per-row predictions without changing training) to better match typical residual sizes. We also fix a subtle preprocessing mismatch: `Healthy-FVC` in train uses `FVC` but test uses `base_FVC`; we align train to use `base_FVC` so the feature semantics match between train/test. These are small changes that typically move OSIC baselines several points upward without changing core logic.'
+- What this solution (achieved -16.21033) has done: 'Your score (-8.785) is below the target (-6.93), so we should improve it with minimal, metric-aligned tweaks while keeping your model and training intact. The main low-risk gain is to make the model’s implied uncertainty behave like the competition’s clipped sigma by (1) enforcing a strictly positive confidence at inference and (2) fitting a single global confidence scaling factor using the competition metric (grid search on train predictions) instead of a median residual ratio. Additionally, we clip the inferred confidence to at least 70 inside `make_eval_data()` so both training-metric calibration and test submission use the same semantics. These changes do not alter architecture, features, loss, or the training loop; they only calibrate post-processing toward the evaluation metric.'
+- What this solution (achieved -7.62814) has done: 'Your current score (-16.21) is far below the target (-6.93), so we should improve it with very small, metric-aligned fixes that don’t change your model, loss, or training loop. The biggest issue is a train/test feature mismatch: during training you treat each visit’s FVC as the “base_FVC”, but at test time “base_FVC” is the baseline-only measurement; this inconsistency can heavily hurt generalization, so we make training use a true per-patient baseline row (Week closest to 0) as `base_FVC/base_Weeks` for all that patient’s targets. Next, we ensure the confidence scaling search uses the same clipping semantics as the competition (sigma clipped at 70) and apply a final clip after scaling so calibration can’t produce invalid/too-small sigmas. These changes are minimal (preprocessing + calibration only), keep the model identical, and typically move OSIC baselines substantially upward toward your target band.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
+
+
+
+
+## === cell 1
+def csv_preprocess(data):
+    data = data.copy()
+
+    COLS = ["Sex", "SmokingStatus"]
+    FE = []
+    for col in COLS:
+        for mod in data[col].dropna().unique():
+            FE.append(mod)
+            data[mod] = (data[col] == mod).astype(int)
+
+    data = data[["Patient", "Weeks", "FVC", "Age", "Percent"] + FE]
+    data = data.sort_values(["Patient", "Weeks"], ascending=True).reset_index(drop=True)
+
+    FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+
+    def _pick_baseline_row(g):
+        g = g.copy()
+        base_idx = (g["Weeks"].abs().astype(float), g["Weeks"].astype(float)).__iter__()
+        g2 = g.sort_values(["Weeks"], ascending=True).copy()
+        base = g.copy()
+        base = g.sort_values(["Weeks"], key=lambda s: s.abs(), ascending=True).head(1)
+        if len(base) == 0:
+            return g
+        base_weeks = float(base["Weeks"].iloc[0])
+        base_fvc = float(base["FVC"].iloc[0])
+        g["base_Weeks"] = base_weeks
+        g["base_FVC"] = base_fvc
+        g["Week"] = g["Weeks"].astype(float)
+        g["actual_FVC"] = g["FVC"].astype(float)
+        return g
+
+    data = (
+        data.groupby("Patient", group_keys=False)
+        .apply(_pick_baseline_row)
+        .reset_index(drop=True)
+    )
+
+    data["Healthy-FVC"] = round((data["base_FVC"] * 100) / data["Percent"])
+
+    npData = data[
+        ["Patient", "base_Weeks", "base_FVC", "Age"]
+        + FE1
+        + ["Week", "Healthy-FVC", "actual_FVC"]
+    ].copy()
+
+    npData.reset_index(inplace=True, drop=True)
+    npData = npData.fillna(0)
+    return npData
+
+
+
+
+## === cell 2
+class SIGMA(nn.Module):
+    def __init__(self):
+        super(SIGMA, self).__init__()
+        self.data_net1 = nn.Sequential(
+            nn.Linear(10, 42),
+            nn.ReLU(),
+            nn.Linear(42, 64),
+            nn.ReLU(),
+            nn.Linear(64, 118),
+            nn.ReLU(),
+        )
+        self.data_net2 = nn.Sequential(
+            nn.Linear(128, 256),
+            nn.ReLU(),
+            nn.Linear(256, 502),
+            nn.ReLU(),
+        )
+        self.data_net3 = nn.Sequential(
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 118),
+            nn.ReLU(),
+        )
+        self.data_net4 = nn.Sequential(
+            nn.Linear(748, 256),
+            nn.ReLU(),
+            nn.Linear(256, 64),
+            nn.ReLU(),
+            nn.Linear(64, 3),
+            nn.ReLU(),
+        )
+
+    def forward(self, data_i):
+        out1 = self.data_net1(data_i)
+        out2 = torch.cat((data_i, out1), dim=-1)
+        out2 = self.data_net2(out2)
+        out3 = torch.cat((data_i, out2), dim=-1)
+        out3 = self.data_net3(out3)
+        out4 = torch.cat((data_i, out1, out2, out3), dim=-1)
+        out = self.data_net4(out4)
+        return out
+
+
+
+
+## === cell 3
+def score(y_true, y_pred):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    fvc_pred = y_pred[:, 1]
+    delta = (y_true[:, 0] - fvc_pred).abs()
+    sq2 = torch.tensor(2.0, device=y_true.device, dtype=y_true.dtype).sqrt()
+    metric = (delta / sigma) * sq2 + (sigma * sq2).log()
+    return metric.mean()
+
+
+def closs(y_true, y_pred):
+    sigma = y_pred[:, 2] - y_pred[:, 0]
+    e = torch.abs(y_true[:, 0] - y_pred[:, 1])
+    loss = torch.abs(sigma - e)
+    return loss
+
+
+def quartile_loss(y_true, y_pred):
+    loss = score(y_true, y_pred)
+    return loss
+
+
+
+
+## === cell 4
+def make_eval_data(npEval, model, device="cuda"):
+    npEval = npEval.copy()
+
+    x_features = npEval[
+        [
+            "base_Weeks",
+            "base_FVC",
+            "Age",
+            "Male",
+            "Female",
+            "Ex-smoker",
+            "Never smoked",
+            "Currently smokes",
+            "Week",
+            "Healthy-FVC",
+        ]
+    ]
+    x_features = torch.tensor(x_features.values, dtype=torch.float32)
+
+    use_cuda = torch.cuda.is_available() and device == "cuda"
+    model = model.to("cuda" if use_cuda else "cpu")
+    model.eval()
+
+    preds = []
+    with torch.no_grad():
+        for i in range(len(npEval)):
+            x = x_features[i].unsqueeze(0).to("cuda" if use_cuda else "cpu")
+            p = model(x).detach().to("cpu").numpy()[0]
+            preds.append(p)
+
+    preds = np.asarray(preds)
+    npEval["FVC"] = preds[:, 1]
+
+    conf = (preds[:, 2] - preds[:, 0]).astype(np.float32)
+    conf = np.where(np.isfinite(conf), conf, 70.0).astype(np.float32)
+    conf = np.clip(conf, 1e-3, None)
+    conf = np.clip(conf, 70.0, None)
+    npEval["Confidence"] = conf
+    return npEval
+
+
+
+
+## === cell 5
+DATA_DIR = "../input/osic-pulmonary-fibrosis-progression"
+data_train = pd.read_csv(f"{DATA_DIR}/train.csv")
+data_test = pd.read_csv(f"{DATA_DIR}/test.csv")
+sample_submission = pd.read_csv(f"{DATA_DIR}/sample_submission.csv")
+
+
+
+## === cell 6
+submission = sample_submission.copy()
+submission["Patient"] = submission["Patient_Week"].apply(lambda x: x.split("_")[0])
+submission["Weeks"] = submission["Patient_Week"].apply(lambda x: int(x.split("_")[1]))
+submission_sorted = submission.sort_values(
+    by=["Patient", "Weeks"], ascending=True
+).reset_index(drop=True)
+
+
+
+## === cell 7
+merge = (
+    pd.merge(data_test, submission_sorted, on=["Patient"], how="left")
+    .sort_values(["Patient", "Weeks_y"])
+    .reset_index(drop=True)
+)
+merge = merge.drop(["FVC_y"], axis=1)
+merge = merge.rename(
+    columns={"FVC_x": "base_FVC", "Weeks_y": "Week", "Weeks_x": "base_Weeks"}
+)
+
+data_test_expanded = merge.loc[
+    :,
+    [
+        "Patient_Week",
+        "Patient",
+        "base_Weeks",
+        "base_FVC",
+        "Percent",
+        "Age",
+        "Sex",
+        "SmokingStatus",
+        "Week",
+    ],
+]
+
+submission_out = merge.loc[:, ["Patient_Week", "base_FVC", "Confidence"]].rename(
+    columns={"base_FVC": "FVC"}
+)
+
+
+
+## === cell 8
+data = data_test_expanded.copy()
+data["Healthy-FVC"] = round((data["base_FVC"] * 100) / data["Percent"])
+FE = ["Healthy-FVC"]
+
+COLS = ["Sex", "SmokingStatus"]
+for col in COLS:
+    for mod in data[col].dropna().unique():
+        FE.append(mod)
+        data[mod] = (data[col] == mod).astype(int)
+
+FE1 = ["Male", "Female", "Ex-smoker", "Never smoked", "Currently smokes"]
+npData = pd.DataFrame(
+    columns=["Patient_Week", "Patient", "base_Weeks", "base_FVC", "Age", "Healthy-FVC"]
+    + FE1
+    + ["Week"]
+)
+npData = pd.concat([npData, data], ignore_index=True, sort=True)
+npData = npData.fillna(0)
+
+data_test_features = npData[
+    [
+        "Patient_Week",
+        "Patient",
+        "base_Weeks",
+        "base_FVC",
+        "Age",
+        "Healthy-FVC",
+        "Male",
+        "Female",
+        "Ex-smoker",
+        "Never smoked",
+        "Currently smokes",
+        "Week",
+    ]
+].copy()
+
+
+
+## === cell 9
+weights_path = (
+    "../input/new01681/Epoch1_Score6.813718921799141_Acc0.9353082271685015.pth"
+)
+
+model = SIGMA()
+
+use_cuda = torch.cuda.is_available()
+device = "cuda" if use_cuda else "cpu"
+
+loaded = False
+if os.path.exists(weights_path):
+    state = torch.load(weights_path, map_location="cpu")
+    model.load_state_dict(state)
+    loaded = True
+
+if not loaded:
+    npTrain = csv_preprocess(data_train)
+
+    x = (
+        npTrain[
+            [
+                "base_Weeks",
+                "base_FVC",
+                "Age",
+                "Male",
+                "Female",
+                "Ex-smoker",
+                "Never smoked",
+                "Currently smokes",
+                "Week",
+                "Healthy-FVC",
+            ]
+        ]
+        .astype(np.float32)
+        .values
+    )
+    y = npTrain[["actual_FVC"]].astype(np.float32).values
+
+    x_t = torch.tensor(x, dtype=torch.float32)
+    y_t = torch.tensor(y, dtype=torch.float32)
+
+    ds = TensorDataset(x_t, y_t)
+    dl = DataLoader(ds, batch_size=256, shuffle=True, drop_last=False)
+
+    model = model.to(device)
+    opt = torch.optim.Adam(model.parameters(), lr=1e-3)
+
+    for epoch in range(25):
+        model.train()
+        for xb, yb in dl:
+            xb = xb.to(device)
+            yb = yb.to(device)
+
+            pred = model(xb)
+            loss = quartile_loss(yb, pred).mean()
+
+            opt.zero_grad(set_to_none=True)
+            loss.backward()
+            opt.step()
+
+    model = model.to("cpu")
+
+
+
+
+## === cell 10
+def laplace_metric_np(fvc_true, fvc_pred, sigma):
+    sigma = np.maximum(sigma, 70.0)
+    delta = np.minimum(np.abs(fvc_true - fvc_pred), 1000.0)
+    return (-np.sqrt(2.0) * delta / sigma) - np.log(np.sqrt(2.0) * sigma)
+
+
+npTrain_cal = csv_preprocess(data_train)
+train_pred = make_eval_data(npTrain_cal.copy(), model, device=device)
+
+fvc_true = pd.to_numeric(train_pred["actual_FVC"], errors="coerce").astype(float).values
+fvc_pred = pd.to_numeric(train_pred["FVC"], errors="coerce").astype(float).values
+conf_raw = (
+    pd.to_numeric(train_pred["Confidence"], errors="coerce")
+    .fillna(70.0)
+    .astype(float)
+    .values
+)
+
+conf_raw = np.where(np.isfinite(conf_raw), conf_raw, 70.0)
+conf_raw = np.clip(conf_raw, 70.0, None)
+
+grid = np.linspace(0.6, 2.6, 41)
+best_scale = 1.0
+best_score = -1e18
+for s in grid:
+    m = laplace_metric_np(fvc_true, fvc_pred, conf_raw * s).mean()
+    if m > best_score:
+        best_score = float(m)
+        best_scale = float(s)
+
+scale = best_scale
+
+test_pred = make_eval_data(data_test_features.copy(), model, device=device)
+
+test_pred["Confidence"] = (
+    pd.to_numeric(test_pred["Confidence"], errors="coerce").fillna(70.0).astype(float)
+    * scale
+)
+
+test_pred["Confidence"] = (
+    pd.to_numeric(test_pred["Confidence"], errors="coerce").fillna(70.0).astype(float)
+)
+test_pred.loc[test_pred.Confidence < 70.0, "Confidence"] = 70.0
+
+for nid in test_pred.Patient.unique():
+    idx = test_pred[
+        (test_pred.Patient == nid) & (test_pred.Week == test_pred.base_Weeks)
+    ].index.values
+    if len(idx) > 0:
+        test_pred.iloc[idx[0], test_pred.columns.get_loc("FVC")] = test_pred.iloc[
+            idx[0], test_pred.columns.get_loc("base_FVC")
+        ]
+        test_pred.iloc[idx[0], test_pred.columns.get_loc("Confidence")] = 70.0
+
+
+
+## === cell 11
+pred_map = test_pred.set_index("Patient_Week")[["FVC", "Confidence"]]
+
+final_sub = sample_submission.copy()
+final_sub["FVC"] = final_sub["Patient_Week"].map(pred_map["FVC"])
+final_sub["Confidence"] = final_sub["Patient_Week"].map(pred_map["Confidence"])
+
+final_sub["FVC"] = pd.to_numeric(final_sub["FVC"], errors="coerce").fillna(
+    final_sub["FVC"].median()
+)
+final_sub["Confidence"] = pd.to_numeric(
+    final_sub["Confidence"], errors="coerce"
+).fillna(70.0)
+final_sub.loc[final_sub.Confidence < 70.0, "Confidence"] = 70.0
+
+final_sub.to_csv("submission.csv", index=False)
+print(final_sub.head())
+print("Confidence scale used:", scale)
+print("Train metric (approx, mean):", best_score)
+print("Wrote submission.csv with shape:", final_sub.shape)
+print("Columns:", list(final_sub.columns))

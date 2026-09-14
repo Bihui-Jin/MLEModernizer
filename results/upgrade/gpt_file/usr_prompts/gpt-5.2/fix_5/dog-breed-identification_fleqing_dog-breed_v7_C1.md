@@ -1,0 +1,613 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of dogs, predict the breed of each image.
+
+## Metric
+Multi Class Log Loss.
+
+## Submission Format
+For each image in the test set, you must predict a probability for each of the different breeds. The file should contain a header and have the following format:
+```
+id,affenpinscher,afghan_hound,..,yorkshire_terrier
+000621fb3cbb32d8935728e48679680e,0.0083,0.0,...,0.0083
+etc.
+```
+
+## Dataset Description
+- `train.zip` - the training set, you are provided the breed for these dogs
+- `test.zip` - the test set, you must predict the probability of each breed for each image
+- `sample_submission.csv` - a sample submission file in the correct format
+- `labels.csv` - the breeds for the images in the train set
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (169 lines)
+            labels.csv (9200 lines)
+            labels.csv.zip (201.6 kB)
+            sample_submission.csv (1024 lines)
+            sample_submission.csv.zip (32.1 kB)
+            test.zip (36.4 MB)
+            train.zip (324.7 MB)
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+            test/
+                bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                ... and 1021 other files
+                test/
+            train/
+                868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                ... and 9197 other files
+                train/
+        input/
+            description.md (169 lines)
+            labels.csv (9200 lines)
+            labels.csv.zip (201.6 kB)
+            sample_submission.csv (1024 lines)
+            sample_submission.csv.zip (32.1 kB)
+            test.zip (36.4 MB)
+            train.zip (324.7 MB)
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+            test/
+                bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                ... and 1021 other files
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+            train/
+                868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                ... and 9197 other files
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+        working/
+            dog-breed-identification/
+                description.md (169 lines)
+                labels.csv (9200 lines)
+                ... and 5 other files
+                dog-breed-identification/
+                test/
+                    bca88d42e4fc84b3169b13a615f5fdbf.jpg (38.6 kB)
+                    53cb3ed2547cdaf15ec7983d8325f007.jpg (32.9 kB)
+                    ... and 1021 other files
+                    test/
+                train/
+                    868decd906bb483bac17a005a3f06bc3.jpg (22.6 kB)
+                    7b44341b91b48e2eafe679c00ba1a0a6.jpg (48.4 kB)
+                    ... and 9197 other files
+                    train/
+```
+
+-> data/dog-breed-identification/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> data/dog-breed-identification/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> data/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> data/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> input/dog-breed-identification/labels.csv has 9199 rows and 2 columns.
+The columns are: id, breed
+
+-> input/dog-breed-identification/sample_submission.csv has 1023 rows and 121 columns.
+The columns are: id, affenpinscher, afghan_hound, african_hunting_dog, airedale, american_staffordshire_terrier, appenzeller, australian_terrier, basenji, basset, beagle, bedlington_terrier, bernese_mountain_dog, black-and-tan_coonhound, blenheim_spaniel... and 106 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import copy
+import random
+import pandas as pd
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import torchvision.transforms as transforms
+import torchvision.models as models
+from tqdm.auto import tqdm
+from torch.utils.data import Dataset, DataLoader
+from torch.optim.lr_scheduler import ExponentialLR
+from sklearn.model_selection import train_test_split, KFold
+from PIL import Image
+
+import cv2
+
+SEED = 2021
+os.environ["PYTHONHASHSEED"] = str(SEED)
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed_all(SEED)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+
+def seed_worker(worker_id: int):
+    worker_seed = (SEED + worker_id) % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+    torch.manual_seed(worker_seed)
+
+
+g = torch.Generator()
+g.manual_seed(SEED)
+
+
+def get_num_workers():
+    try:
+        cpu = os.cpu_count() or 2
+    except Exception:
+        cpu = 2
+    return max(2, min(8, cpu))
+
+
+NUM_WORKERS = get_num_workers()
+
+
+
+## === cell 1
+train_data = pd.read_csv("/kaggle/input/dog-breed-identification/labels.csv")
+labels = sorted(list(set(list(train_data["breed"]))))
+
+label_to_idx = {b: i for i, b in enumerate(labels)}
+train_data["number"] = train_data["breed"].map(label_to_idx).astype(np.int64)
+train_data.shape
+
+
+
+## === cell 2
+file_names = sorted(os.listdir("/kaggle/input/dog-breed-identification/test"))
+file_ids = [
+    os.path.splitext(name)[0] for name in file_names if name.lower().endswith(".jpg")
+]
+test_data = pd.DataFrame({"id": file_ids})
+test_data.head()
+
+
+
+## === cell 3
+transforms_train = transforms.Compose(
+    [
+        transforms.Resize(256),
+        transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]
+)
+transforms_test = transforms.Compose(
+    [
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]
+)
+
+
+
+## === cell 4
+TRAIN_IMG_DIR = "/kaggle/input/dog-breed-identification/train"
+TEST_IMG_DIR = "/kaggle/input/dog-breed-identification/test"
+
+train_image_cache = None
+test_image_cache = None
+
+
+
+
+## === cell 5
+class Dog_Breed(Dataset):
+    def __init__(self, train_csv, transform=None, test=False, image_cache=None):
+        super().__init__()
+        self.train_csv = train_csv.reset_index(drop=True)
+        self.image_path = self.train_csv["id"].tolist()
+        self.test = test
+        if not self.test:
+            self.label_nums = self.train_csv["number"].to_numpy(dtype=np.int64)
+        self.transform = transform
+        self.image_cache = image_cache  # kept for compatibility; unused when None
+
+    @staticmethod
+    def _read_rgb_pil(img_fp: str) -> Image.Image:
+        img = cv2.imread(img_fp, cv2.IMREAD_COLOR)
+        if img is None:
+            raise FileNotFoundError(f"Image not found or unreadable: {img_fp}")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        return Image.fromarray(img)
+
+    def __getitem__(self, idx):
+        img_id = self.image_path[idx]
+
+        if self.test:
+            img_fp = os.path.join(TEST_IMG_DIR, img_id + ".jpg")
+        else:
+            img_fp = os.path.join(TRAIN_IMG_DIR, img_id + ".jpg")
+
+        image = self._read_rgb_pil(img_fp)
+
+        if self.transform is not None:
+            image = self.transform(image)
+
+        if not self.test:
+            label = int(self.label_nums[idx])
+            return image, label
+        else:
+            return image
+
+    def __len__(self):
+        return len(self.image_path)
+
+
+
+
+## === cell 6
+def get_device():
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+device = get_device()
+device
+
+
+
+## === cell 7
+train, valid = train_test_split(
+    train_data, test_size=0.2, random_state=SEED, stratify=train_data["number"]
+)
+trainset = Dog_Breed(train, transform=transforms_train, image_cache=train_image_cache)
+validset = Dog_Breed(valid, transform=transforms_test, image_cache=train_image_cache)
+
+pin = device == "cuda"
+train_loader = DataLoader(
+    trainset,
+    batch_size=32,
+    shuffle=True,
+    drop_last=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=pin,
+    persistent_workers=(NUM_WORKERS > 0),
+    prefetch_factor=4 if NUM_WORKERS > 0 else None,
+    worker_init_fn=seed_worker,
+    generator=g,
+)
+valid_loader = DataLoader(
+    validset,
+    batch_size=32,
+    shuffle=False,
+    drop_last=False,
+    num_workers=NUM_WORKERS,
+    pin_memory=pin,
+    persistent_workers=(NUM_WORKERS > 0),
+    prefetch_factor=4 if NUM_WORKERS > 0 else None,
+    worker_init_fn=seed_worker,
+    generator=g,
+)
+
+
+
+## === cell 8
+pass
+
+
+
+
+## === cell 9
+class MyResNet50(nn.Module):
+    def __init__(self, num_classes=120):
+        super(MyResNet50, self).__init__()
+        try:
+            self.net = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+        except Exception:
+            self.net = models.resnet50(pretrained=True)
+
+        for param in self.net.parameters():
+            param.requires_grad = False
+        in_features = self.net.fc.in_features
+        self.net.fc = nn.Linear(in_features, num_classes)
+
+    def forward(self, x):
+        x = self.net(x)
+        return x
+
+
+
+
+## === cell 10
+class EfficientNetCustom(nn.Module):
+    def __init__(self, num_classes=120):
+        super(EfficientNetCustom, self).__init__()
+        raise NotImplementedError("EfficientNetCustom is not used in this solution.")
+
+    def forward(self, x):
+        return x
+
+
+
+
+## === cell 11
+def train_model(
+    model,
+    train_loader,
+    valid_loader,
+    loss,
+    optimizer,
+    epoch,
+    device=torch.device("cuda:0"),
+):
+    net = model.to(device)
+    best_epoch = 0
+    best_score = -1.0
+    best_model_state = None
+    early_stopping_round = 3
+    losses = []
+
+    scheduler = ExponentialLR(optimizer, gamma=0.9, verbose=True)
+
+    for i in range(epoch):
+        acc = 0
+        loss_sum = 0.0
+        net.train()
+        for x, y in tqdm(train_loader, leave=False):
+            optimizer.zero_grad(set_to_none=True)
+            x = x.to(device, non_blocking=True)
+            y = y.to(device, non_blocking=True)
+            y_hat = net(x)
+            loss_temp = loss(y_hat, y)
+            loss_sum += loss_temp.detach().item()
+            loss_temp.backward()
+            optimizer.step()
+            acc += (y_hat.argmax(dim=1) == y).sum().item()
+
+        scheduler.step()
+        losses.append(loss_sum / max(1, len(train_loader)))
+        print(
+            "epoch:",
+            i,
+            "loss=",
+            loss_sum / max(1, len(train_loader)),
+            "训练集准确度=",
+            acc / (len(train_loader.dataset)),
+            end=" ",
+        )
+
+        test_acc = 0
+        net.eval()
+        with torch.inference_mode():
+            for x, y in tqdm(valid_loader, leave=False):
+                x = x.to(device, non_blocking=True)
+                y = y.to(device, non_blocking=True)
+                y_hat = net(x)
+                test_acc += (y_hat.argmax(dim=1) == y).sum().item()
+        print("验证集准确度", test_acc / (len(valid_loader.dataset)))
+
+        if test_acc > best_score:
+            best_model_state = copy.deepcopy(net.state_dict())
+            best_score = test_acc
+            best_epoch = i
+            print("best epoch save!")
+        if i - best_epoch >= early_stopping_round:
+            break
+
+    if best_model_state is not None:
+        net.load_state_dict(best_model_state)
+
+    return net
+
+
+
+
+## === cell 12
+def predict_test(net, test_data, device, batch_size=64):
+    testset = Dog_Breed(
+        test_data, transform=transforms_test, test=True, image_cache=test_image_cache
+    )
+    test_loader = DataLoader(
+        testset,
+        batch_size=batch_size,
+        shuffle=False,
+        drop_last=False,
+        num_workers=NUM_WORKERS,
+        pin_memory=(device == "cuda"),
+        persistent_workers=(NUM_WORKERS > 0),
+        prefetch_factor=4 if NUM_WORKERS > 0 else None,
+        worker_init_fn=seed_worker,
+        generator=g,
+    )
+
+    probs_chunks = []
+    net.eval()
+    with torch.inference_mode():
+        for x in tqdm(test_loader, leave=False):
+            x = x.to(device, non_blocking=True)
+            logits = net(x)
+            probs = F.softmax(logits, dim=1)
+            probs_chunks.append(probs.detach().cpu())
+
+    prediction = torch.cat(probs_chunks, dim=0).reshape(-1, 120)
+    return prediction
+
+
+
+
+## === cell 13
+learn_rate = 0.001
+momentum = 0.9
+epoch = 10
+
+
+
+## === cell 14
+kfold = KFold(n_splits=5, shuffle=True, random_state=SEED)
+
+all_fold_preds = []
+for fold, (train_index, val_index) in enumerate(kfold.split(train_data), start=1):
+    print(f"\n=== Fold {fold}/5 ===")
+
+    model = MyResNet50()  # fresh per fold
+
+    train, valid = train_data.iloc[train_index], train_data.iloc[val_index]
+    trainset = Dog_Breed(
+        train, transform=transforms_train, image_cache=train_image_cache
+    )
+    validset = Dog_Breed(
+        valid, transform=transforms_test, image_cache=train_image_cache
+    )
+
+    train_loader = DataLoader(
+        trainset,
+        batch_size=32,
+        shuffle=True,
+        drop_last=False,
+        num_workers=NUM_WORKERS,
+        pin_memory=(device == "cuda"),
+        persistent_workers=(NUM_WORKERS > 0),
+        prefetch_factor=4 if NUM_WORKERS > 0 else None,
+        worker_init_fn=seed_worker,
+        generator=g,
+    )
+    valid_loader = DataLoader(
+        validset,
+        batch_size=32,
+        shuffle=False,
+        drop_last=False,
+        num_workers=NUM_WORKERS,
+        pin_memory=(device == "cuda"),
+        persistent_workers=(NUM_WORKERS > 0),
+        prefetch_factor=4 if NUM_WORKERS > 0 else None,
+        worker_init_fn=seed_worker,
+        generator=g,
+    )
+
+    loss = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.net.fc.parameters(), lr=learn_rate, weight_decay=1e-5)
+
+    net = train_model(model, train_loader, valid_loader, loss, optimizer, epoch, device)
+
+    prediction = predict_test(net, test_data, device, batch_size=64)
+    all_fold_preds.append(prediction.numpy())
+
+avg_pred = np.mean(np.stack(all_fold_preds, axis=0), axis=0)  # (n_test, 120)
+result = pd.DataFrame(avg_pred, columns=labels)
+result = pd.concat([test_data.reset_index(drop=True), result], axis=1)
+
+sample_sub = pd.read_csv("/kaggle/input/dog-breed-identification/sample_submission.csv")
+result = result[["id"] + [c for c in sample_sub.columns if c != "id"]]
+
+out_path = "/kaggle/working/dog_breed.csv"
+result.to_csv(out_path, index=False)
+print("Wrote submission to:", out_path)
+print(result.head())
+
+
+
+## === cell 15
+df = pd.read_csv("/kaggle/working/dog_breed.csv")
+probs = df.iloc[:, 1:].to_numpy(dtype=np.float64)
+probs = np.clip(probs, 1e-15, 1.0)  # avoid log(0) issues
+probs = probs / probs.sum(axis=1, keepdims=True)
+df.iloc[:, 1:] = probs
+df.to_csv("/kaggle/working/dog_breed.csv", index=False)
+print("Submission sanity-checked and saved:", "/kaggle/working/dog_breed.csv")
+print(
+    "Row prob sum (min/mean/max):",
+    probs.sum(axis=1).min(),
+    probs.sum(axis=1).mean(),
+    probs.sum(axis=1).max(),
+)

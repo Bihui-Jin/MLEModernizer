@@ -1,0 +1,673 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean column-wise ROC AUC.
+
+## Submission Format
+For each image_id in the test set, you must predict a probability for each target variable. The file should contain a header and have the following format:
+
+```
+image_id,
+test_0,0.25,0.25,0.25,0.25
+test_1,0.25,0.25,0.25,0.25
+test_2,0.25,0.25,0.25,0.25
+etc.
+```
+
+## Dataset
+Given a photo of an apple leaf, can you accurately assess its health? This competition will challenge you to distinguish between leaves which are healthy, those which are infected with apple rust, those that have apple scab, and those with more than one disease.
+
+**train.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+**images**
+
+A folder containing the train and test images, in jpg format.
+
+**test.csv**
+
+- `image_id`: the foreign key
+
+**sample_submission.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        input/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        working/
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+```
+
+-> data/plant-pathology-2020-fgvc7/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/plant-pathology-2020-fgvc7/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/plant-pathology-2020-fgvc7/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+import zipfile
+from pathlib import Path
+
+
+
+## === cell 1
+CANDIDATE_ROOTS = [
+    Path("../input/plant-pathology-2020-fgvc7"),
+    Path("../input"),
+    Path("/kaggle/input/plant-pathology-2020-fgvc7"),
+    Path("/kaggle/input"),
+    Path("../data/plant-pathology-2020-fgvc7"),
+    Path("../data"),
+    Path("/kaggle/data/plant-pathology-2020-fgvc7"),
+    Path("/kaggle/data"),
+]
+
+DATA_ROOT = None
+for r in CANDIDATE_ROOTS:
+    if (r / "train.csv").exists() and (r / "test.csv").exists():
+        DATA_ROOT = r
+        break
+
+if DATA_ROOT is None:
+    raise FileNotFoundError(
+        "Could not locate train.csv/test.csv under expected ../input or /kaggle paths."
+    )
+
+TRAIN_CSV = DATA_ROOT / "train.csv"
+TEST_CSV = DATA_ROOT / "test.csv"
+SAMPLE_SUB = DATA_ROOT / "sample_submission.csv"
+IMAGES_DIR = DATA_ROOT / "images"
+IMAGES_ZIP = DATA_ROOT / "images.zip"
+
+print("Using DATA_ROOT:", DATA_ROOT)
+print("Has images dir:", IMAGES_DIR.exists(), "Has images.zip:", IMAGES_ZIP.exists())
+
+if not IMAGES_DIR.exists():
+    if IMAGES_ZIP.exists():
+        IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(IMAGES_ZIP, "r") as zf:
+            zf.extractall(DATA_ROOT)
+    else:
+        raise FileNotFoundError("Neither images/ directory nor images.zip found.")
+
+print("Images dir:", IMAGES_DIR, "num files:", len(list(IMAGES_DIR.glob("*.jpg"))))
+
+
+
+## === cell 2
+train_df = pd.read_csv(TRAIN_CSV)
+test_df = pd.read_csv(TEST_CSV)
+sample_sub = pd.read_csv(SAMPLE_SUB)
+
+TARGETS = [c for c in sample_sub.columns if c != "image_id"]
+expected_targets = ["healthy", "multiple_diseases", "rust", "scab"]
+if TARGETS != expected_targets:
+    if all(t in sample_sub.columns for t in expected_targets):
+        TARGETS = expected_targets
+    else:
+        raise ValueError(
+            f"Unexpected target columns in sample_submission: {sample_sub.columns.tolist()}"
+        )
+
+assert "image_id" in train_df.columns and "image_id" in test_df.columns
+for t in TARGETS:
+    if t not in train_df.columns:
+        raise ValueError(f"Train is missing target column: {t}")
+
+train_df.head(), test_df.head(), sample_sub.head()
+
+
+
+
+## === cell 3
+def jpeg_size(path: Path):
+    """
+    Return (width, height) for a JPEG file by parsing markers.
+    Fallback to (np.nan, np.nan) if parsing fails.
+    """
+    try:
+        with open(path, "rb") as f:
+            data = f.read(2048)  # usually enough to hit SOF marker
+        if len(data) < 4 or data[0:2] != b"\xff\xd8":
+            return (np.nan, np.nan)
+        i = 2
+        while i + 9 < len(data):
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            while i < len(data) and data[i] == 0xFF:
+                i += 1
+            if i >= len(data):
+                break
+            marker = data[i]
+            i += 1
+            if marker in (0xD8, 0xD9):
+                continue
+            if i + 2 > len(data):
+                break
+            seglen = int.from_bytes(data[i : i + 2], "big")
+            if seglen < 2:
+                break
+            if marker in (
+                0xC0,
+                0xC1,
+                0xC2,
+                0xC3,
+                0xC5,
+                0xC6,
+                0xC7,
+                0xC9,
+                0xCA,
+                0xCB,
+                0xCD,
+                0xCE,
+                0xCF,
+            ):
+                start = i + 2  # after seglen
+                if start + 5 <= len(data):
+                    height = int.from_bytes(data[start + 1 : start + 3], "big")
+                    width = int.from_bytes(data[start + 3 : start + 5], "big")
+                    return (width, height)
+                break
+            i += seglen
+        return (np.nan, np.nan)
+    except Exception:
+        return (np.nan, np.nan)
+
+
+def _read_image_rgb_float01(path: Path):
+    try:
+        from PIL import Image
+
+        with Image.open(str(path)) as im:
+            im = im.convert("RGB")
+            img = np.asarray(im, dtype=np.float32) / 255.0
+        return np.clip(img, 0.0, 1.0)
+    except Exception:
+        try:
+            import matplotlib.image as mpimg
+
+            img = mpimg.imread(str(path))
+            if img is None:
+                return None
+            img = np.asarray(img)
+            if img.ndim == 2:
+                img = np.stack([img, img, img], axis=-1)
+            if img.shape[-1] == 4:
+                img = img[..., :3]
+            img = img.astype(np.float32)
+            if img.max() > 1.5:
+                img = img / 255.0
+            img = np.clip(img, 0.0, 1.0)
+            return img
+        except Exception:
+            return None
+
+
+def _downsample_mean(img2d: np.ndarray, out_h: int, out_w: int):
+    """Deterministic block-mean downsample without external deps."""
+    H, W = img2d.shape
+    if H < 1 or W < 1:
+        return np.full((out_h, out_w), np.nan, dtype=np.float32)
+    ys = np.linspace(0, H, out_h + 1, dtype=np.int32)
+    xs = np.linspace(0, W, out_w + 1, dtype=np.int32)
+    out = np.empty((out_h, out_w), dtype=np.float32)
+    for i in range(out_h):
+        y0, y1 = ys[i], ys[i + 1]
+        if y1 <= y0:
+            y1 = min(H, y0 + 1)
+        for j in range(out_w):
+            x0, x1 = xs[j], xs[j + 1]
+            if x1 <= x0:
+                x1 = min(W, x0 + 1)
+            block = img2d[y0:y1, x0:x1]
+            out[i, j] = float(block.mean()) if block.size else np.nan
+    return out
+
+
+def _rgb_to_hsv_np(img_rgb01: np.ndarray):
+    """
+    Minimal deterministic RGB->HSV for float RGB in [0,1], returns H,S,V in [0,1].
+    """
+    r = img_rgb01[..., 0]
+    g = img_rgb01[..., 1]
+    b = img_rgb01[..., 2]
+    cmax = np.maximum(np.maximum(r, g), b)
+    cmin = np.minimum(np.minimum(r, g), b)
+    delta = cmax - cmin
+
+    h = np.zeros_like(cmax, dtype=np.float32)
+    eps = 1e-6
+    mask = delta > eps
+
+    idx = mask & (cmax == r)
+    h[idx] = ((g[idx] - b[idx]) / (delta[idx] + eps)) % 6.0
+    idx = mask & (cmax == g)
+    h[idx] = ((b[idx] - r[idx]) / (delta[idx] + eps)) + 2.0
+    idx = mask & (cmax == b)
+    h[idx] = ((r[idx] - g[idx]) / (delta[idx] + eps)) + 4.0
+    h = (h / 6.0) % 1.0
+
+    s = np.zeros_like(cmax, dtype=np.float32)
+    s[cmax > eps] = delta[cmax > eps] / (cmax[cmax > eps] + eps)
+
+    v = cmax.astype(np.float32)
+    return h.astype(np.float32), s.astype(np.float32), v.astype(np.float32)
+
+
+def _dct_1d_ortho(x: np.ndarray):
+    """
+    DCT-II (ortho) for a 1D vector x, implemented directly for small N (N=8).
+    """
+    x = np.asarray(x, dtype=np.float32)
+    N = x.shape[0]
+    k = np.arange(N, dtype=np.float32).reshape(-1, 1)  # (N,1)
+    n = np.arange(N, dtype=np.float32).reshape(1, -1)  # (1,N)
+    M = np.cos(np.pi / N * (n + 0.5) * k).astype(np.float32)  # (N,N)
+    y = M @ x.reshape(-1, 1)
+    y = y.reshape(-1)
+    y[0] *= np.sqrt(1.0 / N)
+    if N > 1:
+        y[1:] *= np.sqrt(2.0 / N)
+    return y
+
+
+def _dct2_8x8_ortho(a8: np.ndarray):
+    """
+    2D DCT-II (ortho) for 8x8 using separability and the 1D DCT above.
+    """
+    a8 = np.asarray(a8, dtype=np.float32)
+    tmp = np.stack([_dct_1d_ortho(a8[i, :]) for i in range(8)], axis=0)
+    out = np.stack([_dct_1d_ortho(tmp[:, j]) for j in range(8)], axis=1)
+    return out.astype(np.float32)
+
+
+def build_features(df: pd.DataFrame):
+    widths = []
+    heights = []
+    sizes = []
+    pix_feats = []
+
+    bins = np.linspace(0.0, 1.0, 9, dtype=np.float32)  # 8 bins
+
+    for img_id in df["image_id"].astype(str).tolist():
+        p = IMAGES_DIR / f"{img_id}.jpg"
+        if not p.exists():
+            matches = list(IMAGES_DIR.glob(f"{img_id}.*"))
+            p = matches[0] if matches else p
+
+        w, h = jpeg_size(p) if p.exists() else (np.nan, np.nan)
+        widths.append(w)
+        heights.append(h)
+        sizes.append(p.stat().st_size if p.exists() else np.nan)
+
+        img = _read_image_rgb_float01(p) if p.exists() else None
+        if img is None:
+            pix_feats.append(
+                np.full(6 + 3 + 64 + 6 + 3 + 10 + 6 + 2 + 24, np.nan, dtype=np.float32)
+            )
+            continue
+
+        flat = img.reshape(-1, 3)
+        ch_mean = flat.mean(axis=0)
+        ch_std = flat.std(axis=0)
+
+        gray = (
+            0.2989 * img[..., 0] + 0.5870 * img[..., 1] + 0.1140 * img[..., 2]
+        ).astype(np.float32)
+
+        base6 = np.array(
+            [ch_mean[0], ch_mean[1], ch_mean[2], ch_std[0], ch_std[1], ch_std[2]],
+            dtype=np.float32,
+        )
+
+        eps = 1e-6
+        ratios3 = np.array(
+            [
+                float(ch_mean[0] / (ch_mean[1] + eps)),
+                float(ch_mean[0] / (ch_mean[2] + eps)),
+                float(ch_mean[1] / (ch_mean[2] + eps)),
+            ],
+            dtype=np.float32,
+        )
+
+        thumb = _downsample_mean(gray, 8, 8).reshape(-1).astype(np.float32)
+
+        h_ch, s_ch, v_ch = _rgb_to_hsv_np(img)
+        hsv_stats6 = np.array(
+            [
+                float(h_ch.mean()),
+                float(s_ch.mean()),
+                float(v_ch.mean()),
+                float(h_ch.std()),
+                float(s_ch.std()),
+                float(v_ch.std()),
+            ],
+            dtype=np.float32,
+        )
+
+        r = img[..., 0]
+        g = img[..., 1]
+        b = img[..., 2]
+        exg = (2.0 * g - r - b).astype(np.float32)
+        exr = (1.4 * r - g).astype(np.float32)
+        exb = (1.4 * b - g).astype(np.float32)
+        veg3 = np.array(
+            [float(exg.mean()), float(exr.mean()), float(exb.mean())], dtype=np.float32
+        )
+
+        a8 = thumb.reshape(8, 8)
+        dct8 = _dct2_8x8_ortho(a8)
+        coords = [
+            (0, 1),
+            (1, 0),
+            (0, 2),
+            (1, 1),
+            (2, 0),
+            (0, 3),
+            (1, 2),
+            (2, 1),
+            (3, 0),
+            (2, 2),
+        ]
+        dct10 = np.array([float(dct8[i, j]) for (i, j) in coords], dtype=np.float32)
+
+        H, W = img.shape[0], img.shape[1]
+        y0, y1 = int(H * 0.25), int(H * 0.75)
+        x0, x1 = int(W * 0.25), int(W * 0.75)
+        center = img[y0:y1, x0:x1, :]
+        if center.size == 0:
+            center = img
+        center_mean = center.reshape(-1, 3).mean(axis=0).astype(np.float32)
+        border_mask = np.ones((H, W), dtype=bool)
+        border_mask[y0:y1, x0:x1] = False
+        border = img[border_mask]
+        if border.size == 0:
+            border = img.reshape(-1, 3)
+        border_mean = border.reshape(-1, 3).mean(axis=0).astype(np.float32)
+        center_border6 = np.concatenate(
+            [center_mean, (center_mean - border_mean)], axis=0
+        ).astype(np.float32)
+
+        gx = np.abs(gray[:, 1:] - gray[:, :-1]).mean() if W > 1 else 0.0
+        gy = np.abs(gray[1:, :] - gray[:-1, :]).mean() if H > 1 else 0.0
+        grad2 = np.array([float(gx), float(gy)], dtype=np.float32)
+
+        rgb_hist = []
+        for ch in range(3):
+            hst, _ = np.histogram(img[..., ch], bins=bins)
+            hst = hst.astype(np.float32)
+            hst = hst / (hst.sum() + 1e-6)
+            rgb_hist.append(hst)
+        rgb_hist24 = np.concatenate(rgb_hist, axis=0).astype(np.float32)  # 3*8
+
+        pix_feats.append(
+            np.concatenate(
+                [
+                    base6,
+                    ratios3,
+                    thumb,
+                    hsv_stats6,
+                    veg3,
+                    dct10,
+                    center_border6,
+                    grad2,
+                    rgb_hist24,
+                ],
+                axis=0,
+            )
+        )
+
+    X = pd.DataFrame({"w": widths, "h": heights, "filesize": sizes})
+    X["aspect"] = X["w"] / (X["h"] + 1e-6)
+
+    pix_feats = np.vstack(pix_feats).astype(float)
+
+    X["r_mean"] = pix_feats[:, 0]
+    X["g_mean"] = pix_feats[:, 1]
+    X["b_mean"] = pix_feats[:, 2]
+    X["r_std"] = pix_feats[:, 3]
+    X["g_std"] = pix_feats[:, 4]
+    X["b_std"] = pix_feats[:, 5]
+    X["rg_mean_ratio"] = pix_feats[:, 6]
+    X["rb_mean_ratio"] = pix_feats[:, 7]
+    X["gb_mean_ratio"] = pix_feats[:, 8]
+    for i in range(64):
+        X[f"thumb_{i}"] = pix_feats[:, 9 + i]
+
+    base = 9 + 64
+    X["h_mean"] = pix_feats[:, base + 0]
+    X["s_mean"] = pix_feats[:, base + 1]
+    X["v_mean"] = pix_feats[:, base + 2]
+    X["h_std"] = pix_feats[:, base + 3]
+    X["s_std"] = pix_feats[:, base + 4]
+    X["v_std"] = pix_feats[:, base + 5]
+
+    X["exg_mean"] = pix_feats[:, base + 6]
+    X["exr_mean"] = pix_feats[:, base + 7]
+    X["exb_mean"] = pix_feats[:, base + 8]
+
+    for i in range(10):
+        X[f"dct_{i}"] = pix_feats[:, base + 9 + i]
+
+    base2 = base + 9 + 10
+    X["center_r_mean"] = pix_feats[:, base2 + 0]
+    X["center_g_mean"] = pix_feats[:, base2 + 1]
+    X["center_b_mean"] = pix_feats[:, base2 + 2]
+    X["center_minus_border_r"] = pix_feats[:, base2 + 3]
+    X["center_minus_border_g"] = pix_feats[:, base2 + 4]
+    X["center_minus_border_b"] = pix_feats[:, base2 + 5]
+
+    base3 = base2 + 6
+    X["grad_x_meanabs"] = pix_feats[:, base3 + 0]
+    X["grad_y_meanabs"] = pix_feats[:, base3 + 1]
+
+    base4 = base3 + 2
+    for i in range(24):
+        X[f"rgb_hist_{i}"] = pix_feats[:, base4 + i]
+
+    return X
+
+
+X_train_df = build_features(train_df)
+X_test_df = build_features(test_df)
+
+med = X_train_df.median(numeric_only=True)
+X_train_df = X_train_df.fillna(med)
+X_test_df = X_test_df.fillna(med)
+
+X_train_df.head(), X_test_df.head()
+
+
+
+
+## === cell 4
+def sigmoid(z):
+    z = np.clip(z, -30, 30)
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+def standardize_fit(X):
+    mu = X.mean(axis=0)
+    sigma = X.std(axis=0)
+    sigma = np.where(sigma < 1e-12, 1.0, sigma)
+    return mu, sigma
+
+
+def standardize_transform(X, mu, sigma):
+    return (X - mu) / sigma
+
+
+def train_logreg_ovr(X, Y, lr=0.15, n_iter=1200, l2=1e-2):
+    """
+    Train independent logistic regressions for each column in Y.
+    X: (n, d)
+    Y: (n, k) binary
+    Returns W: (d+1, k) including bias.
+    """
+    n, d = X.shape
+    k = Y.shape[1]
+    Xb = np.concatenate([np.ones((n, 1)), X], axis=1)  # bias
+    W = np.zeros((d + 1, k), dtype=float)
+    for j in range(k):
+        w = np.zeros(d + 1, dtype=float)
+        y = Y[:, j].astype(float)
+        for _ in range(n_iter):
+            p = sigmoid(Xb @ w)
+            grad = (Xb.T @ (p - y)) / n
+            grad[1:] += l2 * w[1:]
+            w -= lr * grad
+        W[:, j] = w
+    return W
+
+
+def predict_logreg_ovr(X, W):
+    n = X.shape[0]
+    Xb = np.concatenate([np.ones((n, 1)), X], axis=1)
+    P = sigmoid(Xb @ W)
+    return np.clip(P, 1e-6, 1 - 1e-6)
+
+
+X_train = X_train_df.to_numpy(dtype=float)
+X_test = X_test_df.to_numpy(dtype=float)
+Y_train = train_df[TARGETS].to_numpy(dtype=float)
+
+mu, sigma = standardize_fit(X_train)
+X_train_s = standardize_transform(X_train, mu, sigma)
+X_test_s = standardize_transform(X_test, mu, sigma)
+
+W = train_logreg_ovr(X_train_s, Y_train, lr=0.15, n_iter=1200, l2=1e-2)
+P_test = predict_logreg_ovr(X_test_s, W)
+
+P_test.shape
+
+
+
+## === cell 5
+sub = sample_sub.copy()
+sub = sub[["image_id"] + TARGETS].copy()
+
+pred_df = pd.DataFrame(P_test, columns=TARGETS)
+sub.loc[:, TARGETS] = pred_df[TARGETS].values
+
+for c in TARGETS:
+    sub[c] = pd.to_numeric(sub[c], errors="coerce").fillna(0.25).clip(0.0, 1.0)
+
+out_path = "submission.csv"
+sub.to_csv(out_path, index=False)
+print("Wrote:", out_path, "shape:", sub.shape)
+sub.head()

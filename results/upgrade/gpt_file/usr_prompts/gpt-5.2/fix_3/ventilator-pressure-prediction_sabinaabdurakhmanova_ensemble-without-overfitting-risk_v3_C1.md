@@ -1,0 +1,456 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.1459845931172163
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 17.65486) has done: 'Your notebook fails because it tries to read blend submissions from `../input/...` that do not exist in your environment, so nothing downstream is defined and no submission CSV is written. I keep the same “blend multiple submissions then take mean/median” core logic, but make it robust by (1) discovering available submission-like CSVs under `/kaggle/input` and `/kaggle/data`, (2) validating they contain `pressure` and match the sample submission length, and (3) falling back to a simple, valid baseline (`pressure=0`) if none are found. This run end-to-end and always produce valid `submission_mean.csv` and `submission_median.csv` files with the required columns. Since no current score exists, the priority is producing a valid submission; if blend files are present, blending should generally score better than the zero baseline.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import glob
+import pandas as pd
+import numpy as np
+
+
+
+## === cell 1
+sample_path_candidates = [
+    "../input/ventilator-pressure-prediction/sample_submission.csv",
+    "/kaggle/input/ventilator-pressure-prediction/sample_submission.csv",
+    "/kaggle/data/ventilator-pressure-prediction/sample_submission.csv",
+    "/kaggle/data/sample_submission.csv",
+]
+sample_path = None
+for p in sample_path_candidates:
+    if os.path.exists(p):
+        sample_path = p
+        break
+if sample_path is None:
+    raise FileNotFoundError(
+        "Could not find sample_submission.csv in expected locations."
+    )
+
+sub = pd.read_csv(sample_path)
+if not {"id", "pressure"}.issubset(sub.columns):
+    raise ValueError(
+        f"sample_submission.csv must have columns ['id','pressure'], got {sub.columns.tolist()}"
+    )
+
+n_rows = len(sub)
+sub_ids = sub["id"].to_numpy()
+
+
+
+## === cell 2
+search_roots = [
+    "../input",  # typical Kaggle notebook path
+    "/kaggle/input",  # provided in this environment
+    "/kaggle/data",  # provided in this environment
+]
+
+csv_paths = []
+for root in search_roots:
+    if os.path.isdir(root):
+        csv_paths.extend(glob.glob(os.path.join(root, "**", "*.csv"), recursive=True))
+
+exclude_names = {
+    "train.csv",
+    "test.csv",
+    "sample_submission.csv",
+}
+candidate_paths = []
+for p in csv_paths:
+    base = os.path.basename(p)
+    if base in exclude_names:
+        continue
+    if "submission" in base.lower() or "sub" in base.lower() or "blend" in base.lower():
+        candidate_paths.append(p)
+
+seen = set()
+candidate_paths = [p for p in candidate_paths if not (p in seen or seen.add(p))]
+
+len(candidate_paths), candidate_paths[:10]
+
+
+
+
+## === cell 3
+def load_valid_submission(path: str, n_rows_expected: int, ids_expected: np.ndarray):
+    """Load a CSV and return pressure array aligned to sample ids if it looks like a submission."""
+    try:
+        df = pd.read_csv(path)
+    except Exception:
+        return None
+
+    if "pressure" not in df.columns:
+        return None
+
+    if "id" in df.columns:
+        if len(df) != n_rows_expected:
+            return None
+        try:
+            s = df.set_index("id")["pressure"]
+            if s.index.nunique() != n_rows_expected:
+                return None
+            if not np.all(np.isin(ids_expected, s.index.values)):
+                return None
+            pressure = s.loc[ids_expected].to_numpy(dtype=float)
+        except Exception:
+            return None
+    else:
+        if len(df) != n_rows_expected:
+            return None
+        pressure = df["pressure"].to_numpy(dtype=float)
+
+    if np.any(~np.isfinite(pressure)):
+        return None
+
+    return pressure
+
+
+valid_pressures = []
+valid_sources = []
+
+for p in candidate_paths:
+    pr = load_valid_submission(p, n_rows, sub_ids)
+    if pr is not None:
+        valid_pressures.append(pr)
+        valid_sources.append(p)
+
+len(valid_pressures), valid_sources[:5]
+
+
+
+
+## === cell 4
+def find_existing_path(candidates):
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    return None
+
+
+train_path = find_existing_path(
+    [
+        "../input/ventilator-pressure-prediction/train.csv",
+        "/kaggle/input/ventilator-pressure-prediction/train.csv",
+        "/kaggle/data/ventilator-pressure-prediction/train.csv",
+        "/kaggle/data/train.csv",
+    ]
+)
+test_path = find_existing_path(
+    [
+        "../input/ventilator-pressure-prediction/test.csv",
+        "/kaggle/input/ventilator-pressure-prediction/test.csv",
+        "/kaggle/data/ventilator-pressure-prediction/test.csv",
+        "/kaggle/data/test.csv",
+    ]
+)
+
+
+def baseline_pressure_from_train(
+    train_csv: str, test_csv: str, ids_expected: np.ndarray
+) -> np.ndarray:
+    usecols = ["id", "R", "C", "time_step", "u_in", "u_out", "pressure"]
+    train = pd.read_csv(train_csv, usecols=usecols)
+    test = pd.read_csv(test_csv, usecols=["id", "R", "C", "time_step", "u_in", "u_out"])
+
+    bin_size = 0.5
+    train["u_in_bin"] = (train["u_in"] / bin_size).round().astype(np.int16)
+    test["u_in_bin"] = (test["u_in"] / bin_size).round().astype(np.int16)
+
+    key_cols = ["R", "C", "time_step", "u_out", "u_in_bin"]
+
+    grp = train.groupby(key_cols, sort=False)["pressure"].median()
+
+    test_key = test.set_index(key_cols, drop=False)
+    pred = test_key.index.to_series().map(grp)
+
+    if pred.isna().any():
+        grp2 = train.groupby(["R", "C", "time_step", "u_out"], sort=False)[
+            "pressure"
+        ].median()
+        pred2 = (
+            test.set_index(["R", "C", "time_step", "u_out"]).index.to_series().map(grp2)
+        )
+        pred = pred.fillna(pred2.values)
+
+    if pred.isna().any():
+        grp3 = train.groupby(["R", "C", "time_step"], sort=False)["pressure"].median()
+        pred3 = test.set_index(["R", "C", "time_step"]).index.to_series().map(grp3)
+        pred = pred.fillna(pred3.values)
+
+    if pred.isna().any():
+        pred = pred.fillna(float(train["pressure"].median()))
+
+    out = pd.DataFrame(
+        {"id": test["id"].to_numpy(), "pressure": pred.to_numpy(dtype=float)}
+    )
+    out = out.set_index("id").loc[ids_expected]["pressure"].to_numpy(dtype=float)
+    return out
+
+
+if len(valid_pressures) == 0:
+    if train_path is None or test_path is None:
+        pred = np.array([np.zeros(n_rows, dtype=float)])
+    else:
+        baseline_pred = baseline_pressure_from_train(train_path, test_path, sub_ids)
+        pred = np.array([baseline_pred])
+else:
+    pred = np.stack(valid_pressures, axis=0)
+
+pred.shape
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1881743023.py in <cell line: 0>()
+     81         pred = np.array([np.zeros(n_rows, dtype=float)])
+     82     else:
+---> 83         baseline_pred = baseline_pressure_from_train(train_path, test_path, sub_ids)
+     84         pred = np.array([baseline_pred])
+     85 else:
+
+/tmp/ipykernel_11/1881743023.py in baseline_pressure_from_train(train_csv, test_csv, ids_expected)
+     57             test.set_index(["R", "C", "time_step", "u_out"]).index.to_series().map(grp2)
+     58         )
+---> 59         pred = pred.fillna(pred2.values)
+     60 
+     61     # Fallback 2: drop u_out as well
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/generic.py in fillna(self, value, method, axis, inplace, limit, downcast)
+   7341                     pass
+   7342                 else:
+-> 7343                     raise TypeError(
+   7344                         '"value" parameter must be a scalar, dict '
+   7345                         "or Series, but you passed a "
+
+TypeError: "value" parameter must be a scalar, dict or Series, but you passed a "ndarray"
+
+## === cell 5
+mean = np.mean(pred, axis=0)
+med = np.median(pred, axis=0)
+std = np.std(pred, axis=0)
+
+assert mean.shape == (n_rows,)
+assert med.shape == (n_rows,)
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/4035077407.py in <cell line: 0>()
+----> 1 mean = np.mean(pred, axis=0)
+      2 med = np.median(pred, axis=0)
+      3 std = np.std(pred, axis=0)
+      4 
+      5 assert mean.shape == (n_rows,)
+
+NameError: name 'pred' is not defined
+
+## === cell 6
+sub_mean = sub.copy()
+sub_mean["pressure"] = mean
+sub_mean.to_csv("submission_mean.csv", index=False)
+
+sub_median = sub.copy()
+sub_median["pressure"] = med
+sub_median.to_csv("submission_median.csv", index=False)
+
+sub_median.head(5), sub_mean.head(5)
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1783403593.py in <cell line: 0>()
+      1 sub_mean = sub.copy()
+----> 2 sub_mean["pressure"] = mean
+      3 sub_mean.to_csv("submission_mean.csv", index=False)
+      4 
+      5 sub_median = sub.copy()
+
+NameError: name 'mean' is not defined

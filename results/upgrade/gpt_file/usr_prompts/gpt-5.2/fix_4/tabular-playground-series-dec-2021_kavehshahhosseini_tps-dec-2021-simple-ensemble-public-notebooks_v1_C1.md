@@ -1,0 +1,304 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the class of a given image from a synthetic dataset.
+
+## MetricMulti-class classification accuracy.
+
+## Submission FormatFor each `Id` in the test set, you must predict the `Cover_Type` class. The file should contain a header and have the following format:
+```
+Id,Cover_Type
+4000000,2
+4000001,1
+4000001,3
+etc.
+```
+
+## Dataset 
+- train.csv - the training data with the target `Cover_Type` column
+- test.csv - the test set; you will be predicting the `Cover_Type` for each row in this file (the target integer class)
+- sample_submission.csv - a sample submission file in the correct format
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scipy==1.15.3
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        input/
+            description.md (59 lines)
+            sample_submission.csv (400001 lines)
+            sample_submission.csv.zip (1.6 MB)
+            test.csv (400001 lines)
+            test.csv.zip (10.7 MB)
+            train.csv (3600001 lines)
+            train.csv.zip (97.9 MB)
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+        working/
+            tabular-playground-series-dec-2021/
+                description.md (59 lines)
+                sample_submission.csv (400001 lines)
+                ... and 5 other files
+                tabular-playground-series-dec-2021/
+```
+
+-> data/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> data/tabular-playground-series-dec-2021/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/tabular-playground-series-dec-2021/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> data/test.csv has 400000 rows and 55 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 40 more columns
+
+-> data/train.csv has 3600000 rows and 56 columns.
+The columns are: Id, Elevation, Aspect, Slope, Horizontal_Distance_To_Hydrology, Vertical_Distance_To_Hydrology, Horizontal_Distance_To_Roadways, Hillshade_9am, Hillshade_Noon, Hillshade_3pm, Horizontal_Distance_To_Fire_Points, Wilderness_Area1, Wilderness_Area2, Wilderness_Area3, Wilderness_Area4... and 41 more columns
+
+-> input/sample_submission.csv has 400000 rows and 2 columns.
+The columns are: Id, Cover_Type
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+
+from scipy import stats
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_style("darkgrid")
+
+RANDOM_STATE = 42
+np.random.seed(RANDOM_STATE)
+
+DATA_DIR = "/kaggle/input/tabular-playground-series-dec-2021"
+TRAIN_PATH = os.path.join(DATA_DIR, "train.csv")
+TEST_PATH = os.path.join(DATA_DIR, "test.csv")
+SAMPLE_SUB_PATH = os.path.join(DATA_DIR, "sample_submission.csv")
+
+
+
+## === cell 1
+train_head = pd.read_csv(TRAIN_PATH, nrows=5)
+test_head = pd.read_csv(TEST_PATH, nrows=5)
+
+assert "Cover_Type" in train_head.columns
+assert "Id" in train_head.columns and "Id" in test_head.columns
+
+feature_cols = [c for c in train_head.columns if c not in ("Id", "Cover_Type")]
+usecols_train = ["Cover_Type"] + feature_cols
+usecols_test = feature_cols
+
+dtype_map = {}
+for c in feature_cols:
+    s = train_head[c]
+    if pd.api.types.is_integer_dtype(s):
+        vmax = int(s.max())
+        vmin = int(s.min())
+        if vmin >= 0 and vmax <= 1:
+            dtype_map[c] = np.int8
+        elif vmin >= -32768 and vmax <= 32767:
+            dtype_map[c] = np.int16
+        else:
+            dtype_map[c] = np.int32
+    else:
+        dtype_map[c] = np.float32
+
+dtype_map_train = dict(dtype_map)
+dtype_map_train["Cover_Type"] = np.int8
+
+train = pd.read_csv(TRAIN_PATH, usecols=usecols_train, dtype=dtype_map_train)
+test = pd.read_csv(TEST_PATH, usecols=usecols_test, dtype=dtype_map)
+submission = pd.read_csv(SAMPLE_SUB_PATH)
+
+X = train[feature_cols]
+y = train["Cover_Type"].astype(np.int32)
+
+X_test = test[feature_cols]
+
+print(
+    "Train shape:",
+    X.shape,
+    "Test shape:",
+    X_test.shape,
+    "Num classes:",
+    int(pd.Series(y).nunique()),
+)
+print(
+    "Class counts (min/max):",
+    int(pd.Series(y).value_counts().min()),
+    int(pd.Series(y).value_counts().max()),
+)
+
+
+
+## === cell 2
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
+
+models = []
+
+models.append(
+    (
+        "lr",
+        Pipeline(
+            steps=[
+                ("scaler", StandardScaler(with_mean=False)),
+                (
+                    "clf",
+                    LogisticRegression(
+                        max_iter=200,
+                        n_jobs=-1,
+                        multi_class="auto",
+                        random_state=RANDOM_STATE,
+                    ),
+                ),
+            ]
+        ),
+    )
+)
+
+models.append(
+    (
+        "rf",
+        RandomForestClassifier(
+            n_estimators=250, max_depth=None, n_jobs=-1, random_state=RANDOM_STATE
+        ),
+    )
+)
+
+models.append(
+    (
+        "et",
+        ExtraTreesClassifier(
+            n_estimators=400, max_depth=None, n_jobs=-1, random_state=RANDOM_STATE
+        ),
+    )
+)
+
+models.append(
+    ("gnb", Pipeline(steps=[("scaler", StandardScaler()), ("clf", GaussianNB())]))
+)
+
+
+
+## === cell 3
+print(
+    "Skipping validation fit to meet the 600s runtime constraint; training will run on full data for submission."
+)
+
+
+
+## === cell 4
+X_np = np.ascontiguousarray(X.to_numpy())
+y_np = np.ascontiguousarray(y.to_numpy())
+X_test_np = np.ascontiguousarray(X_test.to_numpy())
+
+trained_models = []
+pred_matrix = np.empty((X_test_np.shape[0], len(models)), dtype=np.int16)
+
+for j, (name, clf) in enumerate(models):
+    clf.fit(X_np, y_np)
+    trained_models.append((name, clf))
+    pred_matrix[:, j] = clf.predict(X_test_np).astype(np.int16)
+
+print("Pred matrix shape:", pred_matrix.shape)
+
+
+
+## === cell 5
+n_rows, n_models = pred_matrix.shape
+max_label = int(pred_matrix.max())
+min_label = int(pred_matrix.min())
+offset = -min_label if min_label < 0 else 0
+K = max_label + offset + 1
+
+ensemble = np.empty(n_rows, dtype=np.int16)
+for i in range(n_rows):
+    counts = np.bincount(pred_matrix[i] + offset, minlength=K)
+    ensemble[i] = int(np.argmax(counts) - offset)
+
+
+
+## === cell 6
+submission = submission.copy()
+submission["Cover_Type"] = ensemble.astype(np.int32)
+
+assert submission.shape[0] == X_test_np.shape[0]
+assert list(submission.columns) == ["Id", "Cover_Type"]
+
+submission.to_csv("submission.csv", index=False)
+submission.head()
+
+
+
+## === cell 7
+plt.figure(figsize=(10, 5))
+ax = sns.countplot(x=submission["Cover_Type"])
+plt.title("Predictions")
+plt.xlabel("Cover Type")
+ax.bar_label(ax.containers[0])
+plt.show()

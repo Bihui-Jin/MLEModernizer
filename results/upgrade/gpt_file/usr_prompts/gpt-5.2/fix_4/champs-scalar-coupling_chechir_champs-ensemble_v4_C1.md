@@ -1,0 +1,390 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the `scalar_coupling_constant` between atom pairs in molecules, given the two atom types (e.g., C and H), the coupling type (e.g., `2JHC`), and any features you are able to create from the molecule structure (`xyz`) files.
+
+## Metric
+Log of the Mean Absolute Error, calculated for each scalar coupling type, and then averaged across types.
+
+## Submission Format
+```
+id,scalar_coupling_constant
+2324604,0.0
+2324605,0.0
+2324606,0.0
+etc.
+```
+
+## Dataset
+The training and test splits are by *molecule*, so that no molecule in the training data is found in the test data.
+
+- **train.csv** - the training set, where the first column (`molecule_name`) is the name of the molecule where the coupling constant originates (the corresponding XYZ file is located at ./structures/.xyz), the second (`atom_index_0`) and third column (`atom_index_1`) is the atom indices of the atom-pair creating the coupling and the fourth column (`scalar_coupling_constant`) is the scalar coupling constant that we want to be able to predict
+- **test.csv** - the test set; same info as train, without the target variable
+- **sample_submission.csv** - a sample submission file in the correct format
+- **structures.zip** - folder containing molecular structure (xyz) files, where the first line is the number of atoms in the molecule, followed by a blank line, and then a line for every atom, where the first column contains the atomic element (H for hydrogen, C for carbon etc.) and the remaining columns contain the X, Y and Z cartesian coordinates (a standard format for chemists and molecular visualization programs)
+- **structures.csv** - this file contains the **same** information as the individual xyz structure files, but in a single file
+- **dipole_moments.csv** - contains the molecular electric dipole moments. These are three dimensional vectors that indicate the charge distribution in the molecule. The first column (`molecule_name`) are the names of the molecule, the second to fourth column are the `X`, `Y` and `Z` components respectively of the dipole moment.
+- **magnetic_shielding_tensors.csv** - contains the magnetic shielding tensors for all atoms in the molecules. The first column (`molecule_name`) contains the molecule name, the second column (`atom_index`) contains the index of the atom in the molecule, the third to eleventh columns contain the `XX`, `YX`, `ZX`, `XY`, `YY`, `ZY`, `XZ`, `YZ` and `ZZ` elements of the tensor/matrix respectively.
+- **mulliken_charges.csv** - contains the mulliken charges for all atoms in the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`atom_index`) contains the index of the atom in the molecule, the third column (`mulliken_charge`) contains the mulliken charge of the atom.
+- **potential_energy.csv** - contains the potential energy of the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`potential_energy`) contains the potential energy of the molecule.
+- **scalar_coupling_contributions.csv** - The scalar coupling constants in `train.csv` (or corresponding files) are a sum of four terms. `scalar_coupling_contributions.csv` contain all these terms. The first column (`molecule_name`) are the name of the molecule, the second (`atom_index_0`) and third column (`atom_index_1`) are the atom indices of the atom-pair, the fourth column indicates the type of coupling, the fifth column (`fc`) is the Fermi Contact contribution, the sixth column (`sd`) is the Spin-dipolar contribution, the seventh column (`pso`) is the Paramagnetic spin-orbit contribution and the eighth column (`dso`) is the Diamagnetic spin-orbit contribution.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        input/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        working/
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+```
+
+-> data/champs-scalar-coupling/dipole_moments.csv has 76510 rows and 4 columns.
+The columns are: molecule_name, X, Y, Z
+
+-> data/champs-scalar-coupling/magnetic_shielding_tensors.csv has 1379964 rows and 11 columns.
+The columns are: molecule_name, atom_index, XX, YX, ZX, XY, YY, ZY, XZ, YZ, ZZ
+
+-> data/champs-scalar-coupling/mulliken_charges.csv has 1379964 rows and 3 columns.
+The columns are: molecule_name, atom_index, mulliken_charge
+
+-> data/champs-scalar-coupling/potential_energy.csv has 76510 rows and 2 columns.
+The columns are: molecule_name, potential_energy
+
+-> data/champs-scalar-coupling/sample_submission.csv has 467813 rows and 2 columns.
+The columns are: id, scalar_coupling_constant
+
+-> data/champs-scalar-coupling/scalar_coupling_contributions.csv has 4191263 rows and 8 columns.
+The columns are: molecule_name, atom_index_0, atom_index_1, type, fc, sd, pso, dso
+
+-> data/champs-scalar-coupling/structures.csv has 1379964 rows and 6 columns.
+The columns are: molecule_name, atom_index, atom, x, y, z
+
+-> data/champs-scalar-coupling/test.csv has 467813 rows and 5 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type
+
+-> data/champs-scalar-coupling/train.csv has 4191263 rows and 6 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type, scalar_coupling_constant
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-2.087064111212748
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.23566) has done: 'The current notebook fails because it tries to read out-of-environment input files (`../input/champ-preds` and `../input/1-mpnn`) that do not exist in your provided filesystem, so no submission is ever written. I replace that dependency with an in-notebook baseline that uses only the provided competition data files, while keeping the overall approach “simple and stable” (a per-coupling-type mean predictor) so it runs fast and always outputs a valid `submission.csv`. This yield a valid score (not necessarily competitive), unblocking end-to-end execution and allowing further score-calibration iterations later. I also make the output strictly match the required columns and row order by merging onto `sample_submission.csv`.'
+- What this solution (achieved 1.23566) has done: 'Your current predictor is only using the coupling `type` mean, which leaves a lot of easy signal unused and results in a much worse (higher) log-MAE than your target. To move the score downward toward the target with minimal core-logic change, I keep the same “groupby mean fallback baseline” approach, but condition the mean on `(type, atom_0, atom_1)` by joining atom symbols from `structures.csv`. This adds strong chemistry signal while staying within the same simple aggregation/prediction semantics and should materially reduce error without changing modeling/training loops (there are none). I also keep safe backoffs: if a fine-grained group is unseen, fall back to type mean, then global mean, and ensure the submission aligns exactly to `sample_submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+from pathlib import Path
+
+DATA_DIR = Path("/kaggle/data/champs-scalar-coupling")
+
+print("DATA_DIR exists:", DATA_DIR.exists())
+print("Files (first 20):", sorted([p.name for p in DATA_DIR.iterdir()])[:20])
+
+
+
+## === cell 1
+import pandas as pd
+import numpy as np
+
+train_path = DATA_DIR / "train.csv"
+test_path = DATA_DIR / "test.csv"
+sample_path = DATA_DIR / "sample_submission.csv"
+structures_path = DATA_DIR / "structures.csv"
+
+train = pd.read_csv(train_path)
+test = pd.read_csv(test_path)
+sample = pd.read_csv(sample_path)
+
+print("train:", train.shape, "test:", test.shape, "sample:", sample.shape)
+print("train cols:", train.columns.tolist())
+print("test cols:", test.columns.tolist())
+print("sample cols:", sample.columns.tolist())
+
+structures = pd.read_csv(
+    structures_path, usecols=["molecule_name", "atom_index", "atom", "x", "y", "z"]
+)
+print("structures:", structures.shape)
+
+
+
+## === cell 2
+s0 = structures.rename(
+    columns={
+        "atom_index": "atom_index_0",
+        "atom": "atom_0",
+        "x": "x0",
+        "y": "y0",
+        "z": "z0",
+    }
+)
+s1 = structures.rename(
+    columns={
+        "atom_index": "atom_index_1",
+        "atom": "atom_1",
+        "x": "x1",
+        "y": "y1",
+        "z": "z1",
+    }
+)
+
+train_f = train.merge(
+    s0, on=["molecule_name", "atom_index_0"], how="left", validate="many_to_one"
+).merge(s1, on=["molecule_name", "atom_index_1"], how="left", validate="many_to_one")
+
+test_f = test.merge(
+    s0, on=["molecule_name", "atom_index_0"], how="left", validate="many_to_one"
+).merge(s1, on=["molecule_name", "atom_index_1"], how="left", validate="many_to_one")
+
+for df in (train_f, test_f):
+    dx = df["x0"] - df["x1"]
+    dy = df["y0"] - df["y1"]
+    dz = df["z0"] - df["z1"]
+    df["dist"] = np.sqrt(dx * dx + dy * dy + dz * dz).astype("float64")
+
+BIN_WIDTH = 0.05
+for df in (train_f, test_f):
+    df["dist_bin"] = (df["dist"] / BIN_WIDTH).round().astype("int32")
+
+g_cols = ["type", "atom_0", "atom_1", "dist_bin"]
+fine_mean = train_f.groupby(g_cols, dropna=False)["scalar_coupling_constant"].mean()
+
+g_cols_no_dist = ["type", "atom_0", "atom_1"]
+atompair_mean = train_f.groupby(g_cols_no_dist, dropna=False)[
+    "scalar_coupling_constant"
+].mean()
+type_mean = train_f.groupby("type")["scalar_coupling_constant"].mean()
+global_mean = float(train_f["scalar_coupling_constant"].mean())
+
+test_key_fine = list(
+    zip(test_f["type"], test_f["atom_0"], test_f["atom_1"], test_f["dist_bin"])
+)
+pred_fine = pd.Series(test_key_fine, index=test_f.index).map(fine_mean)
+
+test_key_atompair = list(zip(test_f["type"], test_f["atom_0"], test_f["atom_1"]))
+pred_atompair = pd.Series(test_key_atompair, index=test_f.index).map(atompair_mean)
+
+test_pred = pred_fine
+test_pred = test_pred.fillna(pred_atompair)
+test_pred = test_pred.fillna(test_f["type"].map(type_mean))
+test_pred = test_pred.fillna(global_mean).astype("float64")
+
+sub = sample[["id"]].merge(
+    pd.DataFrame(
+        {"id": test_f["id"].values, "scalar_coupling_constant": test_pred.values}
+    ),
+    on="id",
+    how="left",
+    validate="one_to_one",
+)
+
+sub["scalar_coupling_constant"] = (
+    sub["scalar_coupling_constant"].fillna(global_mean).astype("float64")
+)
+
+print(sub.head())
+print("submission shape:", sub.shape)
+print("missing preds:", sub["scalar_coupling_constant"].isna().sum())
+
+out_path = Path("submission.csv")
+sub.to_csv(out_path, index=False)
+print("Wrote:", out_path.resolve())
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+IntCastingNaNError                        Traceback (most recent call last)
+/tmp/ipykernel_11/2359406403.py in <cell line: 0>()
+     38 BIN_WIDTH = 0.05
+     39 for df in (train_f, test_f):
+---> 40     df["dist_bin"] = (df["dist"] / BIN_WIDTH).round().astype("int32")
+     41 
+     42 # Group means with a safe backoff chain (same semantics as before: lookup means, then fillna).
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/generic.py in astype(self, dtype, copy, errors)
+   6641         else:
+   6642             # else, only a single dtype is given
+-> 6643             new_data = self._mgr.astype(dtype=dtype, copy=copy, errors=errors)
+   6644             res = self._constructor_from_mgr(new_data, axes=new_data.axes)
+   6645             return res.__finalize__(self, method="astype")
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/internals/managers.py in astype(self, dtype, copy, errors)
+    428             copy = False
+    429 
+--> 430         return self.apply(
+    431             "astype",
+    432             dtype=dtype,
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/internals/managers.py in apply(self, f, align_keys, **kwargs)
+    361                 applied = b.apply(f, **kwargs)
+    362             else:
+--> 363                 applied = getattr(b, f)(**kwargs)
+    364             result_blocks = extend_blocks(applied, result_blocks)
+    365 
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/internals/blocks.py in astype(self, dtype, copy, errors, using_cow, squeeze)
+    756             values = values[0, :]  # type: ignore[call-overload]
+    757 
+--> 758         new_values = astype_array_safe(values, dtype, copy=copy, errors=errors)
+    759 
+    760         new_values = maybe_coerce_values(new_values)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in astype_array_safe(values, dtype, copy, errors)
+    235 
+    236     try:
+--> 237         new_values = astype_array(values, dtype, copy=copy)
+    238     except (ValueError, TypeError):
+    239         # e.g. _astype_nansafe can fail on object-dtype of strings
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in astype_array(values, dtype, copy)
+    180 
+    181     else:
+--> 182         values = _astype_nansafe(values, dtype, copy=copy)
+    183 
+    184     # in pandas we don't store numpy str dtypes, so convert to object
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in _astype_nansafe(arr, dtype, copy, skipna)
+     99 
+    100     elif np.issubdtype(arr.dtype, np.floating) and dtype.kind in "iu":
+--> 101         return _astype_float_to_int_nansafe(arr, dtype, copy)
+    102 
+    103     elif arr.dtype == object:
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/dtypes/astype.py in _astype_float_to_int_nansafe(values, dtype, copy)
+    143     """
+    144     if not np.isfinite(values).all():
+--> 145         raise IntCastingNaNError(
+    146             "Cannot convert non-finite values (NA or inf) to integer"
+    147         )
+
+IntCastingNaNError: Cannot convert non-finite values (NA or inf) to integer
+
+## === cell 3
+sub.head(20)
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3779042257.py in <cell line: 0>()
+----> 1 sub.head(20)
+
+NameError: name 'sub' is not defined

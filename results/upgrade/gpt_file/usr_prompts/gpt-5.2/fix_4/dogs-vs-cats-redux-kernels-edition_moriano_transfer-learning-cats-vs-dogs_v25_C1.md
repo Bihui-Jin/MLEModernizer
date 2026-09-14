@@ -1,0 +1,717 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of images of dogs and cats, predict if an image is a dog or a cat.
+
+## Metric
+Log loss.
+
+## Submission Format
+For each image in the test set, you must submit a probability that image is a dog. The file should have a header and be in the following format:
+
+```
+id,label
+1,0.5
+2,0.5
+3,0.5
+...
+```
+
+## Dataset
+The train folder contains 25,000 images of dogs and cats. Each image in this folder has the label as part of the filename. The test folder contains 12,500 images, named according to a numeric id.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-image==0.25.2
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+        input/
+            cat.1714.jpg (7.8 kB)
+            cat.10025.jpg (18.4 kB)
+            ... and 24998 other files
+            description.md (50 lines)
+            sample_submission.csv (2501 lines)
+            sample_submission.csv.zip (6.0 kB)
+            test.zip (56.6 MB)
+            train.zip (513.0 MB)
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+            test/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                unknown/
+                    900.jpg (42.3 kB)
+                    572.jpg (30.6 kB)
+                    ... and 2498 other files
+            train/
+                cat/
+                    cat.4838.jpg (20.2 kB)
+                    cat.1314.jpg (21.7 kB)
+                    ... and 11240 other files
+                dog/
+                    dog.6712.jpg (35.3 kB)
+                    dog.7152.jpg (36.1 kB)
+                    ... and 11256 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+        working/
+            dogs-vs-cats-redux-kernels-edition/
+                cat.1714.jpg (7.8 kB)
+                cat.10025.jpg (18.4 kB)
+                ... and 24998 other files
+                description.md (50 lines)
+                sample_submission.csv (2501 lines)
+                sample_submission.csv.zip (6.0 kB)
+                test.zip (56.6 MB)
+                train.zip (513.0 MB)
+                dogs-vs-cats-redux-kernels-edition/
+                test/
+                    test/
+                    unknown/
+                        900.jpg (42.3 kB)
+                        572.jpg (30.6 kB)
+                        ... and 2498 other files
+                train/
+                    cat/
+                        cat.4838.jpg (20.2 kB)
+                        cat.1314.jpg (21.7 kB)
+                        ... and 11240 other files
+                    dog/
+                        dog.6712.jpg (35.3 kB)
+                        dog.7152.jpg (36.1 kB)
+                        ... and 11256 other files
+                    train/
+```
+
+-> data/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> data/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> input/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+-> working/dogs-vs-cats-redux-kernels-edition/sample_submission.csv has 2500 rows and 2 columns.
+The columns are: id, label
+
+# 5. Target score
+
+0.22786
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.06312) has done: 'The timeout is dominated by slow Python-side image loading/resize in `build_batches()` (skimage+iterrows) plus extra non-essential work (per-image plotting, manual evaluate/predict loops) that repeats I/O. I keep the same model, training loop, augmentations, epochs, and prediction semantics, but make data input significantly faster by (1) using Keras generators’ built-in multiprocessing/prefetch and (2) rewriting `build_batches()` to use OpenCV decoding and `itertuples()` with preallocated NumPy arrays (same resize/scale). I also disable the expensive display/plot cells by default (they don’t affect submission accuracy) and avoid redundant validation “test” generator augmentation mismatch by keeping it unchanged but making it faster. All paths remain identical; outputs and training behavior remain equivalent aside from negligible float differences.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import random
+import numpy as np
+import pandas as pd
+
+os.environ.setdefault("PYTHONHASHSEED", "42")
+random.seed(42)
+np.random.seed(42)
+
+BASE_DIR = "/kaggle/input/dogs-vs-cats-redux-kernels-edition"
+TRAIN_DIR = os.path.join(BASE_DIR, "train")
+TEST_DIR = os.path.join(BASE_DIR, "test", "unknown")
+
+if not os.path.exists(TEST_DIR):
+    candidate_dirs = [
+        os.path.join(BASE_DIR, "test", "test", "unknown"),
+        os.path.join(BASE_DIR, "dogs-vs-cats-redux-kernels-edition", "test", "unknown"),
+        os.path.join(
+            BASE_DIR, "dogs-vs-cats-redux-kernels-edition", "test", "test", "unknown"
+        ),
+    ]
+    for cd in candidate_dirs:
+        if os.path.exists(cd):
+            TEST_DIR = cd
+            break
+
+print("BASE_DIR exists:", os.path.exists(BASE_DIR))
+print("TRAIN_DIR exists:", os.path.exists(TRAIN_DIR))
+print("TEST_DIR exists:", os.path.exists(TEST_DIR))
+print(
+    "TRAIN_DIR subdirs:",
+    os.listdir(TRAIN_DIR)[:10] if os.path.exists(TRAIN_DIR) else None,
+)
+print(
+    "TEST_DIR sample:", os.listdir(TEST_DIR)[:10] if os.path.exists(TEST_DIR) else None
+)
+
+
+
+## === cell 1
+from os import listdir
+
+train_data = []
+
+for cls in ["cat", "dog"]:
+    cls_dir = os.path.join(TRAIN_DIR, cls)
+    label = "1" if cls == "dog" else "0"
+    for file in listdir(cls_dir):
+        rel_path = f"{cls}/{file}"  # relative to TRAIN_DIR
+        train_data.append([rel_path, label])
+
+df_all = pd.DataFrame(train_data, columns=["filename", "class"])
+
+df_all = df_all.sample(frac=1.0, random_state=42).reset_index(drop=True)
+split_idx = int(len(df_all) * 0.85)
+train = df_all.iloc[:split_idx].copy()
+test = df_all.iloc[split_idx:].copy()
+
+print("Train size", len(train))
+print("Val size", len(test))
+for label in ["0", "1"]:
+    print("------------")
+    print("\tTrain has", len(train[train["class"] == label]), label)
+    print("\tVal has", len(test[test["class"] == label]), label)
+
+
+
+## === cell 2
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+IMAGE_WIDTH = 224
+IMAGE_HEIGHT = 224
+BATCH_SIZE = 32
+
+train_image_generator = ImageDataGenerator(
+    rescale=1.0 / 255,
+    rotation_range=90,
+    horizontal_flip=True,
+)
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 3
+train_generator = train_image_generator.flow_from_dataframe(
+    train,
+    directory=TRAIN_DIR,
+    x_col="filename",
+    y_col="class",
+    seed=42,
+    target_size=(IMAGE_WIDTH, IMAGE_HEIGHT),
+    batch_size=BATCH_SIZE,
+    class_mode="binary",
+    shuffle=True,
+)
+
+validation_generator = train_image_generator.flow_from_dataframe(
+    test,
+    directory=TRAIN_DIR,
+    x_col="filename",
+    y_col="class",
+    seed=42,
+    target_size=(IMAGE_WIDTH, IMAGE_HEIGHT),
+    batch_size=BATCH_SIZE,
+    class_mode="binary",
+    shuffle=False,
+)
+
+
+
+## === cell 4
+from tensorflow.keras.applications import vgg16
+
+model = vgg16.VGG16(
+    weights="imagenet",
+    include_top=False,
+    input_shape=(IMAGE_WIDTH, IMAGE_HEIGHT, 3),
+    pooling="max",
+)
+
+
+
+## === cell 5
+for layer in model.layers[:-5]:
+    layer.trainable = False
+
+
+
+## === cell 6
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.models import Sequential
+
+transfer_model_vgg16 = Sequential()
+for layer in model.layers:
+    transfer_model_vgg16.add(layer)
+
+transfer_model_vgg16.add(Dense(512, activation="relu"))
+transfer_model_vgg16.add(Dense(1, activation="sigmoid"))
+
+transfer_model_vgg16.summary()
+
+
+
+## === cell 7
+print("Skipping model_to_dot visualization (not available in this environment).")
+
+
+
+## === cell 8
+from tensorflow.keras import optimizers
+
+adam = optimizers.Adam(learning_rate=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+
+transfer_model_vgg16.compile(
+    optimizer=adam,
+    loss="binary_crossentropy",
+    metrics=["accuracy"],
+)
+
+
+
+## === cell 9
+steps_per_epoch = max(1, train_generator.n // BATCH_SIZE)
+validation_steps = max(1, validation_generator.n // BATCH_SIZE)
+
+vgg16_model_history = transfer_model_vgg16.fit(
+    train_generator,
+    steps_per_epoch=steps_per_epoch,
+    validation_data=validation_generator,
+    validation_steps=validation_steps,
+    epochs=5,
+    workers=min(4, (os.cpu_count() or 4)),
+    use_multiprocessing=True,
+    max_queue_size=16,
+)
+
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/2415220894.py in <cell line: 0>()
+      2 validation_steps = max(1, validation_generator.n // BATCH_SIZE)
+      3 
+----> 4 vgg16_model_history = transfer_model_vgg16.fit(
+      5     train_generator,
+      6     steps_per_epoch=steps_per_epoch,
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+--> 122             raise e.with_traceback(filtered_tb) from None
+    123         finally:
+    124             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    117             return fn(*args, **kwargs)
+    118         except Exception as e:
+--> 119             filtered_tb = _process_traceback_frames(e.__traceback__)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+
+TypeError: TensorFlowTrainer.fit() got an unexpected keyword argument 'workers'
+
+## === cell 10
+PLOT_DEBUG = False
+
+if PLOT_DEBUG:
+    from IPython.display import Image, display
+
+    def plot_prediction(image_path, label):
+        display(Image(filename=image_path, width=IMAGE_WIDTH, height=IMAGE_HEIGHT))
+        prediction = "dog"
+        confidence = float(label)
+        if confidence < 0.5:
+            prediction = "cat"
+            confidence = 1.0 - confidence
+        legend = (
+            "The image %s above is a %s with a confidence of %.2f%% (p_dog=%.6f)"
+            % (
+                image_path,
+                prediction,
+                confidence * 100,
+                float(label),
+            )
+        )
+        print(legend)
+
+else:
+
+    def plot_prediction(image_path, label):
+        pass
+
+
+
+
+## === cell 11
+import cv2
+
+
+def build_batches(
+    df, has_labels=True, limit=500, batch_size=BATCH_SIZE, produce="images"
+):
+    """
+    produce: "images" -> yields (X, y)
+             "paths"  -> yields (paths, y)
+    Note: For has_labels=False, expects df columns: filename (or id/filename) and uses TEST_DIR.
+    """
+    n_rows = len(df)
+    if limit != -1:
+        n_rows = min(n_rows, int(limit))
+
+    has_filename_col = "filename" in df.columns
+
+    Xb = np.empty((batch_size, IMAGE_HEIGHT, IMAGE_WIDTH, 3), dtype=np.float32)
+    yb = np.empty((batch_size,), dtype=np.float32) if has_labels else None
+    paths = [None] * batch_size
+
+    b = 0
+    i = 0
+
+    for row in df.itertuples(index=False):
+        if i >= n_rows:
+            break
+
+        if has_labels:
+            yb[b] = float(getattr(row, "class"))
+            raw_image_path = os.path.join(TRAIN_DIR, getattr(row, "filename"))
+        else:
+            if has_filename_col:
+                fn = getattr(row, "filename")
+                raw_image_path = os.path.join(TEST_DIR, fn)
+            else:
+                raw_image_path = os.path.join(
+                    TEST_DIR, f"{int(getattr(row, 'id'))}.jpg"
+                )
+
+        img = cv2.imread(raw_image_path, cv2.IMREAD_COLOR)
+        if img is None:
+            raise FileNotFoundError(f"Could not read image: {raw_image_path}")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(
+            img, (IMAGE_WIDTH, IMAGE_HEIGHT), interpolation=cv2.INTER_CUBIC
+        )
+
+        Xb[b] = img.astype(np.float32) / 255.0
+        paths[b] = raw_image_path
+
+        b += 1
+        i += 1
+
+        if b == batch_size:
+            if produce == "images":
+                yield Xb, (yb.copy() if has_labels else None)
+            else:
+                yield paths.copy(), (yb.copy() if has_labels else None)
+            b = 0
+
+    if b > 0:
+        if produce == "images":
+            yield Xb[:b].copy(), (yb[:b].copy() if has_labels else None)
+        else:
+            yield paths[:b].copy(), (yb[:b].copy() if has_labels else None)
+
+
+
+
+## === cell 12
+RUN_EVAL_DEBUG = False
+
+if RUN_EVAL_DEBUG:
+    samples = 64
+    eval_steps = 1
+    eval_result = transfer_model_vgg16.evaluate(
+        build_batches(test, limit=samples, batch_size=BATCH_SIZE),
+        steps=eval_steps,
+        verbose=1,
+    )
+    print("Eval:", eval_result)
+
+
+
+## === cell 13
+RUN_PRED_DEBUG = False
+
+if RUN_PRED_DEBUG:
+    some_predictions = transfer_model_vgg16.predict(
+        build_batches(test, limit=12, batch_size=1),
+        steps=12,
+        verbose=1,
+    )
+
+
+
+## === cell 14
+if RUN_PRED_DEBUG:
+    idx = 0
+    for mini_batch_files, _ in build_batches(
+        test, limit=12, batch_size=1, produce="paths"
+    ):
+        mini_batch_file = mini_batch_files[0]
+        predicted_label = float(some_predictions[idx][0])
+        idx += 1
+        plot_prediction(mini_batch_file, predicted_label)
+
+
+
+## === cell 15
+test_files = [f for f in listdir(TEST_DIR) if f.lower().endswith(".jpg")]
+output = pd.DataFrame({"filename": test_files})
+output["id"] = output["filename"].str.replace(".jpg", "", regex=False).astype(int)
+output = output.sort_values("id").reset_index(drop=True)
+
+print("Num test images:", len(output))
+print(output.head())
+
+
+
+## === cell 16
+pred_batch_size = 64
+pred_steps = int(np.ceil(len(output) / pred_batch_size))
+
+results = transfer_model_vgg16.predict(
+    build_batches(output, limit=-1, has_labels=False, batch_size=pred_batch_size),
+    steps=pred_steps,
+    verbose=1,
+)
+
+results = results.reshape(-1)[: len(output)]
+print("Pred shape:", results.shape)
+
+
+
+## --- ERROR in cell 16, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+/tmp/ipykernel_11/2079234402.py in <cell line: 0>()
+      2 pred_steps = int(np.ceil(len(output) / pred_batch_size))
+      3 
+----> 4 results = transfer_model_vgg16.predict(
+      5     build_batches(output, limit=-1, has_labels=False, batch_size=pred_batch_size),
+      6     steps=pred_steps,
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+--> 122             raise e.with_traceback(filtered_tb) from None
+    123         finally:
+    124             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/optree/ops.py in tree_map(func, tree, is_leaf, none_is_leaf, namespace, *rests)
+    764     leaves, treespec = _C.flatten(tree, is_leaf, none_is_leaf, namespace)
+    765     flat_args = [leaves] + [treespec.flatten_up_to(r) for r in rests]
+--> 766     return treespec.unflatten(map(func, *flat_args))
+    767 
+    768 
+
+AttributeError: 'NoneType' object has no attribute 'shape'
+
+## === cell 17
+output["label"] = results.astype(float)
+print(output[["id", "label"]].head(10))
+
+
+
+## --- ERROR in cell 17, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1753242182.py in <cell line: 0>()
+----> 1 output["label"] = results.astype(float)
+      2 print(output[["id", "label"]].head(10))
+      3 
+
+NameError: name 'results' is not defined
+
+## === cell 18
+if PLOT_DEBUG:
+    stop = 5
+    for _, row in output.head(stop).iterrows():
+        path = os.path.join(TEST_DIR, f"{int(row['id'])}.jpg")
+        plot_prediction(path, row["label"])
+
+submission = output[["id", "label"]].copy()
+submission["id"] = submission["id"].astype(int)
+submission["label"] = submission["label"].astype(float)
+
+submission.to_csv("submission_file.csv", index=False)
+print("Wrote submission_file.csv with shape:", submission.shape)
+print(submission.head())
+
+## --- ERROR in cell 18, traceback:
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+/tmp/ipykernel_11/4282152310.py in <cell line: 0>()
+      5         plot_prediction(path, row["label"])
+      6 
+----> 7 submission = output[["id", "label"]].copy()
+      8 submission["id"] = submission["id"].astype(int)
+      9 submission["label"] = submission["label"].astype(float)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py in __getitem__(self, key)
+   4106             if is_iterator(key):
+   4107                 key = list(key)
+-> 4108             indexer = self.columns._get_indexer_strict(key, "columns")[1]
+   4109 
+   4110         # take() does not accept boolean indexers
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in _get_indexer_strict(self, key, axis_name)
+   6198             keyarr, indexer, new_indexer = self._reindex_non_unique(keyarr)
+   6199 
+-> 6200         self._raise_if_missing(keyarr, indexer, axis_name)
+   6201 
+   6202         keyarr = self.take(indexer)
+
+/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py in _raise_if_missing(self, key, indexer, axis_name)
+   6250 
+   6251             not_found = list(ensure_index(key)[missing_mask.nonzero()[0]].unique())
+-> 6252             raise KeyError(f"{not_found} not in index")
+   6253 
+   6254     @overload
+
+KeyError: "['label'] not in index"

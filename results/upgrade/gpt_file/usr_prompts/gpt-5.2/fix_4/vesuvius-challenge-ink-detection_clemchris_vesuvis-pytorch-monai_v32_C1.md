@@ -1,0 +1,1049 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Overview
+Detect the presence of ink from 3d x-ray scans of detached fragments of ancient papyrus scrolls.
+
+## Metric
+We evaluate how well your output image matches our reference image using a modified version of the [Sørensen--Dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient), where instead of using the F1 score, we are using the F0.5 score. The F0.5 score is given by:
+
+$$
+\frac{\left(1+\beta^2\right) p r}{\beta^2 p+r} \text { where } p=\frac{t p}{t p+f p}, r=\frac{t p}{t p+f n}, \beta=0.5
+$$
+
+The F0.5 score weights precision higher than recall, which improves the ability to form coherent characters out of detected ink areas.
+
+In order to reduce the submission file size, our metric uses run-length encoding on the pixel values. Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+Note that, at the time of encoding, the output should be binary, with 0 indicating "no ink" and 1 indicating "ink".
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. The pixels are numbered from left to right, then top to bottom: 1 is pixel (1,1), 2 is pixel (1,2), etc.
+
+Your output should be a single file, **submission.csv**, with this run-length encoded information. This should have a header with two columns, `Id` and `Predicted`, and with one row for every directory under **test/**. For example:
+
+```
+Id,Predicted
+a,1 1 5 1 etc.
+b,10 20 etc.
+```
+
+For a real-world example of what these files look like, see `inklabels_rce.csv` in the data directories, which have been generated with [this script](https://gist.github.com/janpaul123/ca3477c1db6de4346affca37e0e3d5b0).
+
+
+## Data
+- **[train/test]/[fragment_id]/surface_volume/[image_id].tif** slices from the 3d x-ray [surface volume](https://scrollprize.org/tutorial1#3-surface-volumes). Each file contains a greyscale slice in the z-direction. Each fragment contains 65 slices. Combined this image stack gives us `width * height * 65` number of voxels per fragment. You can expect two fragments in the hidden test set, which together are roughly the same size as a single training fragment. The sample slices available to download in the test folders are simply copied from training fragment one, but when you submit your notebook they will be substituted with the real test data.
+- **[train/test]/[fragment_id]/mask.png** --- a binary mask of which pixels contain data.
+- **train/[fragment_id]/inklabels.png** --- a binary mask of the ink vs no-ink labels.
+- **train/[fragment_id]/inklabels_rle.csv** --- a run-length-encoded version of the labels, generated using [this script](https://gist.github.com/janpaul123/ca3477c1db6de4346affca37e0e3d5b0). This is the same format as you should make your submission in.
+- **train/[fragment_id]/ir.png** --- the infrared photo on which the binary mask is based.
+- **sample_submission.csv**, an example of a submission file in the correct format. You need to output the following file in the home directory: **submission.csv**.
+
+# 2. Python version
+
+3.11
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (135 lines)
+            sample_submission.csv (2 lines)
+            sample_submission.csv.zip (215 Bytes)
+            test.zip (3.0 GB)
+            train.zip (15.5 GB)
+            test/
+                a/
+                    mask.png (40.7 kB)
+                    surface_volume/
+                        06.tif (79.8 MB)
+                        01.tif (79.8 MB)
+                        ... and 63 other files
+                test/
+            train/
+                1/
+                    inklabels.png (92.6 kB)
+                    inklabels_rle.csv (2 lines)
+                    ... and 2 other files
+                    surface_volume/
+                        42.tif (103.6 MB)
+                        45.tif (103.6 MB)
+                        ... and 63 other files
+                2/
+                    inklabels.png (294.3 kB)
+                    inklabels_rle.csv (2 lines)
+                    ... and 2 other files
+                    surface_volume/
+                        10.tif (281.9 MB)
+                        17.tif (281.9 MB)
+                        ... and 63 other files
+                train/
+            vesuvius-challenge-ink-detection/
+                description.md (135 lines)
+                sample_submission.csv (2 lines)
+                ... and 3 other files
+                test/
+                    a/
+                        mask.png (40.7 kB)
+                        surface_volume/
+                            ... (max depth reached)
+                    test/
+                train/
+                    1/
+                        inklabels.png (92.6 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    2/
+                        inklabels.png (294.3 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    train/
+                vesuvius-challenge-ink-detection/
+        input/
+            description.md (135 lines)
+            sample_submission.csv (2 lines)
+            sample_submission.csv.zip (215 Bytes)
+            test.zip (3.0 GB)
+            train.zip (15.5 GB)
+            test/
+                a/
+                    mask.png (40.7 kB)
+                    surface_volume/
+                        06.tif (79.8 MB)
+                        01.tif (79.8 MB)
+                        ... and 63 other files
+                test/
+                    a/
+                        mask.png (40.7 kB)
+                        surface_volume/
+                            ... (max depth reached)
+                    test/
+            train/
+                1/
+                    inklabels.png (92.6 kB)
+                    inklabels_rle.csv (2 lines)
+                    ... and 2 other files
+                    surface_volume/
+                        42.tif (103.6 MB)
+                        45.tif (103.6 MB)
+                        ... and 63 other files
+                2/
+                    inklabels.png (294.3 kB)
+                    inklabels_rle.csv (2 lines)
+                    ... and 2 other files
+                    surface_volume/
+                        10.tif (281.9 MB)
+                        17.tif (281.9 MB)
+                        ... and 63 other files
+                train/
+                    1/
+                        inklabels.png (92.6 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    2/
+                        inklabels.png (294.3 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    train/
+            vesuvius-challenge-ink-detection/
+                description.md (135 lines)
+                sample_submission.csv (2 lines)
+                ... and 3 other files
+                test/
+                    a/
+                        mask.png (40.7 kB)
+                        surface_volume/
+                            ... (max depth reached)
+                    test/
+                train/
+                    1/
+                        inklabels.png (92.6 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    2/
+                        inklabels.png (294.3 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    train/
+                vesuvius-challenge-ink-detection/
+        working/
+            vesuvius-challenge-ink-detection/
+                description.md (135 lines)
+                sample_submission.csv (2 lines)
+                ... and 3 other files
+                test/
+                    a/
+                        mask.png (40.7 kB)
+                        surface_volume/
+                            ... (max depth reached)
+                    test/
+                train/
+                    1/
+                        inklabels.png (92.6 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    2/
+                        inklabels.png (294.3 kB)
+                        inklabels_rle.csv (2 lines)
+                        ... and 2 other files
+                        surface_volume/
+                            ... (max depth reached)
+                    train/
+                vesuvius-challenge-ink-detection/
+```
+
+-> data/sample_submission.csv has 1 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/train/1/inklabels_rle.csv has 1 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/train/2/inklabels_rle.csv has 1 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/vesuvius-challenge-ink-detection/sample_submission.csv has 1 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/vesuvius-challenge-ink-detection/train/1/inklabels_rle.csv has 1 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> data/vesuvius-challenge-ink-detection/train/2/inklabels_rle.csv has 1 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> input/sample_submission.csv has 1 rows and 2 columns.
+The columns are: Id, Predicted
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.1342954358193677
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+from pathlib import Path
+
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:128")
+
+
+
+## === cell 1
+from typing import Tuple
+
+import numpy as np
+import pandas as pd
+import PIL.Image as Image
+import torch
+import torch.nn as nn
+import pytorch_lightning as pl
+from torch.utils.data import Dataset, DataLoader
+from tqdm.auto import tqdm
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+## === cell 2
+try:
+    import lovely_numpy as ln  # type: ignore
+
+    _has_lovely = True
+except Exception:
+    _has_lovely = False
+
+    class _LN:
+        @staticmethod
+        def lovely(x):
+            try:
+                return (
+                    f"shape={getattr(x, 'shape', None)}, dtype={getattr(x, 'dtype', None)}, "
+                    f"min={np.min(x):.4g}, max={np.max(x):.4g}"
+                )
+            except Exception:
+                return str(x)
+
+    ln = _LN()  # noqa: N816
+
+
+
+## === cell 3
+KAGGLE_DIR = Path("/") / "kaggle"
+
+INPUT_DIR = KAGGLE_DIR / "input"
+WORKING_DIR = KAGGLE_DIR / "working"
+
+COMPETITION_DATA_DIR = INPUT_DIR / "vesuvius-challenge-ink-detection"
+PREPARED_DATA_DIR = INPUT_DIR / "vesuvis-data-preparation"
+
+TRAIN_DATA_CSV_PATH = PREPARED_DATA_DIR / "data_0.1.csv"
+TEST_DATA_CSV_PATH = "test.csv"
+TRAIN_DATA_CSV_OUT = "train.csv"
+
+if str(TRAIN_DATA_CSV_PATH).endswith(".csv"):
+    try:
+        DOWNSAMPLING = float(
+            TRAIN_DATA_CSV_PATH.name.split("_")[-1].replace(".csv", "")
+        )
+    except Exception:
+        DOWNSAMPLING = 0.1
+else:
+    DOWNSAMPLING = 0.1
+
+Z_START = 27  # First slice in the z direction to use
+Z_DIM = 16  # Number of slices in the z direction
+
+ACCELERATOR = "gpu" if torch.cuda.is_available() else "cpu"
+BATCH_SIZE = 1
+DEVICES = 1
+DROPOUT = 0.0
+ETA_MIN = 1e-6
+FAST_DEV_RUN = False
+LEARNING_RATE = 3e-4
+LOSS = "Dice"  # kept for config compatibility (fallback uses BCEWithLogits)
+MODEL_NAME = "UNet"  # kept for config compatibility (fallback uses small CNN)
+MAX_EPOCHS = (
+    5  # minimal training to get non-random weights and improve score toward target
+)
+NUM_WORKERS = 0
+NUM_SAMPLES = 64  # unused in fallback
+OPTIMIZER = "AdamW"
+OVERFIT_BATCHES = 0
+PATCH_SIZE = (512, 512)  # unused in fallback
+PRECISION = 16  # Lightning will handle on GPU; on CPU we override to 32
+SCHEDULER = "CosineAnnealingLR"
+SEED = 2023
+SW_BATCH_SIZE = 16  # unused in fallback
+VAL_FRAGMET_ID = 3
+WEIGHT_DECAY = 1e-6
+
+pl.seed_everything(SEED, workers=True)
+torch.set_float32_matmul_precision("high")
+
+
+
+
+## === cell 4
+def create_df_from_mask_paths(mask_paths, train=True):
+    df = pd.DataFrame({"mask_png": mask_paths})
+    df["mask_png"] = df["mask_png"].astype(str)
+
+    df["stage"] = df["mask_png"].str.split("/").str[-3]
+    df["fragmet_id"] = df["mask_png"].str.split("/").str[-2]
+
+    base_out = WORKING_DIR / "prepared_npy" / f"down_{DOWNSAMPLING}"
+    df["mask_npy"] = df.apply(
+        lambda r: str(base_out / r["stage"] / str(r["fragmet_id"]) / "mask.npy"), axis=1
+    )
+
+    if train:
+        df["label_png"] = df["mask_png"].str.replace(
+            "mask.png", "inklabels.png", regex=False
+        )
+        df["label_npy"] = df.apply(
+            lambda r: str(
+                base_out / r["stage"] / str(r["fragmet_id"]) / "inklabels.npy"
+            ),
+            axis=1,
+        )
+
+    df["volumes_dir"] = df["mask_png"].str.replace(
+        "mask.png", "surface_volume", regex=False
+    )
+    df["volume_npy"] = df.apply(
+        lambda r: str(base_out / r["stage"] / str(r["fragmet_id"]) / "volume.npy"),
+        axis=1,
+    )
+    return df
+
+
+
+
+## === cell 5
+def load_image(path):
+    return Image.open(path)
+
+
+def resize_image(image, downsampling):
+    size = int(image.size[0] * downsampling), int(image.size[1] * downsampling)
+    return image.resize(size)
+
+
+def load_and_resize_image(path, downsampling):
+    image = load_image(path)
+    return resize_image(image, downsampling)
+
+
+def load_mask_npy(path, downsampling):
+    mask = load_and_resize_image(path, downsampling).convert("1")
+    return np.array(mask, dtype=np.uint8)
+
+
+def load_label_npy(path, downsampling):
+    label = load_and_resize_image(path, downsampling).convert("1")
+    return np.array(label, dtype=np.uint8)
+
+
+def load_z_slice_npy(path, downsampling):
+    z_slice = load_and_resize_image(path, downsampling)
+    return np.array(z_slice, dtype=np.float32) / 65535.0
+
+
+def load_volume_npy(volumes_dir, downsampling):
+    surface_volume_paths = sorted(Path(volumes_dir).glob("*.tif"))[
+        Z_START : Z_START + Z_DIM
+    ]
+
+    batch_size = 8
+    paths_batches = [
+        surface_volume_paths[i : i + batch_size]
+        for i in range(0, len(surface_volume_paths), batch_size)
+    ]
+
+    volumes = []
+    for paths_batch in tqdm(
+        paths_batches, leave=False, desc="Processing batches", position=1
+    ):
+        z_slices = [
+            load_z_slice_npy(path, downsampling)
+            for path in tqdm(
+                paths_batch, leave=False, desc="Processing paths", position=2
+            )
+        ]
+        volumes.append(np.stack(z_slices, axis=0))
+        del z_slices
+
+    volume = np.concatenate(volumes, axis=0)
+    return volume
+
+
+
+
+## === cell 6
+def save_data_as_npy(df, train=True):
+    for row in tqdm(
+        df.itertuples(), total=len(df), desc="Processing fragments", position=0
+    ):
+        mask_npy = load_mask_npy(row.mask_png, DOWNSAMPLING)
+        volume_npy = load_volume_npy(row.volumes_dir, DOWNSAMPLING)
+
+        Path(row.mask_npy).parent.mkdir(exist_ok=True, parents=True)
+        np.save(row.mask_npy, mask_npy)
+        np.save(row.volume_npy, volume_npy)
+
+        if train:
+            label_npy = load_label_npy(row.label_png, DOWNSAMPLING)
+            np.save(row.label_npy, label_npy)
+
+        tqdm.write(f"Created {row.volume_npy} with shape {volume_npy.shape}")
+
+
+
+
+## === cell 7
+test_mask_paths = sorted((COMPETITION_DATA_DIR / "test").glob("*/mask.png"))
+test_mask_paths = [p for p in test_mask_paths if p.name == "mask.png"]
+
+test_df = create_df_from_mask_paths(test_mask_paths, train=False)
+test_df.to_csv(TEST_DATA_CSV_PATH, index=False)
+test_df
+
+
+
+## === cell 8
+train_mask_paths = sorted((COMPETITION_DATA_DIR / "train").glob("*/mask.png"))
+train_mask_paths = [p for p in train_mask_paths if p.name == "mask.png"]
+train_df = create_df_from_mask_paths(train_mask_paths, train=True)
+train_df.to_csv(TRAIN_DATA_CSV_OUT, index=False)
+train_df
+
+
+
+
+## === cell 9
+def ensure_prepared(df: pd.DataFrame, train: bool):
+    needed = []
+    for r in df.itertuples(index=False):
+        if not Path(r.mask_npy).exists():
+            needed.append(r)
+            continue
+        if not Path(r.volume_npy).exists():
+            needed.append(r)
+            continue
+        if train and (not Path(r.label_npy).exists()):
+            needed.append(r)
+            continue
+    if len(needed) == 0:
+        return
+    subdf = df.loc[
+        [getattr(x, "Index", i) for i, x in enumerate(df.itertuples()) if True]
+    ].copy()
+    save_data_as_npy(df, train=train)
+
+
+ensure_prepared(test_df, train=False)
+ensure_prepared(train_df, train=True)
+
+
+
+
+## === cell 10
+class VesuvisTestDataset(Dataset):
+    def __init__(self, df: pd.DataFrame):
+        self.df = df.reset_index(drop=True)
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx: int):
+        r = self.df.iloc[idx]
+        vol = np.load(r["volume_npy"]).astype(np.float32)  # (Z,H,W)
+        m = np.load(r["mask_npy"]).astype(np.uint8)  # (H,W)
+
+        x = torch.from_numpy(vol)  # (Z,H,W)
+        mask = torch.from_numpy(m)  # (H,W)
+        frag_id = str(r["fragmet_id"])
+        return {"x": x, "mask": mask, "fragmet_id": frag_id}
+
+
+
+
+## === cell 11
+class VesuvisTrainDataset(Dataset):
+    def __init__(self, df: pd.DataFrame):
+        self.df = df.reset_index(drop=True)
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx: int):
+        r = self.df.iloc[idx]
+        vol = np.load(r["volume_npy"]).astype(np.float32)  # (Z,H,W)
+        y = np.load(r["label_npy"]).astype(np.uint8)  # (H,W)
+        m = np.load(r["mask_npy"]).astype(np.uint8)  # (H,W)
+
+        y = (y * m).astype(np.uint8)
+
+        x = torch.from_numpy(vol)  # (Z,H,W)
+        y = torch.from_numpy(y)  # (H,W)
+        return {"x": x, "y": y}
+
+
+
+
+## === cell 12
+class SmallSegNet(nn.Module):
+    """
+    Minimal 2D CNN that maps 16-channel input -> 1-channel logits.
+    """
+
+    def __init__(self, in_ch=16, dropout=0.0):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(in_ch, 32, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.Dropout2d(dropout),
+            nn.Conv2d(32, 32, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(32, 1, kernel_size=1),
+        )
+
+    def forward(self, x):
+        return self.net(x)
+
+
+class VesuvisModule(pl.LightningModule):
+    def __init__(
+        self,
+        dropout: float,
+        eta_min: float,
+        learning_rate: float,
+        loss: str,
+        model_name: str,
+        max_epochs: int,
+        optimizer: str,
+        patch_size: Tuple[int, int],
+        scheduler: str,
+        sw_batch_size: int,
+        weight_decay: float,
+    ):
+        super().__init__()
+        self.save_hyperparameters()
+        self.model = SmallSegNet(in_ch=Z_DIM, dropout=dropout)
+        self.criterion = nn.BCEWithLogitsLoss()
+
+    def forward(self, x):
+        return self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        x = batch["x"].float()
+        if x.ndim == 3:
+            x = x.unsqueeze(0)  # (1,Z,H,W)
+        y = batch["y"].float()
+        if y.ndim == 2:
+            y = y.unsqueeze(0).unsqueeze(1)  # (1,1,H,W)
+        logits = self(x)
+        loss = self.criterion(logits, y)
+        self.log("train_loss", loss, prog_bar=False, on_step=False, on_epoch=True)
+        return loss
+
+    def predict_step(self, batch, batch_idx):
+        x = batch["x"].float()  # (Z,H,W)
+        if x.ndim == 3:
+            x = x.unsqueeze(0)  # (1,Z,H,W)
+        logits = self(x)  # (B,1,H,W)
+        probs = torch.sigmoid(logits)
+        return probs.squeeze(1).squeeze(0)  # (H,W)
+
+    def configure_optimizers(self):
+        opt = torch.optim.AdamW(
+            self.parameters(),
+            lr=self.hparams.learning_rate,
+            weight_decay=self.hparams.weight_decay,
+        )
+        sch = torch.optim.lr_scheduler.CosineAnnealingLR(
+            opt, T_max=self.hparams.max_epochs, eta_min=self.hparams.eta_min
+        )
+        return {
+            "optimizer": opt,
+            "lr_scheduler": {"scheduler": sch, "interval": "epoch"},
+        }
+
+
+
+
+## === cell 13
+def predict(
+    module,
+    accelerator=ACCELERATOR,
+    batch_size=BATCH_SIZE,
+    data_csv_path=TEST_DATA_CSV_PATH,
+    devices=DEVICES,
+    num_workers=NUM_WORKERS,
+    precision=PRECISION,
+):
+    df = pd.read_csv(data_csv_path)
+    ds = VesuvisTestDataset(df)
+    dl = DataLoader(
+        ds,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=torch.cuda.is_available(),
+    )
+
+    trainer = pl.Trainer(
+        accelerator=accelerator,
+        devices=devices,
+        precision=precision if accelerator != "cpu" else "32-true",
+        logger=False,
+        enable_checkpointing=False,
+    )
+    preds = trainer.predict(module, dataloaders=dl)
+    return preds, df
+
+
+
+
+## === cell 14
+train_ds = VesuvisTrainDataset(train_df)
+train_dl = DataLoader(
+    train_ds,
+    batch_size=1,
+    shuffle=True,
+    num_workers=NUM_WORKERS,
+    pin_memory=torch.cuda.is_available(),
+)
+
+module = VesuvisModule(
+    dropout=DROPOUT,
+    eta_min=ETA_MIN,
+    learning_rate=LEARNING_RATE,
+    loss=LOSS,
+    model_name=MODEL_NAME,
+    max_epochs=MAX_EPOCHS,
+    optimizer=OPTIMIZER,
+    patch_size=PATCH_SIZE,
+    scheduler=SCHEDULER,
+    sw_batch_size=SW_BATCH_SIZE,
+    weight_decay=WEIGHT_DECAY,
+)
+
+trainer = pl.Trainer(
+    accelerator=ACCELERATOR,
+    devices=DEVICES,
+    precision=PRECISION if ACCELERATOR != "cpu" else "32-true",
+    max_epochs=MAX_EPOCHS,
+    logger=False,
+    enable_checkpointing=False,
+    fast_dev_run=FAST_DEV_RUN,
+)
+
+trainer.fit(module, train_dataloaders=train_dl)
+
+predictions, _pred_df = predict(module)
+
+
+
+
+## --- ERROR in cell 14, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/2903067244.py in <cell line: 0>()
+     33 )
+     34 
+---> 35 trainer.fit(module, train_dataloaders=train_dl)
+     36 
+     37 predictions, _pred_df = predict(module)
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/trainer/trainer.py in fit(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)
+    558         self.training = True
+    559         self.should_stop = False
+--> 560         call._call_and_handle_interrupt(
+    561             self, self._fit_impl, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path
+    562         )
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/trainer/call.py in _call_and_handle_interrupt(trainer, trainer_fn, *args, **kwargs)
+     47         if trainer.strategy.launcher is not None:
+     48             return trainer.strategy.launcher.launch(trainer_fn, *args, trainer=trainer, **kwargs)
+---> 49         return trainer_fn(*args, **kwargs)
+     50 
+     51     except _TunerExitException:
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/trainer/trainer.py in _fit_impl(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)
+    596             model_connected=self.lightning_module is not None,
+    597         )
+--> 598         self._run(model, ckpt_path=ckpt_path)
+    599 
+    600         assert self.state.stopped
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/trainer/trainer.py in _run(self, model, ckpt_path)
+   1009         # RUN THE TRAINER
+   1010         # ----------------------------
+-> 1011         results = self._run_stage()
+   1012 
+   1013         # ----------------------------
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/trainer/trainer.py in _run_stage(self)
+   1053                 self._run_sanity_check()
+   1054             with torch.autograd.set_detect_anomaly(self._detect_anomaly):
+-> 1055                 self.fit_loop.run()
+   1056             return None
+   1057         raise RuntimeError(f"Unexpected state {self.state}")
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/fit_loop.py in run(self)
+    214             try:
+    215                 self.on_advance_start()
+--> 216                 self.advance()
+    217                 self.on_advance_end()
+    218             except StopIteration:
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/fit_loop.py in advance(self)
+    456         with self.trainer.profiler.profile("run_training_epoch"):
+    457             assert self._data_fetcher is not None
+--> 458             self.epoch_loop.run(self._data_fetcher)
+    459 
+    460     def on_advance_end(self) -> None:
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/training_epoch_loop.py in run(self, data_fetcher)
+    150         while not self.done:
+    151             try:
+--> 152                 self.advance(data_fetcher)
+    153                 self.on_advance_end(data_fetcher)
+    154             except StopIteration:
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/training_epoch_loop.py in advance(self, data_fetcher)
+    346                 if trainer.lightning_module.automatic_optimization:
+    347                     # in automatic optimization, there can only be one optimizer
+--> 348                     batch_output = self.automatic_optimization.run(trainer.optimizers[0], batch_idx, kwargs)
+    349                 else:
+    350                     batch_output = self.manual_optimization.run(kwargs)
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/optimization/automatic.py in run(self, optimizer, batch_idx, kwargs)
+    190         # gradient update with accumulated gradients
+    191         else:
+--> 192             self._optimizer_step(batch_idx, closure)
+    193 
+    194         result = closure.consume_result()
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/optimization/automatic.py in _optimizer_step(self, batch_idx, train_step_and_backward_closure)
+    268 
+    269         # model hook
+--> 270         call._call_lightning_module_hook(
+    271             trainer,
+    272             "optimizer_step",
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/trainer/call.py in _call_lightning_module_hook(trainer, hook_name, pl_module, *args, **kwargs)
+    175 
+    176     with trainer.profiler.profile(f"[LightningModule]{pl_module.__class__.__name__}.{hook_name}"):
+--> 177         output = fn(*args, **kwargs)
+    178 
+    179     # restore current_fx when nested context
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/core/module.py in optimizer_step(self, epoch, batch_idx, optimizer, optimizer_closure)
+   1364 
+   1365         """
+-> 1366         optimizer.step(closure=optimizer_closure)
+   1367 
+   1368     def optimizer_zero_grad(self, epoch: int, batch_idx: int, optimizer: Optimizer) -> None:
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/core/optimizer.py in step(self, closure, **kwargs)
+    152 
+    153         assert self._strategy is not None
+--> 154         step_output = self._strategy.optimizer_step(self._optimizer, closure, **kwargs)
+    155 
+    156         self._on_after_step()
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/strategies/strategy.py in optimizer_step(self, optimizer, closure, model, **kwargs)
+    237         # TODO(fabric): remove assertion once strategy's optimizer_step typing is fixed
+    238         assert isinstance(model, pl.LightningModule)
+--> 239         return self.precision_plugin.optimizer_step(optimizer, model=model, closure=closure, **kwargs)
+    240 
+    241     def _setup_model_and_optimizers(self, model: Module, optimizers: list[Optimizer]) -> tuple[Module, list[Optimizer]]:
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/plugins/precision/amp.py in optimizer_step(self, optimizer, model, closure, **kwargs)
+     77         if isinstance(optimizer, LBFGS):
+     78             raise MisconfigurationException("AMP and the LBFGS optimizer are not compatible.")
+---> 79         closure_result = closure()
+     80 
+     81         # If backward was skipped in automatic optimization (return None), unscaling is not needed
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/optimization/automatic.py in __call__(self, *args, **kwargs)
+    144     @override
+    145     def __call__(self, *args: Any, **kwargs: Any) -> Optional[Tensor]:
+--> 146         self._result = self.closure(*args, **kwargs)
+    147         return self._result.loss
+    148 
+
+/usr/local/lib/python3.11/dist-packages/torch/utils/_contextlib.py in decorate_context(*args, **kwargs)
+    114     def decorate_context(*args, **kwargs):
+    115         with ctx_factory():
+--> 116             return func(*args, **kwargs)
+    117 
+    118     return decorate_context
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/optimization/automatic.py in closure(self, *args, **kwargs)
+    129     @torch.enable_grad()
+    130     def closure(self, *args: Any, **kwargs: Any) -> ClosureResult:
+--> 131         step_output = self._step_fn()
+    132 
+    133         if step_output.closure_loss is None:
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/loops/optimization/automatic.py in _training_step(self, kwargs)
+    317         trainer = self.trainer
+    318 
+--> 319         training_step_output = call._call_strategy_hook(trainer, "training_step", *kwargs.values())
+    320         self.trainer.strategy.post_training_step()  # unused hook - call anyway for backward compatibility
+    321 
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/trainer/call.py in _call_strategy_hook(trainer, hook_name, *args, **kwargs)
+    327 
+    328     with trainer.profiler.profile(f"[Strategy]{trainer.strategy.__class__.__name__}.{hook_name}"):
+--> 329         output = fn(*args, **kwargs)
+    330 
+    331     # restore current_fx when nested context
+
+/usr/local/lib/python3.11/dist-packages/pytorch_lightning/strategies/strategy.py in training_step(self, *args, **kwargs)
+    389             if self.model != self.lightning_module:
+    390                 return self._forward_redirection(self.model, self.lightning_module, "training_step", *args, **kwargs)
+--> 391             return self.lightning_module.training_step(*args, **kwargs)
+    392 
+    393     def post_training_step(self) -> None:
+
+/tmp/ipykernel_55/1695239901.py in training_step(self, batch, batch_idx)
+     53             y = y.unsqueeze(0).unsqueeze(1)  # (1,1,H,W)
+     54         logits = self(x)
+---> 55         loss = self.criterion(logits, y)
+     56         self.log("train_loss", loss, prog_bar=False, on_step=False, on_epoch=True)
+     57         return loss
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py in _wrapped_call_impl(self, *args, **kwargs)
+   1737             return self._compiled_call_impl(*args, **kwargs)  # type: ignore[misc]
+   1738         else:
+-> 1739             return self._call_impl(*args, **kwargs)
+   1740 
+   1741     # torchrec tests the code consistency with the following code
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/modules/module.py in _call_impl(self, *args, **kwargs)
+   1748                 or _global_backward_pre_hooks or _global_backward_hooks
+   1749                 or _global_forward_hooks or _global_forward_pre_hooks):
+-> 1750             return forward_call(*args, **kwargs)
+   1751 
+   1752         result = None
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/modules/loss.py in forward(self, input, target)
+    819 
+    820     def forward(self, input: Tensor, target: Tensor) -> Tensor:
+--> 821         return F.binary_cross_entropy_with_logits(
+    822             input,
+    823             target,
+
+/usr/local/lib/python3.11/dist-packages/torch/nn/functional.py in binary_cross_entropy_with_logits(input, target, weight, size_average, reduce, reduction, pos_weight)
+   3637 
+   3638     if not (target.size() == input.size()):
+-> 3639         raise ValueError(
+   3640             f"Target size ({target.size()}) must be the same as input size ({input.size()})"
+   3641         )
+
+ValueError: Target size (torch.Size([1, 1483, 950])) must be the same as input size (torch.Size([1, 1, 1483, 950]))
+
+## === cell 15
+def fast_rle(
+    prediction_resized: np.ndarray, threshold: float, debug_print: bool = False
+) -> str:
+    flat = prediction_resized.astype(np.float32).reshape(-1)
+    flat = (flat > threshold).astype(np.uint8)
+
+    padded = np.pad(flat, (1, 1), mode="constant", constant_values=0)
+    changes = np.diff(padded)
+    starts = np.where(changes == 1)[0] + 1  # 1-indexed positions
+    ends = np.where(changes == -1)[0] + 1
+    lengths = ends - starts
+
+    if debug_print:
+        print("prediction_resized", ln.lovely(prediction_resized))
+        print("flat", ln.lovely(flat))
+        print("starts", ln.lovely(starts))
+        print("lengths", ln.lovely(lengths))
+
+    if len(starts) == 0:
+        return ""
+
+    rle = np.column_stack([starts, lengths]).reshape(-1)
+    return " ".join(map(str, rle.tolist()))
+
+
+
+
+## === cell 16
+submission_df = pd.read_csv(COMPETITION_DATA_DIR / "sample_submission.csv")
+submission_df = submission_df[["Id", "Predicted"]].copy()
+submission_df["Id"] = submission_df["Id"].astype(str)
+
+pred_map = {}
+for frag_id, prediction in zip(test_df["fragmet_id"].astype(str).tolist(), predictions):
+    pred_map[str(frag_id)] = prediction
+
+predictions_rle = []
+for frag_id in submission_df["Id"].tolist():
+    pred_tensor = pred_map.get(str(frag_id), None)
+    if pred_tensor is None:
+        predictions_rle.append("")
+        continue
+
+    mask_png_path = COMPETITION_DATA_DIR / "test" / str(frag_id) / "mask.png"
+    mask_img = Image.open(mask_png_path).convert("1")
+    mask = np.array(mask_img, dtype=np.uint8)
+
+    pred = pred_tensor.detach().float().cpu().numpy()  # (h,w) at downsampled resolution
+    pred_img = Image.fromarray(pred.astype(np.float32), mode="F")
+    pred_resized = np.array(
+        pred_img.resize(mask_img.size, resample=Image.BILINEAR), dtype=np.float32
+    )
+
+    pred_resized = pred_resized * mask.astype(np.float32)
+
+    mu = float(np.mean(pred_resized))
+    sd = float(np.std(pred_resized))
+    thr = mu + sd
+    if not np.isfinite(thr):
+        thr = 1.0
+    thr = float(np.clip(thr, 0.0, 1.0))
+
+    try:
+        prediction_rle = fast_rle(pred_resized, thr, debug_print=False)
+    except Exception:
+        prediction_rle = ""
+
+    predictions_rle.append(prediction_rle)
+
+submission_df["Predicted"] = predictions_rle
+submission_df.to_csv("submission.csv", index=False)
+submission_df
+
+## --- ERROR in cell 16, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/158453465.py in <cell line: 0>()
+      4 
+      5 pred_map = {}
+----> 6 for frag_id, prediction in zip(test_df["fragmet_id"].astype(str).tolist(), predictions):
+      7     pred_map[str(frag_id)] = prediction
+      8 
+
+NameError: name 'predictions' is not defined
+
+## --- ERROR in outputing the csv:
+Invalid submission: Expected 2 indices in the submission DataFrame, but got 6 indices.

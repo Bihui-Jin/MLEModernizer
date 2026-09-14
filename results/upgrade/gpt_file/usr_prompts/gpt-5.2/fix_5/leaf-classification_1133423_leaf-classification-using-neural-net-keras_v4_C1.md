@@ -1,0 +1,423 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Use binary leaf images and extracted features to identify the species of plant.
+
+## Metric
+Multi-class log loss. 
+
+The submitted probabilities for a given device are not required to sum to one because they are rescaled prior to being scored (each row is divided by the row sum), but they need to be in the range of [0, 1]. In order to avoid the extremes of the log function, predicted probabilities are replaced with \\(max(min(p,1-10^{-15}),10^{-15})\\).
+
+## Submission Format
+You must submit a csv file with the image id, all candidate species names, and a probability for each species. The order of the rows does not matter. The file must have a header and should look like the following:
+
+id,Acer_Capillipes,Acer_Circinatum,Acer_Mono,...
+2,0.1,0.5,0,0.2,...
+5,0,0.3,0,0.4,...
+6,0,0,0,0.7,...
+etc.
+
+## Dataset
+The dataset consists of images of leaf specimens which have been converted to binary black leaves against white backgrounds. 
+
+Three sets of features are also provided per image: a shape contiguous descriptor, an interior texture histogram, and a ﬁne-scale margin histogram. 
+
+For each feature, a 64-attribute vector is given per leaf sample.
+
+### File descriptions
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+- **images/** - the image files (each image is named with its corresponding id)
+
+### Data fields
+- **id** - an anonymous id unique to an image
+- **margin_1, margin_2, margin_3, ..., margin_64** - each of the 64 attribute vectors for the margin feature
+- **shape_1, shape_2, shape_3, ..., shape_64** - each of the 64 attribute vectors for the shape feature
+- **texture_1, texture_2, texture_3, ..., texture_64** - each of the 64 attribute vectors for the texture feature
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (70 lines)
+            images.zip (22.0 MB)
+            sample_submission.csv (100 lines)
+            sample_submission.csv.zip (2.3 kB)
+            test.csv (100 lines)
+            test.csv.zip (39.3 kB)
+            train.csv (892 lines)
+            train.csv.zip (357.1 kB)
+            images/
+                42.jpg (32.6 kB)
+                168.jpg (16.5 kB)
+                ... and 988 other files
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+        input/
+            description.md (70 lines)
+            images.zip (22.0 MB)
+            sample_submission.csv (100 lines)
+            sample_submission.csv.zip (2.3 kB)
+            test.csv (100 lines)
+            test.csv.zip (39.3 kB)
+            train.csv (892 lines)
+            train.csv.zip (357.1 kB)
+            images/
+                42.jpg (32.6 kB)
+                168.jpg (16.5 kB)
+                ... and 988 other files
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+        working/
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+```
+
+-> data/leaf-classification/sample_submission.csv has 99 rows and 100 columns.
+The columns are: id, Acer_Capillipes, Acer_Circinatum, Acer_Mono, Acer_Opalus, Acer_Palmatum, Acer_Pictum, Acer_Platanoids, Acer_Rubrum, Acer_Rufinerve, Acer_Saccharinum, Alnus_Cordata, Alnus_Maximowiczii, Alnus_Rubra, Alnus_Sieboldiana... and 85 more columns
+
+-> data/leaf-classification/test.csv has 99 rows and 193 columns.
+The columns are: id, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13, margin14... and 178 more columns
+
+-> data/leaf-classification/train.csv has 891 rows and 194 columns.
+The columns are: id, species, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13... and 179 more columns
+
+-> data/sample_submission.csv has 99 rows and 100 columns.
+The columns are: id, Acer_Capillipes, Acer_Circinatum, Acer_Mono, Acer_Opalus, Acer_Palmatum, Acer_Pictum, Acer_Platanoids, Acer_Rubrum, Acer_Rufinerve, Acer_Saccharinum, Alnus_Cordata, Alnus_Maximowiczii, Alnus_Rubra, Alnus_Sieboldiana... and 85 more columns
+
+-> data/test.csv has 99 rows and 193 columns.
+The columns are: id, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13, margin14... and 178 more columns
+
+-> data/train.csv has 891 rows and 194 columns.
+The columns are: id, species, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13... and 179 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+14.910585811583315
+
+# 6. Current score
+
+0.34664
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.32913) has done: 'I fix the environment/runtime issues caused by the old standalone `keras` import (protobuf/tf incompatibility) by switching to `tensorflow.keras`, which is the stable Kaggle runtime path. I also fix the `to_categorical` NameError by importing it from the correct module, and make the submission columns match `sample_submission.csv` exactly (your current code uses `train_labels.unique()` which can be unordered/mismatched). Finally, because your current score (4.5972) is already much better than the target (14.91) for a lower-is-better metric, I not change the model/training to improve score further—only correctness/stability fixes.'
+- What this solution (achieved 0.33379) has done: 'I fix the TensorFlow import crash (`MessageFactory.GetPrototype`) by forcing TensorFlow to use the pure-Python protobuf implementation before importing TF, which is the common Kaggle-safe workaround for this exact error. I also make the input directory selection correctly find your `leaf-classification/` dataset files (your current `INPUT_DIR` points to a parent directory that may not contain the CSVs directly). Finally, I keep the model/training and submission logic the same (since your score is already far better than the target for a lower-is-better metric), only ensuring the pipeline runs end-to-end and writes a valid `submission.csv`.'
+- What this solution (achieved 0.33836) has done: 'I fix the TensorFlow/protobuf crash by setting the necessary environment variables *before* any TensorFlow-related import and by ensuring we import `tensorflow` only after that point. I also make the input-path discovery more deterministic (prefer the `leaf-classification` folder when present) while keeping your existing `find_file` fallback intact. The model architecture, training loop, and prediction/submission logic remain the same so the score should stay in the same ballpark (and it’s already better than the target for a lower-is-better metric). Finally, I renumber cells to start at 1 and keep everything running end-to-end to produce `submission.csv`.'
+- What this solution (achieved 0.34664) has done: 'We fix the TensorFlow/protobuf crash by setting the needed environment variables *and* forcing the pure-Python protobuf implementation before importing TensorFlow, plus clearing any partially imported protobuf modules to avoid the `MessageFactory.GetPrototype` mismatch. This is a runtime-stability fix only; the model architecture, training loop, and prediction logic remain unchanged to avoid moving your already-better-than-target score. We also keep the existing robust input-path discovery and ensure the submission columns match `sample_submission.csv` exactly and the file is written as `submission.csv`. The result should run end-to-end in Kaggle and produce a valid submission CSV.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import sys
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "2"
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
+
+for m in list(sys.modules.keys()):
+    if m.startswith("google.protobuf"):
+        del sys.modules[m]
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+INPUT_DIR_CANDIDATES = [
+    "/kaggle/input",
+    "/kaggle/data/input",
+    "/kaggle/data",
+    "../input",
+]
+
+
+def pick_input_dir(candidates):
+    for base in candidates:
+        if not os.path.exists(base):
+            continue
+        leaf_sub = os.path.join(base, "leaf-classification")
+        if os.path.exists(leaf_sub):
+            return leaf_sub
+        return base
+    return "../input"
+
+
+INPUT_DIR = pick_input_dir(INPUT_DIR_CANDIDATES)
+
+print("Using INPUT_DIR =", INPUT_DIR)
+try:
+    print("Top-level entries:", os.listdir(INPUT_DIR)[:20])
+except Exception as e:
+    print("Could not list INPUT_DIR:", e)
+
+
+
+## === cell 1
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.utils import to_categorical
+
+np.random.seed(42)
+tf.random.set_seed(42)
+
+print("TensorFlow version:", tf.__version__)
+
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 2
+def find_file(filename: str) -> str:
+    direct = os.path.join(INPUT_DIR, filename)
+    if os.path.exists(direct):
+        return direct
+
+    parent = os.path.dirname(INPUT_DIR)
+    if parent and os.path.exists(parent):
+        subpath = os.path.join(parent, filename)
+        if os.path.exists(subpath):
+            return subpath
+
+    for sub in os.listdir(INPUT_DIR):
+        subpath = os.path.join(INPUT_DIR, sub, filename)
+        if os.path.exists(subpath):
+            return subpath
+
+    for root, _, files in os.walk(INPUT_DIR):
+        if filename in files:
+            return os.path.join(root, filename)
+
+    raise FileNotFoundError(f"Could not find {filename} under {INPUT_DIR}")
+
+
+train_path = find_file("train.csv")
+test_path = find_file("test.csv")
+sample_path = find_file("sample_submission.csv")
+
+print("train_path =", train_path)
+print("test_path  =", test_path)
+print("sample_path=", sample_path)
+
+train_df = pd.read_csv(train_path)
+test_df = pd.read_csv(test_path)
+sample_sub = pd.read_csv(sample_path)
+
+
+
+## === cell 3
+train_df.head()
+
+
+
+## === cell 4
+test_df.head()
+
+
+
+## === cell 5
+train_df = train_df.copy()
+test_df = test_df.copy()
+
+train_df.pop("id")
+train_labels = train_df.pop("species")
+test_data_id = test_df.pop("id")
+
+print("Train features shape:", train_df.shape)
+print("Test features shape :", test_df.shape)
+print("Train labels shape  :", train_labels.shape)
+
+
+
+## === cell 6
+train_arr = train_df.values
+test_arr = test_df.values
+
+print("train_arr:", train_arr.shape)
+print("test_arr :", test_arr.shape)
+
+
+
+## === cell 7
+labelEncoder = LabelEncoder()
+train_labels_list = list(train_labels)
+transformed_train_labels = labelEncoder.fit(train_labels_list).transform(
+    train_labels_list
+)
+
+train_labels_arr = to_categorical(transformed_train_labels)
+
+print("One-hot labels shape:", train_labels_arr.shape)
+print("Num classes:", train_labels_arr.shape[1])
+
+
+
+## === cell 8
+X_train, X_val, Y_train, Y_val = train_test_split(
+    train_arr,
+    train_labels_arr,
+    test_size=0.2,
+    random_state=42,
+    stratify=transformed_train_labels,
+)
+
+print("X_train:", X_train.shape)
+print("Y_train:", Y_train.shape)
+print("X_val  :", X_val.shape)
+print("Y_val  :", Y_val.shape)
+
+
+
+## === cell 9
+model = Sequential()
+model.add(
+    Dense(
+        128,
+        kernel_initializer="uniform",
+        input_dim=train_arr.shape[1],
+        activation="tanh",
+    )
+)
+model.add(Dropout(0.25))
+model.add(Dense(train_labels_arr.shape[1], activation="softmax"))
+
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+model.summary()
+
+
+
+## === cell 10
+model_history = model.fit(
+    x=X_train,
+    y=Y_train,
+    epochs=200,
+    batch_size=64,
+    validation_data=(X_val, Y_val),
+    verbose=1,
+)
+
+
+
+## === cell 11
+predictions = model.predict(test_arr, batch_size=32, verbose=1)
+predictions = np.clip(predictions, 0.0, 1.0)
+
+print("predictions shape:", predictions.shape)
+
+
+
+## === cell 12
+plt.plot(model_history.history["loss"])
+plt.plot(model_history.history["val_loss"])
+plt.xlabel("epoch")
+plt.ylabel("loss")
+plt.title("model loss")
+plt.legend(["train", "validation"])
+plt.show()
+
+
+
+## === cell 13
+acc_key = "accuracy" if "accuracy" in model_history.history else "acc"
+val_acc_key = "val_accuracy" if "val_accuracy" in model_history.history else "val_acc"
+
+plt.plot(model_history.history[acc_key])
+plt.plot(model_history.history[val_acc_key])
+plt.xlabel("epoch")
+plt.ylabel("accuracy")
+plt.title("model accuracy")
+plt.legend(["train", "validation"])
+plt.show()
+
+
+
+## === cell 14
+submission_cols = list(sample_sub.columns)
+assert (
+    submission_cols[0] == "id"
+), "Unexpected submission format: first column must be 'id'"
+class_cols = submission_cols[1:]
+
+encoded_class_names = list(labelEncoder.classes_)
+if len(encoded_class_names) != predictions.shape[1]:
+    raise ValueError("Mismatch between encoded classes and prediction columns.")
+
+pred_df = pd.DataFrame(predictions, columns=encoded_class_names)
+
+pred_df = pred_df.reindex(columns=class_cols, fill_value=0.0)
+
+submission = pd.DataFrame({"id": test_data_id.values})
+submission = pd.concat([submission, pred_df.reset_index(drop=True)], axis=1)
+
+print("submission shape:", submission.shape)
+print(submission.head())
+
+
+
+## === cell 15
+submission.to_csv("submission.csv", index=False)
+print(
+    "Wrote submission.csv with columns:",
+    submission.columns[:5].tolist(),
+    "... total cols:",
+    len(submission.columns),
+)

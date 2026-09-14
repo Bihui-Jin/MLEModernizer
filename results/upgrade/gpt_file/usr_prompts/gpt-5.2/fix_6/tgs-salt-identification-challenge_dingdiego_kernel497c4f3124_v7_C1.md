@@ -1,0 +1,530 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Segment regions of salt in seismic images.
+
+## Metric
+Mean average precision at different intersection over union (IoU) thresholds. The IoU of a proposed set of object pixels and a set of true object pixels is calculated as:
+
+$$\text{IoU}(A, B)=\frac{A \cap B}{A \cup B}$$
+
+The metric sweeps over a range of IoU thresholds, at each point calculating an average precision value. The threshold values range from 0.5 to 0.95 with a step size of 0.05: `(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95)`. In other words, at a threshold of 0.5, a predicted object is considered a "hit" if its intersection over union with a ground truth object is greater than 0.5.
+
+At each threshold value 𝑡t, a precision value is calculated based on the number of true positives (TP), false negatives (FN), and false positives (FP) resulting from comparing the predicted object to all ground truth objects:
+
+$$\frac{T P(t)}{T P(t)+F P(t)+F N(t)}$$
+
+A true positive is counted when a single predicted object matches a ground truth object with an IoU above the threshold. A false positive indicates a predicted object had no associated ground truth object. A false negative indicates a ground truth object had no associated predicted object. The average precision of a single image is then calculated as the mean of the above precision values at each IoU threshold:
+
+$$\frac{1}{\mid \text { thresholds } \mid} \sum_t \frac{T P(t)}{T P(t)+F P(t)+F N(t)}$$
+
+## Submission Format
+Use run-length encoding on the pixel values. Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The pixels are one-indexed\
+and numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. It also checks that no two predicted masks for the same image are overlapping.
+
+The file should contain a header and have the following format. Each row in your submission represents a single predicted salt segmentation for the given image.
+
+```
+id,rle_mask
+3e06571ef3,1 1
+a51b08d882,1 1
+c32590b06f,1 1
+etc.
+```
+
+## Dataset
+The data is a set of images chosen at various locations chosen at random in the subsurface. The images are 101 x 101 pixels and each pixel is classified as either salt or sediment. In addition to the seismic images, the depth of the imaged location is provided for each image.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            depths.csv (3001 lines)
+            depths.csv.zip (25.0 kB)
+            description.md (83 lines)
+            sample_submission.csv (1001 lines)
+            sample_submission.csv.zip (6.8 kB)
+            test.zip (9.8 MB)
+            train.csv (3001 lines)
+            train.csv.zip (293.9 kB)
+            train.zip (30.9 MB)
+            test/
+                images/
+                    a05ae39815.png (10.5 kB)
+                    9bf8a38b92.png (10.7 kB)
+                    ... and 998 other files
+                test/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+            train/
+                images/
+                    66cf41c563.png (7.7 kB)
+                    429bf7c665.png (8.2 kB)
+                    ... and 2998 other files
+                masks/
+                    6eeeda7f4a.png (230 Bytes)
+                    5d600057f5.png (230 Bytes)
+                    ... and 2998 other files
+                train/
+        input/
+            depths.csv (3001 lines)
+            depths.csv.zip (25.0 kB)
+            description.md (83 lines)
+            sample_submission.csv (1001 lines)
+            sample_submission.csv.zip (6.8 kB)
+            test.zip (9.8 MB)
+            train.csv (3001 lines)
+            train.csv.zip (293.9 kB)
+            train.zip (30.9 MB)
+            test/
+                images/
+                    a05ae39815.png (10.5 kB)
+                    9bf8a38b92.png (10.7 kB)
+                    ... and 998 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+            train/
+                images/
+                    66cf41c563.png (7.7 kB)
+                    429bf7c665.png (8.2 kB)
+                    ... and 2998 other files
+                masks/
+                    6eeeda7f4a.png (230 Bytes)
+                    5d600057f5.png (230 Bytes)
+                    ... and 2998 other files
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+        working/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+```
+
+-> data/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> data/sample_submission.csv has 1000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/tgs-salt-identification-challenge/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> data/tgs-salt-identification-challenge/sample_submission.csv has 1000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/tgs-salt-identification-challenge/train.csv has 3000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/train.csv has 3000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> input/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.799385547382085
+
+# 6. Current score
+
+0.0
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5221) has done: 'We remove the unavailable `pydensecrf` dependency (it isn’t installed in your environment) and replace the CRF step with a lightweight, deterministic post-processing that keeps the same “refine predicted mask then re-encode to RLE” core intent. We also convert notebook-only commands (`%matplotlib inline`, `ls`) into Python-safe code so the script runs end-to-end. The code robustly locate a baseline `submission.csv` if present; otherwise it fall back to `sample_submission.csv` to still produce a valid `.csv` file. Finally, we fix NaN handling, ensure masks are binary `0/1`, and write the required `id,rle_mask` submission as `crf_correction.csv`.'
+- What this solution (achieved 0.5221) has done: 'Your current score is far below the target (0.5221 vs 0.7994), so we should improve the post-processing in the smallest possible way without changing the overall “decode → refine → encode” pipeline. The biggest likely issue is that your RLE decode/encode uses row-major (`order="C"`) flattening, but this competition’s RLE is column-major (top-to-bottom then left-to-right), so the masks you output are effectively transposed in encoding space, heavily hurting IoU/AP. I fix `rle_decode`/`rle_encode` to the correct column-major convention (Fortran order) while keeping everything else the same. Additionally, I make `refine_mask` slightly safer by removing tiny connected components (a common TGS Salt cleanup) without changing the model logic—still deterministic post-processing.'
+- What this solution (achieved 0.5221) has done: 'Your score gap to the target is large (0.5221 vs 0.7994), so the most likely low-risk gain is fixing submission correctness issues rather than changing modeling. The current script only refines non-empty masks from the baseline file; if the baseline is weak/sparse, most test rows remain empty and score stays low. I keep the exact same “decode → refine → encode” logic, but apply it to every test id by generating a mask from the actual test image intensity when the baseline RLE is empty, then running the same refinement and encoding. This stays within the same post-processing semantics while making predictions non-trivial for all images, which should move mAP upward toward the target.'
+- What this solution (achieved 0.5221) has done: 'Your current score (0.5221) is far below the target (0.7994), so we should improve predictions without changing the overall “decode → refine → encode” post-processing pipeline. The biggest low-risk gain is fixing the fallback mask generation: a fixed threshold of 0.5 is usually wrong for these grayscale seismic images, producing near-empty or noisy masks. I keep your same refinement logic, but change `initial_mask_from_image` to use a deterministic per-image Otsu threshold and then pass it through the same `refine_mask`. Additionally, I calibrate the final binarization using a small fixed probability threshold (still deterministic) and adjust `min_size` slightly to reduce false positives, which typically improves mAP toward your target.'
+- What this solution (achieved 0.0) has done: 'Your current score (0.5221) is far below the target (0.7994), so we should make small, legitimate post-processing changes that usually yield a meaningful uplift without changing your overall decode→refine→encode pipeline. The main issue is that the “empty baseline” path currently produces very noisy masks (Otsu on raw images often segments geology textures as salt), which creates many false positives and drags mAP down; we keep Otsu but constrain it with a conservative prior: if the Otsu mask coverage is implausibly large/small, fall back to an inverted threshold or empty mask. We also tune `refine_mask` minimally by filling small holes and using a slightly more robust connectivity for removing small objects—both are deterministic and keep the same core semantics. Finally, we ensure we iterate in the exact sample_submission order and never change ids/row alignment while writing `crf_correction.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import glob
+import numpy as np
+import pandas as pd
+
+from skimage.io import imread
+from skimage.morphology import (
+    binary_opening,
+    binary_closing,
+    binary_fill_holes,
+    disk,
+    remove_small_objects,
+)
+from skimage.filters import threshold_otsu
+from tqdm import tqdm
+
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
+np.random.seed(42)
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+ImportError                               Traceback (most recent call last)
+/tmp/ipykernel_11/2635068220.py in <cell line: 0>()
+      5 
+      6 from skimage.io import imread
+----> 7 from skimage.morphology import (
+      8     binary_opening,
+      9     binary_closing,
+
+ImportError: cannot import name 'binary_fill_holes' from 'skimage.morphology' (/usr/local/lib/python3.11/dist-packages/skimage/morphology/__init__.py)
+
+## === cell 1
+def rle_decode(rle_mask, shape=(101, 101)):
+    """
+    Competition-correct RLE decode for TGS Salt:
+    Pixels are 1-indexed and enumerated top-to-bottom, then left-to-right,
+    which corresponds to column-major (Fortran) flattening.
+    """
+    if rle_mask is None:
+        return np.zeros(shape, dtype=np.uint8)
+    if not isinstance(rle_mask, str) or rle_mask.strip() == "":
+        return np.zeros(shape, dtype=np.uint8)
+
+    s = rle_mask.split()
+    starts, lengths = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
+    starts -= 1
+    ends = starts + lengths
+
+    img = np.zeros(shape[0] * shape[1], dtype=np.uint8)
+    for lo, hi in zip(starts, ends):
+        img[lo:hi] = 1
+
+    return img.reshape(shape, order="F")
+
+
+def rle_encode(im):
+    """
+    Competition-correct RLE encode for TGS Salt:
+    Use column-major (Fortran) flattening.
+    """
+    im = (im > 0).astype(np.uint8)
+    pixels = im.flatten(order="F")
+    pixels = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
+    runs[1::2] -= runs[::2]
+    return " ".join(str(x) for x in runs)
+
+
+
+
+## === cell 2
+TEST_IMG_DIR = "../input/tgs-salt-identification-challenge/test/images/"
+SAMPLE_SUB_PATH = "../input/tgs-salt-identification-challenge/sample_submission.csv"
+
+baseline_candidates = sorted(glob.glob("../input/*/submission.csv"))
+baseline_path = baseline_candidates[0] if len(baseline_candidates) > 0 else None
+
+if baseline_path is not None and os.path.exists(baseline_path):
+    sub_in_path = baseline_path
+else:
+    sub_in_path = SAMPLE_SUB_PATH
+
+df = pd.read_csv(sub_in_path)
+
+if "id" not in df.columns:
+    raise ValueError(f"Input submission file missing 'id' column: {sub_in_path}")
+if "rle_mask" not in df.columns:
+    possible = [c for c in df.columns if "rle" in c.lower()]
+    if possible:
+        df = df.rename(columns={possible[0]: "rle_mask"})
+    else:
+        df["rle_mask"] = ""
+
+df["rle_mask"] = df["rle_mask"].fillna("").astype(str)
+
+sample_df = pd.read_csv(SAMPLE_SUB_PATH)[["id"]]
+df = sample_df.merge(df[["id", "rle_mask"]], on="id", how="left")
+df["rle_mask"] = df["rle_mask"].fillna("").astype(str)
+
+print(f"Loaded {len(df)} rows from: {sub_in_path} (aligned to sample_submission order)")
+print(f"Test image dir exists: {os.path.isdir(TEST_IMG_DIR)} ({TEST_IMG_DIR})")
+print(df.head())
+
+
+
+## === cell 3
+"""
+Replacement for CRF refinement (pydensecrf not available in this environment).
+
+We keep the same pipeline semantics:
+- decode baseline predicted RLE -> binary mask
+- refine mask using deterministic post-processing
+- encode back to RLE
+
+Change (score improvement toward target):
+- The biggest mAP drag in this lightweight approach is false positives from the "empty baseline"
+  initialization. Raw per-image Otsu can over-segment textures, producing huge masks.
+  We keep Otsu (same idea) but add a deterministic plausibility guard on mask coverage and allow
+  inverted-threshold fallback; otherwise output empty mask. This typically reduces FP and lifts mAP.
+- Add hole filling after closing/opening to improve IoU for contiguous salt regions (common in TGS).
+"""
+
+
+def refine_mask(mask, radius_open=1, radius_close=2, min_size=30, fill_holes=True):
+    """
+    Simple morphological refinement:
+    - closing to fill small gaps
+    - opening to remove small speckles
+    - optionally fill holes (improves IoU for blob-like salt regions)
+    - remove very small connected components (reduces FP noise)
+    """
+    m = mask > 0
+    if radius_close and radius_close > 0:
+        m = binary_closing(m, disk(radius_close))
+    if radius_open and radius_open > 0:
+        m = binary_opening(m, disk(radius_open))
+    if fill_holes:
+        m = binary_fill_holes(m)
+
+    if min_size and min_size > 0:
+        m = remove_small_objects(m.astype(bool), min_size=min_size, connectivity=2)
+
+    return m.astype(np.uint8)
+
+
+def initial_mask_from_image(img):
+    """
+    Deterministic initial mask when baseline is empty.
+
+    Change (score improvement toward target):
+    - Use Otsu threshold per image, but constrain by plausible coverage to avoid massive false positives.
+    - If coverage is implausible, try inverted threshold; if still implausible, return empty mask.
+    """
+    if img.ndim == 3:
+        img = img[..., 0]
+    x = img.astype(np.float32)
+    if x.max() > 1.0:
+        x = x / 255.0
+
+    try:
+        t = float(threshold_otsu(x))
+    except Exception:
+        t = 0.5
+
+    m1 = (x > t).astype(np.uint8)
+    cov1 = float(m1.mean())
+
+    if 0.003 <= cov1 <= 0.65:
+        return m1
+
+    m2 = (x < t).astype(np.uint8)
+    cov2 = float(m2.mean())
+    if 0.003 <= cov2 <= 0.65:
+        return m2
+
+    return np.zeros_like(m1, dtype=np.uint8)
+
+
+def final_binarize(mask, thr=0.5):
+    """
+    Explicit deterministic binarization step before encoding.
+    """
+    return (mask > thr).astype(np.uint8)
+
+
+
+
+## === cell 4
+if plt is not None:
+    n_show = min(6, len(df))
+    idxs = [i for i in range(len(df)) if df.loc[i, "rle_mask"].strip() != ""]
+    idxs = idxs[:n_show] if len(idxs) > 0 else list(range(n_show))
+
+    plt.figure(figsize=(18, 6))
+    for j, i in enumerate(idxs):
+        decoded = rle_decode(df.loc[i, "rle_mask"])
+        refined = refine_mask(decoded)
+        plt.subplot(2, n_show, j + 1)
+        plt.imshow(decoded, cmap="gray")
+        plt.title(f"orig {df.loc[i,'id']}")
+        plt.axis("off")
+        plt.subplot(2, n_show, n_show + j + 1)
+        plt.imshow(refined, cmap="gray")
+        plt.title("refined")
+        plt.axis("off")
+    plt.tight_layout()
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/2953306443.py in <cell line: 0>()
+----> 1 if plt is not None:
+      2     n_show = min(6, len(df))
+      3     idxs = [i for i in range(len(df)) if df.loc[i, "rle_mask"].strip() != ""]
+      4     idxs = idxs[:n_show] if len(idxs) > 0 else list(range(n_show))
+      5 
+
+NameError: name 'plt' is not defined
+
+## === cell 5
+missing_img_count = 0
+empty_baseline_filled = 0
+
+for i in tqdm(range(df.shape[0]), desc="Refining masks"):
+    img_id = df.at[i, "id"]
+    img_path = os.path.join(TEST_IMG_DIR, f"{img_id}.png")
+
+    rle = df.at[i, "rle_mask"]
+    has_rle = isinstance(rle, str) and rle.strip() != ""
+
+    if not os.path.exists(img_path):
+        missing_img_count += 1
+        if has_rle:
+            decoded_mask = rle_decode(rle)
+            refined = refine_mask(decoded_mask)
+            refined = final_binarize(refined, thr=0.5)
+            df.at[i, "rle_mask"] = rle_encode(refined)
+        else:
+            df.at[i, "rle_mask"] = ""
+        continue
+
+    img = imread(img_path)  # keep parity with original intent
+
+    if has_rle:
+        decoded_mask = rle_decode(rle)
+    else:
+        decoded_mask = initial_mask_from_image(img)
+        empty_baseline_filled += 1
+
+    refined = refine_mask(decoded_mask)
+    refined = final_binarize(refined, thr=0.5)
+    df.at[i, "rle_mask"] = rle_encode(refined)
+
+print(f"Missing test images encountered: {missing_img_count}")
+print(f"Empty baseline rows replaced with image-based init: {empty_baseline_filled}")
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1719764260.py in <cell line: 0>()
+      2 empty_baseline_filled = 0
+      3 
+----> 4 for i in tqdm(range(df.shape[0]), desc="Refining masks"):
+      5     img_id = df.at[i, "id"]
+      6     img_path = os.path.join(TEST_IMG_DIR, f"{img_id}.png")
+
+NameError: name 'tqdm' is not defined
+
+## === cell 6
+out_path = "crf_correction.csv"
+df[["id", "rle_mask"]].to_csv(out_path, index=False)
+
+print(f"Wrote submission: {out_path}")
+print(df.head())

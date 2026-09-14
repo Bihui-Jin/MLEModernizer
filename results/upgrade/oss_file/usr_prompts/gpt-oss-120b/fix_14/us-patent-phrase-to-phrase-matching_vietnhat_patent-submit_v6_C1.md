@@ -1,0 +1,393 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given pairs of phrases (an `anchor` and a `target` phrase), build a model to rate how similar they are.  
+
+## Metric
+Pearson correlation coefficient.
+
+## Submission Format
+For each `id` (representing a pair of phrases) in the test set, you must predict the similarity `score`. The file should contain a header and have the following format:
+
+```
+id,score
+4112d61851461f60,0
+09e418c93a776564,0.25
+36baf228038e314b,1
+etc.
+
+```
+
+## Dataset
+The scores are in the 0-1 range with increments of 0.25 with the following meanings:
+
+- **1.0** - Very close match. This is typically an exact match except possibly for differences in conjugation, quantity (e.g. singular vs. plural), and addition or removal of stopwords (e.g. "the", "and", "or").
+- **0.75** - Close synonym, e.g. "mobile phone" vs. "cellphone". This also includes abbreviations, e.g. "TCP" -> "transmission control protocol".
+- **0.5** - Synonyms which don't have the same meaning (same function, same properties). This includes broad-narrow (hyponym) and narrow-broad (hypernym) matches.
+- **0.25** - Somewhat related, e.g. the two phrases are in the same high level domain but are not synonyms. This also includes antonyms.
+- **0.0** - Unrelated.
+
+Files
+-----
+
+- **train.csv** - the training set, containing phrases, contexts, and their similarity scores
+- **test.csv** - the test set set, identical in structure to the training set but without the score
+- **sample_submission.csv** - a sample submission file in the correct format
+
+Columns
+-------
+
+- `id` - a unique identifier for a pair of phrases
+- `anchor` - the first phrase
+- `target` - the second phrase
+- `context` - the [CPC classification (version 2021.05)](https://en.wikipedia.org/wiki/Cooperative_Patent_Classification), which indicates the subject within which the similarity is to be scored
+- `score` - the similarity. This is sourced from a combination of one or more manual expert ratings.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sentence-transformers==4.1.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+transformers==4.53.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        working/
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+```
+
+-> data/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> data/us-patent-phrase-to-phrase-matching/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/us-patent-phrase-to-phrase-matching/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/us-patent-phrase-to-phrase-matching/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> input/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8210748332613725
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.38428) has done: 'The timeout was caused by encoding each row individually with `SentenceTransformer.encode`, which runs the model many thousands of times.  
+We replace the per‑row `apply` calls with a single batched encode for all “context + anchor” strings and all “target” strings, then concatenate the two matrices. This uses the same model, yields identical embeddings, and reduces runtime dramatically while keeping the rest of the pipeline unchanged.'
+- What this solution (achieved 0.55296) has done: 'I fix the protobuf import error by setting the compatibility environment variable before importing any libraries, and I replace the high‑dimensional concatenated embeddings with a single cosine‑similarity feature (which better captures phrase similarity). This keeps the overall pipeline unchanged while providing a more informative feature for the Ridge regressor, helping the Pearson correlation move toward the target score. The script now writes a proper `submission.csv` file.'
+- What this solution (achieved 0.38267) has done: 'I fixed the protobuf import error by removing the `SentenceTransformer` import, which caused the incompatibility, and replaced it with a lightweight embedding pipeline using HuggingFace `AutoTokenizer` and `AutoModel`. The new pipeline batches encoding for efficiency, builds concatenated embeddings of “context + anchor” and “target”, and feeds them to a Ridge regressor (instead of just cosine similarity). This richer feature set markedly improves the Pearson correlation, moving the score toward the target while keeping the overall workflow unchanged and ensuring a proper `submission.csv` is written.'
+- What this solution (achieved 0.38428) has done: 'I replace the failing `AutoTokenizer`/`AutoModel` loading with the higher‑level `SentenceTransformer` class, which avoids the protobuf incompatibility and still provides fast batched embeddings. The rest of the pipeline (concatenating both embeddings and training a Ridge regressor) stays unchanged, ensuring a valid `submission.csv` is written while moving the Pearson score closer to the target.'
+- What this solution (achieved 0.55296) has done: 'I fixed the protobuf import error by replacing `SentenceTransformer` with `AutoTokenizer` and `AutoModel` from `transformers`, which avoids the incompatible protobuf version. I also switched the feature from raw concatenated embeddings to a single cosine‑similarity value between the “context + anchor” and “target” embeddings—this matches the earlier successful tweak and improves Pearson correlation while keeping the overall pipeline unchanged. The script now runs end‑to‑end and writes a correct `submission.csv`.'
+- What this solution (achieved 0.61749) has done: 'We replace the failing `AutoTokenizer`/`AutoModel` loading with `SentenceTransformer`, which avoids the protobuf error, and expand the feature set from a single cosine‑similarity value to the concatenated embeddings of the two phrases (plus cosine similarity). This keeps the original workflow while providing richer information to the Ridge regressor, which should raise the Pearson correlation toward the target score and also fixes the runtime exception.'
+- What this solution (achieved 0.63137) has done: 'We replace the failing `SentenceTransformer` with a HuggingFace `AutoTokenizer` / `AutoModel` pipeline for embedding generation, keeping the same model name.  
+We also enrich the feature matrix by adding element‑wise absolute differences and products of the two phrase embeddings, while preserving the existing cosine similarity feature. These changes fix the protobuf import error and provide extra informative signals, expected to move the Pearson correlation toward the target score without altering the overall workflow.'
+- What this solution (achieved 0.63302) has done: 'The fix replaces the failing `AutoTokenizer`/`AutoModel` loading with the higher‑level `SentenceTransformer`, which avoids the protobuf incompatibility and still provides mean‑pooled embeddings. The embedding function now uses `SentenceTransformer.encode` in batches, preserving the same feature construction (cosine similarity, raw vectors, absolute differences, and element‑wise products). No other logic is altered, so the workflow and model remain unchanged while ensuring the script runs end‑to‑end and writes a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["WANDB_DISABLED"] = "true"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+import random
+import numpy as np
+import pandas as pd
+import torch
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
+from transformers import AutoTokenizer, AutoModel
+
+random.seed(42)
+np.random.seed(42)
+torch.manual_seed(42)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(42)
+    torch.backends.cudnn.benchmark = True  # faster convolution kernels on GPU
+
+
+
+## === cell 1
+TRAIN_PATH = "../input/us-patent-phrase-to-phrase-matching/train.csv"
+TEST_PATH = "../input/us-patent-phrase-to-phrase-matching/test.csv"
+
+train_df = pd.read_csv(TRAIN_PATH)
+test_df = pd.read_csv(TEST_PATH)
+
+
+
+## === cell 2
+MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+if device.type == "cuda":
+    model = AutoModel.from_pretrained(MODEL_NAME, torch_dtype=torch.float16).to(device)
+else:
+    model = AutoModel.from_pretrained(MODEL_NAME).to(device)
+model.eval()
+
+
+def mean_pooling(model_output, attention_mask):
+    token_embeddings = model_output[
+        0
+    ]  # First element of output contains all token embeddings
+    input_mask_expanded = (
+        attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
+    )
+    return torch.sum(token_embeddings * input_mask_expanded, dim=1) / torch.clamp(
+        input_mask_expanded.sum(dim=1), min=1e-9
+    )
+
+
+def embed_texts(texts, batch_size=512):
+    """
+    Encode a list of strings into a NumPy array of embeddings using a transformer,
+    but deduplicate identical strings first to avoid redundant work.
+    """
+    uniq_texts, inv_idx = pd.factorize(texts, sort=False)
+    n_unique = len(uniq_texts)
+    embed_dim = model.config.hidden_size  # e.g., 768 for all‑mpnet‑base‑v2
+    uniq_embeddings = np.empty((n_unique, embed_dim), dtype=np.float32)
+
+    with torch.inference_mode():
+        for start in range(0, n_unique, batch_size):
+            batch = uniq_texts[start : start + batch_size]
+            encoded = tokenizer(
+                batch.tolist(),
+                padding=True,
+                truncation=True,
+                return_tensors="pt",
+                max_length=256,
+            ).to(device, non_blocking=True)
+
+            model_output = model(**encoded)
+            batch_emb = mean_pooling(model_output, encoded["attention_mask"])
+            uniq_embeddings[start : start + batch_emb.shape[0]] = (
+                batch_emb.cpu().numpy()
+            )
+
+    all_embeddings = uniq_embeddings[inv_idx]
+    return all_embeddings
+
+
+train_txt1 = (train_df["context"] + " " + train_df["anchor"]).tolist()
+train_txt2 = train_df["target"].tolist()
+vec1_train = embed_texts(train_txt1)
+vec2_train = embed_texts(train_txt2)
+
+dot_prod = np.sum(vec1_train * vec2_train, axis=1)
+norm1 = np.linalg.norm(vec1_train, axis=1)
+norm2 = np.linalg.norm(vec2_train, axis=1)
+cosine_sim_train = dot_prod / (norm1 * norm2 + 1e-8)
+
+abs_diff_train = np.abs(vec1_train - vec2_train)
+prod_train = vec1_train * vec2_train
+
+X = np.hstack(
+    [
+        cosine_sim_train.reshape(-1, 1),
+        vec1_train,
+        vec2_train,
+        abs_diff_train,
+        prod_train,
+    ]
+)
+
+y = train_df["score"].values.astype(np.float32)
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 3
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+X_train, X_val, y_train, y_val = train_test_split(
+    X_scaled, y, test_size=0.1, random_state=42
+)
+
+regressor = Ridge(alpha=1.0, random_state=42)
+regressor.fit(X_train, y_train)
+
+val_pred = regressor.predict(X_val)
+val_rmse = mean_squared_error(y_val, val_pred, squared=False)
+print(f"Validation RMSE: {val_rmse:.4f}")
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3752905143.py in <cell line: 0>()
+      1 scaler = StandardScaler()
+----> 2 X_scaled = scaler.fit_transform(X)
+      3 
+      4 X_train, X_val, y_train, y_val = train_test_split(
+      5     X_scaled, y, test_size=0.1, random_state=42
+
+NameError: name 'X' is not defined
+
+## === cell 4
+test_txt1 = (test_df["context"] + " " + test_df["anchor"]).tolist()
+test_txt2 = test_df["target"].tolist()
+vec1_test = embed_texts(test_txt1)
+vec2_test = embed_texts(test_txt2)
+
+dot_prod_test = np.sum(vec1_test * vec2_test, axis=1)
+norm1_test = np.linalg.norm(vec1_test, axis=1)
+norm2_test = np.linalg.norm(vec2_test, axis=1)
+cosine_sim_test = dot_prod_test / (norm1_test * norm2_test + 1e-8)
+
+abs_diff_test = np.abs(vec1_test - vec2_test)
+prod_test = vec1_test * vec2_test
+
+X_test = np.hstack(
+    [
+        cosine_sim_test.reshape(-1, 1),
+        vec1_test,
+        vec2_test,
+        abs_diff_test,
+        prod_test,
+    ]
+)
+
+X_test_scaled = scaler.transform(X_test)
+
+test_pred = regressor.predict(X_test_scaled)
+test_pred = np.clip(test_pred, 0.0, 1.0)
+
+submission = pd.DataFrame({"id": test_df["id"], "score": test_pred})
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission saved to {submission_path}")
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/886053725.py in <cell line: 0>()
+      1 test_txt1 = (test_df["context"] + " " + test_df["anchor"]).tolist()
+      2 test_txt2 = test_df["target"].tolist()
+----> 3 vec1_test = embed_texts(test_txt1)
+      4 vec2_test = embed_texts(test_txt2)
+      5 
+
+/tmp/ipykernel_11/1040604278.py in embed_texts(texts, batch_size)
+     36         for start in range(0, n_unique, batch_size):
+     37             batch = uniq_texts[start : start + batch_size]
+---> 38             encoded = tokenizer(
+     39                 batch.tolist(),
+     40                 padding=True,
+
+/usr/local/lib/python3.11/dist-packages/transformers/tokenization_utils_base.py in __call__(self, text, text_pair, text_target, text_pair_target, add_special_tokens, padding, truncation, max_length, stride, is_split_into_words, pad_to_multiple_of, padding_side, return_tensors, return_token_type_ids, return_attention_mask, return_overflowing_tokens, return_special_tokens_mask, return_offsets_mapping, return_length, verbose, **kwargs)
+   2853             if not self._in_target_context_manager:
+   2854                 self._switch_to_input_mode()
+-> 2855             encodings = self._call_one(text=text, text_pair=text_pair, **all_kwargs)
+   2856         if text_target is not None:
+   2857             self._switch_to_target_mode()
+
+/usr/local/lib/python3.11/dist-packages/transformers/tokenization_utils_base.py in _call_one(self, text, text_pair, add_special_tokens, padding, truncation, max_length, stride, is_split_into_words, pad_to_multiple_of, padding_side, return_tensors, return_token_type_ids, return_attention_mask, return_overflowing_tokens, return_special_tokens_mask, return_offsets_mapping, return_length, verbose, split_special_tokens, **kwargs)
+   2913 
+   2914         if not _is_valid_text_input(text):
+-> 2915             raise ValueError(
+   2916                 "text input must be of type `str` (single example), `list[str]` (batch or single pretokenized example) "
+   2917                 "or `list[list[str]]` (batch of pretokenized examples)."
+
+ValueError: text input must be of type `str` (single example), `list[str]` (batch or single pretokenized example) or `list[list[str]]` (batch of pretokenized examples).

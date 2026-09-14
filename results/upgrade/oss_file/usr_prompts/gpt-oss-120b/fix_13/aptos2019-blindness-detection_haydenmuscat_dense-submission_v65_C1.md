@@ -1,0 +1,589 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9016780557601428
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved -0.00885) has done: 'The changes add a protobuf compatibility setting before importing TensorFlow, remove the unsupported `workers` argument from `model.predict`, and slightly tidy the import order. This resolves the import error and the prediction call error, allowing the notebook to run end‑to‑end and produce a valid `submission.csv` file.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
+import gc
+import cv2
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.applications import DenseNet121
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dropout, Dense
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.callbacks import (
+    Callback,
+    ModelCheckpoint,
+    EarlyStopping,
+    ReduceLROnPlateau,
+)
+from tensorflow.keras.optimizers import Adam
+
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+
+tf.config.threading.set_intra_op_parallelism_threads(os.cpu_count())
+tf.config.threading.set_inter_op_parallelism_threads(os.cpu_count())
+
+np.random.seed(42)
+tf.random.set_seed(42)
+
+IMG_DIM = 256
+BATCH_SIZE = 32
+CHANNELS = 3
+NUM_CLASSES = 5
+
+INPUT_FOLDER = "../input/aptos2019-blindness-detection/"
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+def crop(gray, img, percent_smaller):
+    """Vectorised cropping that replicates the original loop logic."""
+    thresh = 8
+
+    middle_col = gray[:, gray.shape[1] // 2] > thresh
+    rows = np.where(middle_col)[0]
+    top, bottom = rows[0], rows[-1]
+
+    middle_row = gray[gray.shape[0] // 2, :] > thresh
+    cols = np.where(middle_row)[0]
+    left, right = cols[0], cols[-1]
+
+    height = bottom - top
+    width = right - left
+
+    bottom -= int(percent_smaller * height)
+    top += int(percent_smaller * height)
+    right -= int(percent_smaller * width)
+    left += int(percent_smaller * width)
+
+    if height < 100 or width < 100:
+        print("Error: squareUp: bottom:", bottom, "top:", top)
+        print("Error: squareUp: right:", right, "left:", left)
+        return img
+
+    return img[top:bottom, left:right]
+
+
+def bensYCC(bgr, weight=4, gamma=15):
+    ycc = cv2.cvtColor(bgr, cv2.COLOR_BGR2YCrCb)
+    y, cr, cb = cv2.split(ycc)
+    y = cv2.addWeighted(y, weight, cv2.GaussianBlur(y, (0, 0), gamma), -weight, 128)
+    ycc_modified = cv2.merge((y, cr, cb))
+    return cv2.cvtColor(ycc_modified, cv2.COLOR_YCrCb2BGR)
+
+
+def claheYCC(bgr, clipLimit=5, grid=8):
+    ycc = cv2.cvtColor(bgr, cv2.COLOR_BGR2YCrCb)
+    y, cr, cb = cv2.split(ycc)
+    clahe = cv2.createCLAHE(clipLimit=clipLimit, tileGridSize=(grid, grid))
+    y = clahe.apply(y)
+    y = adjust_gamma(y, 1 + np.log(110) - np.log(np.median(y)))
+    ycc_modified = cv2.merge((y, cr, cb))
+    return cv2.cvtColor(ycc_modified, cv2.COLOR_YCrCb2BGR)
+
+
+def bensSimple(img, weight=4, gamma=15):
+    return cv2.addWeighted(
+        img, weight, cv2.GaussianBlur(img, (0, 0), gamma), -weight, 128
+    )
+
+
+def adjust_gamma(image, gamma=1.0):
+    invGamma = 1.0 / gamma
+    table = np.array(
+        [((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]
+    ).astype("uint8")
+    return cv2.LUT(image, table)
+
+
+def process(bgr, final_function=bensYCC):
+    if bgr is None:
+        return np.full((IMG_DIM, IMG_DIM, CHANNELS), 128, dtype=np.uint8)
+
+    green = bgr[:, :, 1]  # use green as grayscale
+
+    if bgr.shape != (480, 640, 3):
+        cropped = crop(green, bgr, 0.02)
+        width = int(cropped.shape[1] * 0.9)
+        height = int(width * 480 / 640)
+        if height > cropped.shape[0]:
+            height = cropped.shape[0] - 2
+        h = int((cropped.shape[0] - height) / 2)
+        w = int((cropped.shape[1] - width) / 2)
+        test_crop = cropped[h : height + h, w : width + w, :]
+    else:
+        test_crop = b0
+
+    resized = cv2.resize(test_crop, (IMG_DIM, IMG_DIM), interpolation=cv2.INTER_AREA)
+    img = final_function(resized)
+    return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+
+
+
+## === cell 2
+def dataGenerator(jitter=0.1):
+    datagen = image.ImageDataGenerator(
+        rescale=1.0 / 255,
+        horizontal_flip=True and (jitter > 0.01),
+        vertical_flip=True and (jitter > 0.01),
+        zoom_range=[max(0.8, 1 - 5 * jitter), 1],
+        rotation_range=int(600 * jitter),
+        brightness_range=[1 - jitter / 3, 1 + jitter / 3],
+        fill_mode="mirror",
+        channel_shift_range=int(30 * jitter),
+    )
+    return datagen
+
+
+
+
+## === cell 3
+PROCESSING_FUNC = None
+
+
+def _init_worker(func):
+    """Initializer for each thread to set the global processing function."""
+    global PROCESSING_FUNC
+    PROCESSING_FUNC = func
+
+
+def _load_and_process_path(path):
+    """Loads a single image file and applies the global processing function."""
+    bgr = cv2.imread(path)
+    img = process(bgr, PROCESSING_FUNC)
+    return img.astype(np.float32) / 255.0
+
+
+def load_dataset(df, processing_function):
+    """Load and process every image in df once, now using threads."""
+    global PROCESSING_FUNC
+    PROCESSING_FUNC = processing_function
+
+    image_dir = f"{INPUT_FOLDER}train_images/"
+    filenames = df.id_code.apply(lambda x: f"{x}.png").tolist()
+    paths = [os.path.join(image_dir, f) for f in filenames]
+
+    max_workers = min(os.cpu_count(), 8)
+
+    with ThreadPoolExecutor(
+        max_workers=max_workers,
+        initializer=_init_worker,
+        initargs=(processing_function,),
+    ) as executor:
+        imgs_list = list(executor.map(_load_and_process_path, paths, chunksize=32))
+
+    imgs = np.stack(imgs_list, axis=0).astype(np.float32)
+
+    labels = tf.keras.utils.to_categorical(df.diagnosis.values, NUM_CLASSES)
+    return imgs, labels
+
+
+def train_model(model, processing_function, epochs=3):
+    train_df = pd.read_csv(os.path.join(INPUT_FOLDER, "train.csv"))
+    imgs, labels = load_dataset(train_df, processing_function)
+
+    model.fit(
+        imgs,
+        labels,
+        batch_size=BATCH_SIZE,
+        epochs=epochs,
+        verbose=1,
+    )
+    return model
+
+
+
+
+## === cell 4
+_JITTER_AMOUNTS = [0, 0.01, 0.1, 0.4]
+
+
+def make_predictions(d_set, processing_function, model, jitters=7):
+    images_dir = f"{INPUT_FOLDER}{d_set}_images/"
+    df = pd.read_csv(f"{INPUT_FOLDER}{d_set}.csv")
+    df.id_code = df.id_code.apply(lambda x: x + ".png")
+
+    block_size = 1024
+    total = df.shape[0]
+    predictions = np.zeros((total, NUM_CLASSES))
+
+    print(f"Making predictions on the {d_set} dataset. Total: {total}")
+
+    max_workers = min(os.cpu_count(), 8)
+
+    with ThreadPoolExecutor(
+        max_workers=max_workers,
+        initializer=_init_worker,
+        initargs=(processing_function,),
+    ) as executor:
+        for start in range(0, total, block_size):
+            end = min(start + block_size, total)
+            filenames = df[start:end].id_code.tolist()
+            paths = [os.path.join(images_dir, f) for f in filenames]
+
+            img_block_list = list(
+                executor.map(_load_and_process_path, paths, chunksize=32)
+            )
+            img_block = np.stack(img_block_list, axis=0)
+
+            jitter_amounts = _JITTER_AMOUNTS
+            prediction_jitters = np.zeros(
+                (len(img_block), len(jitter_amounts), NUM_CLASSES)
+            )
+
+            for i, jit in enumerate(jitter_amounts):
+                if jit == 0:
+                    preds = model.predict(img_block, batch_size=BATCH_SIZE, verbose=0)
+                else:
+                    datagen = dataGenerator(jit).flow(img_block, shuffle=False)
+                    preds = model.predict(datagen, verbose=0)
+                prediction_jitters[:, i] = preds
+
+            median_preds = np.median(prediction_jitters, axis=1)
+            predictions[start:end] = median_preds
+            print(f"{start} - {end} finished")
+
+    return predictions
+
+
+
+
+## === cell 5
+def prediction_to_class(predictions):
+    """Convert probability vectors to class indices via arg‑max."""
+    return np.argmax(predictions, axis=1)
+
+
+
+
+## === cell 6
+def create_model(network_name):
+    base = DenseNet121(
+        weights="imagenet",
+        include_top=False,
+        input_shape=(IMG_DIM, IMG_DIM, CHANNELS),
+    )
+    base.trainable = False
+
+    model = Sequential()
+    model.add(base)
+    model.add(GlobalAveragePooling2D())
+    model.add(Dropout(0.5))
+    model.add(Dense(NUM_CLASSES, activation="softmax"))
+
+    model.compile(
+        optimizer=Adam(learning_rate=0.00005),
+        loss="categorical_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model
+
+
+
+
+## === cell 7
+model = create_model("clahe")
+model = train_model(model, claheYCC, epochs=3)
+
+preds = make_predictions("test", claheYCC, model)
+
+test_classes = prediction_to_class(preds)
+
+test_df = pd.read_csv(os.path.join(INPUT_FOLDER, "test.csv"))
+test_df["diagnosis"] = test_classes
+submission_path = "submission.csv"
+test_df.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3990324446.py in <cell line: 0>()
+      1 model = create_model("clahe")
+----> 2 model = train_model(model, claheYCC, epochs=3)
+      3 
+      4 preds = make_predictions("test", claheYCC, model)
+      5 
+
+/tmp/ipykernel_11/63143218.py in train_model(model, processing_function, epochs)
+     42 def train_model(model, processing_function, epochs=3):
+     43     train_df = pd.read_csv(os.path.join(INPUT_FOLDER, "train.csv"))
+---> 44     imgs, labels = load_dataset(train_df, processing_function)
+     45 
+     46     model.fit(
+
+/tmp/ipykernel_11/63143218.py in load_dataset(df, processing_function)
+     32         initargs=(processing_function,),
+     33     ) as executor:
+---> 34         imgs_list = list(executor.map(_load_and_process_path, paths, chunksize=32))
+     35 
+     36     imgs = np.stack(imgs_list, axis=0).astype(np.float32)
+
+/usr/lib/python3.11/concurrent/futures/_base.py in result_iterator()
+    617                     # Careful not to keep a reference to the popped future
+    618                     if timeout is None:
+--> 619                         yield _result_or_cancel(fs.pop())
+    620                     else:
+    621                         yield _result_or_cancel(fs.pop(), end_time - time.monotonic())
+
+/usr/lib/python3.11/concurrent/futures/_base.py in _result_or_cancel(***failed resolving arguments***)
+    315     try:
+    316         try:
+--> 317             return fut.result(timeout)
+    318         finally:
+    319             fut.cancel()
+
+/usr/lib/python3.11/concurrent/futures/_base.py in result(self, timeout)
+    447                     raise CancelledError()
+    448                 elif self._state == FINISHED:
+--> 449                     return self.__get_result()
+    450 
+    451                 self._condition.wait(timeout)
+
+/usr/lib/python3.11/concurrent/futures/_base.py in __get_result(self)
+    399         if self._exception:
+    400             try:
+--> 401                 raise self._exception
+    402             finally:
+    403                 # Break a reference cycle with the exception in self._exception
+
+/usr/lib/python3.11/concurrent/futures/thread.py in run(self)
+     56 
+     57         try:
+---> 58             result = self.fn(*self.args, **self.kwargs)
+     59         except BaseException as exc:
+     60             self.future.set_exception(exc)
+
+/tmp/ipykernel_11/63143218.py in _load_and_process_path(path)
+     11     """Loads a single image file and applies the global processing function."""
+     12     bgr = cv2.imread(path)
+---> 13     img = process(bgr, PROCESSING_FUNC)
+     14     return img.astype(np.float32) / 255.0
+     15 
+
+/tmp/ipykernel_11/2123390236.py in process(bgr, final_function)
+     75         test_crop = cropped[h : height + h, w : width + w, :]
+     76     else:
+---> 77         test_crop = b0
+     78 
+     79     resized = cv2.resize(test_crop, (IMG_DIM, IMG_DIM), interpolation=cv2.INTER_AREA)
+
+NameError: name 'b0' is not defined

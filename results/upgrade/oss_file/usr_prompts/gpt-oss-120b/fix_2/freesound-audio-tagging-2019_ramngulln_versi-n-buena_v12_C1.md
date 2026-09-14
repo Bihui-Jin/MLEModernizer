@@ -1,0 +1,440 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Overview
+Develop a model to tag audio data automatically using a diverse vocabulary of 80 categories.
+
+## Metric
+The task consists of predicting the audio labels (tags) for every test clip. Some test clips bear one label while others bear several labels. The predictions are to be done at the clip level, i.e., no start/end timestamps for the sound events are required.
+
+The primary metric is label-weighted label-ranking average precision. 
+
+The  "label-weighted" part means that the overall score is the average over all the *labels* in the test set, where each label receives equal weight (by contrast, plain *lrap* gives each *test item* equal weight).
+
+## Submission Format
+For each `fname` in the test set, you must predict the probability of each label. The file should contain a header and have the following format:
+
+```
+fname,Accelerating_and_revving_and_vroom,...Zipper_(clothing)
+000ccb97.wav,0.1,....,0.3
+0012633b.wav,0.0,...,0.8
+```
+
+## Dataset
+The following 5 audio files in the curated train set have a wrong label, due to a bug in the file renaming process:\
+`f76181c4.wav, 77b925c2.wav, 6a1f682a.wav, c7db12aa.wav, 7752cc8a.wav`
+
+The audio file `1d44b0bd.wav` in the curated train set was found to be corrupted (contains no signal) due to an error in format conversion.
+
+- **train_curated.csv** - ground truth labels for the curated subset of the training audio files (see Data Fields below)
+- **train_noisy.csv** - ground truth labels for the noisy subset of the training audio files (see Data Fields below)
+- **sample_submission.csv** - a sample submission file in the correct format, including the correct sorting of the sound categories; it contains the list of audio files found in the test.zip folder (corresponding to the public leaderboard)
+- **train_curated.zip** - a folder containing the audio (.wav) training files of the curated subset
+- **train_noisy.zip** - a folder containing the audio (.wav) training files of the noisy subset
+- **test.zip** - a folder containing the audio (.wav) test files for the public leaderboard
+
+### Columns
+Each row of the train_curated.csv and train_noisy.csv files contains the following information:
+
+- **fname**: the audio file name, eg, `0006ae4e.wav`
+- **labels**: the audio classification label(s) (ground truth). Note that the number of labels per clip can be one, eg, `Bark` or more, eg, `"Walk_and_footsteps,Slam"`.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+fastai==2.8.5
+geopandas==0.14.4
+google-api-python-client==2.177.0
+ipython==7.34.0
+ipython-genutils==0.2.0
+ipython_pygments_lexers==1.1.1
+ipython-sql==0.5.0
+librosa==0.11.0
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (276 lines)
+            sample_submission.csv (3362 lines)
+            sample_submission.csv.zip (20.7 kB)
+            test.zip (2.2 GB)
+            train_curated.csv (4971 lines)
+            train_curated.csv.zip (39.3 kB)
+            train_curated.zip (2.4 GB)
+            train_noisy.csv (19816 lines)
+            train_noisy.csv.zip (154.2 kB)
+            train_noisy.zip (21.5 GB)
+            freesound-audio-tagging-2019/
+                description.md (276 lines)
+                sample_submission.csv (3362 lines)
+                ... and 8 other files
+                freesound-audio-tagging-2019/
+                test/
+                    4260ebea.wav (1.0 MB)
+                    426eb1e0.wav (654.5 kB)
+                    ... and 3359 other files
+                    test/
+                train_curated/
+                    0006ae4e.wav (621.0 kB)
+                    0019ef41.wav (181.3 kB)
+                    ... and 4968 other files
+                train_noisy/
+                    00097e21.wav (1.3 MB)
+                    000b6cfb.wav (1.3 MB)
+                    ... and 19813 other files
+            test/
+                4260ebea.wav (1.0 MB)
+                426eb1e0.wav (654.5 kB)
+                ... and 3359 other files
+                test/
+            train_curated/
+                0006ae4e.wav (621.0 kB)
+                0019ef41.wav (181.3 kB)
+                ... and 4968 other files
+            train_noisy/
+                00097e21.wav (1.3 MB)
+                000b6cfb.wav (1.3 MB)
+                ... and 19813 other files
+        input/
+            description.md (276 lines)
+            sample_submission.csv (3362 lines)
+            sample_submission.csv.zip (20.7 kB)
+            test.zip (2.2 GB)
+            train_curated.csv (4971 lines)
+            train_curated.csv.zip (39.3 kB)
+            train_curated.zip (2.4 GB)
+            train_noisy.csv (19816 lines)
+            train_noisy.csv.zip (154.2 kB)
+            train_noisy.zip (21.5 GB)
+            freesound-audio-tagging-2019/
+                description.md (276 lines)
+                sample_submission.csv (3362 lines)
+                ... and 8 other files
+                freesound-audio-tagging-2019/
+                test/
+                    4260ebea.wav (1.0 MB)
+                    426eb1e0.wav (654.5 kB)
+                    ... and 3359 other files
+                    test/
+                train_curated/
+                    0006ae4e.wav (621.0 kB)
+                    0019ef41.wav (181.3 kB)
+                    ... and 4968 other files
+                train_noisy/
+                    00097e21.wav (1.3 MB)
+                    000b6cfb.wav (1.3 MB)
+                    ... and 19813 other files
+            test/
+                4260ebea.wav (1.0 MB)
+                426eb1e0.wav (654.5 kB)
+                ... and 3359 other files
+                test/
+                    4260ebea.wav (1.0 MB)
+                    426eb1e0.wav (654.5 kB)
+                    ... and 3359 other files
+                    test/
+            train_curated/
+                0006ae4e.wav (621.0 kB)
+                0019ef41.wav (181.3 kB)
+                ... and 4968 other files
+            train_noisy/
+                00097e21.wav (1.3 MB)
+                000b6cfb.wav (1.3 MB)
+                ... and 19813 other files
+        working/
+            freesound-audio-tagging-2019/
+                description.md (276 lines)
+                sample_submission.csv (3362 lines)
+                ... and 8 other files
+                freesound-audio-tagging-2019/
+                test/
+                    4260ebea.wav (1.0 MB)
+                    426eb1e0.wav (654.5 kB)
+                    ... and 3359 other files
+                    test/
+                train_curated/
+                    0006ae4e.wav (621.0 kB)
+                    0019ef41.wav (181.3 kB)
+                    ... and 4968 other files
+                train_noisy/
+                    00097e21.wav (1.3 MB)
+                    000b6cfb.wav (1.3 MB)
+                    ... and 19813 other files
+```
+
+-> data/freesound-audio-tagging-2019/sample_submission.csv has 3361 rows and 81 columns.
+The columns are: fname, Accelerating_and_revving_and_vroom, Accordion, Acoustic_guitar, Applause, Bark, Bass_drum, Bass_guitar, Bathtub_(filling_or_washing), Bicycle_bell, Burping_and_eructation, Bus, Buzz, Car_passing_by, Cheering... and 66 more columns
+
+-> data/freesound-audio-tagging-2019/train_curated.csv has 4970 rows and 2 columns.
+The columns are: fname, labels
+
+-> data/freesound-audio-tagging-2019/train_noisy.csv has 19815 rows and 2 columns.
+The columns are: fname, labels
+
+-> data/sample_submission.csv has 3361 rows and 81 columns.
+The columns are: fname, Accelerating_and_revving_and_vroom, Accordion, Acoustic_guitar, Applause, Bark, Bass_drum, Bass_guitar, Bathtub_(filling_or_washing), Bicycle_bell, Burping_and_eructation, Bus, Buzz, Car_passing_by, Cheering... and 66 more columns
+
+-> data/train_curated.csv has 4970 rows and 2 columns.
+The columns are: fname, labels
+
+-> data/train_noisy.csv has 19815 rows and 2 columns.
+The columns are: fname, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.1257248064317963
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os, zipfile, numpy as np, pandas as pd, librosa, librosa.display
+from pathlib import Path
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.metrics import label_ranking_average_precision_score
+
+
+
+## === cell 1
+BASE = Path("../input")
+EXTRACT_ROOT = Path("datos/freesound-audio-tagging-2019")
+ZIP_TEST = BASE / "freesound-audio-tagging-2019/test.zip"
+CSV_TRAIN_CURATED = BASE / "freesound-audio-tagging-2019/train_curated.csv"
+CSV_TRAIN_NOISY = BASE / "freesound-audio-tagging-2019/train_noisy.csv"
+CSV_SUBMISSION = BASE / "freesound-audio-tagging-2019/sample_submission.csv"
+
+if not (EXTRACT_ROOT / "test").exists():
+    with zipfile.ZipFile(ZIP_TEST, "r") as z:
+        z.extractall(path=EXTRACT_ROOT)
+
+df_curated = pd.read_csv(CSV_TRAIN_CURATED)
+df_noisy = pd.read_csv(CSV_TRAIN_NOISY)
+df_train = pd.concat([df_curated, df_noisy], ignore_index=True)
+
+test_df = pd.read_csv(CSV_SUBMISSION)
+
+
+
+
+## === cell 2
+class Conf:
+    sampling_rate = 44100
+    duration = 2  # seconds
+    hop_length = 347 * duration  # approx 128 time steps
+    fmin = 20
+    fmax = sampling_rate // 2
+    n_mels = 128
+    n_fft = n_mels * 20
+    samples = sampling_rate * duration
+
+
+def read_audio(conf, pathname, trim_long_data):
+    y, sr = librosa.load(pathname, sr=conf.sampling_rate, mono=True)
+    if len(y) > 0:
+        y, _ = librosa.effects.trim(y)
+    if len(y) > conf.samples:
+        if trim_long_data:
+            y = y[: conf.samples]
+    else:
+        pad = conf.samples - len(y)
+        offset = pad // 2
+        y = np.pad(y, (offset, conf.samples - len(y) - offset), "constant")
+    return y
+
+
+def audio_to_melspectrogram(conf, audio):
+    S = librosa.feature.melspectrogram(
+        audio,
+        sr=conf.sampling_rate,
+        n_mels=conf.n_mels,
+        hop_length=conf.hop_length,
+        n_fft=conf.n_fft,
+        fmin=conf.fmin,
+        fmax=conf.fmax,
+    )
+    S_db = librosa.power_to_db(S)
+    return S_db.astype(np.float32)
+
+
+def wav_to_feature(path):
+    wav = read_audio(Conf, path, trim_long_data=False)
+    mel = audio_to_melspectrogram(Conf, wav)
+    return mel.flatten()
+
+
+
+
+## === cell 3
+train_folder = EXTRACT_ROOT / "train_curated"
+features = []
+labels = []
+print("Extracting features for training set...")
+for idx, row in tqdm(df_curated.iterrows(), total=len(df_curated)):
+    fp = train_folder / row.fname
+    if not fp.is_file():
+        continue
+    features.append(wav_to_feature(fp))
+    labels.append(row.labels.split(","))
+X = np.stack(features)
+mlb = MultiLabelBinarizer()
+y = mlb.fit_transform(labels)
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/1235396466.py in <cell line: 0>()
+     10     features.append(wav_to_feature(fp))
+     11     labels.append(row.labels.split(","))
+---> 12 X = np.stack(features)
+     13 mlb = MultiLabelBinarizer()
+     14 y = mlb.fit_transform(labels)
+
+/usr/local/lib/python3.11/dist-packages/numpy/core/shape_base.py in stack(arrays, axis, out, dtype, casting)
+    443     arrays = [asanyarray(arr) for arr in arrays]
+    444     if not arrays:
+--> 445         raise ValueError('need at least one array to stack')
+    446 
+    447     shapes = {arr.shape for arr in arrays}
+
+ValueError: need at least one array to stack
+
+## === cell 4
+X_tr, X_val, y_tr, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+base_clf = OneVsRestClassifier(LogisticRegression(max_iter=200, n_jobs=5))
+base_clf.fit(X_tr, y_tr)
+val_probs = base_clf.predict_proba(X_val)
+val_lwlrap = label_ranking_average_precision_score(y_val, val_probs)
+print(f"Validation LWLRAP: {val_lwlrap:.6f}")
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3589020561.py in <cell line: 0>()
+      1 # quick validation to gauge metric (20% hold‑out)
+----> 2 X_tr, X_val, y_tr, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+      3 base_clf = OneVsRestClassifier(LogisticRegression(max_iter=200, n_jobs=5))
+      4 base_clf.fit(X_tr, y_tr)
+      5 val_probs = base_clf.predict_proba(X_val)
+
+NameError: name 'X' is not defined
+
+## === cell 5
+clf = OneVsRestClassifier(LogisticRegression(max_iter=300, n_jobs=5))
+clf.fit(X, y)
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2860370107.py in <cell line: 0>()
+      1 # train on full data
+      2 clf = OneVsRestClassifier(LogisticRegression(max_iter=300, n_jobs=5))
+----> 3 clf.fit(X, y)
+      4 
+
+NameError: name 'X' is not defined
+
+## === cell 6
+test_folder = EXTRACT_ROOT / "test"
+test_features = []
+test_fnames = []
+print("Extracting features for test set...")
+for fname in tqdm(test_df.fname):
+    fp = test_folder / fname
+    if not fp.is_file():
+        test_features.append(np.zeros(X.shape[1], dtype=np.float32))
+    else:
+        test_features.append(wav_to_feature(fp))
+    test_fnames.append(fname)
+X_test = np.stack(test_features)
+
+test_probs = clf.predict_proba(X_test)
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2464132229.py in <cell line: 0>()
+      8     if not fp.is_file():
+      9         # missing file – fill with zeros
+---> 10         test_features.append(np.zeros(X.shape[1], dtype=np.float32))
+     11     else:
+     12         test_features.append(wav_to_feature(fp))
+
+NameError: name 'X' is not defined
+
+## === cell 7
+submission = pd.read_csv(CSV_SUBMISSION)  # header with correct column order
+prob_cols = submission.columns[1:]
+submission[prob_cols] = test_probs
+submission.to_csv("submission.csv", index=False)
+print("Saved submission.csv with shape:", submission.shape)
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/159260086.py in <cell line: 0>()
+      3 # replace probability columns (all except 'fname')
+      4 prob_cols = submission.columns[1:]
+----> 5 submission[prob_cols] = test_probs
+      6 submission.to_csv("submission.csv", index=False)
+      7 print("Saved submission.csv with shape:", submission.shape)
+
+NameError: name 'test_probs' is not defined

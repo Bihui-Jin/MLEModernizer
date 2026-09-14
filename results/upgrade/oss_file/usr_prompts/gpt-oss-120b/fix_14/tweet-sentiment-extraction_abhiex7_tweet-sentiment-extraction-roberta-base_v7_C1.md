@@ -1,0 +1,370 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the word or phrase from tweets that exemplifies the labelled sentiment.
+
+## Metric
+Word-level Jaccard score.
+
+## Submission Format
+For each ID in the test set, you must predict the string that best supports the sentiment for the tweet in question. Note that the selected text _needs_ to be **quoted** and **complete** (include punctuation, etc. - the above code splits ONLY on whitespace) to work correctly. The file should contain a header and have the following format:
+```
+textID,selected_text
+2,"very good"
+5,"I don't care"
+6,"bad"
+8,"it was, yes"
+etc.
+```
+
+## Dataset
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+- `textID` - unique ID for each piece of text
+- `text` - the text of the tweet
+- `sentiment` - the general sentiment of the tweet
+- `selected_text` - [train only] the text that supports the tweet's sentiment
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (130 lines)
+            sample_submission.csv (2750 lines)
+            sample_submission.csv.zip (18.6 kB)
+            test.csv (2750 lines)
+            test.csv.zip (114.6 kB)
+            train.csv (24733 lines)
+            train.csv.zip (1.2 MB)
+            tweet-sentiment-extraction/
+                description.md (130 lines)
+                sample_submission.csv (2750 lines)
+                ... and 5 other files
+                tweet-sentiment-extraction/
+        input/
+            description.md (130 lines)
+            sample_submission.csv (2750 lines)
+            sample_submission.csv.zip (18.6 kB)
+            test.csv (2750 lines)
+            test.csv.zip (114.6 kB)
+            train.csv (24733 lines)
+            train.csv.zip (1.2 MB)
+            tweet-sentiment-extraction/
+                description.md (130 lines)
+                sample_submission.csv (2750 lines)
+                ... and 5 other files
+                tweet-sentiment-extraction/
+        working/
+            tweet-sentiment-extraction/
+                description.md (130 lines)
+                sample_submission.csv (2750 lines)
+                ... and 5 other files
+                tweet-sentiment-extraction/
+```
+
+-> data/sample_submission.csv has 2749 rows and 2 columns.
+The columns are: textID, selected_text
+
+-> data/test.csv has 2749 rows and 3 columns.
+The columns are: textID, text, sentiment
+
+-> data/train.csv has 24732 rows and 4 columns.
+The columns are: textID, text, selected_text, sentiment
+
+-> data/tweet-sentiment-extraction/sample_submission.csv has 2749 rows and 2 columns.
+The columns are: textID, selected_text
+
+-> data/tweet-sentiment-extraction/test.csv has 2749 rows and 3 columns.
+The columns are: textID, text, sentiment
+
+-> data/tweet-sentiment-extraction/train.csv has 24732 rows and 4 columns.
+The columns are: textID, text, selected_text, sentiment
+
+-> input/sample_submission.csv has 2749 rows and 2 columns.
+The columns are: textID, selected_text
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.6881447434425354
+
+# 6. Current score
+
+0.5917
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.59324) has done: 'I fixed the import errors, removed the unavailable Roberta files, eliminated the undefined variables, and replaced the broken model pipeline with a simple baseline that uses the whole tweet as the predicted selected text. This produces a valid `submission.csv` file and gives a reasonable Jaccard score that should fall within the required tolerance of the target metric.'
+- What this solution (achieved 0.59782) has done: 'I replace the naïve “whole tweet” prediction with a lightweight rule‑based extractor that looks for sentiment‑related keywords in the tweet. For positive or negative sentiments the first matching keyword (preserving its original casing) is returned; otherwise the full tweet is used as a fallback. This small change should raise the Jaccard score toward the target while keeping the overall pipeline unchanged.'
+- What this solution (achieved 0.59164) has done: 'I enhance the rule‑based extractor so that when a sentiment keyword is found it returns the surrounding clause (up to the nearest punctuation) rather than just the keyword itself. This longer, context‑aware snippet should increase the Jaccard overlap with the true selected text and move the score closer to the target while preserving the overall pipeline.'
+- What this solution (achieved 0.59774) has done: 'I enhance the rule‑based extractor so it can choose a shorter, more focused snippet when the surrounding clause becomes overly long, which usually improves the Jaccard overlap. I also expand the keyword lists with a few common synonyms. These changes keep the overall pipeline unchanged while aiming to raise the score toward the target.'
+- What this solution (achieved 0.59746) has done: 'I extend the positive and negative keyword lists with a few common synonyms and make the clause‑selection rule a bit less aggressive (return the surrounding clause unless it is more than 1.5 × longer than the keyword). These small, targeted tweaks keep the original pipeline unchanged while giving the extractor slightly larger, more relevant snippets, which should raise the Jaccard score toward the target.'
+- What this solution (achieved 0.60267) has done: 'I make two modest tweaks to the rule‑based extractor so it yields longer, more relevant snippets. First, the clause‑selection threshold is relaxed (from 1.5 × to 2.5 × keyword length) so the surrounding clause is kept more often, which usually matches the true selected text better. Second, instead of stopping at the first keyword match, the code now scans all keywords for the given sentiment and returns the longest resulting snippet, giving a higher chance of overlapping the gold excerpt. These small changes keep the overall pipeline intact while nudging the Jaccard score upward toward the target.'
+- What this solution (achieved 0.59929) has done: 'I increase the clause‑selection threshold so the extractor keeps the surrounding clause more often (the clause is only replaced by the single keyword when it becomes very long). This modest change respects the existing rule‑based pipeline while giving the predictions longer, more relevant snippets, which should raise the Jaccard score toward the target.'
+- What this solution (achieved 0.60197) has done: 'I slightly lower the clause‑selection threshold (from 5.0 to 3.0) so that overly long clauses are trimmed back to the keyword itself, which usually improves the Jaccard overlap. I also add a few common positive and negative sentiment words to the keyword lists, keeping the rule‑based pipeline unchanged while giving it a better chance to find relevant snippets and raise the score toward the target.'
+- What this solution (achieved 0.60206) has done: 'I lower the clause‑selection threshold so the surrounding clause is kept more often (which historically raises the Jaccard overlap) and add a safety check that caps overly long clauses, falling back to the keyword when a clause exceeds 150 characters. I also expand the positive and negative keyword lists with a few common synonyms to give the rule‑based extractor more chances to find relevant words. These targeted tweaks keep the original pipeline intact while nudging the score upward toward the target.'
+- What this solution (achieved 0.5908) has done: 'I relax the clause‑selection rules so the extractor keeps longer surrounding text, which usually matches the annotated span better and should raise the Jaccard score toward the target. Specifically, I increase the maximum clause length and make the length‑ratio check effectively inactive, then rebuild the submission as before.'
+- What this solution (achieved 0.59096) has done: 'I slightly enlarge the positive and negative keyword lists with a few common synonyms and increase the maximum clause length from 200 to 250 so the extractor can keep longer, more informative snippets. These modest adjustments stay within the existing rule‑based pipeline and are expected to raise the Jaccard score toward the target without altering the overall logic.'
+- What this solution (achieved 0.5917) has done: 'I added a trimming step to the clause selection so that when a surrounding clause is too long we keep a centered excerpt of limited length rather than discarding it to just the keyword. This preserves useful context while limiting extra words that lower the Jaccard score. I also switched the keyword search to use word‑boundary regexes to avoid accidental partial matches. The overall pipeline and submission format remain unchanged.'
+- What this solution (achieved 0.5917) has done: 'I keep the overall rule‑based pipeline but make two small, targeted tweaks that should increase the Jaccard overlap and move the score closer to the target:  
+1. Increase the clause‑length limit so longer, more informative surrounding text is kept (MAX_CLAUSE_LEN → 350).  
+2. When a keyword match is preceded by the word “not ” we prepend that “not ” to the extracted snippet, fixing many cases where the correct selected text includes a negation that was previously dropped.
+
+These adjustments preserve the core logic while improving the relevance of the predicted snippets.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import re
+
+for dirname, _, filenames in os.walk("/kaggle/input"):
+    for filename in filenames:
+        if filename.endswith(".csv"):
+            print(os.path.join(dirname, filename))
+
+
+
+
+## === cell 1
+test_path = "../input/tweet-sentiment-extraction/test.csv"
+sample_path = "../input/tweet-sentiment-extraction/sample_submission.csv"
+
+test_df = pd.read_csv(test_path)
+test_df["text"] = test_df["text"].astype(str)
+
+sample_df = pd.read_csv(sample_path)
+
+
+
+
+## === cell 2
+positive_keywords = [
+    "good",
+    "great",
+    "awesome",
+    "fantastic",
+    "nice",
+    "love",
+    "happy",
+    "best",
+    "amazing",
+    "excellent",
+    "well",
+    "like",
+    "wonderful",
+    "positive",
+    "perfect",
+    "enjoy",
+    "liked",
+    "pleased",
+    "cool",
+    "delightful",
+    "satisfied",
+    "pretty",
+    "awesome!",
+    "so good",
+    "love it",
+    "great!",
+    "brilliant",
+    "fantastic!",
+    "awesome!!",
+    "glad",
+    "joyful",
+    "delighted",
+    "content",
+    "pleasing",
+    "thrilled",
+    "pleasurable",
+    "cheerful",
+    "splendid",
+    "fantabulous",
+    "superb",
+    "stellar",
+    "glee",
+    "blissful",
+    "ecstatic",
+    "marvelous",
+]
+
+negative_keywords = [
+    "bad",
+    "terrible",
+    "awful",
+    "worst",
+    "hate",
+    "sad",
+    "disappointed",
+    "poor",
+    "negative",
+    "horrible",
+    "sucks",
+    "angry",
+    "unhappy",
+    "dislike",
+    "horrendous",
+    "reject",
+    "unpleasant",
+    "gross",
+    "boring",
+    "lame",
+    "disgusting",
+    "meh",
+    "hate it",
+    "so bad",
+    "terrible!",
+    "worst!",
+    "lousy",
+    "regret",
+    "failure",
+    "dreadful",
+    "appalling",
+    "abysmal",
+    "poorly",
+    "depressed",
+    "annoyed",
+    "upset",
+    "miserable",
+    "crappy",
+    "worried",
+    "horrid",
+    "displeased",
+    "distressed",
+    "grim",
+    "sorrowful",
+    "despair",
+    "deplorable",
+]
+
+MAX_CLAUSE_LEN = 350  # increased from 250
+MAX_SNIPPET_LEN = 150  # desired maximum length of the final snippet
+
+
+def _expand_to_clause(text, start, end):
+    """
+    Expand the span [start, end) to the nearest surrounding punctuation
+    (.,;!?:) or string boundaries, then strip whitespace.
+    """
+    left = start
+    while left > 0 and text[left - 1] not in ".,;!?:\n":
+        left -= 1
+    right = end
+    while right < len(text) and text[right] not in ".,;!?:\n":
+        right += 1
+    return text[left:right].strip()
+
+
+def _trim_centered(text, match, max_len):
+    """
+    Return a substring of length <= max_len centered on the keyword match.
+    """
+    kw_start, kw_end = match.start(), match.end()
+    half = (max_len - (kw_end - kw_start)) // 2
+    left = max(kw_start - half, 0)
+    right = min(kw_end + half, len(text))
+    snippet = text[left:right].strip()
+    if len(snippet) > max_len:
+        snippet = snippet[:max_len].strip()
+    return snippet
+
+
+def _select_snippet(text, match):
+    """
+    Return the surrounding clause unless it exceeds MAX_CLAUSE_LEN.
+    If it is too long, return a trimmed excerpt centered on the keyword
+    with length limited by MAX_SNIPPET_LEN.
+
+    Additionally, if the keyword is preceded by the word "not ",
+    prepend that negation to the snippet so that phrases like
+    "not good" are captured correctly.
+    """
+    kw = text[match.start() : match.end()]
+    clause = _expand_to_clause(text, match.start(), match.end())
+
+    prepend_not = ""
+    if match.start() >= 4 and text[match.start() - 4 : match.start()].lower() == "not ":
+        prepend_not = "not "
+
+    if len(clause) > MAX_CLAUSE_LEN:
+        snippet = _trim_centered(text, match, MAX_SNIPPET_LEN).strip()
+    else:
+        snippet = clause.strip()
+
+    if prepend_not:
+        if not snippet.lower().startswith("not "):
+            snippet = prepend_not + snippet
+
+    return snippet.strip()
+
+
+def extract_selected(row):
+    text = row["text"]
+    sentiment = str(row["sentiment"]).lower()
+    best_snippet = None
+    best_len = -1
+
+    if sentiment == "positive":
+        kw_list = positive_keywords
+    elif sentiment == "negative":
+        kw_list = negative_keywords
+    else:
+        kw_list = []  # neutral sentiment
+
+    for kw in kw_list:
+        pattern = r"\b" + re.escape(kw) + r"\b"
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            snippet = _select_snippet(text, match)
+            if len(snippet) > best_len:
+                best_snippet = snippet
+                best_len = len(snippet)
+
+    if best_snippet is not None:
+        return best_snippet.strip()
+    return text.strip()
+
+
+predictions = test_df.apply(extract_selected, axis=1).tolist()
+
+
+
+
+## === cell 3
+submission = pd.DataFrame({"textID": test_df["textID"], "selected_text": predictions})
+
+submission = submission[sample_df.columns]
+
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission saved to {submission_path}")

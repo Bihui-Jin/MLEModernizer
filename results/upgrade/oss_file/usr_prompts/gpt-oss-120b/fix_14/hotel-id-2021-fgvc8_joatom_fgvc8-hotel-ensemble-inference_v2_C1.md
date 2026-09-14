@@ -1,0 +1,481 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Identify hotels from images.
+
+## Metric
+Mean Average Precision @ 5 (MAP@5)
+
+## Submission Format
+For each image in the test set, you must predict a space-delimited list of hotel IDs that could match that image. The first ID should be the most relevant one and the last the least relevant one. The file should contain a header and have the following format:
+
+```
+image,hotel_id
+99e91ad5f2870678.jpg,36363 53586 18807 64314 60181
+b5cc62ab665591a9.jpg,36363 53586 18807 64314 60181
+d5664a972d5a644b.jpg,36363 53586 18807 64314 60181
+```
+
+## Dataset
+**train.csv** - The training set metadata.
+
+- `image` - The image ID.
+
+- `chain` - An ID code for the hotel chain. A `chain` of zero (0) indicates that the hotel is either not part of a chain or the chain is not known. This field is not available for the test set. The number of hotels per chain varies widely.
+
+- `hotel_id` - The hotel ID. The target class.
+
+- `timestamp` - When the image was taken. Provided for the training set only.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image` The image ID
+
+- `hotel_id` The hotel ID. The target class.
+
+**train_images** - The training set contains 97000+ images from around 7700 hotels from across the globe. All of the images for each hotel chain are in a dedicated subfolder for that chain.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 13,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+dill==0.4.0
+fastai==2.8.5
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (120 lines)
+            sample_submission.csv (9757 lines)
+            sample_submission.csv.zip (106.8 kB)
+            test.zip (160 Bytes)
+            test_images.zip (2.6 GB)
+            train.csv (87799 lines)
+            train.csv.zip (1.9 MB)
+            train.zip (162 Bytes)
+            train_images.zip (23.5 GB)
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+            test/
+                test/
+            test_images/
+                ccc436fc41bf402f.jpg (72.8 kB)
+                fb9d48b39c614c32.jpg (91.3 kB)
+                ... and 9754 other files
+                test_images/
+            train/
+                train/
+            train_images/
+                0/
+                    b5bd0a0a2de05bb5.jpg (73.8 kB)
+                    c242bcf0719f9d61.jpg (71.9 kB)
+                    ... and 18211 other files
+                1/
+                    a7ad6a44813b77c8.jpg (81.1 kB)
+                    9b89db65b496490d.jpg (630.0 kB)
+                    ... and 1116 other files
+                ... and 87 other folders
+        input/
+            description.md (120 lines)
+            sample_submission.csv (9757 lines)
+            sample_submission.csv.zip (106.8 kB)
+            test.zip (160 Bytes)
+            test_images.zip (2.6 GB)
+            train.csv (87799 lines)
+            train.csv.zip (1.9 MB)
+            train.zip (162 Bytes)
+            train_images.zip (23.5 GB)
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+            test/
+                test/
+                    test/
+            test_images/
+                ccc436fc41bf402f.jpg (72.8 kB)
+                fb9d48b39c614c32.jpg (91.3 kB)
+                ... and 9754 other files
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+            train/
+                train/
+                    train/
+            train_images/
+                0/
+                    b5bd0a0a2de05bb5.jpg (73.8 kB)
+                    c242bcf0719f9d61.jpg (71.9 kB)
+                    ... and 18211 other files
+                1/
+                    a7ad6a44813b77c8.jpg (81.1 kB)
+                    9b89db65b496490d.jpg (630.0 kB)
+                    ... and 1116 other files
+                ... and 87 other folders
+        working/
+            hotel-id-2021-fgvc8/
+                description.md (120 lines)
+                sample_submission.csv (9757 lines)
+                ... and 7 other files
+                hotel-id-2021-fgvc8/
+                test/
+                    test/
+                test_images/
+                    ccc436fc41bf402f.jpg (72.8 kB)
+                    fb9d48b39c614c32.jpg (91.3 kB)
+                    ... and 9754 other files
+                    test_images/
+                train/
+                    train/
+                train_images/
+                    0/
+                        b5bd0a0a2de05bb5.jpg (73.8 kB)
+                        c242bcf0719f9d61.jpg (71.9 kB)
+                        ... and 18211 other files
+                    1/
+                        a7ad6a44813b77c8.jpg (81.1 kB)
+                        9b89db65b496490d.jpg (630.0 kB)
+                        ... and 1116 other files
+                    ... and 87 other folders
+```
+
+-> data/hotel-id-2021-fgvc8/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> data/hotel-id-2021-fgvc8/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> data/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> data/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> input/hotel-id-2021-fgvc8/sample_submission.csv has 9756 rows and 2 columns.
+The columns are: image, hotel_id
+
+-> input/hotel-id-2021-fgvc8/train.csv has 87798 rows and 4 columns.
+The columns are: image, chain, hotel_id, timestamp
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.5399174875810392
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.00209) has done: 'I guard the model loading so missing .pkl files no longer raise an error, and add a simple fallback that predicts the five most common hotel IDs from the training set when no models are available. This ensures the notebook runs end‑to‑end and writes a valid `submission.csv` with the required columns, allowing a baseline MAP@5 score rather than a crash.'
+
+# 9. Code solution
+
+## === cell 0
+import os, torch, contextlib
+
+torch.set_num_threads(os.cpu_count() or 1)
+torch.backends.cudnn.benchmark = True
+if hasattr(torch, "set_float32_matmul_precision"):
+    torch.set_float32_matmul_precision("high")
+
+
+## === cell 1
+print("fastai:", fastai.__version__, "torch:", torch.__version__)
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2910956869.py in <cell line: 0>()
+----> 1 print("fastai:", fastai.__version__, "torch:", torch.__version__)
+
+NameError: name 'fastai' is not defined
+
+## === cell 2
+models = [
+    "../input/fgvc8hotel/export_dn161_Fa_CE_bs32.pkl",
+    "../input/fgvc8hotel/export_dn161_Fa_FL_bs32.pkl",
+    "../input/fgvc8hotel/export_res101_Fall_HQAdam.pkl",
+]
+
+
+## === cell 3
+submission = pd.read_csv(
+    "../input/hotel-id-2021-hotel-id-2021-fgvc8/sample_submission.csv"
+)
+test = submission.copy()
+test["image"] = "../input/hotel-id-2021-fgvc8/test_images/" + test["image"]
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/303417415.py in <cell line: 0>()
+----> 1 submission = pd.read_csv(
+      2     "../input/hotel-id-2021-hotel-id-2021-fgvc8/sample_submission.csv"
+      3 )
+      4 test = submission.copy()
+      5 test["image"] = "../input/hotel-id-2021-fgvc8/test_images/" + test["image"]
+
+NameError: name 'pd' is not defined
+
+## === cell 4
+probs_agg = None
+model_loaded = False
+
+first_model_path = next((p for p in models if Path(p).exists()), None)
+if first_model_path:
+    temp_learner = load_learner(
+        fname=Path(first_model_path), cpu=False, pickle_module=dill
+    )
+    test_dl = temp_learner.dls.test_dl(test, bs=1024, num_workers=8)
+
+for model_path in models:
+    try:
+        learn = load_learner(fname=Path(model_path), cpu=False, pickle_module=dill)
+        model_loaded = True
+        probs_temp, _ = learn.tta(dl=test_dl)  # (n_samples, n_classes) probabilities
+        log_probs = torch.log(probs_temp)
+        probs_agg = log_probs if probs_agg is None else probs_agg + log_probs
+    except FileNotFoundError:
+        continue
+
+if model_loaded:
+    preds_idx = probs_agg.topk(5, dim=1)[1]  # indices of top‑5 classes
+    preds = [" ".join(map(str, learn.dls.vocab[pred.tolist()])) for pred in preds_idx]
+else:
+    train_csv_path = "../input/hotel-id-2021-fgvc8/train.csv"
+    train_images_root = Path("../input/hotel-id-2021-fgvc8/train_images")
+    test_images_root = Path("../input/hotel-id-2021-fgvc8/test_images")
+
+    train_df = pd.read_csv(train_csv_path)
+    train_df["hotel_id"] = train_df["hotel_id"].astype(str)
+
+    embed_cache_path = Path("train_embeddings.pt")
+    labels_cache_path = Path("train_labels.npy")
+    norm_cache_path = Path("train_norm.pt")
+
+    if (
+        embed_cache_path.exists()
+        and labels_cache_path.exists()
+        and norm_cache_path.exists()
+    ):
+        train_embeddings = torch.load(embed_cache_path)  # (N, 512)
+        train_labels = np.load(labels_cache_path, allow_pickle=True).tolist()
+        train_norm = torch.load(norm_cache_path)  # (N,)
+    else:
+        all_train_files = list(train_images_root.rglob("*.jpg"))
+        file_map = {p.name: p for p in all_train_files}
+        train_df["path"] = train_df["image"].map(file_map)
+        train_df = train_df.dropna(subset=["path"]).reset_index(drop=True)
+
+        class ImgDataset(Dataset):
+            def __init__(self, paths, labels, transform):
+                self.paths = paths
+                self.labels = labels
+                self.transform = transform
+
+            def __len__(self):
+                return len(self.paths)
+
+            def __getitem__(self, idx):
+                img = PILImage.create(self.paths[idx])
+                img = self.transform(img)
+                return img, self.labels[idx]
+
+        tfms = T.Compose(
+            [
+                T.Resize((224, 224)),
+                T.ToTensor(),
+                T.Normalize(mean=imagenet_stats[0], std=imagenet_stats[1]),
+            ]
+        )
+
+        train_dataset = ImgDataset(
+            train_df["path"].tolist(),
+            train_df["hotel_id"].tolist(),
+            tfms,
+        )
+        train_loader = DataLoader(
+            train_dataset,
+            batch_size=1024,  # larger batch for fewer iterations
+            shuffle=False,
+            num_workers=8,  # more workers speeds up image loading
+            pin_memory=True,
+        )
+
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        resnet = torchvision.models.resnet34(pretrained=True)
+        resnet.fc = torch.nn.Identity()
+        resnet.eval()
+        resnet.to(device)
+
+        emb_list = []
+        train_labels = []
+        amp_ctx = (
+            torch.cuda.amp.autocast()
+            if device.type == "cuda"
+            else contextlib.nullcontext()
+        )
+        with torch.no_grad(), amp_ctx:
+            for imgs, labs in train_loader:
+                imgs = imgs.to(device, non_blocking=True)
+                emb = resnet(imgs)  # (B, 512)
+                emb_list.append(emb.cpu())
+                train_labels.extend(labs)
+
+        train_embeddings = torch.cat(emb_list, dim=0).to(device)  # (N, 512)
+        torch.save(train_embeddings.cpu(), embed_cache_path)
+        np.save(labels_cache_path, np.array(train_labels, dtype=object))
+        train_norm = train_embeddings.pow(2).sum(dim=1)  # (N,)
+        torch.save(train_norm.cpu(), norm_cache_path)
+
+    test_paths = test["image"].tolist()
+    test_dataset = ImgDataset(test_paths, [0] * len(test_paths), tfms)  # dummy labels
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=1024,
+        shuffle=False,
+        num_workers=8,
+        pin_memory=True,
+    )
+
+    device = train_embeddings.device
+    preds = []
+
+    amp_ctx = (
+        torch.cuda.amp.autocast() if device.type == "cuda" else contextlib.nullcontext()
+    )
+    with torch.no_grad(), amp_ctx:
+        for imgs, _ in test_loader:
+            imgs = imgs.to(device, non_blocking=True)
+            test_emb = resnet(imgs)  # (B, 512)
+            test_norm = test_emb.pow(2).sum(dim=1, keepdim=True)  # (B,1)
+
+            dists = (
+                test_norm
+                + train_norm.unsqueeze(0)
+                - 2.0 * test_emb @ train_embeddings.t()
+            )  # (B, N)
+
+            _, idxs = torch.topk(-dists, 5, dim=1)
+            for batch_idx in idxs:
+                nearest_ids = [train_labels[i] for i in batch_idx.tolist()]
+                preds.append(" ".join(nearest_ids))
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/314213184.py in <cell line: 0>()
+      3 
+      4 # create a single test DataLoader with larger batch size and more workers
+----> 5 first_model_path = next((p for p in models if Path(p).exists()), None)
+      6 if first_model_path:
+      7     temp_learner = load_learner(
+
+/tmp/ipykernel_55/314213184.py in <genexpr>(.0)
+      3 
+      4 # create a single test DataLoader with larger batch size and more workers
+----> 5 first_model_path = next((p for p in models if Path(p).exists()), None)
+      6 if first_model_path:
+      7     temp_learner = load_learner(
+
+NameError: name 'Path' is not defined
+
+## === cell 5
+submission["hotel_id"] = preds
+submission.to_csv("submission.csv", index=False)
+print("Submission written to submission.csv")
+print(submission.head())
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/12902193.py in <cell line: 0>()
+----> 1 submission["hotel_id"] = preds
+      2 submission.to_csv("submission.csv", index=False)
+      3 print("Submission written to submission.csv")
+      4 print(submission.head())
+
+NameError: name 'preds' is not defined

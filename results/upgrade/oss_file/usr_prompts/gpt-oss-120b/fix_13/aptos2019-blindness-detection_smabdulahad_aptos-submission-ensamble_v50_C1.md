@@ -1,0 +1,508 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+sklearn-pandas==2.2.0
+timm==1.0.19
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7959658426024361
+
+# 6. Current score
+
+-0.06574
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -0.09019) has done: 'The fixes address three runtime errors: (1) use the modern Pillow resampling constant instead of the removed `Image.ANTIALIAS`; (2) ensure the image resize works on any mode by converting to RGB; (3) handle missing pretrained model files by falling back to ImageNet‑pretrained weights. These changes let the preprocessing, dataset loading, model inference, and CSV writing run end‑to‑end, producing a valid `submission.csv` while keeping the original model architecture and inference logic untouched.'
+- What this solution (achieved 0.0) has done: 'I keep the overall architecture unchanged but fix two key issues that are hurting the quadratic weighted‑kappa score: (1) the test images were unnecessarily down‑scaled to 100 px and then up‑scaled again, so I point the dataset to the original high‑resolution images; (2) instead of using a hard argmax on the soft‑max outputs, I compute the expected rating (the probability‑weighted average) and round it to the nearest integer, which aligns better with the kappa metric. These small changes should raise the score toward the target while preserving the original model logic.'
+- What this solution (achieved 0.0) has done: 'I add the missing import of `shutil` at the top of the script so the cleanup code in cell 1 runs without raising a `NameError`. This allows the downstream preprocessing, model loading, inference, and CSV creation to execute, producing a valid submission whose score should move toward the target.'
+- What this solution (achieved -0.0518) has done: 'I replace the soft‑max expectation calculation with a simple argmax of the weighted ensemble probabilities, which aligns better with the quadratic weighted‑kappa metric for discrete class predictions while keeping the rest of the pipeline unchanged. This minor change should move the score toward the target without altering the core model architecture or training process.'
+- What this solution (achieved 0.0) has done: 'I replace the hard argmax prediction with a probability‑weighted expected rating rounded to the nearest integer, which aligns better with the quadratic weighted kappa metric and should raise the score toward the target while keeping the rest of the pipeline unchanged.'
+- What this solution (achieved 0.03957) has done: 'I replace the expected‑rating rounding with a simple argmax over the weighted soft‑max probabilities, because predicting the most likely discrete class usually yields a higher quadratic weighted‑kappa than rounding the probability‑weighted average. This change is minimal, keeps the overall architecture intact, and should move the score upward toward the target.'
+- What this solution (achieved 0.0) has done: 'I replace the hard‑argmax prediction with a probability‑weighted expected rating (rounded to the nearest integer) because the quadratic weighted‑kappa metric benefits from calibrated class probabilities rather than a raw argmax. This small change keeps the model architecture and loading logic untouched while aligning the predictions more closely with the evaluation metric, which should raise the score toward the target.'
+- What this solution (achieved 0.00569) has done: 'I replace the probability‑weighted expected rating (rounded) with a simple argmax over the weighted soft‑max probabilities in the inference cell. This minor change keeps the model loading and preprocessing untouched while providing discrete class predictions that usually yield a higher quadratic weighted‑kappa, moving the score toward the target.'
+- What this solution (achieved 0.0) has done: 'I make two small but impactful changes:  
+
+1. Load the provided checkpoint with `strict=False` so any compatible pretrained weights are actually applied instead of falling back to generic ImageNet weights.  
+2. Replace the hard argmax prediction with a probability‑weighted expected rating (rounded to the nearest integer) which aligns better with the quadratic weighted‑kappa metric while keeping the rest of the pipeline unchanged.'
+- What this solution (achieved -0.09457) has done: 'I adjust the model loading to always use a strong ImageNet‑pretrained backbone (EfficientNet‑B5) instead of relying on a missing checkpoint, and I switch the prediction from a probability‑weighted expected rating to a simple arg‑max of the soft‑max probabilities, which is generally better for quadratic weighted‑kappa. These minimal changes keep the overall pipeline intact while moving the expected score toward the target.'
+- What this solution (achieved 0.22941) has done: 'I replace the hard argmax prediction with a probability‑weighted expected rating (rounded to the nearest integer) because this aligns better with the quadratic weighted‑kappa metric and should increase the score toward the target while keeping the rest of the pipeline unchanged.'
+- What this solution (achieved -0.06574) has done: 'I keep the overall pipeline unchanged but improve the predictions by (1) using a larger input size that matches the EfficientNet‑B5 backbone (456 px instead of 224 px) and (2) switching from the probability‑weighted expected rating to a simple argmax over the weighted class probabilities, which usually yields higher quadratic weighted‑kappa scores. These minimal adjustments preserve the original architecture and training logic while moving the score toward the target.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import warnings
+import numpy as np
+import pandas as pd
+from PIL import Image
+from tqdm import tqdm
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, Dataset
+from torchvision import transforms
+import timm
+from multiprocessing import Pool
+import cv2
+import shutil
+
+
+
+## === cell 1
+try:
+    shutil.rmtree("/kaggle/working/train")
+    model_file_to_delete = "/kaggle/working/models"
+    if os.path.isfile(model_file_to_delete):
+        os.remove(model_file_to_delete)
+except Exception:
+    print("No such directories or files to delete")
+
+
+
+
+## === cell 2
+def load_data(data_dir):
+    test_csv = os.path.join(data_dir, "test.csv")
+    test = pd.read_csv(test_csv)
+    test_dir = os.path.join(data_dir, "test_images/")
+    test["file_path"] = test["id_code"].map(
+        lambda x: os.path.join(test_dir, f"{x}.png")
+    )
+    test["file_name"] = test["id_code"] + ".png"
+    return test
+
+
+
+
+## === cell 3
+data_dir = "/kaggle/input/aptos2019-blindness-detection/"
+test_df = load_data(data_dir)
+
+
+
+
+## === cell 4
+def crop_img(img, percentage):
+    img_arr = np.array(img)
+    img_gray = cv2.cvtColor(img_arr, cv2.COLOR_BGR2GRAY)
+    threshold = img_gray > 0.1 * np.mean(img_gray[img_gray != 0])
+    row_sums = np.sum(threshold, axis=1)
+    col_sums = np.sum(threshold, axis=0)
+    rows = np.where(row_sums > img_arr.shape[1] * percentage)[0]
+    cols = np.where(col_sums > img_arr.shape[0] * percentage)[0]
+    min_row, min_col = np.min(rows), np.min(cols)
+    max_row, max_col = np.max(rows), np.max(cols)
+    crop_img = img_arr[min_row : max_row + 1, min_col : max_col + 1]
+    return Image.fromarray(crop_img)
+
+
+
+
+## === cell 5
+def resize_maintain_aspect(img, desired_size):
+    img = img.convert("RGB")
+    old_width, old_height = img.size
+    aspect_ratio = old_width / old_height
+
+    if aspect_ratio > 1:
+        new_width = desired_size
+        new_height = int(desired_size / aspect_ratio)
+    else:
+        new_height = desired_size
+        new_width = int(desired_size * aspect_ratio)
+
+    if hasattr(Image, "Resampling"):
+        resample = Image.Resampling.LANCZOS
+    else:
+        resample = Image.ANTIALIAS  # fallback for older versions
+
+    resized_img = img.resize((new_width, new_height), resample)
+
+    padded_image = Image.new("RGB", (desired_size, desired_size))
+    x_offset = (desired_size - new_width) // 2
+    y_offset = (desired_size - new_height) // 2
+    padded_image.paste(resized_img, (x_offset, y_offset))
+    return padded_image
+
+
+
+
+## === cell 6
+def save_single(args):
+    image_path, output_path_folder, percentage, output_size = args
+    image = Image.open(image_path)
+    cropped_img = crop_img(image, percentage)
+    image_resized = resize_maintain_aspect(cropped_img, desired_size=output_size[0])
+    output_image_path = os.path.basename(image_path)
+    output_file_path = os.path.join(output_path_folder, output_image_path)
+    image_resized.save(output_file_path)
+
+
+
+
+## === cell 7
+def fast_image_resize(df, output_path_folder, percentage, output_size=None):
+    """Resize all images using multiprocessing."""
+    if output_size is None:
+        warnings.warn("Need to specify output_size! For example: output_size=100")
+        return
+
+    if not os.path.exists(output_path_folder):
+        os.makedirs(output_path_folder, exist_ok=True)
+
+    jobs = []
+    for idx in range(len(df)):
+        image_path = df.file_path.iloc[idx]
+        jobs.append((image_path, output_path_folder, percentage, output_size))
+
+    with Pool() as p:
+        list(tqdm(p.imap_unordered(save_single, jobs), total=len(jobs)))
+
+
+
+
+## === cell 8
+percentage = 0.01
+fast_image_resize(
+    test_df, "/kaggle/working/test/images_resized/", percentage, output_size=(100, 100)
+)
+
+
+
+
+## === cell 9
+class BlindnessDataset(Dataset):
+    def __init__(self, csv_file, root_dir, transform=None, test=False):
+        self.annotations = pd.read_csv(csv_file)
+        self.root_dir = root_dir
+        self.transform = transform
+        self.test = test
+
+    def __len__(self):
+        return len(self.annotations)
+
+    def __getitem__(self, idx):
+        img_name = os.path.join(self.root_dir, self.annotations.iloc[idx, 0] + ".png")
+        image = Image.open(img_name).convert("RGB")
+        if self.transform:
+            image = self.transform(image)
+        if self.test:
+            return image
+        else:
+            label = int(self.annotations.iloc[idx, 1])
+            return image, label
+
+
+
+
+## === cell 10
+transform = transforms.Compose(
+    [
+        transforms.Resize((456, 456)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ]
+)
+
+
+
+## === cell 11
+test_csv_file = "/kaggle/input/aptos2019-blindness-detection/test.csv"
+test_root_dir = "/kaggle/input/aptos2019-blindness-detection/test_images/"
+test_dataset = BlindnessDataset(
+    test_csv_file, test_root_dir, transform=transform, test=True
+)
+test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+
+
+
+## === cell 12
+model_paths = {
+    "efficientnet_b5": ""  # empty path forces fallback to pretrained weights
+}
+model_names = {
+    "efficientnet_b5": "efficientnet_b5",
+    "resnet18": "resnet18",
+    "efficientnet_b5": "efficientnet_b5",
+    "inception_resnet_v2": "inception_resnet_v2",
+    "inception_v4": "inception_v4",
+    "seresnext50_32x4d": "seresnext50_32x4d",
+    "seresnext101_32x4d": "seresnext101_32x4d",
+}
+
+
+
+## === cell 13
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+models_list = []
+
+for model_key, path in model_paths.items():
+    model_name = model_names[model_key]
+    try:
+        if path and os.path.isfile(path):
+            model = timm.create_model(model_name, pretrained=False, num_classes=5)
+            state = torch.load(path, map_location=device)
+            model.load_state_dict(state, strict=False)
+        else:
+            raise FileNotFoundError("Checkpoint not provided")
+    except Exception as e:
+        print(
+            f"Could not load checkpoint for {model_key} ({e}); using ImageNet pretrained weights."
+        )
+        model = timm.create_model(model_name, pretrained=True, num_classes=5)
+    model.to(device)
+    model.eval()
+    models_list.append(model)
+
+
+
+## === cell 14
+validation_scores = {
+    "efficientnet_b5": 0.887,
+}
+total_score = sum(validation_scores.values())
+weights = {k: v / total_score for k, v in validation_scores.items()}
+
+
+
+## === cell 15
+all_predictions = []
+class_indices = torch.arange(
+    5, dtype=torch.float32, device=device
+)  # 0‑4 (kept for compatibility)
+with torch.no_grad():
+    for images in tqdm(test_loader):
+        images = images.to(device)
+        probs = [
+            weights[model_key]
+            * nn.functional.softmax(model(images), dim=1).unsqueeze(0)
+            for model_key, model in zip(model_paths.keys(), models_list)
+        ]
+        probs = torch.cat(probs)  # (num_models, batch, 5)
+        weighted_probs = torch.sum(probs, dim=0)  # (batch, 5)
+
+        preds = torch.argmax(weighted_probs, dim=1).long()
+        preds = torch.clamp(preds, 0, 4)  # ensure valid range
+        all_predictions.extend(preds.cpu().numpy())
+
+final_predictions = np.array(all_predictions, dtype=int)
+
+
+
+## === cell 16
+submission_df = pd.DataFrame(
+    {"id_code": pd.read_csv(test_csv_file)["id_code"], "diagnosis": final_predictions}
+)
+submission_df.to_csv("submission.csv", index=False)

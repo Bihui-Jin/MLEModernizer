@@ -1,0 +1,571 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Identify technosignature signals in cadence snippets taken from a digital spectrometer.
+
+## Metric
+Area under the ROC curve between the predicted probability and the observed target.
+
+## Submission Format
+For each `id` in the test set, you must predict a probability for the `target` variable. The file should contain a header and have the following format:
+
+```
+id,target
+00034abb3629,0.5
+0004be0baf70,0.5
+0005be4d0752,0.5
+etc.
+
+```
+
+## Dataset
+The data is from a digital spectrometer, which takes incoming raw data from the telescope (amounting to hundreds of TB per day) and performs a Fourier Transform to generate a spectrogram. These spectrograms, also referred to as filterbank files, or dynamic spectra, consist of measurements of signal intensity as a function of frequency and time.
+
+Below is an example of an FM radio signal. This is not from the GBT, but from a small antenna attached to a software defined radio dongle (a $20 piece of kit that you can plug into your laptop to pick up signals). The data we get from the GBT are very similar, but split into larger numbers of frequency channels, covering a much broader instantaneous frequency range, and with much better sensitivity.
+
+![frequency-time-plot](https://prod-files-secure.s3.us-west-2.amazonaws.com/667f1cbf-826f-4641-a321-96054292638d/b59a57f3-11a7-4493-8268-55c3fa632f7e/Untitled.png)
+
+The screenshot above shows frequency on the horizontal axis (running from around 88.2 to 89.8 MHz) and time on the vertical axis. The bright orange feature at 88.5 MHz is the FM signal from KQED, a radio station in the San Francisco Bay Area. The solid yellow blocks on either side (one highlighted by the pointer in the screenshot) are the KQED “HD radio” signal (the same data as the FM signal, but encoded digitally). Additional FM stations are visible at different frequencies, including another obvious FM signal (without the corresponding digital sidebands) at 89.5 MHz.
+
+The spectrometer generates similar spectrograms to the one shown above, but typically spanning several GHz of the radio spectrum (rather than the approx. 2 MHz shown above). The data are stored either as filterbank format or HDF5 format files, but essentially are arrays of intensity as a function of frequency and time, accompanied by headers containing metadata such as the direction the telescope was pointed in, the frequency scale, and so on. We generate over 1 PB of spectrograms per year; individual filterbank files can be tens of GB in size. We have discarded the majority of the metadata and are simply presenting numpy arrays consisting of small regions of the spectrograms that we refer to as “snippets”.
+
+The spectrometer is searching for candidate signatures of extraterrestrial technology - so-called technosignatures. The main obstacle to doing so is that our own human technology (not just radio stations, but wifi routers, cellphones, and even electronics that are not deliberately designed to transmit radio signals) also gives off radio signals. We refer to these human-generated signals as “radio frequency interference”, or RFI.
+
+One method we use to isolate candidate technosignatures from RFI is to look for signals that appear to be coming from particular positions on the sky. Typically we do this by alternating observations of our primary target star with observations of three nearby stars: 5 minutes on star “A”, then 5 minutes on star “B”, then back to star “A” for 5 minutes, then “C”, then back to “A”, then finishing with 5 minutes on star “D”. One set of six observations (ABACAD) is referred to as a “cadence”. Since we're just giving you a small range of frequencies for each cadence, we refer to the datasets you'll be analyzing as “cadence snippets”.
+
+An example of an extraterrestrial signal:
+
+![voyager-signal](https://storage.googleapis.com/kaggle-media/competitions/SETI-Berkeley/Screen%20Shot%202021-05-03%20at%2011.39.42.png)
+
+As the plot title suggests, this is the Voyager 1 spacecraft. Even though it's 20 billion kilometers from Earth, it's picked up clearly by the GBT. The first, third, and fifth panels are the “A” target (the spacecraft, in this case). The yellow diagonal line is the radio signal coming from Voyager. It's detected when we point at the spacecraft, and it disappears when we point away. It's a diagonal line in this plot because the relative motion of the Earth and the spacecraft imparts a Doppler drift, causing the frequency to change over time. As it happens, that's another possible way to reject RFI, which has a higher tendency to remain at a fixed frequency over time.
+
+While it would be nice to train our algorithms entirely on observations of interplanetary spacecraft, there are not many examples of them, and we also want to be able to find a wider range of signal types. So we've turned to simulating technosignature candidates.
+
+We've taken tens of thousands of cadence snippets, which we're calling the haystack, and we've hidden needles among them. Some of these needles look similar to the Voyager 1 signal above and should be easy to detect, even with classical detection algorithms. Others are hidden in noisy regions of the spectrum and will be harder, even though they might be relatively obvious on visual inspection:
+
+![needle-signal](https://storage.googleapis.com/kaggle-media/competitions/SETI-Berkeley/Screen%20Shot%202021-05-03%20at%2011.34.06.png)
+
+After we perform the signal injections, we normalize each snippet, so you probably can't identify most of the needles just by looking for excess energy in the corresponding array. You'll likely need a more subtle algorithm that looks for patterns that appear only in the on-target observations.
+
+Not all of the “needle” signals look like diagonal lines, and they may not be present for the entirety of all three “A” observations, but what they do have in common is that they are only present in some or all of the “A” observations (panels 1, 3, and 5 in the cadence snippets). Your challenge is to train an algorithm to find as many needles as you can, while minimizing the number of false positives from the haystack.
+
+- **train/** - a training set of cadence snippet files stored in `numpy` `float16` format (v1.20.1), one file per cadence snippet `id`, with corresponding labels found in the `train_labels.csv` file. Each file has dimension `(6, 273, 256)`, with the 1st dimension representing the 6 positions of the cadence, and the 2nd and 3rd dimensions representing the 2D spectrogram.
+- **test/** - the test set cadence snippet files; you must predict whether or not the cadence contains a "needle", which is the `target` for this competition
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train_labels** - targets corresponding (by `id`) to the cadence snippet files found in the `train/` folder
+- **old_leaky_data** - full pre-relaunch data, including test labels; you should not assume this data is helpful (it may or may not be).
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (112 lines)
+            old_leaky_data.zip (23.6 GB)
+            sample_submission.csv (6001 lines)
+            sample_submission.csv.zip (60.0 kB)
+            test.zip (4.5 GB)
+            train.zip (4.7 GB)
+            train_labels.csv (54001 lines)
+            train_labels.csv.zip (529.5 kB)
+            old_leaky_data/
+                test_labels_old.csv (35848 lines)
+                train_labels_old.csv (50166 lines)
+                test_old/
+                    0/
+                        00034db451c4.npy (838.8 kB)
+                        0006316b5ca0.npy (838.8 kB)
+                        ... and 2197 other files
+                    1/
+                        10038983cab1.npy (838.8 kB)
+                        100865aff453.npy (838.8 kB)
+                        ... and 2278 other files
+                    ... and 14 other folders
+                train_old/
+                    0/
+                        00034abb3629.npy (838.8 kB)
+                        0004300a0b9b.npy (838.8 kB)
+                        ... and 3143 other files
+                    1/
+                        1000e00b26db.npy (838.8 kB)
+                        100148224705.npy (838.8 kB)
+                        ... and 3142 other files
+                    ... and 14 other folders
+            seti-breakthrough-listen/
+                description.md (112 lines)
+                old_leaky_data.zip (23.6 GB)
+                ... and 6 other files
+                old_leaky_data/
+                    test_labels_old.csv (35848 lines)
+                    train_labels_old.csv (50166 lines)
+                    test_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    train_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                seti-breakthrough-listen/
+                test/
+                    0/
+                        0016fd6c09d476d.npy (838.8 kB)
+                        0017643c1c5c254.npy (838.8 kB)
+                        ... and 374 other files
+                    1/
+                        1001ca1d08f9235.npy (838.8 kB)
+                        1016de9cec2dc8a.npy (838.8 kB)
+                        ... and 353 other files
+                    ... and 15 other folders
+                train/
+                    0/
+                        0000799a2b2c42d.npy (838.8 kB)
+                        00042890562ff68.npy (838.8 kB)
+                        ... and 3335 other files
+                    1/
+                        100105755d4c5b1.npy (838.8 kB)
+                        1001a55ebce86f2.npy (838.8 kB)
+                        ... and 3392 other files
+                    ... and 15 other folders
+            test/
+                0/
+                    0016fd6c09d476d.npy (838.8 kB)
+                    0017643c1c5c254.npy (838.8 kB)
+                    ... and 374 other files
+                1/
+                    1001ca1d08f9235.npy (838.8 kB)
+                    1016de9cec2dc8a.npy (838.8 kB)
+                    ... and 353 other files
+                ... and 15 other folders
+            train/
+                0/
+                    0000799a2b2c42d.npy (838.8 kB)
+                    00042890562ff68.npy (838.8 kB)
+                    ... and 3335 other files
+                1/
+                    100105755d4c5b1.npy (838.8 kB)
+                    1001a55ebce86f2.npy (838.8 kB)
+                    ... and 3392 other files
+                ... and 15 other folders
+        input/
+            description.md (112 lines)
+            old_leaky_data.zip (23.6 GB)
+            sample_submission.csv (6001 lines)
+            sample_submission.csv.zip (60.0 kB)
+            test.zip (4.5 GB)
+            train.zip (4.7 GB)
+            train_labels.csv (54001 lines)
+            train_labels.csv.zip (529.5 kB)
+            old_leaky_data/
+                test_labels_old.csv (35848 lines)
+                train_labels_old.csv (50166 lines)
+                test_old/
+                    0/
+                        00034db451c4.npy (838.8 kB)
+                        0006316b5ca0.npy (838.8 kB)
+                        ... and 2197 other files
+                    1/
+                        10038983cab1.npy (838.8 kB)
+                        100865aff453.npy (838.8 kB)
+                        ... and 2278 other files
+                    ... and 14 other folders
+                train_old/
+                    0/
+                        00034abb3629.npy (838.8 kB)
+                        0004300a0b9b.npy (838.8 kB)
+                        ... and 3143 other files
+                    1/
+                        1000e00b26db.npy (838.8 kB)
+                        100148224705.npy (838.8 kB)
+                        ... and 3142 other files
+                    ... and 14 other folders
+            seti-breakthrough-listen/
+                description.md (112 lines)
+                old_leaky_data.zip (23.6 GB)
+                ... and 6 other files
+                old_leaky_data/
+                    test_labels_old.csv (35848 lines)
+                    train_labels_old.csv (50166 lines)
+                    test_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    train_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                seti-breakthrough-listen/
+                test/
+                    0/
+                        0016fd6c09d476d.npy (838.8 kB)
+                        0017643c1c5c254.npy (838.8 kB)
+                        ... and 374 other files
+                    1/
+                        1001ca1d08f9235.npy (838.8 kB)
+                        1016de9cec2dc8a.npy (838.8 kB)
+                        ... and 353 other files
+                    ... and 15 other folders
+                train/
+                    0/
+                        0000799a2b2c42d.npy (838.8 kB)
+                        00042890562ff68.npy (838.8 kB)
+                        ... and 3335 other files
+                    1/
+                        100105755d4c5b1.npy (838.8 kB)
+                        1001a55ebce86f2.npy (838.8 kB)
+                        ... and 3392 other files
+                    ... and 15 other folders
+            test/
+                0/
+                    0016fd6c09d476d.npy (838.8 kB)
+                    0017643c1c5c254.npy (838.8 kB)
+                    ... and 374 other files
+                1/
+                    1001ca1d08f9235.npy (838.8 kB)
+                    1016de9cec2dc8a.npy (838.8 kB)
+                    ... and 353 other files
+                ... and 15 other folders
+            train/
+                0/
+                    0000799a2b2c42d.npy (838.8 kB)
+                    00042890562ff68.npy (838.8 kB)
+                    ... and 3335 other files
+                1/
+                    100105755d4c5b1.npy (838.8 kB)
+                    1001a55ebce86f2.npy (838.8 kB)
+                    ... and 3392 other files
+                ... and 15 other folders
+        working/
+            seti-breakthrough-listen/
+                description.md (112 lines)
+                old_leaky_data.zip (23.6 GB)
+                ... and 6 other files
+                old_leaky_data/
+                    test_labels_old.csv (35848 lines)
+                    train_labels_old.csv (50166 lines)
+                    test_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                    train_old/
+                        0/
+                            ... (max depth reached)
+                        1/
+                            ... (max depth reached)
+                        ... and 14 other folders
+                seti-breakthrough-listen/
+                test/
+                    0/
+                        0016fd6c09d476d.npy (838.8 kB)
+                        0017643c1c5c254.npy (838.8 kB)
+                        ... and 374 other files
+                    1/
+                        1001ca1d08f9235.npy (838.8 kB)
+                        1016de9cec2dc8a.npy (838.8 kB)
+                        ... and 353 other files
+                    ... and 15 other folders
+                train/
+                    0/
+                        0000799a2b2c42d.npy (838.8 kB)
+                        00042890562ff68.npy (838.8 kB)
+                        ... and 3335 other files
+                    1/
+                        100105755d4c5b1.npy (838.8 kB)
+                        1001a55ebce86f2.npy (838.8 kB)
+                        ... and 3392 other files
+                    ... and 15 other folders
+```
+
+-> data/old_leaky_data/test_labels_old.csv has 35847 rows and 2 columns.
+The columns are: id, target
+
+-> data/old_leaky_data/train_labels_old.csv has 50165 rows and 2 columns.
+The columns are: id, target
+
+-> data/sample_submission.csv has 6000 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/old_leaky_data/test_labels_old.csv has 35847 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/old_leaky_data/train_labels_old.csv has 50165 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/sample_submission.csv has 6000 rows and 2 columns.
+The columns are: id, target
+
+-> data/seti-breakthrough-listen/train_labels.csv has 54000 rows and 2 columns.
+The columns are: id, target
+
+-> data/train_labels.csv has 54000 rows and 2 columns.
+The columns are: id, target
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7571313712626022
+
+# 6. Current score
+
+0.50388
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5) has done: 'I replace the missing external submission reads with a simple baseline that uses the overall positive rate from the training labels as a constant prediction for every test sample. This ensures a valid `submission.csv` is written with the correct columns, fixing the FileNotFound and NameError issues while keeping the core logic unchanged.'
+- What this solution (achieved 0.5003) has done: 'I replace the constant‑mean baseline with a tiny “lookup” model that predicts each test sample using the average target of training samples sharing the same first two hex characters of their id. This adds only a few lines, keeps the overall workflow unchanged, and should raise the AUC toward the target (higher is better). The fallback remains the overall mean for unseen prefixes, and the script still writes a valid `submission.csv`.'
+- What this solution (achieved 0.49959) has done: 'I extend the simple prefix‑lookup heuristic by using a longer (four‑character) ID prefix when it is available, falling back to the original two‑character prefix and finally to the overall mean. This keeps the original workflow intact while giving the model more granularity, which should raise the AUC toward the target.'
+- What this solution (achieved 0.49959) has done: 'I extend the simple prefix‑lookup heuristic by adding a six‑character prefix statistic and use it as the first fallback before the existing four‑ and two‑character prefixes. This keeps the original workflow intact while giving the model more granularity, which should raise the AUC toward the target without altering the overall logic.'
+- What this solution (achieved 0.50314) has done: 'I replace the raw prefix averages with Bayesian‑smoothed estimates that pull rare prefixes toward the global mean while keeping well‑supported prefixes more extreme. This gives predictions with higher variance where justified, which typically raises the AUC and moves the score closer to the target. The rest of the workflow (reading the labels, applying the fall‑backs, and writing `submission.csv`) stays unchanged.'
+- What this solution (achieved 0.49967) has done: 'I add a lightweight hyper‑parameter sweep that selects the smoothing “alpha” which gives the best AUC on a held‑out validation split (using the same prefix‑lookup logic). The chosen alpha is then used to recompute the smoothed prefix statistics on the full training set, keeping the original workflow unchanged while improving the predictions toward the target score.'
+- What this solution (achieved 0.49967) has done: 'I add a lightweight calibration step using a logistic‑regression model that maps the raw prefix‑based probabilities to better‑calibrated scores. This keeps the original prefix‑lookup logic intact, but the calibrated probabilities usually improve the ROC‑AUC, moving the score upward toward the target. The script now fits the calibrator on the full training data after the prefix statistics are computed and then applies it to the test predictions before writing the submission file.'
+- What this solution (achieved 0.5027) has done: 'I added a few lightweight tweaks that keep the original prefix‑lookup idea but give it more expressive power and a better‑tuned smoothing.  
+1. The validation sweep now also tries very small α values (0.1, 0.5) so the model can use less smoothing when the data support it.  
+2. Instead of a strict fallback hierarchy, the raw prediction is a weighted average of the 6‑, 4‑, and 2‑character prefix estimates (weights 0.6, 0.3, 0.1). This uses all available information without changing the overall workflow.  
+3. The logistic calibrator is given a modest regularisation (C = 0.5) to reduce over‑fitting on the full training set.  
+These minimal changes preserve the core logic while nudging the AUC upward toward the target.'
+- What this solution (achieved 0.50145) has done: 'I add an 8‑character prefix statistic and give it the highest weight in the combined prediction (while keeping the existing 6‑, 4‑ and 2‑character prefixes as lower‑weight fall‑backs). This minor change adds a little more granularity to the simple lookup model, which should raise the ROC‑AUC toward the target without altering the overall workflow.'
+- What this solution (achieved 0.49758) has done: 'I keep the original prefix‑lookup idea but replace the fixed‑weight combination with a small logistic regression that learns how to blend the 2‑, 4‑, 6‑ and 8‑character prefix averages. The code now searches for the best smoothing α and the best regularisation C on a held‑out validation split, then fits the final model on the full training data and writes the calibrated probabilities to `submission.csv`. This preserves the overall workflow while giving the model a chance to increase the AUC toward the target.'
+- What this solution (achieved 0.50449) has done: 'I fixed the hyper‑parameter search so that models are trained on the training split and evaluated on the held‑out validation split (instead of fitting and scoring on the same data). This gives a more reliable α and C, which in turn improves the calibrated predictions and moves the AUC toward the target while keeping the overall workflow unchanged.'
+- What this solution (achieved 0.50388) has done: 'I added prefix‑count features (the number of training samples that share each 2‑, 4‑, 6‑ and 8‑character prefix) and included them alongside the smoothed prefix‑mean predictions in the logistic‑regression feature matrix. The extra count columns give the model information about how reliable each prefix estimate is, which should improve calibration and raise the AUC toward the target while keeping the original workflow unchanged. All calls to the feature matrix have been updated to use the new extended version, and the script now writes a valid `submission.csv`.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+from sklearn.linear_model import LogisticRegression
+
+train_labels_path = "../input/train_labels.csv"
+sample_submission_path = "../input/sample_submission.csv"
+
+train_df = pd.read_csv(train_labels_path)
+
+overall_mean_full = train_df["target"].mean()
+
+
+def smoothed_prefix_means(df, prefix_len, alpha, overall_mean):
+    grp = df.groupby(df["id"].str[:prefix_len])["target"]
+    sum_target = grp.sum()
+    count = grp.count()
+    return (sum_target + alpha * overall_mean) / (count + alpha)
+
+
+def prefix_counts(df, prefix_len):
+    """Return a Series mapping each prefix to the count of its occurrences."""
+    return df.groupby(df["id"].str[:prefix_len]).size()
+
+
+def prefix_feature_matrix(id_series, p2, p4, p6, p8, overall_mean):
+    """Return a (n,4) array with the four prefix mean predictions."""
+    f2 = id_series.str[:2].map(p2).fillna(overall_mean).values.reshape(-1, 1)
+    f4 = id_series.str[:4].map(p4).fillna(overall_mean).values.reshape(-1, 1)
+    f6 = id_series.str[:6].map(p6).fillna(overall_mean).values.reshape(-1, 1)
+    f8 = id_series.str[:8].map(p8).fillna(overall_mean).values.reshape(-1, 1)
+    return np.hstack([f2, f4, f6, f8])
+
+
+def prefix_feature_matrix_extended(
+    id_series, p2, p4, p6, p8, c2, c4, c6, c8, overall_mean
+):
+    """Return a (n,8) array with prefix means and their corresponding counts."""
+    f2 = id_series.str[:2].map(p2).fillna(overall_mean).values.reshape(-1, 1)
+    f4 = id_series.str[:4].map(p4).fillna(overall_mean).values.reshape(-1, 1)
+    f6 = id_series.str[:6].map(p6).fillna(overall_mean).values.reshape(-1, 1)
+    f8 = id_series.str[:8].map(p8).fillna(overall_mean).values.reshape(-1, 1)
+
+    cnt2 = id_series.str[:2].map(c2).fillna(0).values.reshape(-1, 1)
+    cnt4 = id_series.str[:4].map(c4).fillna(0).values.reshape(-1, 1)
+    cnt6 = id_series.str[:6].map(c6).fillna(0).values.reshape(-1, 1)
+    cnt8 = id_series.str[:8].map(c8).fillna(0).values.reshape(-1, 1)
+
+    return np.hstack([f2, f4, f6, f8, cnt2, cnt4, cnt6, cnt8])
+
+
+train_split, val_split = train_test_split(
+    train_df,
+    test_size=0.2,
+    stratify=train_df["target"],
+    random_state=42,
+)
+
+overall_mean_train = train_split["target"].mean()
+
+candidate_alphas = [0.01, 0.1, 0.5, 1, 5, 10, 20, 50, 100]
+best_alpha = None
+best_auc_alpha = -1.0
+
+for alpha in candidate_alphas:
+    p2 = smoothed_prefix_means(train_split, 2, alpha, overall_mean_train)
+    p4 = smoothed_prefix_means(train_split, 4, alpha, overall_mean_train)
+    p6 = smoothed_prefix_means(train_split, 6, alpha, overall_mean_train)
+    p8 = smoothed_prefix_means(train_split, 8, alpha, overall_mean_train)
+
+    X_train_alpha = prefix_feature_matrix(
+        train_split["id"], p2, p4, p6, p8, overall_mean_train
+    )
+    X_val_alpha = prefix_feature_matrix(
+        val_split["id"], p2, p4, p6, p8, overall_mean_train
+    )
+
+    y_train_alpha = train_split["target"]
+    y_val_alpha = val_split["target"]
+
+    tmp_model = LogisticRegression(solver="lbfgs", max_iter=1000, C=1.0)
+    tmp_model.fit(X_train_alpha, y_train_alpha)
+    val_pred = tmp_model.predict_proba(X_val_alpha)[:, 1]
+    auc = roc_auc_score(y_val_alpha, val_pred)
+
+    if auc > best_auc_alpha:
+        best_auc_alpha = auc
+        best_alpha = alpha
+
+alpha = best_alpha if best_alpha is not None else 10.0
+print(f"Selected alpha: {alpha:.2f} (validation‑only AUC: {best_auc_alpha:.5f})")
+
+overall_mean = overall_mean_full
+prefix2_means = smoothed_prefix_means(train_df, 2, alpha, overall_mean)
+prefix4_means = smoothed_prefix_means(train_df, 4, alpha, overall_mean)
+prefix6_means = smoothed_prefix_means(train_df, 6, alpha, overall_mean)
+prefix8_means = smoothed_prefix_means(train_df, 8, alpha, overall_mean)
+
+prefix2_counts = prefix_counts(train_df, 2)
+prefix4_counts = prefix_counts(train_df, 4)
+prefix6_counts = prefix_counts(train_df, 6)
+prefix8_counts = prefix_counts(train_df, 8)
+
+candidate_cs = [0.1, 0.5, 1.0, 2.0, 5.0]
+best_c = None
+best_auc_c = -1.0
+
+X_train_c = prefix_feature_matrix_extended(
+    train_split["id"],
+    prefix2_means,
+    prefix4_means,
+    prefix6_means,
+    prefix8_means,
+    prefix2_counts,
+    prefix4_counts,
+    prefix6_counts,
+    prefix8_counts,
+    overall_mean,
+)
+X_val_c = prefix_feature_matrix_extended(
+    val_split["id"],
+    prefix2_means,
+    prefix4_means,
+    prefix6_means,
+    prefix8_means,
+    prefix2_counts,
+    prefix4_counts,
+    prefix6_counts,
+    prefix8_counts,
+    overall_mean,
+)
+y_train_c = train_split["target"]
+y_val_c = val_split["target"]
+
+for c in candidate_cs:
+    model = LogisticRegression(solver="lbfgs", max_iter=1000, C=c)
+    model.fit(X_train_c, y_train_c)
+    val_pred = model.predict_proba(X_val_c)[:, 1]
+    auc = roc_auc_score(y_val_c, val_pred)
+    if auc > best_auc_c:
+        best_auc_c = auc
+        best_c = c
+
+print(f"Selected C: {best_c:.2f} (validation AUC: {best_auc_c:.5f})")
+
+X_train_full = prefix_feature_matrix_extended(
+    train_df["id"],
+    prefix2_means,
+    prefix4_means,
+    prefix6_means,
+    prefix8_means,
+    prefix2_counts,
+    prefix4_counts,
+    prefix6_counts,
+    prefix8_counts,
+    overall_mean,
+)
+y_train_full = train_df["target"]
+
+calibrator = LogisticRegression(solver="lbfgs", max_iter=1000, C=best_c)
+calibrator.fit(X_train_full, y_train_full)
+
+
+
+
+## === cell 1
+submission_df = pd.read_csv(sample_submission_path)
+
+if "target" not in submission_df.columns:
+    submission_df["target"] = np.nan
+
+X_test = prefix_feature_matrix_extended(
+    submission_df["id"],
+    prefix2_means,
+    prefix4_means,
+    prefix6_means,
+    prefix8_means,
+    prefix2_counts,
+    prefix4_counts,
+    prefix6_counts,
+    prefix8_counts,
+    overall_mean,
+)
+
+calibrated_preds = calibrator.predict_proba(X_test)[:, 1]
+submission_df["target"] = calibrated_preds
+
+
+
+
+## === cell 2
+submission_df.to_csv("submission.csv", index=False)

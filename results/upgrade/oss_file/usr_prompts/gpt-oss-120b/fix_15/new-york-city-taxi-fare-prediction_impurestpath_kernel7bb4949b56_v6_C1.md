@@ -1,0 +1,444 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the fare amount for a taxi ride given the pickup and dropoff locations.
+
+## Metric
+Root mean-squared error.
+
+## Submission Format
+For each `key` in the test set, you must predict a value for the `fare_amount` variable. The file should contain a header and have the following format:
+
+```
+key,fare_amount
+2015-01-27 13:08:24.0000002,11.00
+2015-02-27 13:08:24.0000002,12.05
+2015-03-27 13:08:24.0000002,11.23
+2015-04-27 13:08:24.0000002,14.17
+2015-05-27 13:08:24.0000002,15.12
+etc
+```
+
+## Dataset
+- **train.csv** - Input features and target `fare_amount` values for the training set (about 55M rows).
+- **test.csv** - Input features for the test set (about 10K rows). Your goal is to predict `fare_amount` for each row.
+- **sample_submission.csv** - a sample submission file in the correct format (columns `key` and `fare_amount`). This file 'predicts' `fare_amount` to be $`11.35` for all rows, which is the mean `fare_amount` from the training set.
+
+### Data fields
+**ID**
+
+- **key** - Unique `string` identifying each row in both the training and test sets. Comprised of **pickup_datetime** plus a unique integer, but this doesn't matter, it should just be used as a unique ID field.Required in your submission CSV. Not necessarily needed in the training set, but could be useful to simulate a 'submission file' while doing cross-validation within the training set.
+
+**Features**
+
+- **pickup_datetime** - `timestamp` value indicating when the taxi ride started.
+- **pickup_longitude** - `float` for longitude coordinate of where the taxi ride started.
+- **pickup_latitude** - `float` for latitude coordinate of where the taxi ride started.
+- **dropoff_longitude** - `float` for longitude coordinate of where the taxi ride ended.
+- **dropoff_latitude** - `float` for latitude coordinate of where the taxi ride ended.
+- **passenger_count** - `integer` indicating the number of passengers in the taxi ride.
+
+**Target**
+
+- **fare_amount** - `float` dollar amount of the cost of the taxi ride. This value is only in the training set; this is what you are predicting in the test set and it is required in your submission CSV.
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        input/
+            GCP-Coupons-Instructions.rtf (486 Bytes)
+            description.md (100 lines)
+            labels.csv (55413943 lines)
+            labels.csv.zip (1.6 GB)
+            sample_submission.csv (9915 lines)
+            sample_submission.csv.zip (76.2 kB)
+            test.csv (9915 lines)
+            test.csv.zip (273.0 kB)
+            train.csv (55423857 lines)
+            train.csv.zip (1.6 GB)
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+        working/
+            new-york-city-taxi-fare-prediction/
+                GCP-Coupons-Instructions.rtf (486 Bytes)
+                description.md (100 lines)
+                ... and 8 other files
+                new-york-city-taxi-fare-prediction/
+```
+
+-> data/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/labels.csv has 55413942 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/new-york-city-taxi-fare-prediction/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/new-york-city-taxi-fare-prediction/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/sample_submission.csv has 9914 rows and 2 columns.
+The columns are: key, fare_amount
+
+-> data/test.csv has 9914 rows and 7 columns.
+The columns are: key, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> data/train.csv has 55423856 rows and 8 columns.
+The columns are: key, fare_amount, pickup_datetime, pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.style.use("seaborn-whitegrid")
+
+
+
+## === cell 1
+df_train = pd.read_csv(
+    "../input/new-york-city-taxi-fare-prediction/train.csv",
+    nrows=1_000_000,
+    parse_dates=["pickup_datetime"],
+)
+df_train.head()
+
+
+
+## === cell 2
+df_train.describe()
+
+
+
+## === cell 3
+df_test = pd.read_csv(
+    "../input/new-york-city-taxi-fare-prediction/test.csv",
+    parse_dates=["pickup_datetime"],
+)
+df_test.head()
+
+
+
+## === cell 4
+print("Old size: %d" % len(df_train))
+df_train = df_train[df_train.fare_amount >= 0]
+print("New size: %d" % len(df_train))
+
+
+
+## === cell 5
+print("Old size: %d" % len(df_train))
+df_train = df_train.dropna(how="any", axis="rows")
+print("New size: %d" % len(df_train))
+
+
+
+## === cell 6
+df_train[df_train.fare_amount < 80].fare_amount.hist(bins=100)
+plt.xlabel("fare $USD")
+
+
+
+## === cell 7
+df_train["diff_long"] = (df_train.dropoff_longitude - df_train.pickup_longitude).abs()
+df_train["diff_long"].describe()
+
+
+
+## === cell 8
+df_train["diff_lat"] = (df_train.dropoff_latitude - df_train.pickup_latitude).abs()
+df_train["diff_lat"].describe()
+
+
+
+## === cell 9
+print("Old size: %d" % len(df_train))
+df_train = df_train[(df_train.diff_long < 5.0) & (df_train.diff_lat < 5.0)]
+print("New size: %d" % len(df_train))
+
+
+
+## === cell 10
+df_train["year"] = df_train["pickup_datetime"].dt.year
+df_train["weekday"] = df_train["pickup_datetime"].dt.weekday
+df_train["hour"] = df_train["pickup_datetime"].dt.hour
+df_train["month"] = df_train["pickup_datetime"].dt.month
+df_train["is_night"] = ((df_train["hour"] <= 5) | (df_train["hour"] >= 22)).astype(int)
+
+
+
+## === cell 11
+df_train.describe()
+
+
+
+## === cell 12
+df_train[["fare_amount", "hour"]].groupby(["hour"], as_index=False).mean().sort_values(
+    by="fare_amount", ascending=False
+)
+
+
+
+## === cell 13
+df_train[["fare_amount", "weekday"]].groupby(
+    ["weekday"], as_index=False
+).mean().sort_values(by="fare_amount", ascending=False)
+
+
+
+## === cell 14
+df_train[["fare_amount", "year"]].groupby(["year"], as_index=False).mean().sort_values(
+    by="fare_amount", ascending=False
+)
+
+
+
+
+## === cell 15
+def distance(lat1, lon1, lat2, lon2):
+    p = 0.017453292519943295  # Pi/180
+    a = (
+        0.5
+        - np.cos((lat2 - lat1) * p) / 2
+        + np.cos(lat1 * p) * np.cos(lat2 * p) * (1 - np.cos((lon2 - lon1) * p)) / 2
+    )
+    return 12742 * np.arcsin(np.sqrt(a))  # 2*R*asin...
+
+
+
+
+## === cell 16
+df_train["distance"] = distance(
+    df_train.pickup_latitude,
+    df_train.pickup_longitude,
+    df_train.dropoff_latitude,
+    df_train.dropoff_longitude,
+)
+
+
+
+## === cell 17
+plt.figure(figsize=(15, 8))
+sns.heatmap(
+    df_train.drop(["key", "pickup_datetime"], axis=1).corr(), annot=True, fmt=".4f"
+)
+
+
+
+## === cell 18
+df_train.plot.scatter("distance", "fare_amount")
+
+
+
+## === cell 19
+df_train = df_train[(df_train.distance >= 0.1)]
+print("After distance >=0.1: %d" % len(df_train))
+
+
+
+## === cell 20
+df_train = df_train[(df_train.distance <= 50)]
+print("After distance <=50: %d" % len(df_train))
+
+
+
+## === cell 21
+df_train = df_train[(df_train.fare_amount <= 200)]
+print("After fare_amount <=200: %d" % len(df_train))
+
+
+
+## === cell 22
+df_train["log_distance"] = np.log1p(df_train["distance"])
+
+
+
+## === cell 23
+df_train["hour_sin"] = np.sin(2 * np.pi * df_train["hour"] / 24)
+df_train["hour_cos"] = np.cos(2 * np.pi * df_train["hour"] / 24)
+df_train["month_sin"] = np.sin(2 * np.pi * df_train["month"] / 12)
+df_train["month_cos"] = np.cos(2 * np.pi * df_train["month"] / 12)
+df_train["weekday_sin"] = np.sin(2 * np.pi * df_train["weekday"] / 7)
+df_train["weekday_cos"] = np.cos(2 * np.pi * df_train["weekday"] / 7)
+df_train["distance_per_passenger"] = df_train["distance"] / df_train[
+    "passenger_count"
+].replace(0, np.nan)
+df_train["distance_per_passenger"].fillna(df_train["distance"], inplace=True)
+
+
+
+## === cell 24
+df_test["year"] = df_test["pickup_datetime"].dt.year
+df_test["month"] = df_test["pickup_datetime"].dt.month
+df_test["weekday"] = df_test["pickup_datetime"].dt.weekday
+df_test["hour"] = df_test["pickup_datetime"].dt.hour
+df_test["distance"] = distance(
+    df_test.pickup_latitude,
+    df_test.pickup_longitude,
+    df_test.dropoff_latitude,
+    df_test.dropoff_longitude,
+)
+df_test["diff_long"] = (df_test.dropoff_longitude - df_test.pickup_longitude).abs()
+df_test["diff_lat"] = (df_test.dropoff_latitude - df_test.pickup_latitude).abs()
+df_test["is_night"] = ((df_test["hour"] <= 5) | (df_test["hour"] >= 22)).astype(int)
+df_test["log_distance"] = np.log1p(df_test["distance"])
+df_test["hour_sin"] = np.sin(2 * np.pi * df_test["hour"] / 24)
+df_test["hour_cos"] = np.cos(2 * np.pi * df_test["hour"] / 24)
+df_test["month_sin"] = np.sin(2 * np.pi * df_test["month"] / 12)
+df_test["month_cos"] = np.cos(2 * np.pi * df_test["month"] / 12)
+df_test["weekday_sin"] = np.sin(2 * np.pi * df_test["weekday"] / 7)
+df_test["weekday_cos"] = np.cos(2 * np.pi * df_test["weekday"] / 7)
+df_test["distance_per_passenger"] = df_test["distance"] / df_test[
+    "passenger_count"
+].replace(0, np.nan)
+df_test["distance_per_passenger"].fillna(df_test["distance"], inplace=True)
+
+
+
+## === cell 25
+features = [
+    "year",
+    "month",
+    "weekday",
+    "hour",
+    "distance",
+    "log_distance",
+    "passenger_count",
+    "pickup_latitude",
+    "pickup_longitude",
+    "dropoff_latitude",
+    "dropoff_longitude",
+    "diff_long",
+    "diff_lat",
+    "is_night",
+    "hour_sin",
+    "hour_cos",
+    "month_sin",
+    "month_cos",
+    "weekday_sin",
+    "weekday_cos",
+    "distance_per_passenger",
+]
+X = df_train[features].values
+y = df_train["fare_amount"].values
+
+
+
+## === cell 26
+X_kaggle_test = df_test[features].values
+
+
+
+## === cell 27
+from sklearn.model_selection import train_test_split
+import xgboost as xgb
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=10, test_size=0.3)
+
+
+def XGBmodel(x_train, x_val, y_train, y_val):
+    y_train_log = np.log1p(y_train)
+    y_val_log = np.log1p(y_val)
+    dtrain = xgb.DMatrix(x_train, label=y_train_log)
+    dval = xgb.DMatrix(x_val, label=y_val_log)
+    params = {
+        "objective": "reg:squarederror",
+        "eval_metric": "rmse",
+        "max_depth": 8,
+        "eta": 0.005,
+        "subsample": 0.9,
+        "colsample_bytree": 0.9,
+        "lambda": 1.0,
+        "alpha": 0.0,
+        "tree_method": "hist",
+        "nthread": 8,
+    }
+    model = xgb.train(
+        params=params,
+        dtrain=dtrain,
+        num_boost_round=15000,
+        early_stopping_rounds=300,
+        evals=[(dval, "validation")],
+        verbose_eval=False,
+    )
+    return model
+
+
+model = XGBmodel(X_train, X_val, y_train, y_val)
+
+prediction_log = model.predict(xgb.DMatrix(X_kaggle_test))
+prediction = np.expm1(prediction_log)
+
+prediction = np.clip(prediction, a_min=0, a_max=None)
+
+
+
+## === cell 28
+submission = pd.DataFrame({"key": df_test["key"], "fare_amount": prediction})
+submission.to_csv("submission.csv", index=False)
+submission.head()

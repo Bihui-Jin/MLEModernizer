@@ -1,0 +1,356 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean column-wise ROC AUC.
+
+## Submission Format
+For each image_id in the test set, you must predict a probability for each target variable. The file should contain a header and have the following format:
+
+```
+image_id,
+test_0,0.25,0.25,0.25,0.25
+test_1,0.25,0.25,0.25,0.25
+test_2,0.25,0.25,0.25,0.25
+etc.
+```
+
+## Dataset
+Given a photo of an apple leaf, can you accurately assess its health? This competition will challenge you to distinguish between leaves which are healthy, those which are infected with apple rust, those that have apple scab, and those with more than one disease.
+
+**train.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+**images**
+
+A folder containing the train and test images, in jpg format.
+
+**test.csv**
+
+- `image_id`: the foreign key
+
+**sample_submission.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        input/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        working/
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+```
+
+-> data/plant-pathology-2020-fgvc7/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/plant-pathology-2020-fgvc7/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/plant-pathology-2020-fgvc7/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9684771380136814
+
+# 6. Current score
+
+0.51994
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5) has done: 'I make the script robust by loading any external CSV submissions only if they exist, skipping missing files instead of crashing. If no external predictions are available, the code fall back to a simple baseline that uses the mean label frequencies from the training data. This ensures a valid `submission.csv` is always written with the correct columns and ordering while keeping the original averaging logic when possible. The changes are limited to safe file‑handling and a fallback baseline, preserving the core idea of averaging predictions.'
+- What this solution (achieved 0.5) has done: 'I make the script locate the data files more robustly by searching common Kaggle input directories, correctly load the sample submission or fall back to the test file, and safely average any external prediction CSVs that are found. This fixes the FileNotFound and None‑type errors, ensures the submission has the right columns and ordering, and lets the model use the available external predictions (which should raise the ROC‑AUC toward the target score).'
+- What this solution (achieved 0.5) has done: 'I expand the search for external prediction CSVs to include the current working directory and the typical Kaggle `/kaggle/working` folder, and skip any files that lack the required target columns. This keeps the original averaging logic but makes it far more likely to find and use the high‑quality external predictions, which should raise the ROC‑AUC toward the target score.'
+- What this solution (achieved 0.5) has done: 'I broaden the search for external prediction CSVs by recursively scanning all sub‑directories under the detected data folders, picking every file that contains the required target columns, and averaging those predictions. This keeps the original averaging logic but makes it far more likely to locate existing high‑quality external predictions, moving the ROC‑AUC score closer to the target while preserving the core workflow.'
+- What this solution (achieved 0.5) has done: 'I add a deterministic pseudo‑random component to the fallback predictions so that, instead of giving every test image the same global mean, each image gets a slight variation based on its `image_id`. This creates a ranking among images, which usually improves ROC‑AUC when the score was previously flat (0.5). I also adjust the external‑prediction averaging to fill missing values with the column means rather than zeros, preserving more information. These minimal tweaks keep the original workflow intact while moving the score upward toward the target.'
+- What this solution (achieved 0.5) has done: 'The fix adds a lightweight “bucket” heuristic when no external prediction files are found: it extracts the numeric part of each image name, groups training rows by the digit modulo 10, and uses the per‑bucket label means as predictions for the test set. This creates a deterministic ranking that correlates with the training distribution, moving the ROC‑AUC well above the flat 0.5 baseline while keeping the original workflow unchanged. All other logic (external file averaging, clipping, and CSV writing) remains the same.'
+- What this solution (achieved 0.5) has done: 'I replace the simple bucket‑based fallback with a nearest‑neighbor heuristic that, for each test image, finds the training image whose numeric ID is closest and uses that row’s label values as the prediction. This keeps the overall structure unchanged but gives a data‑driven ranking that should raise the ROC‑AUC toward the target score. The rest of the script (file discovery, external prediction averaging, clipping and CSV output) remains the same.'
+- What this solution (achieved 0.5) has done: 'I replace the simple nearest‑neighbor fallback (used when no external predictions are found) with a lightweight “bucket” heuristic: each image’s numeric id modulo 10 defines a bucket, and we compute the mean label frequencies per bucket from the training set. Test images receive the corresponding bucket means (blended slightly with the global means). This keeps the overall workflow unchanged while providing a ranked set of probabilities that should lift the ROC‑AUC toward the target.'
+- What this solution (achieved 0.5) has done: 'I replace the simple bucket‑based fallback with a deterministic nearest‑neighbor heuristic that uses the training row whose numeric image_id is closest to each test image. This keeps the overall workflow unchanged (same data loading, external‑prediction averaging, clipping, and CSV writing) while providing a more informative ranking of probabilities, which should move the ROC‑AUC from the flat 0.5 toward the target value.'
+- What this solution (achieved 0.5) has done: 'I replace the fallback nearest‑neighbor heuristic with a lightweight bucket‑based prediction: each image’s numeric ID modulo 10 defines a bucket, and we use the mean label values of that bucket from the training set (blended 90 % with the global mean). This keeps the overall workflow unchanged while providing a ranked set of probabilities that should improve the ROC‑AUC toward the target.'
+- What this solution (achieved 0.51994) has done: 'The solution keep the existing file‑discovery and external‑prediction averaging, but replace the very simple bucket fallback with a lightweight logistic‑regression model that uses the numeric image id and its modulo‑10 bucket as features. This adds a data‑driven ranking that is still deterministic and fast, and it is blended modestly (10 %) with any external predictions so the overall score moves upward toward the target without changing the overall workflow.'
+- What this solution (achieved 0.51994) has done: 'I replace the simple logistic‑regression fallback (used when no external predictions are found) with a deterministic nearest‑neighbor heuristic based on the numeric image ID. For each test image we locate the training image whose numeric ID is closest and copy its label values, which gives a much richer ranking than the original flat model and moves the ROC‑AUC toward the target. The rest of the script (file discovery, external‑prediction handling, clipping and CSV output) remains unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+import hashlib
+from sklearn.linear_model import LogisticRegression
+
+
+def safe_read_csv(path):
+    """Read CSV and return None on missing file."""
+    try:
+        return pd.read_csv(path)
+    except (FileNotFoundError, pd.errors.EmptyDataError):
+        return None
+
+
+_possible_dirs = [
+    os.path.join(".", "data", "plant-pathology-2020-fgvc7"),
+    os.path.join(".", "data"),
+    os.path.join(".", "input", "plant-pathology-2020-fgvc7"),
+    os.path.join(".", "input"),
+    "/kaggle/input/plant-pathology-2020-fgvc7",
+    "/kaggle/input",
+]
+BASE_DIR = next((d for d in _possible_dirs if os.path.isdir(d)), None)
+if BASE_DIR is None:
+    raise FileNotFoundError("No valid data directory found among expected locations.")
+ALT_BASE_DIR = BASE_DIR  # fallback uses the same found directory
+
+
+
+
+## === cell 1
+sub_path = os.path.join(BASE_DIR, "sample_submission.csv")
+sub = safe_read_csv(sub_path)
+
+if sub is None:
+    sub = safe_read_csv(os.path.join(ALT_BASE_DIR, "sample_submission.csv"))
+
+if sub is None:
+    test_path = os.path.join(BASE_DIR, "test.csv")
+    test = safe_read_csv(test_path)
+    if test is None:
+        test = safe_read_csv(os.path.join(ALT_BASE_DIR, "test.csv"))
+    if test is None:
+        raise FileNotFoundError("Test CSV not found in any expected location.")
+    sub = pd.DataFrame()
+    sub["image_id"] = test["image_id"]
+    for col in ["healthy", "multiple_diseases", "rust", "scab"]:
+        sub[col] = 0.0
+
+sub = sub.set_index("image_id")
+
+
+
+
+## === cell 2
+target_cols = ["healthy", "multiple_diseases", "rust", "scab"]
+
+search_dirs = [
+    BASE_DIR,
+    ALT_BASE_DIR,
+    ".",
+    "/kaggle/working",
+]
+
+
+def discover_prediction_files(dirs, required_cols):
+    """Return list of DataFrames that have at least one of the required target columns."""
+    dfs = []
+    for base in dirs:
+        if not os.path.isdir(base):
+            continue
+        for root, _, files in os.walk(base):
+            for f in files:
+                if f.lower().endswith(".csv"):
+                    path = os.path.join(root, f)
+                    df = safe_read_csv(path)
+                    if df is not None and set(required_cols).intersection(df.columns):
+                        dfs.append(df)
+    return dfs
+
+
+dsub = discover_prediction_files(search_dirs, target_cols)
+
+n = len(dsub)  # number of valid external predictions found
+
+train_path = os.path.join(BASE_DIR, "train.csv")
+train = safe_read_csv(train_path)
+if train is None:
+    train = safe_read_csv(os.path.join(ALT_BASE_DIR, "train.csv"))
+if train is None:
+    raise FileNotFoundError("Train CSV not found in any expected location.")
+mean_vals = train[target_cols].mean()
+
+
+def numeric_id(x):
+    s = str(x)
+    num_str = "".join(filter(str.isdigit, s))
+    return int(num_str) if num_str else 0
+
+
+if n > 0:
+    accum = pd.DataFrame(0.0, index=sub.index, columns=target_cols)
+    for d in dsub:
+        d_aligned = d.set_index("image_id").reindex(sub.index)
+        for col in target_cols:
+            if col not in d_aligned.columns:
+                d_aligned[col] = mean_vals[col]
+        accum += d_aligned[target_cols].fillna(mean_vals)
+    external_pred = accum / n
+
+    train["numeric_id"] = train["image_id"].apply(numeric_id)
+    train["bucket"] = train["numeric_id"] % 10
+    test_df = pd.DataFrame(
+        {
+            "image_id": sub.index,
+            "numeric_id": sub.index.to_series().apply(numeric_id),
+        }
+    )
+    test_df["bucket"] = test_df["numeric_id"] % 10
+    X_train = train[["numeric_id", "bucket"]]
+    model_preds = pd.DataFrame(index=sub.index, columns=target_cols)
+    for col in target_cols:
+        y = train[col]
+        model = LogisticRegression(solver="liblinear", max_iter=200)
+        model.fit(X_train, y)
+        model_preds[col] = model.predict_proba(test_df[["numeric_id", "bucket"]])[:, 1]
+    sub[target_cols] = 0.9 * external_pred + 0.1 * model_preds
+else:
+    train["numeric_id"] = train["image_id"].apply(numeric_id)
+    train_sorted = train.sort_values("numeric_id").reset_index(drop=True)
+
+    test_df = pd.DataFrame(
+        {
+            "image_id": sub.index,
+            "numeric_id": sub.index.to_series().apply(numeric_id),
+        }
+    )
+
+    train_ids = train_sorted["numeric_id"].values
+    test_ids = test_df["numeric_id"].values
+    insert_pos = np.searchsorted(train_ids, test_ids, side="left")
+
+    lower_idx = np.clip(insert_pos - 1, 0, len(train_ids) - 1)
+    upper_idx = np.clip(insert_pos, 0, len(train_ids) - 1)
+
+    lower_ids = train_ids[lower_idx]
+    upper_ids = train_ids[upper_idx]
+
+    dist_low = np.abs(test_ids - lower_ids)
+    dist_up = np.abs(upper_ids - test_ids)
+
+    use_upper = dist_up < dist_low
+    nearest_idx = np.where(use_upper, upper_idx, lower_idx)
+
+    nearest_rows = train_sorted.iloc[nearest_idx][target_cols].reset_index(drop=True)
+    model_preds = nearest_rows.copy()
+    model_preds.index = sub.index  # align with submission index
+
+    sub[target_cols] = model_preds
+
+sub[target_cols] = sub[target_cols].clip(0.0, 1.0)
+
+
+
+
+## === cell 3
+submission_path = "submission.csv"
+sub.reset_index().to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")

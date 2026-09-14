@@ -1,0 +1,601 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.838319734058628
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.61099) has done: 'The fix pre‑computes the frozen EfficientNet features once and then trains only the lightweight classification head on those cached arrays. This removes the expensive forward pass through EfficientNet on every epoch, cutting training time dramatically while keeping the exact same model architecture and predictions. The test images are processed the same way, using the same feature extractor, so result accuracy is unchanged.'
+- What this solution (achieved 0.61099) has done: 'The fix moves the protobuf environment variable **before** importing TensorFlow to eliminate the `MessageFactory` import error, and increases the head‑model training epochs from 5 to 10 so the classifier learns a bit longer, nudging the validation accuracy (and thus the final Kaggle score) toward the target while preserving all original logic.'
+- What this solution (achieved 0.61099) has done: 'Implemented fixes to resolve TensorFlow protobuf import error, removed unsupported `workers` arguments from `predict` calls, corrected ONEDNN environment variable typo, and ensured proper variable scope across cells. These changes allow the script to run end‑to‑end, generate a valid `submission.csv`, and retain the original model architecture for accurate scoring.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications import EfficientNetB0
+from tensorflow.keras.layers import Input, GlobalAveragePooling2D, Dense
+from tensorflow.keras.models import Model
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras import mixed_precision
+
+BASE_DIR = "/kaggle/input/cassava-leaf-disease-classification"
+if not os.path.isdir(BASE_DIR):
+    BASE_DIR = os.path.join(os.getcwd(), "data", "cassava-leaf-disease-classification")
+
+TRAIN_IMG_DIR = os.path.join(BASE_DIR, "train_images")
+TEST_IMG_DIR = os.path.join(BASE_DIR, "test_images")
+TRAIN_CSV = os.path.join(BASE_DIR, "train.csv")
+
+train_df = pd.read_csv(TRAIN_CSV)
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+train_datagen = ImageDataGenerator(
+    rescale=1.0 / 255,
+    horizontal_flip=True,
+    rotation_range=20,
+    validation_split=0.2,
+)
+
+train_generator = train_datagen.flow_from_dataframe(
+    dataframe=train_df,
+    directory=TRAIN_IMG_DIR,
+    x_col="image_id",
+    y_col="label",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    subset="training",
+    shuffle=True,
+    seed=42,
+)
+
+val_generator = train_datagen.flow_from_dataframe(
+    dataframe=train_df,
+    directory=TRAIN_IMG_DIR,
+    x_col="image_id",
+    y_col="label",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    subset="validation",
+    shuffle=False,
+    seed=42,
+)
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1972881415.py in <cell line: 0>()
+     12     x_col="image_id",
+     13     y_col="label",
+---> 14     target_size=(IMG_SIZE, IMG_SIZE),
+     15     batch_size=BATCH_SIZE,
+     16     class_mode="categorical",
+
+NameError: name 'IMG_SIZE' is not defined
+
+## === cell 2
+IMG_SIZE = 224  # EfficientNetB0 default input size
+BATCH_SIZE = 32
+NUM_CLASSES = 5
+
+mixed_precision.set_global_policy("mixed_float16")
+
+base_model = EfficientNetB0(
+    weights="imagenet", include_top=False, input_shape=(IMG_SIZE, IMG_SIZE, 3)
+)
+base_model.trainable = False
+
+inputs = Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+x = base_model(inputs, training=False)
+x = GlobalAveragePooling2D()(x)
+feature_extractor = Model(inputs, x, name="feature_extractor")
+
+train_features = feature_extractor.predict(train_generator, verbose=1)
+val_features = feature_extractor.predict(val_generator, verbose=1)
+
+train_labels = to_categorical(train_generator.classes, NUM_CLASSES)
+val_labels = to_categorical(val_generator.classes, NUM_CLASSES)
+
+inputs_feat = Input(shape=(train_features.shape[1],))
+outputs = Dense(NUM_CLASSES, activation="softmax", dtype="float32")(inputs_feat)
+head_model = Model(inputs_feat, outputs, name="head_model")
+head_model.compile(
+    optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
+)
+
+checkpoint_path = "best_head.h5"
+checkpoint = ModelCheckpoint(
+    checkpoint_path, monitor="val_accuracy", save_best_only=True, mode="max", verbose=1
+)
+early_stop = EarlyStopping(
+    monitor="val_accuracy", patience=3, mode="max", restore_best_weights=True, verbose=1
+)
+
+head_model.fit(
+    train_features,
+    train_labels,
+    epochs=30,
+    batch_size=BATCH_SIZE,
+    validation_data=(val_features, val_labels),
+    callbacks=[checkpoint, early_stop],
+    verbose=2,
+)
+
+head_model.load_weights(checkpoint_path)
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3546156876.py in <cell line: 0>()
+     17 
+     18 # Extract features for training / validation sets
+---> 19 train_features = feature_extractor.predict(train_generator, verbose=1)
+     20 val_features = feature_extractor.predict(val_generator, verbose=1)
+     21 
+
+NameError: name 'train_generator' is not defined
+
+## === cell 3
+train_generator = train_datagen.flow_from_dataframe(
+    dataframe=train_df,
+    directory=TRAIN_IMG_DIR,
+    x_col="image_id",
+    y_col="label",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    subset="training",
+    shuffle=True,
+    seed=42,
+)
+
+val_generator = train_datagen.flow_from_dataframe(
+    dataframe=train_df,
+    directory=TRAIN_IMG_DIR,
+    x_col="image_id",
+    y_col="label",
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode="categorical",
+    subset="validation",
+    shuffle=False,
+    seed=42,
+)
+
+full_input = Input(shape=(IMG_SIZE, IMG_SIZE, 3))
+x_full = base_model(full_input, training=False)
+x_full = GlobalAveragePooling2D()(x_full)
+output_full = Dense(NUM_CLASSES, activation="softmax", dtype="float32")(x_full)
+full_model = Model(full_input, output_full, name="full_model")
+
+full_model.layers[-1].set_weights(head_model.layers[-1].get_weights())
+
+for layer in base_model.layers[-40:]:
+    layer.trainable = True
+
+full_model.compile(
+    optimizer=tf.keras.optimizers.Adam(1e-4),
+    loss="categorical_crossentropy",
+    metrics=["accuracy"],
+)
+
+ft_checkpoint = ModelCheckpoint(
+    "best_full.h5", monitor="val_accuracy", save_best_only=True, mode="max", verbose=1
+)
+ft_early_stop = EarlyStopping(
+    monitor="val_accuracy", patience=3, mode="max", restore_best_weights=True, verbose=1
+)
+
+full_model.fit(
+    train_generator,
+    epochs=20,  # increased from 12
+    validation_data=val_generator,
+    callbacks=[ft_checkpoint, ft_early_stop],
+    verbose=2,
+)
+
+full_model.load_weights("best_full.h5")
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/1329178908.py in <cell line: 0>()
+      1 # Re‑create generators for fine‑tuning (previous generators exhausted)
+----> 2 train_generator = train_datagen.flow_from_dataframe(
+      3     dataframe=train_df,
+      4     directory=TRAIN_IMG_DIR,
+      5     x_col="image_id",
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/preprocessing/image.py in flow_from_dataframe(self, dataframe, directory, x_col, y_col, weight_col, target_size, color_mode, classes, class_mode, batch_size, shuffle, seed, save_to_dir, save_prefix, save_format, subset, interpolation, validate_filenames, **kwargs)
+   1206             )
+   1207 
+-> 1208         return DataFrameIterator(
+   1209             dataframe,
+   1210             directory,
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/preprocessing/image.py in __init__(self, dataframe, directory, image_data_generator, x_col, y_col, weight_col, target_size, color_mode, classes, class_mode, batch_size, shuffle, seed, data_format, save_to_dir, save_prefix, save_format, subset, interpolation, keep_aspect_ratio, dtype, validate_filenames)
+    749         self.dtype = dtype
+    750         # check that inputs match the required class_mode
+--> 751         self._check_params(df, x_col, y_col, weight_col, classes)
+    752         if (
+    753             validate_filenames
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/preprocessing/image.py in _check_params(self, df, x_col, y_col, weight_col, classes)
+    839             types = (str, list, tuple)
+    840             if not all(df[y_col].apply(lambda x: isinstance(x, types))):
+--> 841                 raise TypeError(
+    842                     'If class_mode="{}", y_col="{}" column '
+    843                     "values must be type string, list or tuple.".format(
+
+TypeError: If class_mode="categorical", y_col="label" column values must be type string, list or tuple.
+
+## === cell 4
+if not os.path.isdir(TEST_IMG_DIR):
+    raise FileNotFoundError(f"Test images directory not found: {TEST_IMG_DIR}")
+
+test_images = sorted(os.listdir(TEST_IMG_DIR))
+test_df = pd.DataFrame({"image_id": test_images})
+
+test_datagen = ImageDataGenerator(rescale=1.0 / 255)
+test_generator = test_datagen.flow_from_dataframe(
+    dataframe=test_df,
+    directory=TEST_IMG_DIR,
+    x_col="image_id",
+    y_col=None,
+    target_size=(IMG_SIZE, IMG_SIZE),
+    batch_size=BATCH_SIZE,
+    class_mode=None,
+    shuffle=False,
+)
+
+pred_probs = full_model.predict(test_generator, verbose=1)
+y_preds = np.argmax(pred_probs, axis=1)
+
+filenames = [os.path.basename(f) for f in test_generator.filenames]
+df_sub = pd.DataFrame({"image_id": filenames, "label": y_preds})
+df_sub.to_csv("submission.csv", index=False)
+print("Submission saved to submission.csv with", len(df_sub), "records.")
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3210697007.py in <cell line: 0>()
+     18 )
+     19 
+---> 20 pred_probs = full_model.predict(test_generator, verbose=1)
+     21 y_preds = np.argmax(pred_probs, axis=1)
+     22 
+
+NameError: name 'full_model' is not defined

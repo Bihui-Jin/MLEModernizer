@@ -1,0 +1,444 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict whether an image contains a cactus.
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each ID in the test set, you must predict a probability for the `has_cactus` variable. The file should contain a header and have the following format:
+
+```
+id,has_cactus
+000940378805c44108d287872b2f04ce.jpg,0.5
+0017242f54ececa4512b4d7937d1e21e.jpg,0.5
+001ee6d8564003107853118ab87df407.jpg,0.5
+etc.
+```
+
+## Dataset
+This dataset contains a large number of 32 x 32 thumbnail images containing aerial photos of a cactus. The file name of an image corresponds to its `id`.
+
+- **train/** - the training set images
+- **test/** - the test set images (you must predict the labels of these)
+- **train.csv** - the training set labels, indicates whether the image has a cactus (`has_cactus = 1`)
+- **sample_submission.csv** - a sample submission file in the correct format
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+        input/
+            description.md (56 lines)
+            sample_submission.csv (3326 lines)
+            sample_submission.csv.zip (67.3 kB)
+            test.zip (3.5 MB)
+            train.csv (14176 lines)
+            train.csv.zip (285.6 kB)
+            train.zip (15.0 MB)
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+            test/
+                76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                ... and 3323 other files
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+            train/
+                775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                ... and 14173 other files
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+        working/
+            aerial-cactus-identification/
+                description.md (56 lines)
+                sample_submission.csv (3326 lines)
+                ... and 5 other files
+                aerial-cactus-identification/
+                test/
+                    76bad42ebc1ed65f7f50c06fd17849db.jpg (1.2 kB)
+                    f620bd2745d51c25cd05eca4f7c4da94.jpg (1.1 kB)
+                    ... and 3323 other files
+                    test/
+                train/
+                    775da0be6da934cb05d6bc7955931dd9.jpg (1.0 kB)
+                    65a52562f1ebce1166d9737ac9d1c0e5.jpg (960 Bytes)
+                    ... and 14173 other files
+                    train/
+```
+
+-> data/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> data/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/sample_submission.csv has 3325 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> input/aerial-cactus-identification/train.csv has 14175 rows and 2 columns.
+The columns are: id, has_cactus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9944
+
+# 6. Current score
+
+0.51148
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.51148) has done: 'The changes import the TensorFlow Keras version, add missing imports, correct variable assignments, update callbacks and metric keys, replace deprecated `predict_proba`/`predict_classes` with `predict`, and ensure the submission CSV is written with the required columns. These fixes unblock the entire pipeline and let the model train and generate a valid `aerial-cactus-submission.csv` while preserving the original CNN architecture.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import cv2 as cv
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tqdm import tqdm, tqdm_notebook
+
+from sklearn.metrics import confusion_matrix, roc_auc_score, classification_report
+from sklearn.model_selection import train_test_split
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import (
+    Conv2D,
+    Dense,
+    Flatten,
+    BatchNormalization,
+    LeakyReLU,
+    Dropout,
+    GlobalAveragePooling2D,
+)
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ReduceLROnPlateau, ModelCheckpoint, EarlyStopping
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+print("Input dirs:", os.listdir("../input"))
+
+
+
+## === cell 2
+train_data = pd.read_csv("../input/train.csv")
+print("Train rows:", len(train_data))
+
+
+
+## === cell 3
+train_data.head()
+
+
+
+
+## === cell 4
+def create_model():
+    model = Sequential()
+
+    model.add(
+        Conv2D(filters=16, kernel_size=3, activation="relu", input_shape=(32, 32, 3))
+    )
+    model.add(Conv2D(filters=16, kernel_size=3, activation="relu"))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
+
+    model.add(Conv2D(filters=32, kernel_size=3, activation="relu"))
+    model.add(Conv2D(filters=64, kernel_size=3, activation="relu"))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
+
+    model.add(Conv2D(filters=64, kernel_size=3, activation="relu"))
+    model.add(Conv2D(filters=128, kernel_size=3, activation="relu"))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
+
+    model.add(Conv2D(filters=128, kernel_size=3, activation="relu"))
+    model.add(Conv2D(filters=256, kernel_size=3, activation="relu"))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
+
+    model.add(GlobalAveragePooling2D())
+    model.add(Dense(1, activation="sigmoid"))
+
+    model.compile(
+        optimizer=Adam(learning_rate=0.01),
+        loss="binary_crossentropy",
+        metrics=["accuracy"],
+    )
+    return model
+
+
+
+
+## === cell 5
+def plot_training_curves(history):
+    acc = history.history["accuracy"]
+    val_acc = history.history["val_accuracy"]
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+
+    epochs = range(1, len(acc) + 1)
+
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, loss, "r", label="Training loss")
+    plt.plot(epochs, val_loss, "g", label="Validation loss")
+    plt.title("Loss")
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, acc, "r", label="Training acc")
+    plt.plot(epochs, val_acc, "g", label="Validation acc")
+    plt.title("Accuracy")
+    plt.legend()
+    plt.show()
+
+
+
+
+## === cell 6
+file_path = "weights-aerial-cactus.h5"
+
+callbacks = [
+    ModelCheckpoint(
+        file_path, monitor="val_accuracy", verbose=1, save_best_only=True, mode="max"
+    ),
+    ReduceLROnPlateau(
+        monitor="val_loss", factor=0.2, patience=3, verbose=1, mode="min", min_lr=1e-5
+    ),
+    EarlyStopping(
+        monitor="val_loss",
+        min_delta=1e-10,
+        patience=5,
+        verbose=1,
+        restore_best_weights=True,
+    ),
+]
+
+training_path = "../input/train/train/"
+test_path = "../input/test/test/"
+
+
+
+## === cell 7
+images_train = []
+labels_train = []
+
+images = train_data["id"].values
+
+for image_id in tqdm_notebook(images):
+    img = cv.imread(os.path.join(training_path, image_id))
+    if img is None:
+        continue
+    images_train.append(img)
+    label = train_data.loc[train_data["id"] == image_id, "has_cactus"].values[0]
+    labels_train.append(label)
+
+images_train = np.asarray(images_train, dtype="float32") / 255.0
+labels_train = np.asarray(labels_train, dtype="float32")
+
+
+
+## === cell 8
+x_tr = images_train
+y_tr = labels_train
+
+
+
+## === cell 9
+test_images_names = sorted(os.listdir(test_path))
+
+images_test = []
+for image_id in tqdm_notebook(test_images_names):
+    img = cv.imread(os.path.join(test_path, image_id))
+    if img is None:
+        continue
+    images_test.append(img)
+
+images_test = np.asarray(images_test, dtype="float32") / 255.0
+
+
+
+## === cell 10
+x_train, x_val, y_train, y_val = train_test_split(
+    images_train, labels_train, test_size=0.15, stratify=labels_train, random_state=42
+)
+
+
+
+## === cell 11
+model = create_model()
+
+
+
+## === cell 12
+history = model.fit(
+    x_train,
+    y_train,
+    batch_size=32,
+    epochs=50,
+    validation_data=(x_val, y_val),
+    verbose=1,
+    callbacks=callbacks,
+)
+
+
+
+## === cell 13
+model.load_weights(file_path)
+
+
+
+## === cell 14
+pred_test = model.predict(images_test, verbose=1).flatten()
+
+
+
+## === cell 15
+submission = pd.read_csv("../input/sample_submission.csv")
+submission["has_cactus"] = pred_test
+submission.to_csv("aerial-cactus-submission.csv", index=False)
+print("Submission saved to aerial-cactus-submission.csv")
+
+
+
+## === cell 16
+plot_training_curves(history)
+
+
+
+## === cell 17
+val_pred = model.predict(x_val, verbose=0).flatten()
+auc = roc_auc_score(y_val, val_pred)
+print(f"Validation AUC: {auc:.4f}")
+
+conf_matrix = confusion_matrix(y_val, (val_pred > 0.5).astype(int))
+sns.heatmap(
+    conf_matrix, annot=True, fmt="d", xticklabels=["0", "1"], yticklabels=["0", "1"]
+)
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.show()

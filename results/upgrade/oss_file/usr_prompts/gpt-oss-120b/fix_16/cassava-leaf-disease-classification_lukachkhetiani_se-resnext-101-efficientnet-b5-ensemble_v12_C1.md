@@ -1,0 +1,563 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8757932910244787
+
+# 6. Current score
+
+0.10463
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.13416) has done: 'I fixed the script by making model weight loading optional (skip if files are missing), guaranteeing that `use_midas` is always defined, and loading the test images using the official `sample_submission.csv` order so the output length matches the expected number of rows. The code now safely falls back to random‑initialized models and skips depth estimation when MiDaS cannot be loaded, then writes a correct `submission.csv`.'
+- What this solution (achieved 0.19283) has done: 'I load the EfficientNet and SEResNeXt models with ImageNet‑pretrained weights, fix the image preprocessing to scale pixel values to [0, 1] before applying the ImageNet mean/std, and skip the optional depth‑based cropping (which can shrink or distort leaves). These minimal adjustments keep the overall pipeline intact while greatly improving predictive quality, moving the validation accuracy from 0.13 toward the target 0.875.'
+- What this solution (achieved 0.13191) has done: 'I add a lightweight test‑time augmentation: for each test image the model also predict on its horizontal flip and average the logits before picking the final class. This keeps the core architecture unchanged while usually giving a noticeable boost in accuracy, moving the validation score closer to the target.'
+- What this solution (achieved 0.32025) has done: 'I enable the optional depth‑based cropping that was previously disabled. When the MiDaS model loads successfully, each test image be masked and cropped before being fed to the two classifiers, which usually improves leaf focus and therefore accuracy. The rest of the pipeline stays unchanged, so the submission format remains valid.'
+- What this solution (achieved 0.08782) has done: 'I convert the BGR images read by OpenCV to RGB before applying the ImageNet normalization in the `processor` function. The pretrained models expect RGB ordering; fixing this mismatch should raise the validation accuracy, moving the score closer to the target while keeping the overall pipeline unchanged.'
+- What this solution (achieved 0.1278) has done: 'I make the weight‑loading paths robust so that the fine‑tuned EfficientNet and SEResNeXt checkpoints are found and loaded if they exist in any Kaggle input folder. Loading the proper fine‑tuned weights (instead of falling back to generic ImageNet weights) is the smallest change that can raise the validation accuracy dramatically and therefore move the current score much closer to the target. No core model architecture or training logic is altered.'
+- What this solution (achieved 0.23505) has done: 'I make the checkpoint lookup more robust so fine‑tuned weights are actually found (instead of silently falling back to ImageNet weights), and I resize images to the models’ native input size (≈456 × 456 for EfficientNet‑b5) rather than a generic 512 × 512. These small, targeted changes keep the core pipeline unchanged but restore the intended pretrained weights and provide inputs that match the models, which should move the validation accuracy substantially toward the target score.'
+- What this solution (achieved 0.13789) has done: 'I will (1) ensure depth‑based cropping is disabled (MiDaS loading is ignored) because it often harms the leaf focus, (2) make the checkpoint lookup a bit more flexible so any fine‑tuned *.pth* file that contains “eff” or “ser” is used if the expected “eff_best.pth” / “seresnext_best.pth” is missing, and (3) simplify the test‑time inference to use only the EfficientNet model (the stronger of the two in most validations). These small, targeted changes keep the core pipeline intact while ‑ without extra training ‑ should move the validation accuracy noticeably closer to the target score.'
+- What this solution (achieved 0.10164) has done: 'I add a lightweight ensemble: after the existing EfficientNet predictions (original + horizontal flip) I also run the SEResNeXt model on the same tensors and average its logits with EfficientNet’s. This small change keeps the overall pipeline unchanged while likely raising validation accuracy, moving the score toward the target.'
+- What this solution (achieved 0.0583) has done: 'I simplify the inference to rely only on the EfficientNet model (which is generally stronger than the SEResNeXt in this setup) and expand the test‑time augmentation to include a vertical flip in addition to the horizontal flip. This keeps the overall pipeline unchanged, removes the averaging with a weaker model, and adds a tiny amount of extra data diversity, which should raise the validation accuracy and move the Kaggle score closer to the target.'
+- What this solution (achieved 0.25075) has done: 'I make the EfficientNet model always use the timm implementation (so its architecture matches any fine‑tuned checkpoints) and load checkpoint weights with `strict=False` to tolerate minor key mismatches. This minimal change keeps the overall pipeline unchanged but enables the model to actually use the fine‑tuned weights when they are present, which should raise the validation accuracy and move the Kaggle score toward the target.'
+- What this solution (achieved 0.16854) has done: 'I add a second image‑preprocessing function that matches the SEResNeXt input size, compute SEResNeXt logits (on the original image) and average them with the EfficientNet TTA logits. This minimal ensemble keeps the core pipeline unchanged while providing additional model information, which should raise the validation accuracy toward the target score.'
+- What this solution (achieved 0.12481) has done: 'I simplify the inference to rely only on the EfficientNet model with a modest horizontal‑flip test‑time augmentation (removing the vertical flips and the SEResNeXt ensemble, which were hurting performance). This keeps the core architecture unchanged while providing a more reliable prediction, moving the validation accuracy much closer to the target. The rest of the script (model loading, preprocessing, submission writing) remains the same.'
+- What this solution (achieved 0.10463) has done: 'I enable depth‑masking when MiDaS loads, add vertical‑flip test‑time augmentation, and combine EfficientNet b5 and SEResNeXt predictions (averaging their logits). These changes keep the same models and preprocessing while providing richer inference, which should raise accuracy toward the target score.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import torch
+import torch.nn.functional as F
+import cv2
+import glob
+import numpy as np
+import pandas as pd
+import timm
+from pathlib import Path
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def find_checkpoint(filename):
+    """
+    Search common Kaggle input directories for *filename*.
+    If not found, fall back to any *.pth* file that contains a hint
+    of the model name (e.g., 'eff' for EfficientNet, 'ser' for SEResNeXt).
+    """
+    search_paths = [
+        Path("/kaggle/input"),
+        Path("../input"),
+        Path("."),
+    ]
+    for base in search_paths:
+        cand = base / filename
+        if cand.is_file():
+            return cand
+        matches = list(base.rglob(f"*{filename}*"))
+        if matches:
+            return matches[0]
+
+    hint = "eff" if "eff" in filename.lower() else "ser"
+    for base in search_paths:
+        candidates = list(base.rglob(f"*{hint}*.pth"))
+        if candidates:
+            return candidates[0]
+    return None
+
+
+efficient = timm.create_model("tf_efficientnet_b5_ns", pretrained=True, num_classes=5)
+
+eff_path = find_checkpoint("eff_best.pth")
+if eff_path and eff_path.is_file():
+    try:
+        state = torch.load(str(eff_path), map_location=device)
+        efficient.load_state_dict(state, strict=False)
+        print(f"EfficientNet fine‑tuned weights loaded from {eff_path}.")
+    except Exception as e:
+        print(f"Failed to load EfficientNet fine‑tuned weights: {e}")
+else:
+    print(
+        "EfficientNet fine‑tuned weight file not found – using ImageNet pretrained weights."
+    )
+efficient.eval().to(device)
+
+seresnext = timm.create_model("seresnext101_32x4d", pretrained=True, num_classes=5)
+
+ser_path = find_checkpoint("seresnext_best.pth")
+if ser_path and ser_path.is_file():
+    try:
+        state = torch.load(str(ser_path), map_location=device)
+        seresnext.load_state_dict(state, strict=False)
+        print(f"SEResNeXt fine‑tuned weights loaded from {ser_path}.")
+    except Exception as e:
+        print(f"Failed to load SEResNeXt fine‑tuned weights: {e}")
+else:
+    print(
+        "SEResNeXt fine‑tuned weight file not found – using ImageNet pretrained weights."
+    )
+seresnext.eval().to(device)
+
+print("Models have been prepared.")
+
+use_midas = False
+try:
+    midas = torch.hub.load("intel-isl/MiDaS", "MiDaS")
+    midas.to(device).eval()
+    midas_transforms = torch.hub.load("intel-isl/MiDaS", "transforms")
+    transform = midas_transforms.default_transform
+    use_midas = True
+    print("MiDaS depth model loaded (depth‑based cropping will be used).")
+except Exception:
+    print("MiDaS could not be loaded; depth will be ignored.")
+    use_midas = False
+
+INPUT_HEIGHT, INPUT_WIDTH = efficient.default_cfg["input_size"][1:3]
+SER_INPUT_HEIGHT, SER_INPUT_WIDTH = seresnext.default_cfg["input_size"][1:3]
+print(f"Using EfficientNet input size: {INPUT_HEIGHT}x{INPUT_WIDTH}")
+print(f"Using SEResNeXt input size: {SER_INPUT_HEIGHT}x{SER_INPUT_WIDTH}")
+
+
+
+
+## === cell 1
+def processor_eff(image):
+    """Resize, normalize and convert a BGR image to a torch tensor for EfficientNet."""
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, (INPUT_WIDTH, INPUT_HEIGHT)).astype(np.float32) / 255.0
+    img = (img - [0.485, 0.456, 0.406]) / [0.229, 0.224, 0.225]
+    tensor = (
+        torch.tensor(img.transpose(2, 0, 1), dtype=torch.float).unsqueeze(0).to(device)
+    )
+    return tensor
+
+
+def processor_ser(image):
+    """Resize, normalize and convert a BGR image to a torch tensor for SEResNeXt."""
+    img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    img = (
+        cv2.resize(img, (SER_INPUT_WIDTH, SER_INPUT_HEIGHT)).astype(np.float32) / 255.0
+    )
+    img = (img - [0.485, 0.456, 0.406]) / [0.229, 0.224, 0.225]
+    tensor = (
+        torch.tensor(img.transpose(2, 0, 1), dtype=torch.float).unsqueeze(0).to(device)
+    )
+    return tensor
+
+
+def get_depth(img):
+    """Return a binary mask from MiDaS depth; fallback to all‑True mask."""
+    if not use_midas:
+        return np.ones((img.shape[0], img.shape[1]), dtype=bool)
+
+    rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    input_batch = transform(rgb).to(device)
+
+    with torch.no_grad():
+        prediction = midas(input_batch)
+        prediction = torch.nn.functional.interpolate(
+            prediction.unsqueeze(1),
+            size=rgb.shape[:2],
+            mode="bicubic",
+            align_corners=False,
+        ).squeeze()
+    output = prediction.cpu().numpy()
+    img_min, img_max = np.min(output), np.max(output)
+    return output > ((img_min + img_max) / 3)
+
+
+def crop_image(image, depth):
+    """Crop image to the region where depth mask is True."""
+    depth = depth.astype(int)
+    mask_3d = np.stack((depth, depth, depth), axis=2)
+    masked_arr = np.where(mask_3d == 1, image, mask_3d).astype(np.uint8)
+    coords = np.where(masked_arr != [0, 0, 0])
+    if coords[0].size == 0:
+        return image
+    y_min, y_max = coords[0].min(), coords[0].max()
+    x_min, x_max = coords[1].min(), coords[1].max()
+    return masked_arr[y_min:y_max, x_min:x_max]
+
+
+def tta_tensors(img, processor, flips):
+    """Generate tensors for a list of flip functions (including no‑flip)."""
+    tensors = []
+    for f in flips:
+        aug = f(img) if f is not None else img
+        tensors.append(processor(aug))
+    return tensors
+
+
+def predict_with_tta(img, model, processor):
+    """
+    Return averaged logits from *model* using original, horizontal,
+    vertical and both‑flip augmentations.
+    """
+    flips = [
+        None,  # original
+        lambda x: cv2.flip(x, 1),  # horizontal
+        lambda x: cv2.flip(x, 0),  # vertical
+        lambda x: cv2.flip(cv2.flip(x, 1), 0),  # both
+    ]
+    tensors = tta_tensors(img, processor, flips)
+    with torch.no_grad():
+        logits = sum(model(t) for t in tensors) / len(tensors)
+    return logits
+
+
+def predict_ensemble(img):
+    """
+    Combine EfficientNet and SEResNeXt predictions (each with TTA) by averaging logits.
+    """
+    logits_eff = predict_with_tta(img, efficient, processor_eff)
+    logits_ser = predict_with_tta(img, seresnext, processor_ser)
+    return (logits_eff + logits_ser) / 2.0
+
+
+
+
+## === cell 2
+sample_path = Path("../input/cassava-leaf-disease-classification/sample_submission.csv")
+submission_template = pd.read_csv(sample_path)
+test_img_dir = Path("../input/cassava-leaf-disease-classification/test_images")
+
+names, labels = [], []
+
+for img_name in submission_template["image_id"]:
+    img_path = test_img_dir / img_name
+    if not img_path.is_file():
+        print(f"Warning: image {img_path} not found.")
+        names.append(img_name)
+        labels.append(0)
+        continue
+
+    img = cv2.imread(str(img_path))
+    if img is None:
+        print(f"Warning: failed to read {img_path}.")
+        names.append(img_name)
+        labels.append(0)
+        continue
+
+    if use_midas:
+        depth_mask = get_depth(img)
+        img = crop_image(img, depth_mask)
+
+    logits = predict_ensemble(img)
+    probs = F.softmax(logits, dim=1)
+    pred_label = int(torch.argmax(probs, dim=1).cpu().item())
+
+    names.append(img_name)
+    labels.append(pred_label)
+
+
+
+## === cell 3
+submission_df = pd.DataFrame({"image_id": names, "label": labels})
+submission_df.to_csv("submission.csv", index=False)
+print("Submission file saved as submission.csv (rows:", len(submission_df), ")")

@@ -1,0 +1,312 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given pairs of phrases (an `anchor` and a `target` phrase), build a model to rate how similar they are.  
+
+## Metric
+Pearson correlation coefficient.
+
+## Submission Format
+For each `id` (representing a pair of phrases) in the test set, you must predict the similarity `score`. The file should contain a header and have the following format:
+
+```
+id,score
+4112d61851461f60,0
+09e418c93a776564,0.25
+36baf228038e314b,1
+etc.
+
+```
+
+## Dataset
+The scores are in the 0-1 range with increments of 0.25 with the following meanings:
+
+- **1.0** - Very close match. This is typically an exact match except possibly for differences in conjugation, quantity (e.g. singular vs. plural), and addition or removal of stopwords (e.g. "the", "and", "or").
+- **0.75** - Close synonym, e.g. "mobile phone" vs. "cellphone". This also includes abbreviations, e.g. "TCP" -> "transmission control protocol".
+- **0.5** - Synonyms which don't have the same meaning (same function, same properties). This includes broad-narrow (hyponym) and narrow-broad (hypernym) matches.
+- **0.25** - Somewhat related, e.g. the two phrases are in the same high level domain but are not synonyms. This also includes antonyms.
+- **0.0** - Unrelated.
+
+Files
+-----
+
+- **train.csv** - the training set, containing phrases, contexts, and their similarity scores
+- **test.csv** - the test set set, identical in structure to the training set but without the score
+- **sample_submission.csv** - a sample submission file in the correct format
+
+Columns
+-------
+
+- `id` - a unique identifier for a pair of phrases
+- `anchor` - the first phrase
+- `target` - the second phrase
+- `context` - the [CPC classification (version 2021.05)](https://en.wikipedia.org/wiki/Cooperative_Patent_Classification), which indicates the subject within which the similarity is to be scored
+- `score` - the similarity. This is sourced from a combination of one or more manual expert ratings.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+datasets==4.4.1
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sentence-transformers==4.1.0
+sklearn-pandas==2.2.0
+tensorflow-datasets==4.9.9
+transformers==4.53.3
+vega-datasets==0.9.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (3649 lines)
+            sample_submission.csv.zip (38.3 kB)
+            test.csv (3649 lines)
+            test.csv.zip (86.4 kB)
+            train.csv (32826 lines)
+            train.csv.zip (790.5 kB)
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+        working/
+            us-patent-phrase-to-phrase-matching/
+                description.md (118 lines)
+                sample_submission.csv (3649 lines)
+                ... and 5 other files
+                us-patent-phrase-to-phrase-matching/
+```
+
+-> data/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> data/us-patent-phrase-to-phrase-matching/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> data/us-patent-phrase-to-phrase-matching/test.csv has 3648 rows and 4 columns.
+The columns are: id, anchor, target, context
+
+-> data/us-patent-phrase-to-phrase-matching/train.csv has 32825 rows and 5 columns.
+The columns are: id, anchor, target, context, score
+
+-> input/sample_submission.csv has 3648 rows and 2 columns.
+The columns are: id, score
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7819492614928613
+
+# 6. Current score
+
+0.56437
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5299) has done: 'I fixed the `Ridge` regression error by switching to the `lsqr` solver (which works with sparse TF‑IDF matrices) and slightly adjusted the regularization strength to 0.5 for a modest potential boost. The rest of the pipeline is unchanged, and the script now runs end‑to‑end, creates predictions, and writes a valid `submission.csv` file.'
+- What this solution (achieved 0.41351) has done: 'I replace the TF‑IDF feature extraction with dense sentence‑transformer embeddings, which generally capture semantic similarity much better and should raise the Pearson correlation toward the target. The rest of the pipeline (train/validation split, Ridge regression, prediction clipping, and CSV output) stays unchanged, only the feature engineering step is updated.'
+- What this solution (achieved 0.4135) has done: 'The fix adds a protobuf compatibility setting before importing SentenceTransformer, switches the Ridge regularisation to α=0.5, and standardises the dense embeddings with StandardScaler both for validation and final training. These changes resolve the import error and improve the correlation while keeping the overall model pipeline unchanged. The script now runs end‑to‑end and writes a proper submission.csv file.'
+- What this solution (achieved 0.54951) has done: 'I fixed the protobuf import error by monkey‑patching `MessageFactory` to add the missing `GetPrototype` attribute, then replaced the ridge‑regression pipeline with a direct cosine‑similarity computation on SentenceTransformer embeddings (scaled to 0‑1). This removes unnecessary scaling/regression steps, aligns the prediction method with the Pearson metric, and is expected to lift the validation score toward the target while still writing a proper `submission.csv`.'
+- What this solution (achieved 0.53357) has done: 'I patch the protobuf monkey‑patching to avoid the `GetPrototype` attribute error and adjust the embedding generation to include the `context` together with `anchor` and `target`. This keeps the core cosine‑similarity logic while providing richer inputs, which should raise the Pearson correlation toward the target. The script now run end‑to‑end and write a proper `submission.csv`.'
+- What this solution (achieved 0.53368) has done: 'I keep the existing embedding‑based pipeline but add a tiny calibration step: fit a simple Ridge regression that maps the raw cosine‑similarity scores (still scaled to [0,1]) to the true similarity labels on the training data, then use this calibrated model for both validation and final test predictions. This small supervised adjustment is expected to raise the Pearson correlation toward the target while preserving the core logic and keeping the code runnable end‑to‑end.'
+- What this solution (achieved 0.56437) has done: 'I add a simple distance‑based feature to the calibration step: besides the cosine‑similarity score I compute a scaled inverse‑distance feature and let the Ridge model use both. This keeps the overall pipeline unchanged while giving the calibrator more information, which should raise the Pearson correlation toward the target.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION_VERSION"] = "3"
+
+try:
+    from google.protobuf.message_factory import MessageFactory
+
+    if not hasattr(MessageFactory, "GetPrototype"):
+        if hasattr(MessageFactory, "GetMessageClass"):
+            MessageFactory.GetPrototype = MessageFactory.GetMessageClass
+        else:
+
+            def _missing_getprototype(*args, **kwargs):
+                raise NotImplementedError("MessageFactory.GetPrototype is unavailable")
+
+            MessageFactory.GetPrototype = _missing_getprototype
+except Exception:
+    pass
+
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Ridge  # added for calibration
+from scipy.stats import pearsonr
+from sentence_transformers import SentenceTransformer
+
+base_path = "./input/us-patent-phrase-to-phrase-matching/"
+if not os.path.exists(os.path.join(base_path, "train.csv")):
+    base_path = "/kaggle/input/us-patent-phrase-to-phrase-matching/"
+
+
+
+
+## === cell 1
+def load_and_prepare(df: pd.DataFrame) -> pd.DataFrame:
+    """Create a single text field that combines context, anchor and target."""
+    df["combined"] = (
+        df["context"].astype(str)
+        + " "
+        + df["anchor"].astype(str)
+        + " "
+        + df["target"].astype(str)
+    )
+    return df
+
+
+train_df = pd.read_csv(os.path.join(base_path, "train.csv"))
+test_df = pd.read_csv(os.path.join(base_path, "test.csv"))
+
+train_df = load_and_prepare(train_df)
+test_df = load_and_prepare(test_df)
+
+
+
+
+## === cell 2
+train_split, val_split = train_test_split(
+    train_df,
+    test_size=0.2,
+    random_state=42,
+    stratify=train_df["score"],
+)
+
+embedder = SentenceTransformer("paraphrase-MiniLM-L6-v2", device="cpu")
+
+
+def get_embeddings(texts):
+    """Encode a list of texts to dense embeddings."""
+    return embedder.encode(
+        texts,
+        batch_size=64,
+        show_progress_bar=False,
+        convert_to_numpy=True,
+    )
+
+
+def cosine_to_score(a_emb, b_emb):
+    """Cosine similarity scaled to [0,1]."""
+    a_norm = np.linalg.norm(a_emb, axis=1, keepdims=True)
+    b_norm = np.linalg.norm(b_emb, axis=1, keepdims=True)
+    cos = (a_emb * b_emb).sum(axis=1) / (a_norm * b_norm + 1e-8).ravel()
+    return np.clip((cos + 1.0) / 2.0, 0.0, 1.0)
+
+
+def distance_feature(a_emb, b_emb):
+    """Scaled inverse Euclidean distance, also in (0,1]."""
+    dist = np.linalg.norm(a_emb - b_emb, axis=1, keepdims=True)
+    return 1.0 / (1.0 + dist)
+
+
+def make_features(a_emb, b_emb):
+    """Combine cosine‑based score and distance feature into a 2‑column matrix."""
+    cos_score = cosine_to_score(a_emb, b_emb).reshape(-1, 1)
+    dist_score = distance_feature(a_emb, b_emb)
+    return np.hstack([cos_score, dist_score])
+
+
+def get_pair_embeddings(df):
+    """
+    Produce embeddings for anchor and target, each prefixed with the same context.
+    This gives the model richer semantic information than using anchor/target alone.
+    """
+    anchor_texts = (df["context"] + " " + df["anchor"]).tolist()
+    target_texts = (df["context"] + " " + df["target"]).tolist()
+    anchor_emb = get_embeddings(anchor_texts)
+    target_emb = get_embeddings(target_texts)
+    return anchor_emb, target_emb
+
+
+anchor_val, target_val = get_pair_embeddings(val_split)
+val_features = make_features(anchor_val, target_val)
+
+anchor_train, target_train = get_pair_embeddings(train_split)
+train_features = make_features(anchor_train, target_train)
+
+calibrator = Ridge(alpha=0.5, solver="lsqr")
+calibrator.fit(train_features, train_split["score"].values)
+
+val_pred = calibrator.predict(val_features)
+val_pred = np.clip(val_pred, 0.0, 1.0)
+
+y_val = val_split["score"].values
+pearson_val = pearsonr(y_val, val_pred)[0]
+print(f"Validation Pearson correlation (calibrated): {pearson_val:.6f}")
+
+
+
+
+## === cell 3
+anchor_full, target_full = get_pair_embeddings(train_df)
+full_features = make_features(anchor_full, target_full)
+
+full_calibrator = Ridge(alpha=0.5, solver="lsqr")
+full_calibrator.fit(full_features, train_df["score"].values)
+
+anchor_test, target_test = get_pair_embeddings(test_df)
+test_features = make_features(anchor_test, target_test)
+
+test_pred = full_calibrator.predict(test_features)
+test_pred = np.clip(test_pred, 0.0, 1.0)
+
+submission = pd.DataFrame({"id": test_df["id"], "score": test_pred})
+submission_path = os.path.join(".", "submission.csv")
+submission.to_csv(submission_path, index=False)
+print(f"Submission saved to {submission_path}")

@@ -1,0 +1,427 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict engagement with a pet's profile based on the photograph for that profile.
+
+## Metric
+Root mean squared error.
+
+## Submission Format
+For each `Id` in the test set, you must predict a probability for the target variable, `Pawpularity`. The file should contain a header and have the following format:
+
+```
+Id, Pawpularity
+0008dbfb52aa1dc6ee51ee02adf13537, 99.24
+0014a7b528f1682f0cf3b73a991c17a0, 61.71
+0019c1388dfcd30ac8b112fb4250c251, 6.23
+00307b779c82716b240a24f028b0031b, 9.43
+00320c6dd5b4223c62a9670110d47911, 70.89
+etc.
+```
+
+## Dataset
+- **train/** - Folder containing training set photos of the form **{id}.jpg**, where **{id}** is a unique Pet Profile ID.
+- **train.csv** - Metadata (described below) for each photo in the training set as well as the target, the photo's Pawpularity score. The Id column gives the photo's unique Pet Profile ID corresponding the photo's file name.
+
+The train.csv and test.csv files contain metadata for photos in the training set and test set, respectively. Each pet photo is labeled with the value of 1 (Yes) or 0 (No) for each of the following features:
+
+- **Focus** - Pet stands out against uncluttered background, not too close / far.
+- **Eyes** - Both eyes are facing front or near-front, with at least 1 eye / pupil decently clear.
+- **Face** - Decently clear face, facing front or near-front.
+- **Near** - Single pet taking up significant portion of photo (roughly over 50% of photo width or height).
+- **Action** - Pet in the middle of an action (e.g., jumping).
+- **Accessory** - Accompanying physical or digital accessory / prop (i.e. toy, digital sticker), excluding collar and leash.
+- **Group** - More than 1 pet in the photo.
+- **Collage** - Digitally-retouched photo (i.e. with digital photo frame, combination of multiple photos).
+- **Human** - Human in the photo.
+- **Occlusion** - Specific undesirable objects blocking part of the pet (i.e. human, cage or fence). Note that not all blocking objects are considered occlusion.
+- **Info** - Custom-added text or labels (i.e. pet name, description).
+- **Blur** - Noticeably out of focus or noisy, especially for the pet's eyes and face. For Blur entries, "Eyes" column is always set to 0.
+
+# 2. Python version
+
+3.12
+
+# 3. Installed packages
+
+cuml-cu12==25.2.1
+geopandas==0.14.4
+libcuml-cu12==25.2.1
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sentence-transformers==4.1.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+transformers==4.53.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (132 lines)
+            sample_submission.csv (993 lines)
+            sample_submission.csv.zip (22.7 kB)
+            test.csv (993 lines)
+            test.csv.zip (22.5 kB)
+            test.zip (102.2 MB)
+            train.csv (8921 lines)
+            train.csv.zip (213.0 kB)
+            train.zip (926.9 MB)
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+            test/
+                a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                ... and 990 other files
+                test/
+            train/
+                e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                ... and 8918 other files
+                train/
+        input/
+            description.md (132 lines)
+            sample_submission.csv (993 lines)
+            sample_submission.csv.zip (22.7 kB)
+            test.csv (993 lines)
+            test.csv.zip (22.5 kB)
+            test.zip (102.2 MB)
+            train.csv (8921 lines)
+            train.csv.zip (213.0 kB)
+            train.zip (926.9 MB)
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+            test/
+                a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                ... and 990 other files
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+            train/
+                e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                ... and 8918 other files
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+        working/
+            petfinder-pawpularity-score/
+                description.md (132 lines)
+                sample_submission.csv (993 lines)
+                ... and 7 other files
+                petfinder-pawpularity-score/
+                test/
+                    a5c4de4c29e2097889f0d4cbd566625c.jpg (57.3 kB)
+                    2e5cda2c4cf0530423e8181b7f8c67bc.jpg (94.9 kB)
+                    ... and 990 other files
+                    test/
+                train/
+                    e449bbacd2930d6f6ab4589182a09185.jpg (95.7 kB)
+                    cfe66786a9c53db0e6936209291cc67d.jpg (247.5 kB)
+                    ... and 8918 other files
+                    train/
+```
+
+-> data/petfinder-pawpularity-score/sample_submission.csv has 992 rows and 2 columns.
+The columns are: Id, Pawpularity
+
+-> data/petfinder-pawpularity-score/test.csv has 992 rows and 13 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur
+
+-> data/petfinder-pawpularity-score/train.csv has 8920 rows and 14 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur, Pawpularity
+
+-> data/sample_submission.csv has 992 rows and 2 columns.
+The columns are: Id, Pawpularity
+
+-> data/test.csv has 992 rows and 13 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur
+
+-> data/train.csv has 8920 rows and 14 columns.
+The columns are: Id, Subject Focus, Eyes, Face, Near, Action, Accessory, Group, Collage, Human, Occlusion, Info, Blur, Pawpularity
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+17.679672632190417
+
+# 6. Current score
+
+20.17465
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 20.62622) has done: 'The fix removes the GPU‑only `cuml` imports that crash, simplifies the pipeline to use only the provided metadata features, adds proper scaling, trains a scikit‑learn SVR model, generates predictions for the test set, and writes a correctly‑formatted `submission.csv`. This resolves all runtime errors and ensures a valid submission file is produced while keeping the core idea of a regression model.'
+- What this solution (achieved 20.24392) has done: 'I keep the overall pipeline and feature handling unchanged, but replace the single SVR model with a modest ensemble of an SVR (using a stronger regularization parameter) and a simple LinearRegression. Averaging their predictions usually reduces over‑/under‑fitting and moves the RMSE closer to the target without altering the core logic or introducing heavy new machinery.'
+- What this solution (achieved 20.1527) has done: 'I add a lightweight Ridge regression model to the existing ensemble and average its predictions with the SVR and LinearRegression outputs. Ridge adds just a bit of regularization and often improves generalization on tabular data, which should lower the validation RMSE and move the score closer to the target without changing the overall pipeline. The code now imports Ridge, fits it, and includes its predictions in both the training‑RMSE check and the final test predictions.'
+- What this solution (achieved 20.10817) has done: 'I add a GradientBoostingRegressor to the existing ensemble and include its predictions in the averaged output. This model often improves tabular regression performance with little extra cost, so the training RMSE should move closer to the target while keeping the original workflow unchanged.'
+- What this solution (achieved 20.10619) has done: 'I add a simple validation split to assess each model’s individual RMSE, compute weights inversely proportional to those errors, and then use the weighted average for the final predictions. This modest adjustment keeps the original models and workflow while expectedly lowering the ensemble error toward the target score.'
+- What this solution (achieved 20.20426) has done: 'The patch adds a lightweight stacking step: after obtaining validation predictions from the four base regressors, a simple LinearRegression model learns optimal combination coefficients (meta‑weights) on the validation split. These learned weights replace the previous inverse‑RMSE weighting, and are then used for both the training‑RMSE check and the final test‑set predictions. This small, model‑agnostic adjustment keeps the original architecture while aiming to lower the validation RMSE and move the overall score nearer the target.'
+- What this solution (achieved 20.12535) has done: 'I add a HistGradientBoostingRegressor to the ensemble, recompute validation RMSEs, and let the linear meta‑learner determine new weights (now five of them). This modest model addition preserves the original workflow while giving the ensemble more expressive power, which should lower the validation RMSE and move the score closer to the target.'
+- What this solution (achieved 20.07124) has done: 'I keep the existing models and data processing but replace the meta‑learner with a non‑negative Ridge regression and blend its learned coefficients with the inverse‑RMSE weights.  This modest regularisation usually yields more stable ensemble weights and, when normalized, can reduce the validation RMSE, moving the score closer to the target while preserving the core pipeline.'
+- What this solution (achieved 20.07185) has done: 'I simplify the ensemble weighting by discarding the extra averaging with inverse‑RMSE weights and instead use the Ridge‑learned meta‑weights directly (normalized). This keeps the core modeling pipeline unchanged while likely reducing the validation RMSE, moving the score closer to the target.'
+- What this solution (achieved 20.07702) has done: 'I added a lightweight RandomForestRegressor to the existing ensemble and incorporated its validation predictions into the meta‑learning step, then retrained it on the full data and used its predictions alongside the other five models when forming the final weighted average. This modest expansion increases model diversity and lets the ridge meta‑learner assign optimal non‑negative weights, which is expected to lower the validation RMSE and move the overall score closer to the target while keeping the original workflow intact.'
+- What this solution (achieved 20.17465) has done: 'I refit the meta‑learner on the predictions of the base models after they have been trained on the full training set, then recompute the ensemble weights from this full‑data meta model. Using these updated weights for both the training‑RMSE check and the final test predictions should move the validation error closer to the target without altering any core model or feature logic.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVR
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.ensemble import (
+    GradientBoostingRegressor,
+    HistGradientBoostingRegressor,
+    RandomForestRegressor,
+)
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+
+
+## === cell 1
+directory = "/kaggle/input/petfinder-pawpularity-score"
+
+train_df = pd.read_csv(os.path.join(directory, "train.csv"))
+test_df = pd.read_csv(os.path.join(directory, "test.csv"))
+
+print("Train rows:", len(train_df), "Test rows:", len(test_df))
+
+
+
+## === cell 2
+x_meta = train_df.iloc[:, 1:13].values
+x_test_meta = test_df.iloc[:, 1:13].values
+y = train_df["Pawpularity"].values.astype(np.float32)
+
+scaler = StandardScaler()
+scaler.fit(np.vstack((x_meta, x_test_meta)))
+X = scaler.transform(x_meta)
+X_test = scaler.transform(x_test_meta)
+
+print("Feature matrix shapes -> train:", X.shape, "test:", X_test.shape)
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+
+## === cell 3
+svr_reg = SVR(C=100.0, kernel="rbf", epsilon=0.1, max_iter=400000)
+lr_reg = LinearRegression()
+ridge_reg = Ridge(alpha=1.0, random_state=42)
+gbr_reg = GradientBoostingRegressor(
+    n_estimators=500, learning_rate=0.05, max_depth=4, random_state=42
+)
+hgb_reg = HistGradientBoostingRegressor(
+    max_iter=500, learning_rate=0.05, max_depth=4, random_state=42
+)
+rf_reg = RandomForestRegressor(n_estimators=300, random_state=42, n_jobs=5)
+
+svr_reg.fit(X_train, y_train)
+lr_reg.fit(X_train, y_train)
+ridge_reg.fit(X_train, y_train)
+gbr_reg.fit(X_train, y_train)
+hgb_reg.fit(X_train, y_train)
+rf_reg.fit(X_train, y_train)
+
+val_pred_svr = svr_reg.predict(X_val)
+val_pred_lr = lr_reg.predict(X_val)
+val_pred_ridge = ridge_reg.predict(X_val)
+val_pred_gbr = gbr_reg.predict(X_val)
+val_pred_hgb = hgb_reg.predict(X_val)
+val_pred_rf = rf_reg.predict(X_val)
+
+rmse_svr = np.sqrt(mean_squared_error(y_val, val_pred_svr))
+rmse_lr = np.sqrt(mean_squared_error(y_val, val_pred_lr))
+rmse_ridge = np.sqrt(mean_squared_error(y_val, val_pred_ridge))
+rmse_gbr = np.sqrt(mean_squared_error(y_val, val_pred_gbr))
+rmse_hgb = np.sqrt(mean_squared_error(y_val, val_pred_hgb))
+rmse_rf = np.sqrt(mean_squared_error(y_val, val_pred_rf))
+
+print(
+    "Validation RMSEs -> SVR:",
+    rmse_svr,
+    "LR:",
+    rmse_lr,
+    "Ridge:",
+    rmse_ridge,
+    "GBR:",
+    rmse_gbr,
+    "HGB:",
+    rmse_hgb,
+    "RF:",
+    rmse_rf,
+)
+
+inv_weights = np.array(
+    [
+        1.0 / rmse_svr,
+        1.0 / rmse_lr,
+        1.0 / rmse_ridge,
+        1.0 / rmse_gbr,
+        1.0 / rmse_hgb,
+        1.0 / rmse_rf,
+    ]
+)
+inv_weights = inv_weights / inv_weights.sum()
+print("Inverse‑RMSE ensemble weights (reference):", inv_weights)
+
+val_preds = np.column_stack(
+    [
+        val_pred_svr,
+        val_pred_lr,
+        val_pred_ridge,
+        val_pred_gbr,
+        val_pred_hgb,
+        val_pred_rf,
+    ]
+)
+
+meta_reg = Ridge(alpha=1.0, positive=True, random_state=42)
+meta_reg.fit(val_preds, y_val)
+meta_weights = meta_reg.coef_
+print("Meta ensemble weights (Ridge, learned on validation):", meta_weights)
+
+weights = meta_weights / meta_weights.sum()
+print("Final ensemble weights (meta only, initial):", weights)
+
+svr_reg.fit(X, y)
+lr_reg.fit(X, y)
+ridge_reg.fit(X, y)
+gbr_reg.fit(X, y)
+hgb_reg.fit(X, y)
+rf_reg.fit(X, y)
+
+
+
+## === cell 4
+train_pred_svr = svr_reg.predict(X)
+train_pred_lr = lr_reg.predict(X)
+train_pred_ridge = ridge_reg.predict(X)
+train_pred_gbr = gbr_reg.predict(X)
+train_pred_hgb = hgb_reg.predict(X)
+train_pred_rf = rf_reg.predict(X)
+
+train_preds_full = np.column_stack(
+    [
+        train_pred_svr,
+        train_pred_lr,
+        train_pred_ridge,
+        train_pred_gbr,
+        train_pred_hgb,
+        train_pred_rf,
+    ]
+)
+
+meta_reg_full = Ridge(alpha=1.0, positive=True, random_state=42)
+meta_reg_full.fit(train_preds_full, y)
+meta_weights_full = meta_reg_full.coef_
+weights = meta_weights_full / meta_weights_full.sum()
+print("Updated ensemble weights (meta trained on full data):", weights)
+
+train_pred_weighted = train_preds_full @ weights
+train_rmse = np.sqrt(mean_squared_error(y, train_pred_weighted))
+print("Training RMSE (weighted ensemble with updated meta weights):", train_rmse)
+
+
+
+## === cell 5
+y_pred_svr = svr_reg.predict(X_test)
+y_pred_lr = lr_reg.predict(X_test)
+y_pred_ridge = ridge_reg.predict(X_test)
+y_pred_gbr = gbr_reg.predict(X_test)
+y_pred_hgb = hgb_reg.predict(X_test)
+y_pred_rf = rf_reg.predict(X_test)
+
+y_pred = (
+    weights[0] * y_pred_svr
+    + weights[1] * y_pred_lr
+    + weights[2] * y_pred_ridge
+    + weights[3] * y_pred_gbr
+    + weights[4] * y_pred_hgb
+    + weights[5] * y_pred_rf
+)
+y_pred = np.clip(y_pred, 0, 100)
+
+
+
+## === cell 6
+submission = pd.DataFrame({"Id": test_df["Id"], "Pawpularity": y_pred})
+output_path = "submission.csv"
+submission.to_csv(output_path, index=False)
+print(f"Submission written to {output_path}")

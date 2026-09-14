@@ -1,0 +1,286 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Given a dataset of comments from Wikipedia's talk page edits, predict the probability of each comment being toxic.
+
+## Metric
+Mean column-wise ROC AUC; the average of the individual AUCs of each predicted column.
+
+## Submission Format
+For each `id` in the test set, you must predict a probability for each of the six possible types of comment toxicity (toxic, severe_toxic, obscene, threat, insult, identity_hate). The columns must be in the same order as shown below. The file should contain a header and have the following format:
+
+```
+id,toxic,severe_toxic,obscene,threat,insult,identity_hate
+00001cee341fdb12,0.5,0.5,0.5,0.5,0.5,0.5
+0000247867823ef7,0.5,0.5,0.5,0.5,0.5,0.5
+etc.
+```
+
+## Dataset 
+- **train.csv** - the training set, contains comments with their binary labels
+- **test.csv** - the test set, you must predict the toxicity probabilities for these comments.
+- **sample_submission.csv** - a sample submission file in the correct format
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (69 lines)
+            sample_submission.csv (153165 lines)
+            sample_submission.csv.zip (1.5 MB)
+            test.csv (552889 lines)
+            test.csv.zip (24.6 MB)
+            train.csv (561809 lines)
+            train.csv.zip (27.7 MB)
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+        input/
+            description.md (69 lines)
+            sample_submission.csv (153165 lines)
+            sample_submission.csv.zip (1.5 MB)
+            test.csv (552889 lines)
+            test.csv.zip (24.6 MB)
+            train.csv (561809 lines)
+            train.csv.zip (27.7 MB)
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+        working/
+            jigsaw-toxic-comment-classification-challenge/
+                description.md (69 lines)
+                sample_submission.csv (153165 lines)
+                ... and 5 other files
+                jigsaw-toxic-comment-classification-challenge/
+```
+
+-> data/jigsaw-toxic-comment-classification-challenge/sample_submission.csv has 153164 rows and 7 columns.
+The columns are: id, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/jigsaw-toxic-comment-classification-challenge/test.csv has 552888 rows and 2 columns.
+The columns are: id, comment_text
+
+-> data/jigsaw-toxic-comment-classification-challenge/train.csv has 561808 rows and 8 columns.
+The columns are: id, comment_text, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/sample_submission.csv has 153164 rows and 7 columns.
+The columns are: id, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> data/test.csv has 552888 rows and 2 columns.
+The columns are: id, comment_text
+
+-> data/train.csv has 561808 rows and 8 columns.
+The columns are: id, comment_text, toxic, severe_toxic, obscene, threat, insult, identity_hate
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from scipy import sparse
+from joblib import Parallel, delayed
+from sklearn.linear_model import LogisticRegression
+
+np.random.seed(42)
+
+candidates = [
+    os.path.join("data", "jigsaw-toxic-comment-classification-challenge"),
+    os.path.join("kaggle", "input", "jigsaw-toxic-comment-classification-challenge"),
+    os.path.join("input", "jigsaw-toxic-comment-classification-challenge"),
+    os.path.join("kaggle", "input", "jigsaw-toxic-comment-classification-challenge"),
+]
+
+base_path = None
+for cand in candidates:
+    abs_cand = os.path.abspath(cand)
+    if os.path.isdir(abs_cand):
+        base_path = abs_cand
+        break
+
+if base_path is None:
+    for root, dirs, files in os.walk(os.getcwd()):
+        if "train.csv" in files:
+            base_path = root
+            break
+
+if base_path is None:
+    raise FileNotFoundError(
+        "Could not locate the dataset directory. Tried: " + ", ".join(candidates)
+    )
+
+train_path = os.path.join(base_path, "train.csv")
+test_path = os.path.join(base_path, "test.csv")
+
+if not os.path.isfile(train_path):
+    raise FileNotFoundError(f"train.csv not found at expected location: {train_path}")
+if not os.path.isfile(test_path):
+    raise FileNotFoundError(f"test.csv not found at expected location: {test_path}")
+
+train_df = pd.read_csv(train_path)
+test_df = pd.read_csv(test_path)
+print("Train shape:", train_df.shape, "Test shape:", test_df.shape)
+
+
+
+## === cell 1
+train_df["comment_text"] = train_df["comment_text"].fillna(" ")
+test_df["comment_text"] = test_df["comment_text"].fillna(" ")
+
+word_vectorizer = TfidfVectorizer(
+    sublinear_tf=True,
+    strip_accents="unicode",
+    analyzer="word",
+    token_pattern=r"\w{1,}",
+    stop_words="english",
+    ngram_range=(1, 2),
+    max_features=200000,  # larger vocab for a modest boost
+    dtype=np.float32,
+)
+
+char_vectorizer = TfidfVectorizer(
+    sublinear_tf=True,
+    strip_accents="unicode",
+    analyzer="char",
+    stop_words=None,
+    ngram_range=(3, 5),
+    max_features=200000,  # larger vocab for a modest boost
+    dtype=np.float32,
+)
+
+
+def fit_transform(vect, series):
+    X = vect.fit_transform(series)
+    return vect, X
+
+
+(word_vectorizer, X_train_word), (char_vectorizer, X_train_char) = Parallel(
+    n_jobs=2, backend="threading"
+)(
+    delayed(fit_transform)(vect, train_df["comment_text"])
+    for vect in (word_vectorizer, char_vectorizer)
+)
+
+X_train = sparse.hstack([X_train_word, X_train_char])
+
+
+def transform(vect, series):
+    return vect.transform(series)
+
+
+X_test_word, X_test_char = Parallel(n_jobs=2, backend="threading")(
+    delayed(transform)(vect, test_df["comment_text"])
+    for vect in (word_vectorizer, char_vectorizer)
+)
+
+X_test = sparse.hstack([X_test_word, X_test_char])
+
+del X_train_word, X_train_char, X_test_word, X_test_char
+print("Feature matrix shape:", X_train.shape)
+
+
+
+## === cell 2
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+
+label_cols = ["toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"]
+outer_n_jobs = min(len(label_cols), os.cpu_count() or 1)
+
+X_tr, X_val, y_tr, y_val = train_test_split(
+    X_train, train_df[label_cols], test_size=0.1, random_state=42
+)
+
+
+def train_one(lbl, X, y):
+    lr = LogisticRegression(
+        solver="sag",
+        max_iter=4000,  # a bit more iterations for better convergence
+        C=4.0,  # mild regularisation change
+        class_weight="balanced",
+        n_jobs=1,
+        random_state=42,
+    )
+    lr.fit(X, y[lbl])
+    return lbl, lr
+
+
+val_results = Parallel(n_jobs=outer_n_jobs, backend="threading")(
+    delayed(train_one)(lbl, X_tr, y_tr) for lbl in label_cols
+)
+
+val_models = dict(val_results)
+
+val_scores = []
+for lbl in label_cols:
+    preds = val_models[lbl].predict_proba(X_val)[:, 1]
+    score = roc_auc_score(y_val[lbl], preds)
+    val_scores.append(score)
+mean_val_auc = np.mean(val_scores)
+print(f"Validation mean ROC‑AUC (10% hold‑out): {mean_val_auc:.6f}")
+
+full_results = Parallel(n_jobs=outer_n_jobs, backend="threading")(
+    delayed(train_one)(lbl, X_train, train_df) for lbl in label_cols
+)
+
+models = dict(full_results)
+
+del X_train  # free memory
+
+
+
+## === cell 3
+preds = {}
+for lbl in label_cols:
+    preds[lbl] = models[lbl].predict_proba(X_test)[:, 1]
+
+submission = pd.DataFrame({"id": test_df["id"]})
+for lbl in label_cols:
+    submission[lbl] = preds[lbl]
+
+print("Submission preview:")
+print(submission.head())
+
+
+
+## === cell 4
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission saved to {submission_path}")

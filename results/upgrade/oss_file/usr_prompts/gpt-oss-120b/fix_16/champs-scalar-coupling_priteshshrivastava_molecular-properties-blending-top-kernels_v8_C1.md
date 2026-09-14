@@ -1,0 +1,398 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict the `scalar_coupling_constant` between atom pairs in molecules, given the two atom types (e.g., C and H), the coupling type (e.g., `2JHC`), and any features you are able to create from the molecule structure (`xyz`) files.
+
+## Metric
+Log of the Mean Absolute Error, calculated for each scalar coupling type, and then averaged across types.
+
+## Submission Format
+```
+id,scalar_coupling_constant
+2324604,0.0
+2324605,0.0
+2324606,0.0
+etc.
+```
+
+## Dataset
+The training and test splits are by *molecule*, so that no molecule in the training data is found in the test data.
+
+- **train.csv** - the training set, where the first column (`molecule_name`) is the name of the molecule where the coupling constant originates (the corresponding XYZ file is located at ./structures/.xyz), the second (`atom_index_0`) and third column (`atom_index_1`) is the atom indices of the atom-pair creating the coupling and the fourth column (`scalar_coupling_constant`) is the scalar coupling constant that we want to be able to predict
+- **test.csv** - the test set; same info as train, without the target variable
+- **sample_submission.csv** - a sample submission file in the correct format
+- **structures.zip** - folder containing molecular structure (xyz) files, where the first line is the number of atoms in the molecule, followed by a blank line, and then a line for every atom, where the first column contains the atomic element (H for hydrogen, C for carbon etc.) and the remaining columns contain the X, Y and Z cartesian coordinates (a standard format for chemists and molecular visualization programs)
+- **structures.csv** - this file contains the **same** information as the individual xyz structure files, but in a single file
+- **dipole_moments.csv** - contains the molecular electric dipole moments. These are three dimensional vectors that indicate the charge distribution in the molecule. The first column (`molecule_name`) are the names of the molecule, the second to fourth column are the `X`, `Y` and `Z` components respectively of the dipole moment.
+- **magnetic_shielding_tensors.csv** - contains the magnetic shielding tensors for all atoms in the molecules. The first column (`molecule_name`) contains the molecule name, the second column (`atom_index`) contains the index of the atom in the molecule, the third to eleventh columns contain the `XX`, `YX`, `ZX`, `XY`, `YY`, `ZY`, `XZ`, `YZ` and `ZZ` elements of the tensor/matrix respectively.
+- **mulliken_charges.csv** - contains the mulliken charges for all atoms in the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`atom_index`) contains the index of the atom in the molecule, the third column (`mulliken_charge`) contains the mulliken charge of the atom.
+- **potential_energy.csv** - contains the potential energy of the molecules. The first column (`molecule_name`) contains the name of the molecule, the second column (`potential_energy`) contains the potential energy of the molecule.
+- **scalar_coupling_contributions.csv** - The scalar coupling constants in `train.csv` (or corresponding files) are a sum of four terms. `scalar_coupling_contributions.csv` contain all these terms. The first column (`molecule_name`) are the name of the molecule, the second (`atom_index_0`) and third column (`atom_index_1`) are the atom indices of the atom-pair, the fourth column indicates the type of coupling, the fifth column (`fc`) is the Fermi Contact contribution, the sixth column (`sd`) is the Spin-dipolar contribution, the seventh column (`pso`) is the Paramagnetic spin-orbit contribution and the eighth column (`dso`) is the Diamagnetic spin-orbit contribution.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        input/
+            description.md (111 lines)
+            dipole_moments.csv (76511 lines)
+            dipole_moments.csv.zip (892.4 kB)
+            magnetic_shielding_tensors.csv (1379965 lines)
+            magnetic_shielding_tensors.csv.zip (47.9 MB)
+            mulliken_charges.csv (1379965 lines)
+            mulliken_charges.csv.zip (9.5 MB)
+            potential_energy.csv (76511 lines)
+            potential_energy.csv.zip (641.9 kB)
+            sample_submission.csv (467814 lines)
+            sample_submission.csv.zip (846.9 kB)
+            scalar_coupling_contributions.csv (4191264 lines)
+            scalar_coupling_contributions.csv.zip (90.0 MB)
+            structures.csv (1379965 lines)
+            structures.csv.zip (33.0 MB)
+            structures.zip (44.3 MB)
+            test.csv (467814 lines)
+            test.csv.zip (2.6 MB)
+            train.csv (4191264 lines)
+            train.csv.zip (43.6 MB)
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+            structures/
+                dsgdb9nsd_000001.xyz (212 Bytes)
+                dsgdb9nsd_000002.xyz (171 Bytes)
+                ... and 76508 other files
+        working/
+            champs-scalar-coupling/
+                description.md (111 lines)
+                dipole_moments.csv (76511 lines)
+                ... and 18 other files
+                champs-scalar-coupling/
+                structures/
+                    dsgdb9nsd_000001.xyz (212 Bytes)
+                    dsgdb9nsd_000002.xyz (171 Bytes)
+                    ... and 76508 other files
+```
+
+-> data/champs-scalar-coupling/dipole_moments.csv has 76510 rows and 4 columns.
+The columns are: molecule_name, X, Y, Z
+
+-> data/champs-scalar-coupling/magnetic_shielding_tensors.csv has 1379964 rows and 11 columns.
+The columns are: molecule_name, atom_index, XX, YX, ZX, XY, YY, ZY, XZ, YZ, ZZ
+
+-> data/champs-scalar-coupling/mulliken_charges.csv has 1379964 rows and 3 columns.
+The columns are: molecule_name, atom_index, mulliken_charge
+
+-> data/champs-scalar-coupling/potential_energy.csv has 76510 rows and 2 columns.
+The columns are: molecule_name, potential_energy
+
+-> data/champs-scalar-coupling/sample_submission.csv has 467813 rows and 2 columns.
+The columns are: id, scalar_coupling_constant
+
+-> data/champs-scalar-coupling/scalar_coupling_contributions.csv has 4191263 rows and 8 columns.
+The columns are: molecule_name, atom_index_0, atom_index_1, type, fc, sd, pso, dso
+
+-> data/champs-scalar-coupling/structures.csv has 1379964 rows and 6 columns.
+The columns are: molecule_name, atom_index, atom, x, y, z
+
+-> data/champs-scalar-coupling/test.csv has 467813 rows and 5 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type
+
+-> data/champs-scalar-coupling/train.csv has 4191263 rows and 6 columns.
+The columns are: id, molecule_name, atom_index_0, atom_index_1, type, scalar_coupling_constant
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-1.664883110448491
+
+# 6. Current score
+
+1.23566
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 1.23566) has done: 'The fix replaces the failing blend file reads with a robust baseline prediction: it loads the actual training data, computes the mean coupling constant for each coupling type, applies these means to the test set, and writes a valid submission CSV. This eliminates the FileNotFoundError and ensures a proper submission file is generated, moving the solution toward the target score.'
+- What this solution (achieved 1.23566) has done: 'I enhance the baseline by incorporating atom element information from the structures file. By merging atom types for each pair and computing the mean coupling constant for each (type, atom0, atom1) combination, predictions become more specific than a simple type‑average, which should lower the log‑MAE toward the target while keeping the overall pipeline unchanged. The script still writes a valid CSV submission.'
+- What this solution (achieved 1.23566) has done: 'I add a few inexpensive hierarchical fallback averages to the prediction logic: first try the exact (type, atom0, atom1) mean, then the reversed atom order, then means by (type, atom0) and (type, atom1), before falling back to the type‑average and finally the global mean. This keeps the core approach intact while giving more specific estimates for rare atom‑pair combos, which should lower the log‑MAE toward the target score.'
+- What this solution (achieved 1.23566) has done: 'I add a simple distance‑based correction to the existing hierarchical mean‑lookup. By reading the atom coordinates from the structures file, computing the Euclidean distance for each pair, and storing the mean scalar coupling for each (type, distance‑bucket) combo, the predictor can use a more specific estimate when the exact atom‑type combo is missing. This keeps the original fallback logic intact while providing a targeted improvement that should lower the log‑MAE toward the target.'
+- What this solution (achieved 1.18497) has done: 'I replace the averaging steps with median calculations, which are less sensitive to outliers and should lower the log‑MAE toward the target while keeping the overall hierarchical fallback logic unchanged. The rest of the pipeline, merges, distance computation and submission writing remain identical.'
+- What this solution (achieved 1.18497) has done: 'I add a more specific fallback that uses the median scalar coupling for each (type, atom 0, atom 1, distance‑bucket) combination. This extra lookup is cheap, preserves the hierarchical logic, and is expected to give tighter predictions than the existing distance‑only fallback, moving the log‑MAE closer to the target. The rest of the pipeline and file output remain unchanged.'
+- What this solution (achieved 1.23566) has done: 'I replace the median‑based lookup tables with mean‑based ones, keeping the same hierarchical fallback logic. Using the average coupling for each grouping usually yields lower MAE (and thus a lower log‑MAE) than the median, moving the score closer to the target while preserving the overall pipeline.'
+- What this solution (achieved 1.34767) has done: 'I replace the mean‑based lookup tables with median‑based ones (median is more robust to outliers and was shown to improve the log‑MAE) and then apply a simple bias correction computed from the training set predictions. This keeps the hierarchical fallback logic unchanged while making the predictions slightly more accurate, moving the score closer to the target lower‑is‑better value.'
+- What this solution (achieved 1.23566) has done: 'I replace all median aggregations with means (which previously yielded a lower score), switch the global fallback to the overall mean, and add a tiny linear calibration fitted on the training predictions instead of a simple bias term. These tweaks keep the hierarchical lookup logic intact while making the predictions slightly more accurate, moving the log‑MAE toward the lower target value.'
+- What this solution (achieved 1.25315) has done: 'I replace the mean‑based aggregation tables with median‑based ones, which is a small but effective tweak that has previously lowered the log‑MAE score. All other logic—including the hierarchical fallback and calibration step—remains unchanged, ensuring the script still runs end‑to‑end and writes a valid submission file.'
+- What this solution (achieved 1.23566) has done: 'I replace the median‑based aggregation tables with mean‑based ones (while keeping the same hierarchical fallback logic). Using means typically provides lower MAE than medians for this dataset, so the calibrated predictions should move the log‑MAE closer to the target lower value.'
+- What this solution (achieved 1.23566) has done: 'I replace the mean‑based aggregation tables with median‑based ones (medians are more robust to outliers) and add a simple per‑type bias correction computed from the training set after the global linear calibration. This keeps the hierarchical lookup logic intact while providing a tighter calibration that should lower the log‑MAE, moving the score closer to the target.'
+- What this solution (achieved 1.23566) has done: 'I replace all median‑based aggregations with mean‑based ones (while keeping the hierarchical fallback logic unchanged) because means usually give lower MAE, which move the log‑MAE toward the lower target value. The only other change is renaming the global‑median variable to a global‑mean for clarity.'
+- What this solution (achieved 1.23566) has done: 'I tighten the distance‑bucket grouping (round to one decimal instead of two) to give each bucket more samples, and I add a reversed‑order distance‑bucket lookup in the prediction logic so the model can use the same‑distance information when the atom order is swapped. These minimal tweaks keep the original hierarchical mean‑based approach while expected to lower the log‑MAE toward the target value.'
+- What this solution (achieved 1.23566) has done: 'The update switches all aggregation steps from mean to median, including the global fallback value. Using medians reduces the influence of outliers in the lookup tables, which should lower the MAE and thus move the log‑MAE score closer to the target while preserving the existing hierarchical prediction and calibration logic.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+
+
+
+
+## === cell 1
+train_path = "../input/champs-scalar-coupling/train.csv"
+test_path = "../input/champs-scalar-coupling/test.csv"
+structures_path = "../input/champs-scalar-coupling/structures.csv"
+
+if not os.path.exists(train_path):
+    raise FileNotFoundError(f"Training file not found at {train_path}")
+if not os.path.exists(test_path):
+    raise FileNotFoundError(f"Test file not found at {test_path}")
+if not os.path.exists(structures_path):
+    raise FileNotFoundError(f"Structures file not found at {structures_path}")
+
+train_df = pd.read_csv(train_path)
+test_df = pd.read_csv(test_path)
+
+structures = pd.read_csv(
+    structures_path, usecols=["molecule_name", "atom_index", "atom", "x", "y", "z"]
+)
+
+train_merged = (
+    train_df.merge(
+        structures,
+        left_on=["molecule_name", "atom_index_0"],
+        right_on=["molecule_name", "atom_index"],
+        how="left",
+    )
+    .rename(columns={"atom": "atom_0", "x": "x0", "y": "y0", "z": "z0"})
+    .drop(columns=["atom_index"])
+)
+
+train_merged = (
+    train_merged.merge(
+        structures,
+        left_on=["molecule_name", "atom_index_1"],
+        right_on=["molecule_name", "atom_index"],
+        how="left",
+    )
+    .rename(columns={"atom": "atom_1", "x": "x1", "y": "y1", "z": "z1"})
+    .drop(columns=["atom_index"])
+)
+
+test_merged = (
+    test_df.merge(
+        structures,
+        left_on=["molecule_name", "atom_index_0"],
+        right_on=["molecule_name", "atom_index"],
+        how="left",
+    )
+    .rename(columns={"atom": "atom_0", "x": "x0", "y": "y0", "z": "z0"})
+    .drop(columns=["atom_index"])
+)
+
+test_merged = (
+    test_merged.merge(
+        structures,
+        left_on=["molecule_name", "atom_index_1"],
+        right_on=["molecule_name", "atom_index"],
+        how="left",
+    )
+    .rename(columns={"atom": "atom_1", "x": "x1", "y": "y1", "z": "z1"})
+    .drop(columns=["atom_index"])
+)
+
+
+
+
+## === cell 2
+def compute_distance(df):
+    return np.sqrt(
+        (df["x0"] - df["x1"]) ** 2
+        + (df["y0"] - df["y1"]) ** 2
+        + (df["z0"] - df["z1"]) ** 2
+    )
+
+
+train_merged["distance"] = compute_distance(train_merged)
+test_merged["distance"] = compute_distance(test_merged)
+
+train_merged["dist_bucket"] = train_merged["distance"].round(1)
+test_merged["dist_bucket"] = test_merged["distance"].round(1)
+
+
+
+
+## === cell 3
+combo_means = train_merged.groupby(["type", "atom_0", "atom_1"])[
+    "scalar_coupling_constant"
+].median()
+combo_dict = combo_means.to_dict()
+
+combo_dist_means = train_merged.groupby(["type", "atom_0", "atom_1", "dist_bucket"])[
+    "scalar_coupling_constant"
+].median()
+combo_dist_dict = combo_dist_means.to_dict()
+
+pair0_means = train_merged.groupby(["type", "atom_0"])[
+    "scalar_coupling_constant"
+].median()
+pair0_dict = pair0_means.to_dict()
+
+pair1_means = train_merged.groupby(["type", "atom_1"])[
+    "scalar_coupling_constant"
+].median()
+pair1_dict = pair1_means.to_dict()
+
+type_means = train_merged.groupby("type")["scalar_coupling_constant"].median()
+type_dict = type_means.to_dict()
+
+dist_means = train_merged.groupby(["type", "dist_bucket"])[
+    "scalar_coupling_constant"
+].median()
+dist_dict = dist_means.to_dict()
+
+global_mean = train_merged["scalar_coupling_constant"].median()
+
+
+
+
+## === cell 4
+def predict_row(row):
+    key = (row["type"], row["atom_0"], row["atom_1"])
+    if key in combo_dict:
+        return combo_dict[key]
+
+    dist_key_combo = (row["type"], row["atom_0"], row["atom_1"], row["dist_bucket"])
+    if dist_key_combo in combo_dist_dict:
+        return combo_dist_dict[dist_key_combo]
+
+    rev_key = (row["type"], row["atom_1"], row["atom_0"])
+    if rev_key in combo_dict:
+        return combo_dict[rev_key]
+
+    rev_dist_key = (row["type"], row["atom_1"], row["atom_0"], row["dist_bucket"])
+    if rev_dist_key in combo_dist_dict:
+        return combo_dist_dict[rev_dist_key]
+
+    key0 = (row["type"], row["atom_0"])
+    if key0 in pair0_dict:
+        return pair0_dict[key0]
+
+    key1 = (row["type"], row["atom_1"])
+    if key1 in pair1_dict:
+        return pair1_dict[key1]
+
+    dist_key = (row["type"], row["dist_bucket"])
+    if dist_key in dist_dict:
+        return dist_dict[dist_key]
+
+    if row["type"] in type_dict:
+        return type_dict[row["type"]]
+
+    return global_mean
+
+
+
+
+## === cell 5
+train_preds_raw = train_merged.apply(predict_row, axis=1)
+
+slope, intercept = np.polyfit(train_preds_raw, train_df["scalar_coupling_constant"], 1)
+
+train_preds_cal = train_preds_raw * slope + intercept
+
+type_bias_series = (
+    (train_df["scalar_coupling_constant"] - train_preds_cal)
+    .groupby(train_df["type"])
+    .mean()
+)
+type_bias = type_bias_series.to_dict()
+
+
+
+
+## === cell 6
+test_preds_raw = test_merged.apply(predict_row, axis=1)
+
+test_preds_cal = test_preds_raw * slope + intercept
+
+bias_addition = test_df["type"].map(type_bias).fillna(0)
+test_preds = test_preds_cal + bias_addition
+
+submission = pd.DataFrame({"id": test_df["id"], "scalar_coupling_constant": test_preds})
+submission_path = "my_blend_2.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")

@@ -1,0 +1,426 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8146999076638982
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
+import pandas as pd
+import tensorflow as tf
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+output_dir = "./"
+test_dir = "../input/plant-pathology-2021-fgvc8/test_images/"
+model_dir = "../input/conve01/effb7-e12/epoch-12"
+efficientB7 = "../input/efficientb7/effb7"
+
+image_dims = (300, 300, 3)
+data_set = pd.read_csv("../input/plant-pathology-2021-fgvc8/train.csv")
+df_labels = data_set["labels"]
+one_hot = df_labels.str.get_dummies(sep=" ")
+dataset_labels = one_hot.columns.to_list()
+
+
+
+## === cell 2
+from tensorflow.keras.applications import EfficientNetB7
+from tensorflow.keras import Sequential, Model
+from tensorflow.keras.layers import (
+    Dense,
+    Flatten,
+    BatchNormalization,
+    Dropout,
+    GlobalMaxPool2D,
+    Conv2D,
+    InputLayer,
+    TFSMLayer,
+)
+from tensorflow import concat
+
+
+class MultiLabel(Model):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model_backbone = TFSMLayer(efficientB7, call_endpoint="serving_default")
+        self.model = Sequential()
+        self.model.add(InputLayer(input_shape=image_dims))
+        self.model.add(self.model_backbone)
+        self.model.add(Conv2D(filters=1024, kernel_size=(1, 1), padding="same"))
+        self.model.add(BatchNormalization(momentum=0.7))
+        self.model.add(Dropout(0.2))
+        self.model.add(Conv2D(filters=1024, kernel_size=(1, 1), padding="same"))
+        self.model.add(Conv2D(filters=2400, kernel_size=(1, 1), padding="same"))
+
+        self.model_pred1_2 = Conv2D(filters=1024, kernel_size=(1, 1), padding="same")
+        self.model_pred1_3 = BatchNormalization()
+        self.model_pred1_4 = Conv2D(filters=512, kernel_size=(1, 1), padding="same")
+        self.model_pred1_5 = GlobalMaxPool2D()
+        self.model_pred1_6 = Dense(units=1, activation="sigmoid")
+
+        self.model_pred2_2 = Conv2D(filters=1024, kernel_size=(1, 1), padding="same")
+        self.model_pred2_3 = BatchNormalization()
+        self.model_pred2_4 = Conv2D(filters=512, kernel_size=(1, 1), padding="same")
+        self.model_pred2_5 = GlobalMaxPool2D()
+        self.model_pred2_6 = Dense(units=1, activation="sigmoid")
+
+        self.model_pred3_2 = Conv2D(filters=1024, kernel_size=(1, 1), padding="same")
+        self.model_pred3_3 = BatchNormalization()
+        self.model_pred3_4 = Conv2D(filters=512, kernel_size=(1, 1), padding="same")
+        self.model_pred3_5 = GlobalMaxPool2D()
+        self.model_pred3_6 = Dense(units=1, activation="sigmoid")
+
+        self.model_pred4_2 = Conv2D(filters=1024, kernel_size=(1, 1), padding="same")
+        self.model_pred4_3 = BatchNormalization()
+        self.model_pred4_4 = Conv2D(filters=512, kernel_size=(1, 1), padding="same")
+        self.model_pred4_5 = GlobalMaxPool2D()
+        self.model_pred4_6 = Dense(units=1, activation="sigmoid")
+
+        self.model_pred5_2 = Conv2D(filters=1024, kernel_size=(1, 1), padding="same")
+        self.model_pred5_3 = BatchNormalization()
+        self.model_pred5_4 = Conv2D(filters=512, kernel_size=(1, 1), padding="same")
+        self.model_pred5_5 = GlobalMaxPool2D()
+        self.model_pred5_6 = Dense(units=1, activation="sigmoid")
+
+        self.model_pred6_2 = Conv2D(filters=1024, kernel_size=(1, 1), padding="same")
+        self.model_pred6_3 = BatchNormalization()
+        self.model_pred6_4 = Conv2D(filters=512, kernel_size=(1, 1), padding="same")
+        self.model_pred6_5 = GlobalMaxPool2D()
+        self.model_pred6_6 = Dense(units=1, activation="sigmoid")
+
+    def call(self, x, **kwargs):
+        y = self.model(x)
+        pred1 = y[:, :, :, :400]
+        pred2 = y[:, :, :, 400:800]
+        pred3 = y[:, :, :, 800:1200]
+        pred4 = y[:, :, :, 1200:1600]
+        pred5 = y[:, :, :, 1600:2000]
+        pred6 = y[:, :, :, 2000:2400]
+
+        pred1 = self.model_pred1_2(pred1)
+        pred1 = self.model_pred1_3(pred1)
+        pred1 = self.model_pred1_4(pred1)
+        pred1 = self.model_pred1_5(pred1)
+        pred1 = self.model_pred1_6(pred1)
+
+        pred2 = self.model_pred2_2(pred2)
+        pred2 = self.model_pred2_3(pred2)
+        pred2 = self.model_pred2_4(pred2)
+        pred2 = self.model_pred2_5(pred2)
+        pred2 = self.model_pred2_6(pred2)
+
+        pred3 = self.model_pred3_2(pred3)
+        pred3 = self.model_pred3_3(pred3)
+        pred3 = self.model_pred3_4(pred3)
+        pred3 = self.model_pred3_5(pred3)
+        pred3 = self.model_pred3_6(pred3)
+
+        pred4 = self.model_pred4_2(pred4)
+        pred4 = self.model_pred4_3(pred4)
+        pred4 = self.model_pred4_4(pred4)
+        pred4 = self.model_pred4_5(pred4)
+        pred4 = self.model_pred4_6(pred4)
+
+        pred5 = self.model_pred5_2(pred5)
+        pred5 = self.model_pred5_3(pred5)
+        pred5 = self.model_pred5_4(pred5)
+        pred5 = self.model_pred5_5(pred5)
+        pred5 = self.model_pred5_6(pred5)
+
+        pred6 = self.model_pred6_2(pred6)
+        pred6 = self.model_pred6_3(pred6)
+        pred6 = self.model_pred6_4(pred6)
+        pred6 = self.model_pred6_5(pred6)
+        pred6 = self.model_pred6_6(pred6)
+
+        return concat([pred1, pred2, pred3, pred4, pred5, pred6], axis=1)
+
+    def create_model(self):
+        return self.model
+
+
+
+
+## === cell 3
+if __name__ == "__main__":
+    model = MultiLabel()
+    model.build(input_shape=[None, image_dims[0], image_dims[1], image_dims[2]])
+    model.load_weights(model_dir)
+
+    images_path_list = sorted(os.listdir(test_dir))
+
+    def test_on_sub(index):
+        img_path = os.path.join(test_dir, images_path_list[index])
+        raw = tf.io.read_file(img_path)
+        img = tf.io.decode_image(raw, channels=3, dtype=tf.dtypes.float32)
+        img = tf.image.resize(img, [image_dims[0], image_dims[1]])
+        name_jpg = images_path_list[index]
+        return name_jpg, tf.expand_dims(img, axis=0)
+
+    values = []
+    for i in range(len(images_path_list)):
+        name, img_tensor = test_on_sub(i)
+        img_tensor = img_tensor * 255.0
+        preds = model.call(img_tensor)
+        pred_array = preds[0].numpy()
+        index_values = [idx for idx, v in enumerate(pred_array) if v > 0.7]
+        classes_img = " ".join([dataset_labels[idx] for idx in index_values])
+        values.append([name, classes_img])
+
+    submission_df = pd.DataFrame(values, columns=["image", "labels"])
+    submission_path = os.path.join(output_dir, "submission.csv")
+    submission_df.to_csv(submission_path, index=False)
+    print(f"Submission written to {submission_path}")
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+OSError                                   Traceback (most recent call last)
+/tmp/ipykernel_11/1121653093.py in <cell line: 0>()
+      1 if __name__ == "__main__":
+----> 2     model = MultiLabel()
+      3     model.build(input_shape=[None, image_dims[0], image_dims[1], image_dims[2]])
+      4     # Load pretrained weights (assumes a TensorFlow checkpoint format)
+      5     model.load_weights(model_dir)
+
+/tmp/ipykernel_11/3639981507.py in __init__(self, *args, **kwargs)
+     18         super().__init__(*args, **kwargs)
+     19         # Load EfficientNetB7 as a frozen inference layer
+---> 20         self.model_backbone = TFSMLayer(efficientB7, call_endpoint="serving_default")
+     21         self.model = Sequential()
+     22         self.model.add(InputLayer(input_shape=image_dims))
+
+/usr/local/lib/python3.11/dist-packages/keras/src/export/tfsm_layer.py in __init__(self, filepath, call_endpoint, call_training_endpoint, trainable, name, dtype)
+     64         super().__init__(trainable=trainable, name=name, dtype=dtype)
+     65 
+---> 66         self._reloaded_obj = tf.saved_model.load(filepath)
+     67 
+     68         self.filepath = filepath
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/saved_model/load.py in load(export_dir, tags, options)
+    910   if isinstance(export_dir, os.PathLike):
+    911     export_dir = os.fspath(export_dir)
+--> 912   result = load_partial(export_dir, None, tags, options)["root"]
+    913   return result
+    914 
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/saved_model/load.py in load_partial(export_dir, filters, tags, options)
+   1014     tags = nest.flatten(tags)
+   1015   saved_model_proto, debug_info = (
+-> 1016       loader_impl.parse_saved_model_with_debug_info(export_dir))
+   1017 
+   1018   loader = None
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/saved_model/loader_impl.py in parse_saved_model_with_debug_info(export_dir)
+     57     parsed. Missing graph debug info file is fine.
+     58   """
+---> 59   saved_model = parse_saved_model(export_dir)
+     60 
+     61   debug_info_path = file_io.join(
+
+/usr/local/lib/python3.11/dist-packages/tensorflow/python/saved_model/loader_impl.py in parse_saved_model(export_dir)
+    117       raise IOError(f"Cannot parse file {path_to_pbtxt}: {str(e)}.") from e
+    118   else:
+--> 119     raise IOError(
+    120         f"SavedModel file does not exist at: {export_dir}{os.path.sep}"
+    121         f"{{{constants.SAVED_MODEL_FILENAME_PBTXT}|"
+
+OSError: SavedModel file does not exist at: ../input/efficientb7/effb7/{saved_model.pbtxt|saved_model.pb}

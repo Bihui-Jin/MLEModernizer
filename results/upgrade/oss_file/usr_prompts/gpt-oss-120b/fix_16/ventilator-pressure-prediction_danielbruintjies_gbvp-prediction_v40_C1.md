@@ -1,0 +1,338 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os, gc, random, time
+import numpy as np, pandas as pd
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_absolute_error
+import lightgbm as lgb
+import concurrent.futures  # retained for compatibility but not used
+
+
+def set_seed(seed_val: int = 42):
+    random.seed(seed_val)
+    np.random.seed(seed_val)
+    os.environ["PYTHONHASHSEED"] = str(seed_val)
+
+
+set_seed(23)
+
+
+
+
+## === cell 1
+TRAIN_PATH = "../input/ventilator-pressure-prediction/train.csv"
+TEST_PATH = "../input/ventilator-pressure-prediction/test.csv"
+SUBM_PATH = "../input/ventilator-pressure-prediction/sample_submission.csv"
+
+dtype_dict = {
+    "R": "int16",
+    "C": "int16",
+    "time_step": "float32",
+    "u_in": "float32",
+    "u_out": "int8",
+    "pressure": "float32",
+    "breath_id": "int32",
+    "id": "int32",
+}
+train = pd.read_csv(TRAIN_PATH, dtype=dtype_dict, low_memory=False)
+test = pd.read_csv(TEST_PATH, dtype=dtype_dict, low_memory=False)
+submission = pd.read_csv(SUBM_PATH)
+
+numeric_cols = ["R", "C", "time_step", "u_in", "u_out"]
+for col in numeric_cols:
+    train[col] = pd.to_numeric(train[col], errors="coerce")
+    test[col] = pd.to_numeric(test[col], errors="coerce")
+
+train = train.fillna(0)
+test = test.fillna(0)
+
+train["log_u_in"] = np.log1p(train["u_in"])
+test["log_u_in"] = np.log1p(test["u_in"])
+
+
+def add_temporal_features(df):
+    df = df.sort_values(["breath_id", "time_step"]).reset_index(drop=True)
+    g = df.groupby("breath_id")
+    df["u_in_lag1"] = g["u_in"].shift(1).fillna(0)
+    df["u_out_lag1"] = g["u_out"].shift(1).fillna(0)
+    df["time_step_delta"] = g["time_step"].diff().fillna(0)
+    df["cum_u_in"] = g["u_in"].cumsum()
+    return df
+
+
+train = add_temporal_features(train)
+test = add_temporal_features(test)
+
+train["u_in_R"] = train["u_in"] * train["R"]
+test["u_in_R"] = test["u_in"] * test["R"]
+train["u_in_div_C"] = train["u_in"] / (train["C"] + 1e-5)
+test["u_in_div_C"] = test["u_in"] / (test["C"] + 1e-5)
+
+feature_cols = [
+    "R",
+    "C",
+    "time_step",
+    "u_in",
+    "u_out",
+    "log_u_in",
+    "u_in_lag1",
+    "u_out_lag1",
+    "time_step_delta",
+    "cum_u_in",
+    "u_in_R",
+    "u_in_div_C",
+    "breath_id",
+]
+
+X_np = train[feature_cols].values.astype(np.float32)
+y_np = train["pressure"].values.astype(np.float32)
+X_test_np = test[feature_cols].values.astype(np.float32)
+
+
+
+
+## === cell 2
+n_splits = 5
+kf = KFold(n_splits=n_splits, shuffle=True, random_state=23)
+
+test_pred = np.zeros(len(X_test_np), dtype=np.float64)
+oof_pred = np.zeros(len(X_np), dtype=np.float64)
+
+max_threads = max(1, os.cpu_count() or 1)
+n_jobs = min(n_splits, max_threads)
+threads_per_fold = max(1, max_threads // n_jobs)
+
+
+def train_fold(fold, tr_idx, val_idx):
+    X_tr, X_val = X_np[tr_idx], X_np[val_idx]
+    y_tr, y_val = y_np[tr_idx], y_np[val_idx]
+
+    lgb_train = lgb.Dataset(X_tr, label=y_tr, free_raw_data=False)
+    lgb_valid = lgb.Dataset(
+        X_val, label=y_val, reference=lgb_train, free_raw_data=False
+    )
+
+    params = {
+        "objective": "regression",
+        "metric": "mae",
+        "boosting_type": "gbdt",
+        "learning_rate": 0.05,
+        "num_leaves": 63,
+        "feature_fraction": 0.9,
+        "bagging_fraction": 0.8,
+        "bagging_freq": 5,
+        "seed": 23,
+        "verbosity": -1,
+        "num_threads": threads_per_fold,  # limit threads per parallel fold
+    }
+
+    callbacks = [
+        lgb.early_stopping(stopping_rounds=100, verbose=False),
+        lgb.log_evaluation(period=0),
+    ]
+
+    model = lgb.train(
+        params,
+        lgb_train,
+        num_boost_round=2000,
+        valid_sets=[lgb_valid],
+        callbacks=callbacks,
+    )
+
+    test_pred_fold = model.predict(X_test_np, num_iteration=model.best_iteration)
+    oof_pred_fold = model.predict(X_val, num_iteration=model.best_iteration)
+    best_iter = model.best_iteration
+
+    del X_tr, X_val, y_tr, y_val, lgb_train, lgb_valid, model
+    gc.collect()
+
+    return fold, test_pred_fold, val_idx, oof_pred_fold, best_iter
+
+
+fold_results = []
+with concurrent.futures.ProcessPoolExecutor(max_workers=n_jobs) as executor:
+    futures = []
+    for fold, (tr_idx, val_idx) in enumerate(kf.split(X_np, y_np)):
+        futures.append(executor.submit(train_fold, fold, tr_idx, val_idx))
+    for fut in concurrent.futures.as_completed(futures):
+        fold_results.append(fut.result())
+
+for fold, test_pred_fold, val_idx, oof_pred_fold, best_iter in sorted(
+    fold_results, key=lambda x: x[0]
+):
+    test_pred += test_pred_fold / n_splits
+    oof_pred[val_idx] = oof_pred_fold
+    print(f"Fold {fold} completed. Best iteration: {best_iter}")
+
+print("OOF MAE:", mean_absolute_error(y_np, oof_pred))
+
+
+
+
+## === cell 3
+submission["pressure"] = test_pred
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission saved to {submission_path}")

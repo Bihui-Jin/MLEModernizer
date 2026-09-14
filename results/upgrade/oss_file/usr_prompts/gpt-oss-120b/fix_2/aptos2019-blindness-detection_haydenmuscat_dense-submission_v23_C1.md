@@ -1,0 +1,538 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Create a classifier to predict the severity of diabetic retinopathy.
+
+## Metric
+Quadratic weighted kappa, which measures the agreement between two ratings. This metric typically varies from 0 (random agreement between raters) to 1 (complete agreement between raters). In the event that there is less agreement between the raters than expected by chance, this metric may go below 0. The quadratic weighted kappa is calculated between the scores assigned by the human rater and the predicted scores.
+
+Images have five possible ratings, 0,1,2,3,4.  Each image is characterized by a tuple *(e*,*e)*, which corresponds to its scores by *Rater A* (human) and *Rater B* (predicted).  The quadratic weighted kappa is calculated as follows. First, an N x N histogram matrix *O* is constructed, such that *O* corresponds to the number of images that received a rating *i* by *A* and a rating *j* by *B*. An *N-by-N* matrix of weights, *w*, is calculated based on the difference between raters' scores:
+
+An *N-by-N* histogram matrix of expected ratings, *E*, is calculated, assuming that there is no correlation between rating scores.  This is calculated as the outer product between each rater's histogram vector of ratings, normalized such that *E* and *O* have the same sum.
+
+## Submission Format
+```
+id_code,diagnosis
+0005cfc8afb6,0
+003f0afdcd15,0
+etc.
+```
+
+## Dataset
+You are provided with a large set of retina images taken using [fundus photography](https://en.wikipedia.org/wiki/Fundus_photography) under a variety of imaging conditions.
+
+Labels are on a scale of 0 to 4:
+
+> 0 - No DR
+> 1 - Mild
+> 2 - Moderate
+> 3 - Severe
+> 4 - Proliferative DR
+
+Images may contain artifacts, be out of focus, underexposed, or overexposed. The images were gathered from multiple clinics using a variety of cameras over an extended period of time, which will introduce further variation.
+
+- **train.csv** - the training labels
+- **test.csv** - the test set (you must predict the `diagnosis` value for these variables)
+- **sample_submission.csv** - a sample submission file in the correct format
+- **train.zip** - the training set images
+- **test.zip** - the public test set images
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+        input/
+            description.md (118 lines)
+            sample_submission.csv (368 lines)
+            sample_submission.csv.zip (3.2 kB)
+            test.csv (368 lines)
+            test.csv.zip (2.9 kB)
+            test.zip (160 Bytes)
+            test_images.zip (902.9 MB)
+            train.csv (3296 lines)
+            train.csv.zip (27.5 kB)
+            train.zip (162 Bytes)
+            train_images.zip (7.7 GB)
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+            test_images/
+                218c822a3dd9.png (5.7 MB)
+                0e82bcacc475.png (5.2 MB)
+                ... and 365 other files
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+            train_images/
+                184a185e7447.png (337.5 kB)
+                c4aef0d88d1b.png (876.6 kB)
+                ... and 3293 other files
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+        working/
+            aptos2019-blindness-detection/
+                description.md (118 lines)
+                sample_submission.csv (368 lines)
+                ... and 9 other files
+                aptos2019-blindness-detection/
+                test_images/
+                    218c822a3dd9.png (5.7 MB)
+                    0e82bcacc475.png (5.2 MB)
+                    ... and 365 other files
+                    test_images/
+                train_images/
+                    184a185e7447.png (337.5 kB)
+                    c4aef0d88d1b.png (876.6 kB)
+                    ... and 3293 other files
+                    train_images/
+```
+
+-> data/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/aptos2019-blindness-detection/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/aptos2019-blindness-detection/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> data/test.csv has 367 rows and 1 columns.
+The columns are: id_code
+
+-> data/train.csv has 3295 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> input/aptos2019-blindness-detection/sample_submission.csv has 367 rows and 2 columns.
+The columns are: id_code, diagnosis
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8948003622955246
+
+# 6. Current score
+
+0.0
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.0) has done: 'I remove the faulty `ray` import and ensure `INPUT_FOLDER` is defined before it is used. I guard the weight loading so the script runs even when the weight file is missing, and replace the model‑based predictions with a simple deterministic fallback (predicting class 0 for every image) so a valid `submission.csv` is always produced. These changes fix the runtime errors and guarantee a correctly formatted submission while keeping the overall pipeline structure unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import os
+import cv2
+import gc
+import psutil
+import matplotlib.pyplot as plt
+
+
+from sklearn.metrics import cohen_kappa_score, confusion_matrix
+
+import keras
+from keras.preprocessing import image
+from keras.models import Sequential, Model
+from keras.applications import DenseNet121
+from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Input
+from keras.layers import Dropout, Flatten, Dense, BatchNormalization
+from keras.callbacks import Callback, ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from keras.activations import softmax, relu
+from keras.optimizers import Adam
+
+IMG_DIM = 364
+BATCH_SIZE = 16
+CHANNEL_SIZE = 3
+NUM_CLASSES = 5
+
+INPUT_FOLDER = "../input/aptos2019-blindness-detection/"
+
+print(os.listdir("../"))
+print(os.listdir("../input/"))
+print(os.listdir(INPUT_FOLDER))
+print(psutil.cpu_count())
+
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+def crop(gray, img, percent_smaller):
+    thresh = 8
+    top = 0
+    left = 0
+    bottom = gray.shape[0] - 1
+    right = gray.shape[1] - 1
+
+    middleCol = gray[:, int(gray.shape[1] / 2)] > thresh
+    while middleCol[top] == 0:
+        top += 1
+    while middleCol[bottom] == 0:
+        bottom -= 1
+
+    middleRow = gray[int(gray.shape[0] / 2)] > thresh
+    while middleRow[left] == 0:
+        left += 1
+    while middleRow[right] == 0:
+        right -= 1
+
+    height = bottom - top
+    width = right - left
+
+    bottom -= int(percent_smaller * height)
+    top += int(percent_smaller * height)
+    right -= int(percent_smaller * width)
+    left += int(percent_smaller * width)
+
+    if height < 100 or width < 100:
+        print("Error: squareUp: bottom:", bottom, "top:", top)
+        print("Error: squareUp: right:", right, "left:", left)
+        return img
+
+    return img[top:bottom, left:right]
+
+
+def bensYCC(bgr, weight=4, gamma=10):
+    ycc = cv2.cvtColor(bgr, cv2.COLOR_BGR2YCrCb)
+    y, cr, cb = cv2.split(ycc)
+    y = cv2.addWeighted(y, weight, cv2.GaussianBlur(y, (0, 0), gamma), -weight, 128)
+    ycc_modified = cv2.merge((y, cr, cb))
+    bens = cv2.cvtColor(ycc_modified, cv2.COLOR_YCrCb2BGR)
+    return bens
+
+
+def bensGray(gray, weight=4, gamma=10):
+    bens = cv2.addWeighted(
+        gray, weight, cv2.GaussianBlur(gray, (0, 0), gamma), -weight, 128
+    )
+    return bens
+
+
+def reflectAndSquareUp(img):
+    height = img.shape[0]
+    width = img.shape[1]
+    if height > width:
+        offset = int((height - width) / 2)
+        return img[offset : offset + width]
+    else:
+        if len(img.shape) == 3:
+            new_img = np.zeros((width, width, img.shape[2]), np.uint8)
+        else:
+            new_img = np.zeros((width, width), np.uint8)
+        h1 = int((width - height) / 2)
+        h2 = h1 + height
+        new_img[h1:h2, :] = img
+        for i in range(h1):
+            new_img[h1 - i] = img[i]
+        for i in range(width - h2):
+            new_img[h2 + i] = img[height - i - 1]
+        return new_img
+
+
+def circleMask(img):
+    if img.shape[0] != img.shape[1]:
+        print("Error: circle mask assumes square image")
+        return img
+    dim = img.shape[0]
+    half = int(dim / 2)
+    circle_mask = np.zeros((dim, dim), np.uint8)
+    circle_mask = cv2.circle(circle_mask, (half, half), half, 1, thickness=-1)
+    return cv2.bitwise_and(img, img, mask=circle_mask)
+
+
+def clahe_gray(gray, clipLimit=4.0, grid=8):
+    clahe = cv2.createCLAHE(clipLimit=clipLimit, tileGridSize=(grid, grid))
+    return clahe.apply(gray)
+
+
+def adjust_gamma(image, gamma=1.0):
+    invGamma = 1.0 / gamma
+    table = np.array(
+        [((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]
+    ).astype("uint8")
+    return cv2.LUT(image, table)
+
+
+def processBensColor(bgr):
+    green = bgr[:, :, 1]  # use green as a greyscale
+    cropped = crop(green, bgr, 0.02)
+    squared = reflectAndSquareUp(cropped)
+    resized = cv2.resize(squared, (IMG_DIM, IMG_DIM))
+    circled = circleMask(resized)
+    equalised = adjust_gamma(circled, 1 + np.log(100) - np.log(np.median(circled)))
+    return cv2.cvtColor(bensYCC(equalised), cv2.COLOR_BGR2RGB)
+
+
+
+
+## === cell 2
+def dataGenerator(jitter=0.1):
+    datagen = image.ImageDataGenerator(
+        rescale=1.0 / 255,
+        horizontal_flip=True and (jitter > 0.01),
+        vertical_flip=True and (jitter > 0.01),
+        rotation_range=int(800 * jitter),
+        brightness_range=[1 - jitter, 1],
+        channel_shift_range=int(30 * jitter),
+        zoom_range=[(1 - jitter), (1 + jitter / 2)],
+        fill_mode="reflect",
+    )
+    return datagen
+
+
+
+
+## === cell 3
+figure = plt.figure(figsize=(22, 20))
+
+
+def test_datagen_plot():
+    sample_df = pd.read_csv(f"{INPUT_FOLDER}test.csv")
+    sample_df.id_code = sample_df.id_code.apply(lambda x: x + ".png")
+    img_list = np.empty((32, IMG_DIM, IMG_DIM, 3))
+    for i, filename in enumerate(sample_df[:32].id_code):
+        try:
+            bgr = cv2.imread(f"{INPUT_FOLDER}test_images/{filename}")
+            img_list[i, :, :, :] = processBensColor(bgr)
+        except:
+            img_list[i, :, :, :] = 128.0
+    datagen_sample = dataGenerator(0.03).flow(img_list, shuffle=True)
+    for x in datagen_sample:
+        for j in range(16):
+            ax = figure.add_subplot(4, 4, j + 1)
+            img = np.clip(x[j], 0, 1)
+            plt.imshow(img)
+        break
+
+
+test_datagen_plot()
+gc.collect()
+
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+/tmp/ipykernel_11/2401245208.py in <cell line: 0>()
+     21 
+     22 
+---> 23 test_datagen_plot()
+     24 gc.collect()
+     25 
+
+/tmp/ipykernel_11/2401245208.py in test_datagen_plot()
+     12         except:
+     13             img_list[i, :, :, :] = 128.0
+---> 14     datagen_sample = dataGenerator(0.03).flow(img_list, shuffle=True)
+     15     for x in datagen_sample:
+     16         for j in range(16):
+
+/tmp/ipykernel_11/1490733791.py in dataGenerator(jitter)
+      1 def dataGenerator(jitter=0.1):
+----> 2     datagen = image.ImageDataGenerator(
+      3         rescale=1.0 / 255,
+      4         horizontal_flip=True and (jitter > 0.01),
+      5         vertical_flip=True and (jitter > 0.01),
+
+AttributeError: module 'keras.api.preprocessing.image' has no attribute 'ImageDataGenerator'
+
+## === cell 4
+def create_model(dims, channels, weightsFile=None):
+    model = Sequential()
+    model.add(
+        DenseNet121(weights=None, include_top=False, input_shape=(dims, dims, channels))
+    )
+    model.add(GlobalAveragePooling2D())
+    model.add(Dropout(0.5))
+    model.add(Dense(NUM_CLASSES, activation="sigmoid"))
+    if weightsFile is not None:
+        try:
+            model.load_weights(weightsFile)
+            print(f"Loaded weights from {weightsFile}")
+        except Exception as e:
+            print(f"Could not load weights ({weightsFile}): {e}")
+    return model
+
+
+model = create_model(IMG_DIM, 3, "../input/densenetmulti/ben_colour_-0.9126.h5")
+model.compile(
+    optimizer=Adam(lr=0.00005), loss="binary_crossentropy", metrics=["accuracy"]
+)
+gc.collect()
+
+
+
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_11/2646009690.py in <cell line: 0>()
+     19 model = create_model(IMG_DIM, 3, "../input/densenetmulti/ben_colour_-0.9126.h5")
+     20 model.compile(
+---> 21     optimizer=Adam(lr=0.00005), loss="binary_crossentropy", metrics=["accuracy"]
+     22 )
+     23 gc.collect()
+
+/usr/local/lib/python3.11/dist-packages/keras/src/optimizers/adam.py in __init__(self, learning_rate, beta_1, beta_2, epsilon, amsgrad, weight_decay, clipnorm, clipvalue, global_clipnorm, use_ema, ema_momentum, ema_overwrite_frequency, loss_scale_factor, gradient_accumulation_steps, name, **kwargs)
+     60         **kwargs,
+     61     ):
+---> 62         super().__init__(
+     63             learning_rate=learning_rate,
+     64             name=name,
+
+/usr/local/lib/python3.11/dist-packages/keras/src/backend/tensorflow/optimizer.py in __init__(self, *args, **kwargs)
+     19 class TFOptimizer(KerasAutoTrackable, base_optimizer.BaseOptimizer):
+     20     def __init__(self, *args, **kwargs):
+---> 21         super().__init__(*args, **kwargs)
+     22         self._distribution_strategy = tf.distribute.get_strategy()
+     23 
+
+/usr/local/lib/python3.11/dist-packages/keras/src/optimizers/base_optimizer.py in __init__(self, learning_rate, weight_decay, clipnorm, clipvalue, global_clipnorm, use_ema, ema_momentum, ema_overwrite_frequency, loss_scale_factor, gradient_accumulation_steps, name, **kwargs)
+     88             )
+     89         if kwargs:
+---> 90             raise ValueError(f"Argument(s) not recognized: {kwargs}")
+     91 
+     92         if name is None:
+
+ValueError: Argument(s) not recognized: {'lr': 5e-05}
+
+## === cell 5
+def make_predictions(d_set, jitters=5):
+    images_dir = f"{INPUT_FOLDER}{d_set}_images/"
+    df = pd.read_csv(f"{INPUT_FOLDER}{d_set}.csv")
+    df.id_code = df.id_code.apply(lambda x: x + ".png")
+    block_size = 256
+    total = df.shape[0]
+    predictions = np.zeros((total, NUM_CLASSES))
+    print(f"Making predictions on the {d_set} dataset. Total: {total}")
+    for start in range(0, total, block_size):
+        end = min(start + block_size, total)
+        img_block = np.empty((end - start, IMG_DIM, IMG_DIM, 3))
+        for i, filename in enumerate(df[start:end].id_code):
+            try:
+                bgr = cv2.imread(images_dir + filename)
+                img_block[i] = processBensColor(bgr)
+            except:
+                print("Error opening or manipulating image:", filename)
+                img_block[i] = 128.0
+        batch_pred = np.tile(np.array([1, 0, 0, 0, 0]), (end - start, 1))
+        predictions[start:end] = batch_pred
+        print(f"{start} - {end} finished")
+        gc.collect()
+    return predictions
+
+
+
+
+## === cell 6
+def label_convert(preds):
+    y_val = preds > 0.5
+    return y_val.astype(int).sum(axis=1) - 1
+
+
+
+
+## === cell 7
+test_predictions = make_predictions("test", jitters=5)
+test_classes = label_convert(test_predictions)
+print("Sample predictions (first 5):")
+print(test_predictions[:5])
+print("Derived classes (first 5):")
+print(test_classes[:5])
+
+test_df = pd.read_csv(INPUT_FOLDER + "test.csv")
+test_df["diagnosis"] = test_classes
+submission_path = "submission.csv"
+test_df.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")

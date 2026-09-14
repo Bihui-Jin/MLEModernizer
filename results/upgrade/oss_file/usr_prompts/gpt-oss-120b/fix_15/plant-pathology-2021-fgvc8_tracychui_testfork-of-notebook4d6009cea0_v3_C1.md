@@ -1,0 +1,350 @@
+# Goal
+
+Make the code finish within a 600-second timeout. The last attempt timed out after 10 minutes. Optimize for speed WITHOUT harming result accuracy and WITHOUT changing the core logic.
+
+# Requirements
+
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (timeout fix); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Keep file paths unchanged.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Code solution
+
+## === cell 0
+import os, gc, hashlib
+import numpy as np, pandas as pd
+from PIL import Image
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.multiclass import OneVsRestClassifier
+
+import concurrent.futures
+import scipy.sparse  # added for sparse target handling
+
+np.random.seed(42)
+
+print("Imports successful")
+
+
+
+## === cell 1
+possible_bases = [
+    "./input/plant-pathology-2021-fgvc8",
+    "/kaggle/input/plant-pathology-2021-fgvc8",
+    "./data/plant-pathology-2021-fgvc8",
+]
+BASE = next((p for p in possible_bases if os.path.isdir(p)), None)
+if BASE is None:
+    raise FileNotFoundError("Base data directory not found.")
+TRAIN_IMG_DIR = os.path.join(BASE, "train_images")
+TEST_IMG_DIR = os.path.join(BASE, "test_images")
+TRAIN_CSV = os.path.join(BASE, "train.csv")
+SAMPLE_SUB = os.path.join(BASE, "sample_submission.csv")
+print("Base path resolved:", BASE)
+
+
+
+## === cell 2
+train_df = pd.read_csv(TRAIN_CSV)
+train_df["label_list"] = train_df["labels"].apply(lambda x: x.split())
+mlb = MultiLabelBinarizer()
+Y_dense = mlb.fit_transform(train_df["label_list"])
+Y = scipy.sparse.csr_matrix(Y_dense)
+
+
+
+
+## === cell 3
+def load_and_preprocess(img_path, target_size=(64, 64)):
+    """Load an image, resize, and flatten to a 1‑D vector."""
+    img = Image.open(img_path).convert("RGB")
+    img = img.resize(target_size, Image.BILINEAR)
+    arr = np.asarray(img, dtype=np.float32) / 255.0  # normalize to [0,1]
+    return arr.flatten()
+
+
+
+
+## === cell 4
+def _load_path(path):
+    """Helper for executor: load and preprocess a single image given its full path."""
+    return load_and_preprocess(path)
+
+
+def extract_features(img_dir, img_names, cache_path=None, chunksize=1000):
+    """
+    Load and preprocess images, optionally caching the resulting array.
+    Using ThreadPoolExecutor reduces process‑creation overhead while still
+    parallelising I/O‑bound image loading.
+    """
+    if cache_path is not None and os.path.exists(cache_path):
+        return np.load(cache_path, mmap_mode="r")
+    n = len(img_names)
+    feats = np.zeros((n, 64 * 64 * 3), dtype=np.float32)
+
+    paths = [os.path.join(img_dir, name) for name in img_names]
+
+    max_workers = min(16, os.cpu_count() or 1)  # reasonable thread count
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for i, arr in enumerate(executor.map(_load_path, paths, chunksize=chunksize)):
+            feats[i] = arr
+
+    if cache_path is not None:
+        np.save(cache_path, feats)
+    return feats
+
+
+train_img_names = train_df["image"].values
+train_cache = "./train_features.npy"
+X_train = extract_features(TRAIN_IMG_DIR, train_img_names, cache_path=train_cache)
+
+
+
+## === cell 5
+feature_min = X_train.min(axis=0)
+feature_max = X_train.max(axis=0)
+feature_range = feature_max - feature_min
+feature_range[feature_range == 0] = 1.0
+
+X_train_scaled = ((X_train - feature_min) / feature_range).astype(np.float32)
+
+del X_train
+gc.collect()
+
+from types import SimpleNamespace
+
+
+def _transform(X):
+    return ((X - feature_min) / feature_range).astype(np.float32)
+
+
+scaler = SimpleNamespace(min_=feature_min, scale_=feature_range, transform=_transform)
+
+
+
+## === cell 6
+base_clf = LogisticRegression(
+    max_iter=100,
+    n_jobs=-1,
+    solver="saga",
+    random_state=42,
+    penalty="l2",
+    dual=False,
+)
+clf = OneVsRestClassifier(base_clf)
+clf.fit(X_train_scaled, Y)  # Y is a sparse matrix
+
+
+
+## === cell 7
+test_img_names = sorted(
+    [f for f in os.listdir(TEST_IMG_DIR) if f.lower().endswith(".jpg")]
+)
+test_cache = "./test_features.npy"
+X_test = extract_features(TEST_IMG_DIR, test_img_names, cache_path=test_cache)
+X_test_scaled = scaler.transform(X_test)
+del X_test
+gc.collect()
+
+
+
+## === cell 8
+test_probs = clf.predict_proba(X_test_scaled)
+test_pred_binary = (test_probs >= 0.5).astype(int)
+
+
+
+
+## === cell 9
+def binary_to_tags(binary_matrix, classes):
+    tags = []
+    for row in binary_matrix:
+        idxs = np.where(row == 1)[0]
+        if len(idxs) == 0:
+            tags.append("healthy")
+        else:
+            tags.append(" ".join([classes[i] for i in idxs]))
+    return tags
+
+
+test_pred_tags = binary_to_tags(test_pred_binary, mlb.classes_)
+
+
+
+## === cell 10
+submission = pd.DataFrame({"image": test_img_names, "labels": test_pred_tags})
+sample = pd.read_csv(SAMPLE_SUB)
+assert list(submission.columns) == list(sample.columns), "Column mismatch!"
+
+
+
+## === cell 11
+submission_path = "./submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission saved to {submission_path}, shape: {submission.shape}")

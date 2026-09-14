@@ -1,0 +1,775 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8785131459655485
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+N/A
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+from pathlib import Path
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+from torch.utils.data import Dataset, DataLoader
+from torch.cuda.amp import autocast, GradScaler
+
+import torchvision.models as models
+
+from sklearn.model_selection import train_test_split
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+
+def locate_path(*candidates):
+    for p in candidates:
+        if Path(p).exists():
+            return p
+    raise FileNotFoundError(f"None of the candidate paths exist: {candidates}")
+
+
+train_csv_path = locate_path(
+    "data/cassava-leaf-disease-classification/train.csv",
+    "input/cassava-leaf-disease-classification/train.csv",
+    "train.csv",
+)
+test_csv_path = locate_path(
+    "data/cassava-leaf-disease-classification/sample_submission.csv",
+    "input/cassava-leaf-disease-classification/sample_submission.csv",
+    "sample_submission.csv",
+)
+
+train_img_dir = locate_path(
+    "data/cassava-leaf-disease-classification/train_images",
+    "input/cassava-leaf-disease-classification/train_images",
+    "train_images",
+)
+test_img_dir = locate_path(
+    "data/cassava-leaf-disease-classification/test_images",
+    "input/cassava-leaf-disease-classification/test_images",
+    "test_images",
+)
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/3061427291.py in <cell line: 0>()
+     28 
+     29 # CSV files
+---> 30 train_csv_path = locate_path(
+     31     "data/cassava-leaf-disease-classification/train.csv",
+     32     "input/cassava-leaf-disease-classification/train.csv",
+
+/tmp/ipykernel_55/3061427291.py in locate_path(*candidates)
+     24         if Path(p).exists():
+     25             return p
+---> 26     raise FileNotFoundError(f"None of the candidate paths exist: {candidates}")
+     27 
+     28 
+
+FileNotFoundError: None of the candidate paths exist: ('data/cassava-leaf-disease-classification/train.csv', 'input/cassava-leaf-disease-classification/train.csv', 'train.csv')
+
+## === cell 1
+train_df = pd.read_csv(train_csv_path)
+test_df = pd.read_csv(test_csv_path)
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/90545545.py in <cell line: 0>()
+      1 # Load CSVs
+----> 2 train_df = pd.read_csv(train_csv_path)
+      3 # The test split is provided via the sample submission file (contains only image_id)
+      4 test_df = pd.read_csv(test_csv_path)
+      5 
+
+NameError: name 'train_csv_path' is not defined
+
+## === cell 2
+train_transform = A.Compose(
+    [
+        A.CLAHE(clip_limit=2.0, tile_grid_size=(8, 8), p=1.0),
+        A.Resize(384, 384, p=1.0),
+        A.HorizontalFlip(p=0.5),
+        A.ShiftScaleRotate(0.1, 0.1, 20, p=0.7),
+        A.HueSaturationValue(10, 15, 10, p=0.5),
+        A.RandomBrightnessContrast(0.2, 0.2, p=0.5),
+        A.GaussNoise((0.1, 0.5), p=0.4),
+        A.Blur(blur_limit=3, p=0.3),
+        A.CoarseDropout(
+            max_holes=8,
+            max_height=20,
+            max_width=20,
+            min_holes=1,
+            min_height=10,
+            min_width=10,
+            fill_value=0,
+            p=0.5,
+        ),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+val_transform = A.Compose(
+    [
+        A.Resize(384, 384, p=1.0),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+tta_transform = A.Compose(
+    [
+        A.ShiftScaleRotate(0.1, 0.1, 20, p=0.7),
+        A.HueSaturationValue(10, 15, 10, p=0.5),
+        A.RandomBrightnessContrast(0.2, 0.2, p=0.5),
+        A.HorizontalFlip(p=0.5),
+        A.GaussNoise((0.1, 0.5), p=0.4),
+        A.Blur(blur_limit=3, p=0.3),
+        A.CoarseDropout(
+            max_holes=8,
+            max_height=20,
+            max_width=20,
+            min_holes=1,
+            min_height=10,
+            min_width=10,
+            fill_value=0,
+            p=0.5,
+        ),
+        A.Resize(384, 384, p=1.0),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ToTensorV2(),
+    ]
+)
+
+
+
+
+## === cell 3
+class CassavaDataset(Dataset):
+    """Pre‑load and resize all training images once to avoid per‑epoch disk I/O."""
+
+    def __init__(self, df, img_dir, transform=None):
+        self.df = df.reset_index(drop=True)
+        self.img_dir = img_dir
+        self.transform = transform
+        self.images = []
+        for img_name in self.df["image_id"]:
+            img_path = os.path.join(self.img_dir, img_name)
+            img = cv2.imread(img_path)
+            if img is None:
+                img = np.zeros((384, 384, 3), dtype=np.uint8)
+            else:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                img = cv2.resize(img, (384, 384), interpolation=cv2.INTER_LINEAR)
+            self.images.append(img)
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        img = self.images[idx]
+        label = int(self.df.iloc[idx]["label"])
+        if self.transform:
+            img = self.transform(image=img)["image"]
+        return img, label
+
+
+class CassavaTestDataset(Dataset):
+    """Pre‑load all test images into memory once for fast TTA."""
+
+    def __init__(self, df, img_dir):
+        self.df = df.reset_index(drop=True)
+        self.img_dir = img_dir
+        self.images = []
+        for img_name in self.df["image_id"]:
+            img_path = os.path.join(self.img_dir, img_name)
+            img = cv2.imread(img_path)
+            if img is None:
+                img = np.zeros((384, 384, 3), dtype=np.uint8)
+            else:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            self.images.append(img)
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        return self.images[idx], self.df.iloc[idx]["image_id"]
+
+
+
+
+## === cell 4
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+
+## === cell 5
+train_split, val_split = train_test_split(
+    train_df,
+    test_size=0.1,
+    stratify=train_df["label"],
+    random_state=42,
+)
+
+train_dataset = CassavaDataset(train_split, train_img_dir, transform=train_transform)
+val_dataset = CassavaDataset(val_split, train_img_dir, transform=val_transform)
+
+num_workers = min(os.cpu_count() or 4, 4)
+
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=64,
+    shuffle=True,
+    num_workers=num_workers,
+    pin_memory=True,
+    persistent_workers=True,
+    prefetch_factor=2,
+)
+
+val_loader = DataLoader(
+    val_dataset,
+    batch_size=64,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=True,
+    persistent_workers=True,
+    prefetch_factor=2,
+)
+
+
+
+## --- ERROR in cell 5, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/594907676.py in <cell line: 0>()
+      1 # Split train/val
+      2 train_split, val_split = train_test_split(
+----> 3     train_df,
+      4     test_size=0.1,
+      5     stratify=train_df["label"],
+
+NameError: name 'train_df' is not defined
+
+## === cell 6
+model = models.efficientnet_v2_s(weights=models.EfficientNet_V2_S_Weights.IMAGENET1K_V1)
+if isinstance(model.classifier, nn.Sequential):
+    num_features = model.classifier[1].in_features
+else:
+    num_features = model.classifier.in_features
+model.classifier = nn.Sequential(nn.Dropout(p=0.5), nn.Linear(num_features, 5))
+model = model.to(device)
+
+try:
+    model = torch.compile(model)
+except Exception:
+    pass
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=1e-4)
+scaler = GradScaler()
+
+
+
+
+## === cell 7
+def train_one_epoch(model, loader, optimizer, criterion, device, scaler):
+    model.train()
+    running_loss = 0.0
+    for imgs, targets in loader:
+        imgs, targets = imgs.to(device, non_blocking=True), targets.to(
+            device, non_blocking=True
+        )
+        optimizer.zero_grad()
+        with autocast():
+            outputs = model(imgs)
+            loss = criterion(outputs, targets)
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+        running_loss += loss.item() * imgs.size(0)
+    return running_loss / len(loader.dataset)
+
+
+def evaluate(model, loader, device):
+    model.eval()
+    correct, total = 0, 0
+    with torch.inference_mode():
+        for imgs, targets in loader:
+            imgs, targets = imgs.to(device, non_blocking=True), targets.to(
+                device, non_blocking=True
+            )
+            with autocast():
+                outputs = model(imgs)
+            _, preds = torch.max(outputs, 1)
+            correct += (preds == targets).sum().item()
+            total += targets.size(0)
+    return correct / total
+
+
+
+
+## === cell 8
+epochs = 3  # modest number to keep runtime reasonable while improving accuracy
+for epoch in range(epochs):
+    train_loss = train_one_epoch(
+        model, train_loader, optimizer, criterion, device, scaler
+    )
+    val_acc = evaluate(model, val_loader, device)
+    print(
+        f"Epoch {epoch+1}/{epochs} - Train loss: {train_loss:.4f} - Val acc: {val_acc:.4f}"
+    )
+
+
+
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2013021476.py in <cell line: 0>()
+      2 for epoch in range(epochs):
+      3     train_loss = train_one_epoch(
+----> 4         model, train_loader, optimizer, criterion, device, scaler
+      5     )
+      6     val_acc = evaluate(model, val_loader, device)
+
+NameError: name 'train_loader' is not defined
+
+## === cell 9
+def tta_predict_batch_batch(model, images_np, tta_transform, device, n_tta=5):
+    """
+    images_np: (B, H, W, C) uint8
+    Returns mean probability tensor of shape (B, 5)
+    """
+    model.eval()
+    B = images_np.shape[0]
+    probs_sum = torch.zeros((B, 5), device=device, dtype=torch.float32)
+    with torch.inference_mode():
+        for _ in range(n_tta):
+            aug_batch = [tta_transform(image=images_np[i])["image"] for i in range(B)]
+            batch_tensor = torch.stack(aug_batch).to(device, non_blocking=True)
+            with autocast():
+                out = model(batch_tensor)
+            probs = F.softmax(out, dim=1)
+            probs_sum += probs
+    return probs_sum / n_tta
+
+
+
+
+## === cell 10
+def test_collate_fn(batch):
+    """Return a list of images and a list of ids without converting to tensors."""
+    imgs, ids = zip(*batch)
+    return list(imgs), list(ids)
+
+
+test_dataset = CassavaTestDataset(test_df, test_img_dir)
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=64,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=True,
+    persistent_workers=True,
+    prefetch_factor=2,
+    collate_fn=test_collate_fn,
+)
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3840203539.py in <cell line: 0>()
+      5 
+      6 
+----> 7 test_dataset = CassavaTestDataset(test_df, test_img_dir)
+      8 test_loader = DataLoader(
+      9     test_dataset,
+
+NameError: name 'test_df' is not defined
+
+## === cell 11
+ensemble_predictions, image_names = [], []
+model.eval()
+with torch.no_grad():
+    for batch_imgs, batch_names in test_loader:
+        batch_np = np.stack(batch_imgs)  # (B, H, W, C) uint8
+        probs = tta_predict_batch_batch(model, batch_np, tta_transform, device, n_tta=5)
+        preds = probs.argmax(dim=1).cpu().tolist()
+        ensemble_predictions.extend(preds)
+        image_names.extend(batch_names)
+
+
+
+## --- ERROR in cell 11, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2769720687.py in <cell line: 0>()
+      2 model.eval()
+      3 with torch.no_grad():
+----> 4     for batch_imgs, batch_names in test_loader:
+      5         batch_np = np.stack(batch_imgs)  # (B, H, W, C) uint8
+      6         probs = tta_predict_batch_batch(model, batch_np, tta_transform, device, n_tta=5)
+
+NameError: name 'test_loader' is not defined
+
+## === cell 12
+submission_df = pd.DataFrame({"image_id": image_names, "label": ensemble_predictions})
+submission_path = "submission.csv"
+submission_df.to_csv(submission_path, index=False)
+print(f"Submission file saved as '{submission_path}' with {len(submission_df)} rows.")
+
+## --- ERROR in outputing the csv:
+Invalid submission: Submission must have the same length as the answers.

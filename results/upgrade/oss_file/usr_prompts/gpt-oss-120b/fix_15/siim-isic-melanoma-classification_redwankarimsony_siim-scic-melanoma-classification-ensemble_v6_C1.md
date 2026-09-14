@@ -1,0 +1,404 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict whether a lesion is malignant (0 denotes **benign**, and 1 indicates **malignant**).
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each `image_name` in the test set, you must predict the probability (`target`) that the sample is **malignant**. The file should contain a header and have the following format:
+
+```
+image_name,target
+ISIC_0052060,0.7
+ISIC_0052349,0.9
+ISIC_0058510,0.8
+ISIC_0073313,0.5
+ISIC_0073502,0.5
+etc.
+```
+
+## Dataset 
+The images are provided in DICOM format.
+
+Images are also provided in JPEG and TFRecord format (in the `jpeg` and `tfrecords` directories, respectively). Images in TFRecord format have been resized to a uniform 1024x1024.
+
+Metadata is also provided outside of the DICOM format, in CSV files. See the `Columns` section for a description.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `image_name` - unique identifier, points to filename of related DICOM image
+- `patient_id` - unique patient identifier
+- `sex` - the sex of the patient (when unknown, will be blank)
+- `age_approx` - approximate patient age at time of imaging
+- `anatom_site_general_challenge` - location of imaged site
+- `diagnosis` - detailed diagnosis information (train only)
+- `benign_malignant` - indicator of malignancy of imaged lesion
+- `target` - binarized version of the target variable
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (176 lines)
+            jpeg.zip (24.7 GB)
+            sample_submission.csv (4143 lines)
+            sample_submission.csv.zip (16.4 kB)
+            test.csv (4143 lines)
+            test.csv.zip (42.5 kB)
+            test.zip (6.4 GB)
+            tfrecords.zip (9.3 GB)
+            train.csv (28985 lines)
+            train.csv.zip (299.7 kB)
+            train.zip (46.0 GB)
+            jpeg/
+                test/
+                    ISIC_1440063.jpg (1.1 MB)
+                    ISIC_0815802.jpg (853.1 kB)
+                    ... and 4140 other files
+                train/
+                    ISIC_1845271.jpg (1.0 MB)
+                    ISIC_1970027.jpg (138.4 kB)
+                    ... and 28982 other files
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+            test/
+                ISIC_0052212.dcm (1.5 MB)
+                ISIC_0076545.dcm (4.0 MB)
+                ... and 4140 other files
+                test/
+            tfrecords/
+                test00-2071.tfrec (579.6 MB)
+                test01-2071.tfrec (583.5 MB)
+                ... and 14 other files
+            train/
+                ISIC_0015719.dcm (2.4 MB)
+                ISIC_0068279.dcm (1.3 MB)
+                ... and 28982 other files
+                train/
+        input/
+            description.md (176 lines)
+            jpeg.zip (24.7 GB)
+            sample_submission.csv (4143 lines)
+            sample_submission.csv.zip (16.4 kB)
+            test.csv (4143 lines)
+            test.csv.zip (42.5 kB)
+            test.zip (6.4 GB)
+            tfrecords.zip (9.3 GB)
+            train.csv (28985 lines)
+            train.csv.zip (299.7 kB)
+            train.zip (46.0 GB)
+            jpeg/
+                test/
+                    ISIC_1440063.jpg (1.1 MB)
+                    ISIC_0815802.jpg (853.1 kB)
+                    ... and 4140 other files
+                train/
+                    ISIC_1845271.jpg (1.0 MB)
+                    ISIC_1970027.jpg (138.4 kB)
+                    ... and 28982 other files
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+            test/
+                ISIC_0052212.dcm (1.5 MB)
+                ISIC_0076545.dcm (4.0 MB)
+                ... and 4140 other files
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+            tfrecords/
+                test00-2071.tfrec (579.6 MB)
+                test01-2071.tfrec (583.5 MB)
+                ... and 14 other files
+            train/
+                ISIC_0015719.dcm (2.4 MB)
+                ISIC_0068279.dcm (1.3 MB)
+                ... and 28982 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+        working/
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+```
+
+-> data/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> data/siim-isic-melanoma-classification/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> data/siim-isic-melanoma-classification/test.csv has 4142 rows and 5 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge
+
+-> data/siim-isic-melanoma-classification/train.csv has 28984 rows and 8 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge, diagnosis, benign_malignant, target
+
+-> data/test.csv has 4142 rows and 5 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge
+
+-> data/train.csv has 28984 rows and 8 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge, diagnosis, benign_malignant, target
+
+-> input/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9173396242213752
+
+# 6. Current score
+
+0.66342
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.75288) has done: 'I adjust the feature selection so that only columns present in both the training and test tables are used (dropping “diagnosis” and “benign_malignant” which are missing from the test set). This prevents the KeyError, allows the pipeline to run, and ensures `test_pred` is defined for the submission file. No other logic is changed.'
+- What this solution (achieved 0.77052) has done: 'I keep the overall pipeline structure but improve the preprocessing and model regularisation: fill missing numeric values with the median, scale numeric features, use a balanced class weight and a slightly stronger regularisation (C = 0.5) with more iterations. These adjustments are small, stay within the original logistic‑regression framework, and are expected to raise the validation AUC toward the target value.'
+- What this solution (achieved 0.77314) has done: 'I keep the overall pipeline and logistic‑regression model but add simple polynomial features for the numeric columns and relax the regularisation (increase C) so the model can capture mild non‑linear patterns, which should raise the AUC toward the target while preserving the original architecture.'
+- What this solution (achieved 0.77199) has done: 'I slightly adjust the numeric preprocessing and the regularisation strength to better match the AUC target while keeping the overall pipeline unchanged.  
+The numeric pipeline now uses third‑degree polynomial features (capturing richer interactions) and the logistic‑regression regularisation is tightened (C = 1.0). These small hyper‑parameter tweaks are expected to raise validation AUC toward the desired score without altering the core model architecture.'
+- What this solution (achieved 0.77504) has done: 'I make two lightweight adjustments that stay within the existing logistic‑regression pipeline: reduce the polynomial expansion to second‑order interactions only (degree 2, interaction_only=True) to avoid over‑fitting, and relax the regularisation slightly by increasing C to 2.0. These changes keep the core model unchanged while giving the classifier a modestly richer yet more stable feature set, which should move the validation AUC upward toward the target.'
+- What this solution (achieved 0.77107) has done: 'I increase the expressive power of the numeric features by expanding the polynomial degree to 3 (allowing all interaction terms) and relax the regularisation a bit (C = 5.0). These small adjustments stay inside the original logistic‑regression pipeline but give the model more capacity to capture non‑linear patterns, which should raise the validation AUC toward the target while keeping the core logic unchanged.'
+- What this solution (achieved 0.73398) has done: 'I tighten regularization and simplify the polynomial expansion to reduce over‑fitting while keeping the logistic‑regression pipeline unchanged. Using a lower C (stronger regularization), a degree‑2 interaction‑only polynomial, and an L1‑penalised liblinear solver should modestly raise the validation AUC and move the score toward the target, without altering the overall model architecture or I/O logic.'
+- What this solution (achieved 0.62427) has done: 'We keep the same preprocessing and model logic but make the pipeline use sparse one‑hot encoding (avoiding a huge dense matrix) and enable parallelism in the LogisticRegression solver. These changes dramatically cut memory use and runtime while preserving identical predictions.'
+- What this solution (achieved 0.71986) has done: 'I increase the expressive power of the numeric features and relax the regularisation so the logistic‑regression model can capture more non‑linear patterns, which should raise the validation AUC toward the target. Specifically, I change the polynomial degree from 2 to 3, increase C to 10.0, and raise max_iter to 5000 so the optimizer fully converges. No other logic is altered, and the script still writes a correct `submission.csv`.'
+- What this solution (achieved 0.57324) has done: 'I reduce the polynomial degree to 2 and strengthen regularisation (C = 1.0) to curb over‑fitting, which should raise the validation AUC toward the target. The core pipeline, model type, and overall workflow remain unchanged.'
+- What this solution (achieved 0.66833) has done: 'I add any training columns that are missing from the test set (e.g., diagnosis, benign_malignant) and fill them with neutral placeholder values, allowing the model to use these informative features. I also relax the logistic‑regression regularisation slightly (C = 2.0) to let the richer feature set have more effect. These minimal adjustments keep the original pipeline intact while expected to raise the validation AUC toward the target.'
+- What this solution (achieved 0.66342) has done: 'I keep the overall logistic‑regression pipeline but slightly increase its expressive power and allow the optimizer to converge better: use a 3‑degree polynomial for numeric features, relax regularisation (C = 10.0) and raise the iteration limit to 5000. These minimal tweaks stay inside the original model architecture while expected to raise the validation AUC, moving the score closer to the target.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+from pathlib import Path
+
+DATA_ROOT = Path("../input/siim-isic-melanoma-classification")
+TRAIN_PATH = DATA_ROOT / "train.csv"
+TEST_PATH = DATA_ROOT / "test.csv"
+SAMPLE_SUB_PATH = DATA_ROOT / "sample_submission.csv"
+
+train_df = pd.read_csv(TRAIN_PATH)
+test_df = pd.read_csv(TEST_PATH)
+sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+
+assert "target" in train_df.columns, "Training file must contain 'target' column"
+assert set(sample_sub.columns) == {
+    "image_name",
+    "target",
+}, "Sample submission has unexpected columns"
+
+
+
+## === cell 1
+TARGET_COL = "target"
+
+ALL_FEATURES = [c for c in train_df.columns if c not in ["image_name", TARGET_COL]]
+
+for col in ALL_FEATURES:
+    if col not in test_df.columns:
+        test_df[col] = np.nan
+
+X = train_df[ALL_FEATURES].copy()
+y = train_df[TARGET_COL].astype(int)
+
+X_test = test_df[ALL_FEATURES].copy()
+
+cat_cols = X.select_dtypes(include=["object"]).columns.tolist()
+num_cols = X.select_dtypes(exclude=["object"]).columns.tolist()
+
+X[cat_cols] = X[cat_cols].fillna("missing")
+X_test[cat_cols] = X_test[cat_cols].fillna("missing")
+
+for col in num_cols:
+    median_val = X[col].median()
+    X[col] = X[col].fillna(median_val)
+    X_test[col] = X_test[col].fillna(median_val)
+
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, PolynomialFeatures
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+
+cat_pipe = Pipeline(
+    steps=[
+        ("ohe", OneHotEncoder(handle_unknown="ignore", sparse=True)),
+    ]
+)
+
+num_pipe = Pipeline(
+    steps=[
+        (
+            "poly",
+            PolynomialFeatures(degree=3, interaction_only=False, include_bias=False),
+        ),
+        ("scaler", StandardScaler()),
+    ]
+)
+
+preprocess = ColumnTransformer(
+    transformers=[
+        ("cat", cat_pipe, cat_cols),
+        ("num", num_pipe, num_cols),
+    ]
+)
+
+model = LogisticRegression(
+    penalty="l2",
+    C=10.0,  # relax regularisation
+    solver="saga",
+    max_iter=5000,  # allow full convergence
+    class_weight="balanced",
+    random_state=42,
+    n_jobs=-1,
+)
+
+pipeline = Pipeline(steps=[("preprocess", preprocess), ("model", model)])
+
+X_tr, X_val, y_tr, y_val = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+pipeline.fit(X_tr, y_tr)
+val_pred = pipeline.predict_proba(X_val)[:, 1]
+val_auc = roc_auc_score(y_val, val_pred)
+print(f"Validation AUC (quick check): {val_auc:.5f}")
+
+pipeline.fit(X, y)
+
+test_pred = pipeline.predict_proba(X_test)[:, 1]
+
+
+
+## === cell 2
+submission = sample_sub.copy()
+submission["target"] = test_pred
+submission.to_csv("submission.csv", index=False)
+print("Submission file written to 'submission.csv' with shape:", submission.shape)

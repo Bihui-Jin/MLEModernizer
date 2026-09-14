@@ -1,0 +1,427 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean column-wise ROC AUC.
+
+## Submission Format
+For each image_id in the test set, you must predict a probability for each target variable. The file should contain a header and have the following format:
+
+```
+image_id,
+test_0,0.25,0.25,0.25,0.25
+test_1,0.25,0.25,0.25,0.25
+test_2,0.25,0.25,0.25,0.25
+etc.
+```
+
+## Dataset
+Given a photo of an apple leaf, can you accurately assess its health? This competition will challenge you to distinguish between leaves which are healthy, those which are infected with apple rust, those that have apple scab, and those with more than one disease.
+
+**train.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+**images**
+
+A folder containing the train and test images, in jpg format.
+
+**test.csv**
+
+- `image_id`: the foreign key
+
+**sample_submission.csv**
+
+- `image_id`: the foreign key
+- combinations: one of the target labels
+- healthy: one of the target labels
+- rust: one of the target labels
+- scab: one of the target labels
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+opencv-python==4.12.0.88
+opencv-python-headless==4.12.0.88
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        input/
+            description.md (94 lines)
+            images.zip (397.8 MB)
+            sample_submission.csv (184 lines)
+            sample_submission.csv.zip (682 Bytes)
+            test.csv (184 lines)
+            test.csv.zip (542 Bytes)
+            train.csv (1639 lines)
+            train.csv.zip (4.6 kB)
+            images/
+                Train_370.jpg (133.2 kB)
+                Test_59.jpg (220.5 kB)
+                ... and 1819 other files
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+        working/
+            plant-pathology-2020-fgvc7/
+                description.md (94 lines)
+                images.zip (397.8 MB)
+                ... and 6 other files
+                images/
+                    Train_370.jpg (133.2 kB)
+                    Test_59.jpg (220.5 kB)
+                    ... and 1819 other files
+                plant-pathology-2020-fgvc7/
+```
+
+-> data/plant-pathology-2020-fgvc7/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/plant-pathology-2020-fgvc7/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/plant-pathology-2020-fgvc7/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/sample_submission.csv has 183 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> data/test.csv has 183 rows and 1 columns.
+The columns are: image_id
+
+-> data/train.csv has 1638 rows and 5 columns.
+The columns are: image_id, healthy, multiple_diseases, rust, scab
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8075
+
+# 6. Current score
+
+0.47568
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.47568) has done: 'I fixed the import errors by switching to `tensorflow.keras`, corrected the undefined `ImageDataGenerator`, rewrote the label handling to use proper NumPy slicing and `to_categorical`, simplified image array creation, and fixed the variable names so the model, training history, predictions and submission are all defined. These changes resolve the runtime crashes and ensure a valid `my_submission.csv` is written, while preserving the original CNN architecture and training logic.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+import cv2
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+import tensorflow as tf
+from tensorflow.keras import Model, Sequential, optimizers, callbacks
+from tensorflow.keras.layers import (
+    Input,
+    Conv2D,
+    MaxPool2D,
+    Flatten,
+    Dense,
+    Dropout,
+    BatchNormalization,
+    Activation,
+)
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+sample_submission = pd.read_csv(
+    "../input/plant-pathology-2020-fgvc7/sample_submission.csv"
+)
+test = pd.read_csv("../input/plant-pathology-2020-fgvc7/test.csv")
+train = pd.read_csv("../input/plant-pathology-2020-fgvc7/train.csv")
+
+
+## === cell 2
+size = 64
+train_image_data = []
+for _id in train["image_id"]:
+    path = os.path.join("../input/plant-pathology-2020-fgvc7/images", f"{_id}.jpg")
+    img = cv2.imread(path)
+    if img is not None:
+        img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
+        train_image_data.append(img)
+    else:
+        train_image_data.append(np.zeros((size, size, 3), dtype=np.uint8))
+
+
+## === cell 3
+test_image_data = []
+for _id in test["image_id"]:
+    path = os.path.join("../input/plant-pathology-2020-fgvc7/images", f"{_id}.jpg")
+    img = cv2.imread(path)
+    if img is not None:
+        img = cv2.resize(img, (size, size), interpolation=cv2.INTER_AREA)
+        test_image_data.append(img)
+    else:
+        test_image_data.append(np.zeros((size, size, 3), dtype=np.uint8))
+
+
+## === cell 4
+X_Train = np.stack(train_image_data).astype(np.float32) / 255.0
+X_Test = np.stack(test_image_data).astype(np.float32) / 255.0
+print("Train shape:", X_Train.shape, "Test shape:", X_Test.shape)
+
+
+## === cell 5
+y = train[["healthy", "multiple_diseases", "rust", "scab"]].values
+print("y shape:", y.shape)
+
+
+## === cell 6
+X_train, X_val, y_train, y_val = train_test_split(
+    X_Train, y, test_size=0.2, random_state=10, stratify=y[:, 0]
+)
+
+
+## === cell 7
+y_train1 = to_categorical(y_train[:, 0], 2)
+y_train2 = to_categorical(y_train[:, 1], 2)
+y_train3 = to_categorical(y_train[:, 2], 2)
+y_train4 = to_categorical(y_train[:, 3], 2)
+
+y_val1 = to_categorical(y_val[:, 0], 2)
+y_val2 = to_categorical(y_val[:, 1], 2)
+y_val3 = to_categorical(y_val[:, 2], 2)
+y_val4 = to_categorical(y_val[:, 3], 2)
+
+
+
+
+## === cell 8
+def define_model():
+    inputs = Input(shape=(size, size, 3))
+    x = BatchNormalization()(inputs)
+    x = Conv2D(128, (3, 3), strides=(1, 1), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = Conv2D(128, (3, 3), strides=(1, 1), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = MaxPool2D((2, 2))(x)
+    x = Dropout(0.2)(x)
+
+    x = Conv2D(256, (3, 3), strides=(1, 1), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = Conv2D(256, (3, 3), strides=(1, 1), padding="same")(x)
+    x = BatchNormalization()(x)
+    x = Activation("relu")(x)
+    x = MaxPool2D((2, 2))(x)
+    x = Dropout(0.2)(x)
+
+    x = Flatten()(x)
+    x = Dense(1024, activation="relu")(x)
+    x = Dropout(0.2)(x)
+    x = Dense(1024, activation="relu")(x)
+    x = Dropout(0.2)(x)
+
+    out1 = Dense(2, activation="softmax", name="output1")(x)
+    out2 = Dense(2, activation="softmax", name="output2")(x)
+    out3 = Dense(2, activation="softmax", name="output3")(x)
+    out4 = Dense(2, activation="softmax", name="output4")(x)
+
+    model = Model(inputs, [out1, out2, out3, out4])
+    opt = optimizers.Adam(learning_rate=1e-4)
+    model.compile(
+        optimizer=opt,
+        loss={
+            "output1": "categorical_crossentropy",
+            "output2": "categorical_crossentropy",
+            "output3": "categorical_crossentropy",
+            "output4": "categorical_crossentropy",
+        },
+        metrics=["accuracy"],
+    )
+    return model
+
+
+
+
+## === cell 9
+datagen = ImageDataGenerator(
+    rotation_range=360,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True,
+)
+datagen.fit(X_train)
+
+es_cb = callbacks.EarlyStopping(
+    monitor="val_loss", patience=15, restore_best_weights=True, verbose=1
+)
+cp_cb = callbacks.ModelCheckpoint(
+    "cnn_model_02.h5", monitor="val_loss", save_best_only=True, verbose=1
+)
+
+batch_size = 32
+epochs = 50
+
+model = define_model()
+history = model.fit(
+    datagen.flow(
+        X_train,
+        {
+            "output1": y_train1,
+            "output2": y_train2,
+            "output3": y_train3,
+            "output4": y_train4,
+        },
+        batch_size=batch_size,
+    ),
+    steps_per_epoch=len(X_train) // batch_size,
+    validation_data=(
+        X_val,
+        {"output1": y_val1, "output2": y_val2, "output3": y_val3, "output4": y_val4},
+    ),
+    epochs=epochs,
+    callbacks=[es_cb, cp_cb],
+    verbose=2,
+)
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/2791736013.py in <cell line: 0>()
+     19 model = define_model()
+     20 history = model.fit(
+---> 21     datagen.flow(
+     22         X_train,
+     23         {
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/preprocessing/image.py in flow(self, x, y, batch_size, shuffle, sample_weight, seed, save_to_dir, save_prefix, save_format, ignore_class_split, subset)
+   1101         subset=None,
+   1102     ):
+-> 1103         return NumpyArrayIterator(
+   1104             x,
+   1105             y,
+
+/usr/local/lib/python3.11/dist-packages/keras/src/legacy/preprocessing/image.py in __init__(self, x, y, image_data_generator, batch_size, shuffle, sample_weight, seed, data_format, save_to_dir, save_prefix, save_format, subset, ignore_class_split, dtype)
+    560 
+    561         if y is not None and len(x) != len(y):
+--> 562             raise ValueError(
+    563                 "`x` (images tensor) and `y` (labels) "
+    564                 "should have the same length. "
+
+ValueError: `x` (images tensor) and `y` (labels) should have the same length. Found: x.shape = (1310, 64, 64, 3), y.shape = ()
+
+## === cell 11
+predict = model.predict(X_Test, batch_size=32)
+
+
+## === cell 12
+healthy = predict[0][:, 1]  # probability of class 1
+multiple_diseases = predict[1][:, 1]
+rust = predict[2][:, 1]
+scab = predict[3][:, 1]
+
+
+## === cell 13
+submit = pd.DataFrame(
+    {
+        "image_id": test["image_id"],
+        "healthy": healthy,
+        "multiple_diseases": multiple_diseases,
+        "rust": rust,
+        "scab": scab,
+    }
+)
+submit.head()
+
+
+## === cell 14
+submit.to_csv("my_submission.csv", index=False)
+print("Your submission was successfully saved as my_submission.csv")

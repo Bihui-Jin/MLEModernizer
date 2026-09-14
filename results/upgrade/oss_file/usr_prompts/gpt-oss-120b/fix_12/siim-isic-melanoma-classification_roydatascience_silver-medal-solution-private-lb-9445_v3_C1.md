@@ -1,0 +1,430 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict whether a lesion is malignant (0 denotes **benign**, and 1 indicates **malignant**).
+
+## Metric
+Area under the ROC curve.
+
+## Submission Format
+For each `image_name` in the test set, you must predict the probability (`target`) that the sample is **malignant**. The file should contain a header and have the following format:
+
+```
+image_name,target
+ISIC_0052060,0.7
+ISIC_0052349,0.9
+ISIC_0058510,0.8
+ISIC_0073313,0.5
+ISIC_0073502,0.5
+etc.
+```
+
+## Dataset 
+The images are provided in DICOM format.
+
+Images are also provided in JPEG and TFRecord format (in the `jpeg` and `tfrecords` directories, respectively). Images in TFRecord format have been resized to a uniform 1024x1024.
+
+Metadata is also provided outside of the DICOM format, in CSV files. See the `Columns` section for a description.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `image_name` - unique identifier, points to filename of related DICOM image
+- `patient_id` - unique patient identifier
+- `sex` - the sex of the patient (when unknown, will be blank)
+- `age_approx` - approximate patient age at time of imaging
+- `anatom_site_general_challenge` - location of imaged site
+- `diagnosis` - detailed diagnosis information (train only)
+- `benign_malignant` - indicator of malignancy of imaged lesion
+- `target` - binarized version of the target variable
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scipy==1.15.3
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (176 lines)
+            jpeg.zip (24.7 GB)
+            sample_submission.csv (4143 lines)
+            sample_submission.csv.zip (16.4 kB)
+            test.csv (4143 lines)
+            test.csv.zip (42.5 kB)
+            test.zip (6.4 GB)
+            tfrecords.zip (9.3 GB)
+            train.csv (28985 lines)
+            train.csv.zip (299.7 kB)
+            train.zip (46.0 GB)
+            jpeg/
+                test/
+                    ISIC_1440063.jpg (1.1 MB)
+                    ISIC_0815802.jpg (853.1 kB)
+                    ... and 4140 other files
+                train/
+                    ISIC_1845271.jpg (1.0 MB)
+                    ISIC_1970027.jpg (138.4 kB)
+                    ... and 28982 other files
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+            test/
+                ISIC_0052212.dcm (1.5 MB)
+                ISIC_0076545.dcm (4.0 MB)
+                ... and 4140 other files
+                test/
+            tfrecords/
+                test00-2071.tfrec (579.6 MB)
+                test01-2071.tfrec (583.5 MB)
+                ... and 14 other files
+            train/
+                ISIC_0015719.dcm (2.4 MB)
+                ISIC_0068279.dcm (1.3 MB)
+                ... and 28982 other files
+                train/
+        input/
+            description.md (176 lines)
+            jpeg.zip (24.7 GB)
+            sample_submission.csv (4143 lines)
+            sample_submission.csv.zip (16.4 kB)
+            test.csv (4143 lines)
+            test.csv.zip (42.5 kB)
+            test.zip (6.4 GB)
+            tfrecords.zip (9.3 GB)
+            train.csv (28985 lines)
+            train.csv.zip (299.7 kB)
+            train.zip (46.0 GB)
+            jpeg/
+                test/
+                    ISIC_1440063.jpg (1.1 MB)
+                    ISIC_0815802.jpg (853.1 kB)
+                    ... and 4140 other files
+                train/
+                    ISIC_1845271.jpg (1.0 MB)
+                    ISIC_1970027.jpg (138.4 kB)
+                    ... and 28982 other files
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+            test/
+                ISIC_0052212.dcm (1.5 MB)
+                ISIC_0076545.dcm (4.0 MB)
+                ... and 4140 other files
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+            tfrecords/
+                test00-2071.tfrec (579.6 MB)
+                test01-2071.tfrec (583.5 MB)
+                ... and 14 other files
+            train/
+                ISIC_0015719.dcm (2.4 MB)
+                ISIC_0068279.dcm (1.3 MB)
+                ... and 28982 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+        working/
+            siim-isic-melanoma-classification/
+                description.md (176 lines)
+                jpeg.zip (24.7 GB)
+                ... and 9 other files
+                jpeg/
+                    test/
+                        ISIC_1440063.jpg (1.1 MB)
+                        ISIC_0815802.jpg (853.1 kB)
+                        ... and 4140 other files
+                    train/
+                        ISIC_1845271.jpg (1.0 MB)
+                        ISIC_1970027.jpg (138.4 kB)
+                        ... and 28982 other files
+                siim-isic-melanoma-classification/
+                test/
+                    ISIC_0052212.dcm (1.5 MB)
+                    ISIC_0076545.dcm (4.0 MB)
+                    ... and 4140 other files
+                    test/
+                tfrecords/
+                    test00-2071.tfrec (579.6 MB)
+                    test01-2071.tfrec (583.5 MB)
+                    ... and 14 other files
+                train/
+                    ISIC_0015719.dcm (2.4 MB)
+                    ISIC_0068279.dcm (1.3 MB)
+                    ... and 28982 other files
+                    train/
+```
+
+-> data/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> data/siim-isic-melanoma-classification/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> data/siim-isic-melanoma-classification/test.csv has 4142 rows and 5 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge
+
+-> data/siim-isic-melanoma-classification/train.csv has 28984 rows and 8 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge, diagnosis, benign_malignant, target
+
+-> data/test.csv has 4142 rows and 5 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge
+
+-> data/train.csv has 28984 rows and 8 columns.
+The columns are: image_name, patient_id, sex, age_approx, anatom_site_general_challenge, diagnosis, benign_malignant, target
+
+-> input/sample_submission.csv has 4142 rows and 2 columns.
+The columns are: image_name, target
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.942396872030668
+
+# 6. Current score
+
+0.66441
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.5) has done: 'I make the script robust by safely loading any available pseudo‑label CSVs, falling back to a simple mean‑target baseline when none are present, and then averaging the predictions (or using the baseline) to create a valid `submission.csv` with the correct columns.'
+- What this solution (achieved 0.66796) has done: 'I keep the existing pseudo‑label handling but replace the trivial global‑mean baseline with a simple metadata‑based mean‑target model (grouping by sex, site and age bins). When no pseudo‑label files are found, the script use this richer baseline; when pseudo‑labels exist, it blend the rank‑based predictions with the metadata baseline. This modest change should raise the AUC toward the target while preserving the overall workflow.'
+- What this solution (achieved 0.66332) has done: 'The fix changes how the prediction column is written to the sample‑submission DataFrame.  
+Instead of assigning a 1‑D array to a list‑style column slice (which raises a length‑mismatch error), we align predictions with the `image_name` index, assign the single `'target'` column directly, and ensure the resulting DataFrame keeps the correct order and column names. This resolves the runtime error and guarantees a valid `submission.csv` file without altering the core modeling logic.'
+- What this solution (achieved 0.66489) has done: 'The update adds a lightweight blend of the logistic‑regression probabilities with the metadata‑based mean target (group) predictions, which usually captures useful demographic patterns and raises the AUC without altering the core modeling pipeline. When pseudo‑label files are present the blended base prediction is further averaged with the pseudo‑label ranks, keeping the original logic intact.'
+- What this solution (achieved 0.66326) has done: 'I keep the existing data loading, preprocessing, and model training unchanged, but adjust the way predictions are blended. By giving more weight to the logistic‑regression probabilities (which capture patterns beyond simple metadata) and modestly reducing the influence of the metadata baseline and pseudo‑label ranks, the final probabilities should better reflect true signal and raise the AUC toward the target. The changes are limited to weighting constants and the blending formulas, preserving the core pipeline.'
+- What this solution (achieved 0.66339) has done: 'The fix removes the non‑existent **diagnosis** column from the feature list and categorical handling (which caused the KeyError), aligns the preprocessing accordingly, and therefore allows the pipeline to run fully and produce a valid `submission.csv`. No core modeling logic is changed, preserving the original approach while ensuring predictions are generated.'
+- What this solution (achieved 0.66232) has done: 'The changes remove the potentially noisy metadata baseline and add simple scaling for the numeric age feature, letting the logistic‑regression model dominate the prediction while keeping the overall pipeline unchanged.'
+- What this solution (achieved 0.66441) has done: 'I keep the overall pipeline unchanged but give the model a modest boost by blending the logistic‑regression output with the metadata‑based mean target (instead of ignoring it) and by slightly reducing the influence of any pseudo‑label ensembles. After blending, I clip the final probabilities to the valid [0, 1] range to avoid invalid scores. These small, targeted tweaks are expected to lift the AUC toward the target without altering the core logic.'
+
+# 9. Code solution
+
+## === cell 0
+import os, glob, warnings
+import numpy as np
+import pandas as pd
+from scipy.stats import rankdata
+
+warnings.filterwarnings("ignore")
+print("Available input folders:", os.listdir("../input"))
+
+
+
+## === cell 1
+pseudo_dir = "../input/pseudolabelmodels"
+csv_files = sorted(glob.glob(os.path.join(pseudo_dir, "*.csv")))
+print(f"Found {len(csv_files)} pseudo‑label files.")
+LABELS = ["target"]
+predict_list = []
+for f in csv_files:
+    try:
+        df = pd.read_csv(f, usecols=LABELS)
+        predict_list.append(df.values)
+    except Exception as e:
+        print(f"Skipping {f}: {e}")
+
+
+
+## === cell 2
+train_path = "../input/siim-isic-melanoma-classification/train.csv"
+test_path = "../input/siim-isic-melanoma-classification/test.csv"
+train_df = pd.read_csv(train_path)
+test_df = pd.read_csv(test_path)
+
+global_mean = train_df["target"].mean()
+
+age_bins = [0, 30, 50, 70, 120]  # ages >120 will fall in last bin
+train_df["age_bin"] = pd.cut(
+    train_df["age_approx"], bins=age_bins, labels=False, include_lowest=True
+)
+test_df["age_bin"] = pd.cut(
+    test_df["age_approx"], bins=age_bins, labels=False, include_lowest=True
+)
+
+group_cols = ["sex", "anatom_site_general_challenge", "age_bin"]
+group_means = (
+    train_df.groupby(group_cols)["target"]
+    .mean()
+    .reset_index()
+    .rename(columns={"target": "group_target"})
+)
+
+test_merged = test_df.merge(group_means, on=group_cols, how="left")
+metadata_baseline = (
+    test_merged["group_target"].fillna(global_mean).values.reshape(-1, 1)
+)
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+
+feature_cols = [
+    "sex",
+    "anatom_site_general_challenge",
+    "age_bin",
+    "age_approx",
+]
+
+categorical_features = ["sex", "anatom_site_general_challenge", "age_bin"]
+numeric_features = ["age_approx"]
+
+train_df["age_bin"] = train_df["age_bin"].astype(str)
+test_df["age_bin"] = test_df["age_bin"].astype(str)
+
+train_df[categorical_features] = train_df[categorical_features].fillna("unknown")
+test_df[categorical_features] = test_df[categorical_features].fillna("unknown")
+
+median_age = train_df["age_approx"].median()
+train_df["age_approx"] = train_df["age_approx"].fillna(median_age)
+test_df["age_approx"] = test_df["age_approx"].fillna(median_age)
+
+preprocess = ColumnTransformer(
+    transformers=[
+        ("cat", OneHotEncoder(handle_unknown="ignore"), categorical_features),
+        ("num", StandardScaler(), numeric_features),
+    ]
+)
+
+logreg_pipe = Pipeline(
+    steps=[
+        ("preprocess", preprocess),
+        ("clf", LogisticRegression(max_iter=1000, n_jobs=5, class_weight="balanced")),
+    ]
+)
+
+logreg_pipe.fit(train_df[feature_cols], train_df["target"])
+logreg_pred = logreg_pipe.predict_proba(test_df[feature_cols])[:, 1].reshape(-1, 1)
+
+weight_logreg = 0.6
+weight_meta = 0.4
+base_pred = weight_logreg * logreg_pred + weight_meta * metadata_baseline
+
+if not predict_list:
+    predictions = base_pred
+else:
+    n_models = len(predict_list)
+    n_samples = predict_list[0].shape[0]
+    rank_sum = np.zeros((n_samples, 1))
+    for arr in predict_list:
+        ranks = rankdata(arr[:, 0], method="average").reshape(-1, 1) / n_samples
+        rank_sum += ranks
+    pseudo_pred = rank_sum / n_models  # averaged rank probabilities
+
+    weight_pseudo = 0.2
+    weight_base = 0.8
+    predictions = weight_pseudo * pseudo_pred + weight_base * base_pred
+
+predictions = np.clip(predictions, 0.0, 1.0)
+
+
+
+## === cell 3
+sample_sub_path = "../input/siim-isic-melanoma-classification/sample_submission.csv"
+submission = pd.read_csv(sample_sub_path)
+
+submission = submission.set_index("image_name")
+test_df_indexed = test_df.set_index("image_name")
+pred_series = pd.Series(predictions.ravel(), index=test_df_indexed.index, name="target")
+
+submission["target"] = pred_series.reindex(submission.index).values
+submission = submission.reset_index()  # restore image_name column
+
+output_path = "submission.csv"
+submission.to_csv(output_path, index=False)
+print(f"Submission written to {output_path} with shape {submission.shape}")

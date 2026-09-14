@@ -1,0 +1,683 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.13
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8756421879721971
+
+# 6. Current score
+
+0.59043
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.61099) has done: 'I remove the problematic `tensorflow_hub` import, guard model loading so missing `.h5` files are skipped, compute a majority‑class fallback from the training labels, and adjust the prediction loop to use the loaded models when available or the fallback label otherwise. These fixes eliminate the import error, the file‑not‑found crash, and the undefined‑variable issue while still producing a correctly formatted submission CSV.'
+- What this solution (achieved 0.20404) has done: 'The fix removes the problematic TensorFlow import and replaces the model‑based prediction with a lightweight nearest‑centroid classifier built from simple image colour features. This avoids the protobuf error, guarantees a CSV submission, and typically yields higher accuracy than the majority‑class fallback, moving the score toward the target.'
+- What this solution (achieved 0.18423) has done: 'I eliminate the 30 % random subsampling of the training set so that centroids are built from all available images, guaranteeing that every class has a representative centroid and removing the majority‑label fallback that caused many wrong predictions. This small change keeps the original feature extraction and nearest‑centroid logic intact while substantially improving classification accuracy toward the target score.'
+- What this solution (achieved 0.47982) has done: 'I speed up the K‑Nearest‑Neighbour inference by pre‑computing squared norms of the training feature matrix and using a vectorised dot‑product formula for Euclidean distances instead of calling `np.linalg.norm` for every test image. This reduces Python‑level looping and leverages fast BLAS operations while keeping the exact K‑NN logic unchanged. The rest of the pipeline and feature extraction remain identical.'
+- What this solution (achieved 0.45703) has done: 'I keep the overall pipeline (image feature extraction and K‑Nearest‑Neighbour prediction) but replace Euclidean distance with cosine similarity (which often works better for high‑dimensional pixel features) and increase K to 5. The changes are limited to the distance calculation and related tie‑breaking, preserving the core logic while aiming to raise the accuracy toward the target score.'
+- What this solution (achieved 0.53999) has done: 'I speed up test‑time inference by computing all test features once, then performing the K‑NN search in a fully vectorized way (single matrix‑multiply for cosine or a single broadcasted distance matrix for Euclidean). This removes the Python‑level loop that performed a full O(N_train·N_test) distance computation per test image, cutting the runtime dramatically while keeping the exact same K‑NN logic and tie‑breaking rules. I also ensure feature arrays stay in `float32` to lower memory pressure without affecting results.'
+- What this solution (achieved 0.54484) has done: 'The update keeps every part of the original pipeline but replaces the slow Python‑only validation loop with a single scikit‑learn nearest‑neighbors query for each metric.  By querying the whole validation set once (using the maximum K needed) we avoid recomputing distances for every K and every sample, dramatically cutting runtime while preserving the exact voting and tie‑breaking logic.  All other steps – feature extraction, train/val split, majority‑label fallback, and test‑time inference – remain unchanged.'
+- What this solution (achieved 0.59043) has done: 'I boost the model’s discriminative power by enriching the image feature vector with a simple HSV colour‑histogram (16 bins per channel) and by expanding the candidate K values so the validation can pick a better neighbourhood size. During inference I compute both cosine‑ and euclidean‑based K‑NN predictions and combine them with a majority vote (fallback to the cosine‑based choice on ties). These adjustments keep the overall pipeline untouched while giving it a better chance to reach the target accuracy.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+from collections import Counter
+from PIL import Image
+import random
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
+from sklearn.neighbors import NearestNeighbors
+
+
+
+## === cell 1
+test_image_dir = "/kaggle/input/cassava-leaf-disease-classification/test_images"
+sample_submission_path = (
+    "/kaggle/input/cassava-leaf-disease-classification/sample_submission.csv"
+)
+train_csv_path = "/kaggle/input/cassava-leaf-disease-classification/train.csv"
+train_image_dir = "/kaggle/input/cassava-leaf-disease-classification/train_images"
+
+
+
+## === cell 2
+sample_csv = pd.read_csv(sample_submission_path)
+train_df = pd.read_csv(train_csv_path)
+
+majority_label = int(train_df["label"].mode()[0])
+
+train_sample = train_df
+
+train_features = []
+train_labels = []
+
+
+def extract_feature(img_path, hist_bins=16):
+    """
+    Resize to 32×32, normalize pixels, flatten, append colour statistics,
+    and a simple HSV colour‑histogram (hist_bins per channel).
+    Returns a 1‑D float32 vector.
+    """
+    with Image.open(img_path) as img:
+        img = img.convert("RGB")
+        img = img.resize((32, 32))
+        arr = np.asarray(img, dtype=np.float32) / 255.0  # (32,32,3)
+
+        flat = arr.flatten()
+        means = arr.mean(axis=(0, 1))  # (3,)
+        stds = arr.std(axis=(0, 1))  # (3,)
+
+        hsv = img.convert("HSV")
+        hsv_arr = np.asarray(hsv, dtype=np.uint8)
+        h_hist, _ = np.histogram(
+            hsv_arr[:, :, 0], bins=hist_bins, range=(0, 255), density=True
+        )
+        s_hist, _ = np.histogram(
+            hsv_arr[:, :, 1], bins=hist_bins, range=(0, 255), density=True
+        )
+        v_hist, _ = np.histogram(
+            hsv_arr[:, :, 2], bins=hist_bins, range=(0, 255), density=True
+        )
+        hist_feat = np.concatenate([h_hist, s_hist, v_hist]).astype(np.float32)
+
+        return np.concatenate([flat, means, stds, hist_feat])  # length 3072+6+48=3126
+
+
+def _process_train_row(row):
+    img_id, label = row
+    img_path = os.path.join(train_image_dir, img_id)
+    if not os.path.exists(img_path):
+        return None
+    try:
+        feat = extract_feature(img_path)
+        return (feat, int(label))
+    except Exception:
+        return None
+
+
+rows = list(zip(train_sample["image_id"], train_sample["label"]))
+with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
+    futures = {executor.submit(_process_train_row, r): r for r in rows}
+    for fut in as_completed(futures):
+        res = fut.result()
+        if res is not None:
+            feat, lab = res
+            train_features.append(feat)
+            train_labels.append(lab)
+
+if train_features:
+    X_train = np.stack(train_features).astype(np.float32)  # (n_samples, d)
+    y_train = np.array(train_labels)
+
+    train_norms = np.linalg.norm(X_train, axis=1, keepdims=True)
+    X_train_norm = X_train / np.where(train_norms == 0, 1, train_norms)
+
+    random.seed(42)
+    np.random.seed(42)
+    n_samples = X_train.shape[0]
+    idx = np.arange(n_samples)
+    np.random.shuffle(idx)
+    split = int(0.9 * n_samples)  # 90 % train, 10 % val
+    train_idx, val_idx = idx[:split], idx[split:]
+
+    X_tr, X_val = X_train[train_idx], X_train[val_idx]
+    y_tr, y_val = y_train[train_idx], y_train[val_idx]
+
+    tr_norms = np.linalg.norm(X_tr, axis=1, keepdims=True)
+    X_tr_norm = X_tr / np.where(tr_norms == 0, 1, tr_norms)
+
+    candidate_Ks = [5, 9, 13]
+    max_K = max(candidate_Ks)
+    best_acc = -1.0
+    best_metric = "cosine"
+    best_K = 5  # will be overwritten
+
+    val_norms = np.linalg.norm(X_val, axis=1, keepdims=True)
+    X_val_norm = X_val / np.where(val_norms == 0, 1, val_norms)
+
+    knn_cos = NearestNeighbors(n_neighbors=max_K, metric="cosine", algorithm="auto")
+    knn_cos.fit(X_tr_norm)
+    cos_dists, cos_inds = knn_cos.kneighbors(X_val_norm, return_distance=True)
+    cos_sims = 1.0 - cos_dists  # similarity
+
+    knn_euc = NearestNeighbors(n_neighbors=max_K, metric="euclidean", algorithm="auto")
+    knn_euc.fit(X_tr)
+    euc_dists, euc_inds = knn_euc.kneighbors(X_val, return_distance=True)
+
+    def compute_preds(indices, scores, metric):
+        preds = []
+        for i in range(indices.shape[0]):
+            knn_idx = indices[i]
+            knn_labels = y_tr[knn_idx]
+            vote_counts = Counter(knn_labels)
+            max_votes = max(vote_counts.values())
+            candidates = [lbl for lbl, cnt in vote_counts.items() if cnt == max_votes]
+            if len(candidates) == 1:
+                preds.append(candidates[0])
+            else:
+                if metric == "cosine":
+                    avg_sim = {
+                        lbl: scores[i][knn_labels == lbl].mean() for lbl in candidates
+                    }
+                    preds.append(max(avg_sim, key=avg_sim.get))
+                else:
+                    avg_dist = {
+                        lbl: scores[i][knn_labels == lbl].mean() for lbl in candidates
+                    }
+                    preds.append(min(avg_dist, key=avg_dist.get))
+        return np.array(preds)
+
+    for K_candidate in candidate_Ks:
+        cos_pred = compute_preds(
+            cos_inds[:, :K_candidate], cos_sims[:, :K_candidate], "cosine"
+        )
+        acc_cos = (cos_pred == y_val).mean()
+        if acc_cos > best_acc:
+            best_acc = acc_cos
+            best_metric = "cosine"
+            best_K = K_candidate
+        euc_pred = compute_preds(
+            euc_inds[:, :K_candidate], euc_dists[:, :K_candidate], "euclidean"
+        )
+        acc_euc = (euc_pred == y_val).mean()
+        if acc_euc > best_acc:
+            best_acc = acc_euc
+            best_metric = "euclidean"
+            best_K = K_candidate
+
+    use_knn = True
+else:
+    use_knn = False
+    best_metric = "cosine"
+    best_K = 5
+
+
+
+## === cell 3
+image_ids = sorted(
+    [
+        f
+        for f in os.listdir(test_image_dir)
+        if f.lower().endswith((".jpg", ".jpeg", ".png"))
+    ]
+)
+
+test_features = []
+valid_mask = []  # True if feature extraction succeeded
+
+
+def _process_test_image(image_id):
+    img_path = os.path.join(test_image_dir, image_id)
+    try:
+        feat = extract_feature(img_path)
+        return (image_id, feat, True)
+    except Exception:
+        return (image_id, None, False)
+
+
+with ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
+    futures = {
+        executor.submit(_process_test_image, img_id): img_id for img_id in image_ids
+    }
+    for fut in as_completed(futures):
+        img_id, feat, ok = fut.result()
+        if ok:
+            test_features.append(feat)
+            valid_mask.append(True)
+        else:
+            test_features.append(None)
+            valid_mask.append(False)
+
+if test_features and test_features[0] is None:
+    zero_vec = np.zeros_like(train_features[0], dtype=np.float32)
+    test_features = [zero_vec if f is None else f for f in test_features]
+elif test_features:
+    dim = (
+        test_features[0].shape[0]
+        if test_features[0] is not None
+        else train_features[0].shape[0]
+    )
+    zero_vec = np.zeros(dim, dtype=np.float32)
+    test_features = [zero_vec if f is None else f for f in test_features]
+
+test_features = np.stack(test_features).astype(np.float32)  # (n_test, d)
+valid_mask = np.array(valid_mask)
+
+if use_knn:
+    if best_metric == "cosine":
+        test_norms = np.linalg.norm(test_features, axis=1, keepdims=True)
+        test_normed = test_features / np.where(test_norms == 0, 1, test_norms)
+
+        knn_cos = NearestNeighbors(
+            n_neighbors=best_K, metric="cosine", algorithm="auto"
+        )
+        knn_cos.fit(X_train_norm)
+        distances_cos, indices_cos = knn_cos.kneighbors(
+            test_normed, return_distance=True
+        )
+        sims_cos = 1.0 - distances_cos
+        preds_cos = []
+        for i in range(len(image_ids)):
+            if not valid_mask[i]:
+                preds_cos.append(majority_label)
+                continue
+            labels = y_train[indices_cos[i]]
+            vote_counts = Counter(labels)
+            max_votes = max(vote_counts.values())
+            candidates = [lbl for lbl, cnt in vote_counts.items() if cnt == max_votes]
+            if len(candidates) == 1:
+                preds_cos.append(candidates[0])
+            else:
+                avg_sim = {lbl: sims_cos[i][labels == lbl].mean() for lbl in candidates}
+                preds_cos.append(max(avg_sim, key=avg_sim.get))
+
+        knn_euc = NearestNeighbors(
+            n_neighbors=best_K, metric="euclidean", algorithm="auto"
+        )
+        knn_euc.fit(X_train)
+        distances_euc, indices_euc = knn_euc.kneighbors(
+            test_features, return_distance=True
+        )
+        preds_euc = []
+        for i in range(len(image_ids)):
+            if not valid_mask[i]:
+                preds_euc.append(majority_label)
+                continue
+            labels = y_train[indices_euc[i]]
+            vote_counts = Counter(labels)
+            max_votes = max(vote_counts.values())
+            candidates = [lbl for lbl, cnt in vote_counts.items() if cnt == max_votes]
+            if len(candidates) == 1:
+                preds_euc.append(candidates[0])
+            else:
+                avg_dist = {
+                    lbl: distances_euc[i][labels == lbl].mean() for lbl in candidates
+                }
+                preds_euc.append(min(avg_dist, key=avg_dist.get))
+
+    else:  # best_metric == "euclidean"
+        knn_euc = NearestNeighbors(
+            n_neighbors=best_K, metric="euclidean", algorithm="auto"
+        )
+        knn_euc.fit(X_train)
+        distances_euc, indices_euc = knn_euc.kneighbors(
+            test_features, return_distance=True
+        )
+        preds_euc = []
+        for i in range(len(image_ids)):
+            if not valid_mask[i]:
+                preds_euc.append(majority_label)
+                continue
+            labels = y_train[indices_euc[i]]
+            vote_counts = Counter(labels)
+            max_votes = max(vote_counts.values())
+            candidates = [lbl for lbl, cnt in vote_counts.items() if cnt == max_votes]
+            if len(candidates) == 1:
+                preds_euc.append(candidates[0])
+            else:
+                avg_dist = {
+                    lbl: distances_euc[i][labels == lbl].mean() for lbl in candidates
+                }
+                preds_euc.append(min(avg_dist, key=avg_dist.get))
+
+        test_norms = np.linalg.norm(test_features, axis=1, keepdims=True)
+        test_normed = test_features / np.where(test_norms == 0, 1, test_norms)
+
+        knn_cos = NearestNeighbors(
+            n_neighbors=best_K, metric="cosine", algorithm="auto"
+        )
+        knn_cos.fit(X_train_norm)
+        distances_cos, indices_cos = knn_cos.kneighbors(
+            test_normed, return_distance=True
+        )
+        sims_cos = 1.0 - distances_cos
+        preds_cos = []
+        for i in range(len(image_ids)):
+            if not valid_mask[i]:
+                preds_cos.append(majority_label)
+                continue
+            labels = y_train[indices_cos[i]]
+            vote_counts = Counter(labels)
+            max_votes = max(vote_counts.values())
+            candidates = [lbl for lbl, cnt in vote_counts.items() if cnt == max_votes]
+            if len(candidates) == 1:
+                preds_cos.append(candidates[0])
+            else:
+                avg_sim = {lbl: sims_cos[i][labels == lbl].mean() for lbl in candidates}
+                preds_cos.append(max(avg_sim, key=avg_sim.get))
+
+    predictions = []
+    for pc, pe in zip(preds_cos, preds_euc):
+        if pc == pe:
+            predictions.append(pc)
+        else:
+            predictions.append(pc if best_metric == "cosine" else pe)
+else:
+    predictions = [majority_label] * len(image_ids)
+
+submission_df = pd.DataFrame(
+    [
+        {"image_id": img_id, "label": int(pred)}
+        for img_id, pred in zip(image_ids, predictions)
+    ]
+)
+
+
+
+## === cell 4
+submission_path = "/kaggle/working/submission.csv"
+submission_df.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")
+
+
+
+## === cell 5
+submission_df.head()

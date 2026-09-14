@@ -1,0 +1,605 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+albumentations==2.0.8
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+pillow==11.3.0
+pytorch-ignite==0.5.3
+pytorch-lightning==2.5.5
+scipy==1.15.3
+sklearn-pandas==2.2.0
+torch==2.6.0+cu124
+torchao==0.10.0
+torchaudio==2.6.0+cu124
+torchdata==0.11.0
+torchinfo==1.8.0
+torchmetrics==1.8.2
+torchsummary==1.5.1
+torchtune==0.6.1
+torchvision==0.21.0+cu124
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8931701420368692
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.09193) has done: 'Implemented fixes:
+- Replaced the invalid `RandomResizedCrop` with a simple `Resize` to satisfy Albumentations validation.
+- Added a custom `to_tensor` lambda that converts the already‑normalized NumPy image directly to a torch tensor (avoiding double normalization).
+- Ensured the augmentation pipeline (`sub_aug`) is defined correctly before use.
+- Keeping the rest of the logic unchanged so the ensemble predictions are computed and a proper `submission.csv` is written.'
+- What this solution (achieved 0.61099) has done: 'I add a simple class‑frequency prior derived from the training labels and blend it with the model‑based probabilities. This inexpensive calibration nudges predictions toward the most common classes, which should raise accuracy from the very low baseline toward the target without altering the core model architecture or training logic.'
+- What this solution (achieved 0.4929) has done: 'I reduce the influence of the class‑frequency prior (which was pulling predictions toward the most common classes) and give the more powerful EfficientNet model a higher weight in the ensemble. These tiny adjustments keep the original architecture and training untouched while nudging the predictions toward the target accuracy.'
+- What this solution (achieved 0.51271) has done: 'I increase the test‑time augmentation count, compute class probabilities for each model before ensembling, give the stronger EfficientNet model a higher weight, and reduce the influence of the class‑frequency prior. These small, targeted changes keep the original architecture and training untouched while nudging the predictions toward higher accuracy, moving the score closer to the target.'
+- What this solution (achieved 0.0994) has done: 'The changes batch the forward passes for both models and share the augmentation work between them, turning ~64 k single‑image inference calls into 12 batched calls per model (plus lightweight augmentation loops). This keeps the exact TTA count, model architecture, and weighting while dramatically reducing Python‑level overhead and GPU kernel launches, fitting comfortably inside the 600 s limit.'
+- What this solution (achieved 0.61099) has done: 'I incorporate the class‑frequency prior that was computed but never used. By blending a small weight of this prior with the model‑based probabilities before taking the arg‑max, we bias predictions toward the more common classes, which should raise the accuracy from the very low baseline toward the target while leaving the model architecture, training, and TTA untouched.'
+- What this solution (achieved 0.56129) has done: 'I keep the overall pipeline unchanged but modify how the two model outputs are merged. Instead of averaging their probability distributions, I combine the logits (the raw model outputs) using the same 0.15/0.85 weights and then apply a softmax. This typically yields a better calibrated ensemble. I also reduce the class‑prior influence from 0.15 to 0.05 so the prior does not overly bias predictions toward the most frequent classes. These small adjustments should nudge the validation accuracy upward, moving the score closer to the target while preserving the core logic.'
+- What this solution (achieved 0.12481) has done: 'The changes keep the exact model architectures and inference logic but move all tensor accumulation onto the GPU to remove the many costly CPU‑GPU transfers, use `torch.inference_mode` for a lighter no‑grad context, enable cuDNN benchmarking, and replace Python loops with list comprehensions. These tweaks are purely performance‑oriented and do not alter the predictions.'
+- What this solution (achieved 0.61099) has done: 'Implemented a lightweight calibration step by blending the class‑frequency prior (computed from the training labels) with the model‑based probabilities before taking the arg‑max. This uses the existing `prior_probs` array, adds a small weight (5 %) to it, and renormalizes the combined scores. The change preserves the original architecture, training‑free inference pipeline, and only nudges predictions toward a more realistic distribution, which should raise the validation accuracy toward the target without altering core logic.'
+- What this solution (achieved 0.13042) has done: 'I adjust the ensembling step to combine the raw logits from the two models before applying softmax, which typically yields better calibrated probabilities, and I reduce the class‑frequency prior contribution to avoid over‑biasing toward the most common classes. This change keeps the model architecture and inference pipeline unchanged while nudging the predictions toward higher accuracy, moving the score closer to the target.'
+
+# 9. Code solution
+
+## === cell 0
+sample_sub_path = "../input/cassava-leaf-disease-classification/sample_submission.csv"
+test_images_path = "../input/cassava-leaf-disease-classification/test_images"
+
+
+
+## === cell 1
+resnet_model = models.resnext50_32x4d(pretrained=True)
+resnet_model.fc = nn.Linear(resnet_model.fc.in_features, 5)
+resnet_model = resnet_model.to(device)
+resnet_model.eval()
+
+effnet_model = models.efficientnet_b4(pretrained=True)
+effnet_model.classifier[1] = nn.Linear(effnet_model.classifier[1].in_features, 5)
+effnet_model = effnet_model.to(device)
+effnet_model.eval()
+
+sub_aug = A.Compose(
+    [
+        A.Resize(height=512, width=512),
+        A.Transpose(p=0.5),
+        A.HorizontalFlip(p=0.5),
+        A.VerticalFlip(p=0.5),
+        A.ShiftScaleRotate(p=0.8),
+        A.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+            max_pixel_value=255.0,
+            p=1.0,
+        ),
+    ],
+    p=1.0,
+)
+
+to_tensor = lambda img: torch.from_numpy(img).permute(2, 0, 1).float()
+
+train_path = "../input/cassava-leaf-disease-classification/train.csv"
+train_df = pd.read_csv(train_path)
+class_counts = train_df["label"].value_counts().sort_index()
+prior_probs = class_counts.values.astype(np.float32)
+prior_probs = prior_probs / prior_probs.sum()  # shape (5,)
+
+
+
+## --- ERROR in cell 1, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/186417581.py in <cell line: 0>()
+----> 1 resnet_model = models.resnext50_32x4d(pretrained=True)
+      2 resnet_model.fc = nn.Linear(resnet_model.fc.in_features, 5)
+      3 resnet_model = resnet_model.to(device)
+      4 resnet_model.eval()
+      5 
+
+NameError: name 'models' is not defined
+
+## === cell 2
+train_images_path = "../input/cassava-leaf-disease-classification/train_images"
+
+
+class CassavaDataset(torch.utils.data.Dataset):
+    def __init__(self, df, img_dir, aug):
+        self.df = df.reset_index(drop=True)
+        self.img_dir = img_dir
+        self.aug = aug
+
+    def __len__(self):
+        return len(self.df)
+
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]
+        img_path = os.path.join(self.img_dir, row["image_id"])
+        with Image.open(img_path) as im:
+            img = np.array(im.convert("RGB"))
+        img = self.aug(image=img)["image"]
+        img_tensor = to_tensor(img)
+        label = int(row["label"])
+        return img_tensor, label
+
+
+val_frac = 0.10
+val_size = int(len(train_df) * val_frac)
+train_subset = train_df.iloc[:-val_size]
+val_subset = train_df.iloc[-val_size:]
+
+train_dataset = CassavaDataset(train_subset, train_images_path, sub_aug)
+val_dataset = CassavaDataset(val_subset, train_images_path, sub_aug)
+
+num_workers = min(4, os.cpu_count() or 2)
+
+batch_size = 64
+train_loader = torch.utils.data.DataLoader(
+    train_dataset,
+    batch_size=batch_size,
+    shuffle=True,
+    num_workers=num_workers,
+    pin_memory=True,
+    persistent_workers=True,
+)
+val_loader = torch.utils.data.DataLoader(
+    val_subset,
+    batch_size=batch_size,
+    shuffle=False,
+    num_workers=num_workers,
+    pin_memory=True,
+    persistent_workers=True,
+)
+
+for param in resnet_model.parameters():
+    param.requires_grad = False
+for param in resnet_model.fc.parameters():
+    param.requires_grad = True
+
+for param in effnet_model.parameters():
+    param.requires_grad = False
+for param in effnet_model.classifier[1].parameters():
+    param.requires_grad = True
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(
+    [
+        {"params": resnet_model.fc.parameters()},
+        {"params": effnet_model.classifier[1].parameters()},
+    ],
+    lr=1e-3,
+)
+
+epochs = 2
+for epoch in range(epochs):
+    resnet_model.train()
+    effnet_model.train()
+    for imgs, labels in train_loader:
+        imgs = imgs.to(device)
+        labels = labels.to(device)
+
+        optimizer.zero_grad()
+        res_logits = resnet_model(imgs)
+        eff_logits = effnet_model(imgs)
+        loss = criterion(res_logits, labels) + criterion(eff_logits, labels)
+        loss.backward()
+        optimizer.step()
+    resnet_model.eval()
+    effnet_model.eval()
+    correct = total = 0
+    with torch.inference_mode():
+        for imgs, labels in val_loader:
+            imgs = imgs.to(device)
+            labels = labels.to(device)
+            res_logits = resnet_model(imgs)
+            eff_logits = effnet_model(imgs)
+            probs = F.softmax((res_logits * 0.10) + (eff_logits * 0.90), dim=1)
+            preds = probs.argmax(dim=1)
+            correct += (preds == labels).sum().item()
+            total += labels.size(0)
+    acc = correct / total if total > 0 else 0
+    print(f"Epoch {epoch+1}/{epochs} - Val acc: {acc:.4f}")
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3017409233.py in <cell line: 0>()
+      2 
+      3 
+----> 4 class CassavaDataset(torch.utils.data.Dataset):
+      5     def __init__(self, df, img_dir, aug):
+      6         self.df = df.reset_index(drop=True)
+
+NameError: name 'torch' is not defined
+
+## === cell 3
+sample_sub = pd.read_csv(sample_sub_path)
+
+image_paths = [
+    os.path.join(test_images_path, img_id) for img_id in sample_sub["image_id"]
+]
+raw_images = []
+for p in image_paths:
+    with Image.open(p) as im:
+        raw_images.append(np.array(im.convert("RGB")))
+
+N = len(raw_images)
+batch_size = 64  # fits GPU memory
+
+resnet_sum = torch.zeros(N, 5, device=device, dtype=torch.float32)
+effnet_sum = torch.zeros(N, 5, device=device, dtype=torch.float32)
+
+tta_count = 20
+
+with torch.inference_mode():
+    for _ in range(tta_count):
+        for start in range(0, N, batch_size):
+            end = min(start + batch_size, N)
+            batch_imgs = raw_images[start:end]
+
+            aug_tensors = [to_tensor(sub_aug(image=img)["image"]) for img in batch_imgs]
+            batch_tensor = torch.stack(aug_tensors).to(device)  # (B, C, H, W)
+
+            res_out = resnet_model(batch_tensor)  # (B, 5)
+            eff_out = effnet_model(batch_tensor)  # (B, 5)
+
+            resnet_sum[start:end] += res_out
+            effnet_sum[start:end] += eff_out
+
+resnet_logits = resnet_sum / tta_count
+effnet_logits = effnet_sum / tta_count
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3526982266.py in <cell line: 0>()
+----> 1 sample_sub = pd.read_csv(sample_sub_path)
+      2 
+      3 image_paths = [
+      4     os.path.join(test_images_path, img_id) for img_id in sample_sub["image_id"]
+      5 ]
+
+NameError: name 'pd' is not defined
+
+## === cell 4
+logits_ensemble = (resnet_logits * 0.10) + (effnet_logits * 0.90)  # (N,5)
+ensemble_probs = F.softmax(logits_ensemble, dim=1).cpu().numpy()
+
+prior_weight = 0.02
+ensemble_probs = ensemble_probs * (1.0 - prior_weight) + prior_probs * prior_weight
+ensemble_probs = ensemble_probs / ensemble_probs.sum(axis=1, keepdims=True)
+
+pred_labels = ensemble_probs.argmax(axis=1)
+
+submission_df = pd.DataFrame({"image_id": sample_sub["image_id"], "label": pred_labels})
+submission_path = "submission.csv"
+submission_df.to_csv(submission_path, index=False)
+
+print(f"Submission written to {submission_path}")
+print(submission_df.head())
+
+## --- ERROR in cell 4, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2664950274.py in <cell line: 0>()
+----> 1 logits_ensemble = (resnet_logits * 0.10) + (effnet_logits * 0.90)  # (N,5)
+      2 ensemble_probs = F.softmax(logits_ensemble, dim=1).cpu().numpy()
+      3 
+      4 prior_weight = 0.02
+      5 ensemble_probs = ensemble_probs * (1.0 - prior_weight) + prior_probs * prior_weight
+
+NameError: name 'resnet_logits' is not defined

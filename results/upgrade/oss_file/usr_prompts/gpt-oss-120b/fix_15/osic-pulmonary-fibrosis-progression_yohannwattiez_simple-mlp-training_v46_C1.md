@@ -1,0 +1,372 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Predict a patient’s severity of decline in lung function based on a CT scan of their lungs. Lung function is assessed based on output from a spirometer, which measures the forced vital capacity (`FVC`), i.e. the volume of air exhaled.
+
+## Metric
+A modified version of the Laplace Log Likelihood. 
+
+For each true FVC measurement, you will predict both an FVC and a confidence measure (standard deviation 𝜎𝜎). The metric is computed as:
+
+$$
+\begin{gathered}
+\sigma_{\text {clipped }}=\max (\sigma, 70), \\
+\Delta=\min \left(\left|F V C_{\text {true }}-F V C_{\text {predicted }}\right|, 1000\right), \\
+\text { metric }=-\frac{\sqrt{2} \Delta}{\sigma_{\text {clipped }}}-\ln \left(\sqrt{2} \sigma_{\text {clipped }}\right) .
+\end{gathered}
+$$
+
+The error is thresholded at 1000 ml to avoid large errors adversely penalizing results, while the confidence values are clipped at 70 ml to reflect the approximate measurement uncertainty in FVC. The final score is calculated by averaging the metric across all test set `Patient_Week`s (three per patient). 
+
+Metric values will be negative and higher is better.
+
+## Submission Format
+For each `Patient_Week`, you must predict the `FVC` and a confidence. You are asked to predict every patient's `FVC` measurement for every possible week. Those weeks which are not in the final three visits are ignored in scoring.
+
+The file should contain a header and have the following format:
+
+```
+Patient_Week,FVC,Confidence
+ID00002637202176704235138_1,2000,100
+ID00002637202176704235138_2,2000,100
+ID00002637202176704235138_3,2000,100
+etc.
+
+```
+
+## Dataset
+In the dataset, you are provided with a baseline chest CT scan and associated clinical information for a set of patients. A patient has an image acquired at time `Week = 0` and has numerous follow up visits over the course of approximately 1-2 years, at which time their `FVC` is measured.
+
+- In the training set, you are provided with an anonymized, baseline CT scan and the entire history of FVC measurements.
+- In the test set, you are provided with a baseline CT scan and only the initial FVC measurement. **You are asked to predict the final three `FVC` measurements for each patient, as well as a confidence value in your prediction.**
+
+- **train.csv** - the training set, contains full history of clinical information
+- **test.csv** - the test set, contains only the baseline measurement
+- **train/** - contains the training patients' baseline CT scan in DICOM format
+- **test/** - contains the test patients' baseline CT scan in DICOM format
+- **sample_submission.csv** - demonstrates the submission format
+
+**train.csv and test.csv**
+
+- `Patient`a unique Id for each patient (also the name of the patient's DICOM folder)
+- `Weeks`the relative number of weeks pre/post the baseline CT (may be negative)
+- `FVC` - the recorded lung capacity in ml
+- `Percent`a computed field which approximates the patient's FVC as a percent of the typical FVC for a person of similar characteristics
+- `Age`
+- `Sex`
+- `SmokingStatus`
+
+**sample submission.csv**
+
+- `Patient_Week` - a unique Id formed by concatenating the `Patient` and `Weeks` columns (i.e. ABC_22 is a prediction for patient ABC at week 22)
+- `FVC` - the predicted FVC in ml
+- `Confidence` - a confidence value of your prediction (also has units of ml)
+
+# 2. Python version
+
+3.8
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        input/
+            description.md (122 lines)
+            sample_submission.csv (1909 lines)
+            sample_submission.csv.zip (5.7 kB)
+            test.csv (19 lines)
+            test.csv.zip (748 Bytes)
+            test.zip (1.2 GB)
+            train.csv (1395 lines)
+            train.csv.zip (23.6 kB)
+            train.zip (12.7 GB)
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+            test/
+                ID00014637202177757139317/
+                    1.dcm (1.5 MB)
+                    10.dcm (1.5 MB)
+                    ... and 29 other files
+                ID00019637202178323708467/
+                    1.dcm (525.5 kB)
+                    10.dcm (525.5 kB)
+                    ... and 27 other files
+                ... and 17 other folders
+            train/
+                ID00007637202177411956430/
+                    1.dcm (525.6 kB)
+                    10.dcm (525.6 kB)
+                    ... and 28 other files
+                ID00009637202177434476278/
+                    1.dcm (1.2 MB)
+                    10.dcm (1.2 MB)
+                    ... and 392 other files
+                ... and 157 other folders
+        working/
+            osic-pulmonary-fibrosis-progression/
+                description.md (122 lines)
+                sample_submission.csv (1909 lines)
+                ... and 7 other files
+                osic-pulmonary-fibrosis-progression/
+                test/
+                    ID00014637202177757139317/
+                        1.dcm (1.5 MB)
+                        10.dcm (1.5 MB)
+                        ... and 29 other files
+                    ID00019637202178323708467/
+                        1.dcm (525.5 kB)
+                        10.dcm (525.5 kB)
+                        ... and 27 other files
+                    ... and 17 other folders
+                train/
+                    ID00007637202177411956430/
+                        1.dcm (525.6 kB)
+                        10.dcm (525.6 kB)
+                        ... and 28 other files
+                    ID00009637202177434476278/
+                        1.dcm (1.2 MB)
+                        10.dcm (1.2 MB)
+                        ... and 392 other files
+                    ... and 157 other folders
+```
+
+-> data/osic-pulmonary-fibrosis-progression/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/osic-pulmonary-fibrosis-progression/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/osic-pulmonary-fibrosis-progression/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/sample_submission.csv has 1908 rows and 3 columns.
+The columns are: Patient_Week, FVC, Confidence
+
+-> data/test.csv has 18 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> data/train.csv has 1394 rows and 7 columns.
+The columns are: Patient, Weeks, FVC, Percent, Age, Sex, SmokingStatus
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+-7.035642144374044
+
+# 6. Current score
+
+-8.21133
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved -14.9683) has done: 'The script is fixed to load the correct data files, avoid missing‑file errors, replace the unavailable preprocessing and model code with a simple baseline prediction (using each patient’s week‑0 FVC), and reliably write a properly formatted `submission.csv`.'
+- What this solution (achieved -9.48291) has done: 'I fixed the week extraction to safely handle any missing values and increased the default confidence value to 200, which better matches the metric’s trade‑off and should move the score toward the target while keeping the original baseline logic unchanged.'
+- What this solution (achieved -12.29871) has done: 'I keep the overall baseline logic but add a simple global week‑based adjustment derived from the training data and lower the confidence to 100. The week adjustment (median FVC per week minus median FVC at week 0) refines predictions for later visits, and a smaller confidence better balances the Laplace‑log‑likelihood term, moving the score toward the target without altering the core model structure.'
+- What this solution (achieved -8.49935) has done: 'I raise the confidence value from 100 to 300 so the Laplace‑Log‑Likelihood term’s penalty is reduced, moving the score upward toward the target while keeping the original baseline‑plus‑week‑adjustment logic unchanged.'
+- What this solution (achieved -8.00928) has done: 'I tune the baseline predictions slightly by scaling the week‑based median adjustment (to avoid over‑correction) and make the confidence value grow modestly with the absolute week number, keeping the overall simple baseline logic. This should reduce the prediction error for later weeks while keeping the confidence high enough to lower the Laplace‑log‑likelihood penalty, moving the score upward toward the target.'
+- What this solution (achieved -8.05358) has done: 'I slightly increase the week‑adjustment factor (from 0.8 to 0.9) to reduce prediction error for later weeks and lower the confidence baseline from 300 to 250 (with a smaller per‑week increase) so the Laplace‑Log‑Likelihood penalty is better balanced. These minimal tweaks keep the original baseline logic while moving the score upward toward the target.'
+- What this solution (achieved -8.33106) has done: 'I slightly lower the baseline confidence to reduce the ‑ln penalty, use a gentler increase per week, and set the week‑adjustment scaling to 1.0 so the median‑based week correction is applied fully. These tiny tweaks keep the original baseline‑plus‑week‑adjust logic but should decrease the overall Laplace‑Log‑Likelihood loss and move the score upward toward the target.'
+- What this solution (achieved -8.30612) has done: 'I slightly reduce the magnitude of the week‑based median correction (week_adjust_factor = 0.85) to avoid over‑adjusting predictions, and modestly raise the confidence values (base = 250, + 1.5 per absolute week, capped at 400). These small tweaks keep the original baseline‑plus‑week‑adjust logic while expectedly lowering the absolute prediction error and balancing the Laplace‑log‑likelihood term, moving the score upward toward the target.'
+- What this solution (achieved -11.44166) has done: 'I replace the simple week‑median correction with a per‑patient linear trend fitted on the training data, which typically gives more accurate FVC forecasts for future weeks while keeping the overall baseline approach unchanged. I also lower the confidence to a modest constant (120 ml) that balances the Laplace‑log‑likelihood terms better than the previous high confidence values. These minimal adjustments are expected to raise the validation score toward the target without altering the core pipeline.'
+- What this solution (achieved -8.98421) has done: 'I replace the per‑patient linear trend with a simple baseline that uses each patient’s week‑0 FVC (or the global median if missing) and increase the confidence to a higher constant (300 ml) with almost no per‑week growth. This keeps the overall structure unchanged while giving predictions that are less noisy and a confidence that reduces the Laplace‑log‑likelihood penalty, moving the score upward toward the target.'
+- What this solution (achieved -9.01148) has done: 'I add a per‑patient linear trend (slope) computed from the training records and use it together with the week‑0 intercept to predict FVC, while also tuning the confidence to a lower base (100 ml) with a modest growth per week. These changes should reduce the absolute prediction error (Δ) and balance the Laplace‑Log‑Likelihood terms, moving the score upward toward the target without altering the overall simple baseline structure.'
+- What this solution (achieved -8.38025) has done: 'I keep the original baseline‑plus‑per‑patient linear model but slightly temper the slope (multiply by 0.9) to avoid over‑correction on later weeks, and I raise the confidence values (base 250 ml and +8 ml per absolute week, capped at 500 ml). Larger σ reduces the penalty term in the Laplace‑Log‑Likelihood, moving the score upward toward the target while preserving the core logic.'
+- What this solution (achieved -8.83913) has done: 'I tune the confidence to a lower baseline (180 ml) with a modest per‑week increase (5 ml) and add a small global week‑based median adjustment (factor 0.5) to the baseline + per‑patient linear prediction. These minimal changes keep the original model structure while reducing the Laplace‑Log‑Likelihood penalty and improving prediction accuracy, moving the score closer to the target.'
+- What this solution (achieved -8.21133) has done: 'I raise the confidence values (base and per‑week increase) so the Laplace‑Log‑Likelihood penalty is reduced, which should move the score upward toward the target while keeping the original baseline‑plus‑week‑adjust logic unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import pandas as pd
+import numpy as np
+import os
+import random
+
+
+def seed_all(seed=20):
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+
+
+seed_all(20)
+
+
+
+## === cell 1
+BASE_PATH = "/kaggle/input/osic-pulmonary-fibrosis-progression"
+train_path = os.path.join(BASE_PATH, "train.csv")
+test_path = os.path.join(BASE_PATH, "test.csv")
+sample_sub_path = os.path.join(BASE_PATH, "sample_submission.csv")
+
+train = pd.read_csv(train_path)
+test = pd.read_csv(test_path)
+sample_sub = pd.read_csv(sample_sub_path)
+
+
+
+## === cell 2
+EPOCH = 250
+BATCH_SIZE = 128
+LAMBDA_LOSS = 0.8
+
+
+
+## === cell 3
+patient_week0 = (
+    train[train["Weeks"] == 0].groupby("Patient")["FVC"].median().rename("intercept")
+)
+
+global_median_fvc = train["FVC"].median()
+fallback_intercept = global_median_fvc
+
+
+def compute_patient_slope(df):
+    slopes = {}
+    for patient, grp in df.groupby("Patient"):
+        if len(grp) >= 2:
+            x = grp["Weeks"].values.astype(float)
+            y = grp["FVC"].values.astype(float)
+            a = np.polyfit(x, y, 1)[0]  # linear coefficient
+            slopes[patient] = a
+    return pd.Series(slopes, name="slope")
+
+
+patient_slope = compute_patient_slope(train)
+
+week_median = train.groupby("Weeks")["FVC"].median()
+week0_median = week_median.loc[0] if 0 in week_median.index else global_median_fvc
+week_adj_series = week_median - week0_median
+week_adj_factor = 0.5  # modest influence
+
+pred_df = sample_sub.copy()
+pred_df["Patient"] = pred_df["Patient_Week"].str.extract(r"([^_]+)_")
+week_series = pred_df["Patient_Week"].str.extract(r"_(\d+)$")[0]
+pred_df["Week"] = week_series.astype(float).fillna(0).astype(int)
+
+pred_df = pred_df.join(patient_week0, on="Patient")
+pred_df["intercept"] = pred_df["intercept"].fillna(fallback_intercept)
+pred_df = pred_df.join(patient_slope, on="Patient")
+pred_df["slope"] = pred_df["slope"].fillna(0.0)
+
+slope_factor = 0.9
+pred_df["week_adj"] = pred_df["Week"].map(week_adj_series).fillna(0.0)
+
+pred_df["FVC"] = (
+    pred_df["intercept"]
+    + slope_factor * pred_df["slope"] * pred_df["Week"]
+    + week_adj_factor * pred_df["week_adj"]
+)
+
+base_conf = 400.0  # higher baseline confidence
+conf_per_week = 20.0  # larger per‑week increase
+pred_df["Confidence"] = base_conf + conf_per_week * pred_df["Week"].abs()
+pred_df["Confidence"] = pred_df["Confidence"].clip(upper=800.0)  # generous cap
+
+
+
+## === cell 4
+submission_path = "submission.csv"
+pred_df[["Patient_Week", "FVC", "Confidence"]].to_csv(submission_path, index=False)
+print(f"Submission file written to {submission_path}")

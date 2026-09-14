@@ -1,0 +1,321 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect apple diseases from images.
+
+## Metric
+Mean F1-Score
+
+## Submission Format
+labels should be a space-delimited list.
+
+The file should contain a header and have the following format:
+
+```
+image, labels
+85f8cb619c66b863.jpg,healthy
+ad8770db05586b59.jpg,healthy
+c7b03e718489f3ca.jpg,healthy
+```
+
+## Dataset
+**train.csv** - the training set metadata.
+
+- `image` - the image ID.
+- `labels` - the target classes, a space delimited list of all diseases found in the image. Unhealthy leaves with too many diseases to classify visually will have the `complex` class, and may also have a subset of the diseases identified.
+
+**sample_submission.csv** - A sample submission file in the correct format.
+
+- `image`
+- `labels`
+
+**train_images** - The training set images.
+
+**test_images** - The test set images. This competition has a hidden test set: only three images are provided here as samples while the remaining 5,000 images will be available to your notebook once it is submitted.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+        input/
+            description.md (101 lines)
+            sample_submission.csv (3728 lines)
+            sample_submission.csv.zip (39.6 kB)
+            test.zip (160 Bytes)
+            test_images.zip (3.2 GB)
+            train.csv (14906 lines)
+            train.csv.zip (171.3 kB)
+            train.zip (162 Bytes)
+            train_images.zip (12.7 GB)
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+            test_images/
+                df98c83c4d383c2d.jpg (802.8 kB)
+                817e97dad0c33ae0.jpg (667.3 kB)
+                ... and 3725 other files
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+            train_images/
+                c19a7aca95e54c35.jpg (1.1 MB)
+                8476bd24bd4b89a5.jpg (985.0 kB)
+                ... and 14903 other files
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+        working/
+            plant-pathology-2021-fgvc8/
+                description.md (101 lines)
+                sample_submission.csv (3728 lines)
+                ... and 7 other files
+                plant-pathology-2021-fgvc8/
+                test_images/
+                    df98c83c4d383c2d.jpg (802.8 kB)
+                    817e97dad0c33ae0.jpg (667.3 kB)
+                    ... and 3725 other files
+                    test_images/
+                train_images/
+                    c19a7aca95e54c35.jpg (1.1 MB)
+                    8476bd24bd4b89a5.jpg (985.0 kB)
+                    ... and 14903 other files
+                    train_images/
+```
+
+-> data/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> data/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> data/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/sample_submission.csv has 3727 rows and 2 columns.
+The columns are: image, labels
+
+-> input/plant-pathology-2021-fgvc8/train.csv has 14905 rows and 2 columns.
+The columns are: image, labels
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.8065927977839356
+
+# 6. Current score
+
+0.35916
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.28656) has done: 'The changes remove the TensorFlow dependency that caused import errors and replace the complex model inference with a simple baseline that assigns the most common disease label from the training data to every test image. This guarantees the notebook runs end‑to‑end, creates a properly formatted `submission.csv`, and avoids the missing EfficientNet saved‑model path. The baseline is score‑neutral but ensures a valid submission file is produced.'
+- What this solution (achieved 0.38173) has done: 'I keep the original frequency‑based approach but replace the single most common label with a small set of the top‑k most frequent disease labels (joined as a space‑delimited list). This still uses only the training metadata, adds virtually no runtime cost, and is expected to raise both recall and F1‑score compared to predicting a single label, moving the result closer to the target metric.'
+- What this solution (achieved 0.30565) has done: 'I replace the fixed top‑K heuristic with a frequency‑threshold based selection of default labels. By including every disease whose overall occurrence proportion exceeds a modest threshold (e.g., 5 %), the baseline predictions become more comprehensive, which should raise recall and improve the mean F1‑Score, moving the result closer to the target without altering the core workflow. If no label meets the threshold we fall back to “healthy” to keep the submission valid.'
+- What this solution (achieved 0.3327) has done: 'I replace the threshold‑based label selection with a simple “top‑K most frequent disease labels” heuristic (K = 5) and use this richer multi‑label default for every test image. Adding a few extra common classes raises recall for many labels while keeping the core workflow unchanged, which should move the mean F1 score closer to the target.'
+- What this solution (achieved 0.30565) has done: 'I modestly expand the default multi‑label prediction by increasing the number of most‑frequent disease classes (TOP_K) from 5 to 15 and always appending the “healthy” label. This keeps the original simple heuristic while adding more common classes, which should raise recall and move the mean F1 score closer to the target without altering the overall workflow.'
+- What this solution (achieved 0.21904) has done: 'We replace the fixed “top‑K for every image” heuristic with a simple probabilistic sampling that respects the overall label distribution and the average number of labels per image observed in the training set. This keeps the same overall workflow (no model training) but should give predictions that better match the true multi‑label frequencies, moving the mean F1 score closer to the target. The changes only add a few lines for computing label probabilities, the average label count, and per‑image sampling, while keeping the CSV output unchanged.'
+- What this solution (achieved 0.28656) has done: 'I replace the random‑sampling of labels with a deterministic selection of the most frequent `n_labels_to_sample` labels (where `n_labels_to_sample` matches the average number of labels per image). Using the top‑frequency labels raises recall and therefore the mean F1‑Score, moving the current 0.219 score closer to the target while keeping the overall workflow unchanged.'
+- What this solution (achieved 0.35308) has done: 'I replace the fixed‑size “top‑N” heuristic with a cumulative‑probability based selection: labels are ordered by global frequency and we keep adding them until the summed probability exceeds a chosen threshold (e.g., 0.85). This adds a richer, more representative set of common diseases (while still guaranteeing at least one label and always including “healthy”), which should raise recall and move the mean F1 score closer to the target without altering the overall workflow.'
+- What this solution (achieved 0.38173) has done: 'I add a lightweight validation split to automatically choose the cumulative probability threshold that gives the best mean F1 on a held‑out part of the training data, while keeping the same global‑frequency‑based default‑label logic. This small tuning step should improve recall/precision balance and move the score toward the target without changing the core workflow.'
+- What this solution (achieved 0.30565) has done: 'I broaden the set of default labels by evaluating a finer grid of cumulative‑probability thresholds (including higher values up to 1.0) and, after picking the best threshold on the validation split, extend the chosen label list with the next most frequent classes until a modest cap (20 labels) is reached. This keeps the original frequency‑based logic but adds a few extra common diseases, which should raise recall and move the mean F1 score closer to the target while preserving the overall workflow.'
+- What this solution (achieved 0.35916) has done: 'I tighten the heuristic that builds the default multi‑label set: after picking the threshold that gives the best validation F1, I limit the number of labels to roughly the average number of labels per image observed in the training data (instead of always expanding to a fixed 20). This reduces excess false positives, improving precision and thus the mean F1, moving the score closer to the target while keeping the overall workflow unchanged.'
+- What this solution (achieved 0.38173) has done: 'I broaden the cumulative‑probability grid to explore lower thresholds and, most importantly, stop trimming the selected label list to the average number of labels per image. Keeping the full set of labels that gave the best validation F1 should raise the score toward the target while preserving the original workflow.'
+- What this solution (achieved 0.35916) has done: 'I keep the same overall workflow but improve the default label set by limiting it to roughly the average number of labels per image (computed from the training data). During the validation‑threshold search I now truncate each candidate label list to this size (while still guaranteeing “healthy” is present). This reduces excess false positives, which should raise the mean F1 and move the score closer to the target, and the script now writes a proper `submission.csv` in the expected format.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+
+output_dir = "./"
+test_dir = "../input/plant-pathology-2021-fgvc8/test_images/"
+
+train_path = "../input/plant-pathology-2021-fgvc8/train.csv"
+train_df = pd.read_csv(train_path)
+
+label_counts = {}
+total_label_occurrences = 0
+for lbls in train_df["labels"].astype(str):
+    for lab in lbls.split():
+        label_counts[lab] = label_counts.get(lab, 0) + 1
+        total_label_occurrences += 1
+
+labels = list(label_counts.keys())
+probs = np.array([label_counts[l] / total_label_occurrences for l in labels])
+
+avg_labels_per_image = (
+    train_df["labels"].astype(str).apply(lambda x: len(x.split())).mean()
+)
+max_labels = max(1, int(round(avg_labels_per_image)))  # at least one label
+
+rng = np.random.default_rng(seed=42)
+
+
+def mean_f1(true_series, pred_labels):
+    """Mean F1 for a constant prediction list `pred_labels`."""
+    f1s = []
+    pred_set = set(pred_labels)
+    for true_str in true_series.astype(str):
+        true_set = set(true_str.split())
+        tp = len(true_set & pred_set)
+        fp = len(pred_set - true_set)
+        fn = len(true_set - pred_set)
+        if tp + fp + fn == 0:
+            f1 = 1.0
+        else:
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+            f1 = (
+                (2 * precision * recall) / (precision + recall)
+                if (precision + recall) > 0
+                else 0.0
+            )
+        f1s.append(f1)
+    return np.mean(f1s)
+
+
+train_subset = train_df.sample(frac=0.8, random_state=42)
+val_subset = train_df.drop(train_subset.index)
+
+sub_label_counts = {}
+sub_total = 0
+for lbls in train_subset["labels"].astype(str):
+    for lab in lbls.split():
+        sub_label_counts[lab] = sub_label_counts.get(lab, 0) + 1
+        sub_total += 1
+
+sorted_items = sorted(sub_label_counts.items(), key=lambda x: x[1], reverse=True)
+sorted_labels = [lab for lab, _ in sorted_items]
+sorted_probs = np.array([sub_label_counts[lab] / sub_total for lab in sorted_labels])
+cumulative_probs = np.cumsum(sorted_probs)
+
+candidate_thresholds = np.arange(0.10, 1.001, 0.05)  # 0.10, 0.15, ..., 1.00
+best_thr = None
+best_f1 = -1.0
+best_labels = None
+
+for thr in candidate_thresholds:
+    selected_idx = np.where(cumulative_probs <= thr)[0]
+    if len(selected_idx) == 0:
+        selected_idx = np.array([0])
+    cur_labels = [sorted_labels[i] for i in selected_idx]
+
+    if "healthy" not in cur_labels:
+        cur_labels.append("healthy")
+
+    cur_labels = cur_labels[:max_labels]
+
+    cur_f1 = mean_f1(val_subset["labels"], cur_labels)
+    if cur_f1 > best_f1:
+        best_f1 = cur_f1
+        best_thr = thr
+        best_labels = cur_labels
+
+print(f"Best cumulative threshold on validation: {best_thr:.2f} → F1={best_f1:.5f}")
+
+default_labels = best_labels
+if "healthy" not in default_labels:
+    default_labels.append("healthy")
+
+test_images = sorted(
+    [f for f in os.listdir(test_dir) if f.lower().endswith((".jpg", ".png", ".jpeg"))]
+)
+
+
+
+
+## === cell 1
+submission_rows = []
+for img_name in test_images:
+    label_str = " ".join(default_labels)
+    submission_rows.append([img_name, label_str])
+
+submission_df = pd.DataFrame(submission_rows, columns=["image", "labels"])
+
+submission_path = os.path.join(output_dir, "submission.csv")
+submission_df.to_csv(submission_path, index=False)
+
+print(f"Submission file written to {submission_path} with {len(submission_df)} rows.")

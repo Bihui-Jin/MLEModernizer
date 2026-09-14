@@ -1,0 +1,368 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given time series of breaths, predict the airway pressure in the respiratory circuit during the breath, given the time series of control inputs.
+
+The best submissions will take lung attributes compliance and resistance into account.
+
+## Metric
+Mean absolute error between the predicted and actual pressures during the inspiratory phase of each breath. The expiratory phase is not scored.
+
+## Submission Format
+For each `id` in the test set, you must predict a value for the `pressure` variable. The file should contain a header and have the following format:
+
+```
+id,pressure
+1,20
+2,23
+3,24
+etc.
+```
+
+## Dataset
+The ventilator data used in this competition was produced using a modified [open-source ventilator](https://pvp.readthedocs.io/) connected to an [artificial bellows test lung](https://www.ingmarmed.com/product/quicklung/) via a respiratory circuit. The diagram below illustrates the setup, with the two control inputs highlighted in green and the state variable (airway pressure) to predict in blue. The first control input is a continuous variable from 0 to 100 representing the percentage the inspiratory solenoid valve is open to let air into the lung (i.e., 0 is completely closed and no air is let in and 100 is completely open). The second control input is a binary variable representing whether the exploratory valve is open (1) or closed (0) to let air out.
+
+![Ventilator diagram](https://raw.githubusercontent.com/google/deluca-lung/main/assets/2020-10-02%20Ventilator%20diagram.svg)
+
+Each time series represents an approximately 3-second breath. The files are organized such that each row is a time step in a breath and gives the two control signals, the resulting airway pressure, and relevant attributes of the lung, described below.
+
+### Files
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Columns
+- `id` - globally-unique time step identifier across an entire file
+- `breath_id` - globally-unique time step for breaths
+- `R` - lung attribute indicating how restricted the airway is (in cmH2O/L/S). Physically, this is the change in pressure per change in flow (air volume per time). Intuitively, one can imagine blowing up a balloon through a straw. We can change `R` by changing the diameter of the straw, with higher `R` being harder to blow.
+- `C` - lung attribute indicating how compliant the lung is (in mL/cmH2O). Physically, this is the change in volume per change in pressure. Intuitively, one can imagine the same balloon example. We can change `C` by changing the thickness of the balloon’s latex, with higher `C` having thinner latex and easier to blow.
+- `time_step` - the actual time stamp.
+- `u_in` - the control input for the inspiratory solenoid valve. Ranges from 0 to 100.
+- `u_out` - the control input for the exploratory solenoid valve. Either 0 or 1.
+- `pressure` - the airway pressure measured in the respiratory circuit, measured in cmH2O.
+
+# 2. Python version
+
+3.10
+
+# 3. Installed packages
+
+geopandas==0.14.4
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+sklearn-pandas==2.2.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        input/
+            description.md (82 lines)
+            sample_submission.csv (603601 lines)
+            sample_submission.csv.zip (1.3 MB)
+            test.csv (603601 lines)
+            test.csv.zip (8.5 MB)
+            train.csv (5432401 lines)
+            train.csv.zip (93.8 MB)
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+        working/
+            ventilator-pressure-prediction/
+                description.md (82 lines)
+                sample_submission.csv (603601 lines)
+                ... and 5 other files
+                ventilator-pressure-prediction/
+```
+
+-> data/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> data/ventilator-pressure-prediction/test.csv has 603600 rows and 7 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [20, 50, 10]
+R (int64) has 3 unique values: [50, 5, 20]
+breath_id (int64) has range: 2436.00 - 124535.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> data/ventilator-pressure-prediction/train.csv has 5432400 rows and 8 columns.
+Here is some information about the columns:
+C (int64) has 3 unique values: [10, 20, 50]
+R (int64) has 3 unique values: [5, 50, 20]
+breath_id (int64) has range: 1194.00 - 124492.00, 0 nan values
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (float64) has range: 3.52 - 41.48, 0 nan values
+time_step (float64) has range: 0.00 - 2.73, 0 nan values
+u_in (float64) has range: 0.00 - 100.00, 0 nan values
+u_out (int64) has 2 unique values: [0, 1]
+
+-> input/sample_submission.csv has 603600 rows and 2 columns.
+Here is some information about the columns:
+id (int64) has range: 1.00 - 2000.00, 0 nan values
+pressure (int64) has 1 unique values: [0]
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.1518801411887707
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 8.42284) has done: 'The script was failing because it tried to read non‑existent blending files, so no submission CSV was ever created. I removed the faulty blend call and added a simple yet effective baseline: compute the mean pressure for each `(R, C)` pair from the training data, apply it to the test set, map predictions to the nearest observed pressure value, and write a proper `submission.csv`. This fixes the runtime error and ensures a valid Kaggle submission file is generated.'
+- What this solution (achieved 7.54837) has done: 'We replace the simple per‑(R,C) mean baseline with a tiny linear‑regression model built on the main control features (R, C, u_in, u_out, time_step).  The model is fitted closed‑form using NumPy’s least‑squares, then its predictions are snapped to the nearest observed pressure value via the existing `find_nearest`.  This change keeps the overall script structure while substantially lowering the MAE, moving the score toward the target.'
+- What this solution (achieved 6.25752) has done: 'The fix adds richer linear features (one‑hot encoded lung attributes R and C, squared terms and simple interactions) while keeping the original least‑squares regression and nearest‑pressure snapping. These extra features stay within the same linear‑model framework, so the core logic is unchanged, but they give the model far more expressive power, which should lower the MAE and move the score toward the target.'
+- What this solution (achieved 5.5195) has done: 'I keep the existing feature engineering but replace the single global linear regression with a small piece‑wise linear model: for each lung‑attribute pair (R, C) the code fits its own least‑squares coefficients and uses those to predict the test rows of the same pair. This respects the original pipeline while adding expressive power, which should considerably lower the MAE and move the score toward the target.'
+- What this solution (achieved 4.158) has done: 'I replace the piece‑wise linear least‑squares model with a single gradient‑boosting regressor (HistGradientBoostingRegressor) trained on the richer feature set. This keeps the overall pipeline and feature engineering unchanged but provides a much more powerful predictor, which should lower the MAE and move the score toward the target. The rest of the script (feature creation, nearest‑pressure snapping and CSV writing) remains the same.'
+- What this solution (achieved 4.03623) has done: 'I added richer interaction features (e.g., u_in × R, u_in × C, u_out × R, time_step × R, time_step × C) to give the gradient‑boosting model more expressive power, and I tuned the HistGradientBoostingRegressor hyper‑parameters (more estimators, lower learning rate, deeper trees). I also added a quick train/validation split to report a local MAE, which helps confirm that the changes move the score toward the target while keeping the overall pipeline unchanged.'
+- What this solution (achieved 3.99736) has done: 'I keep the overall pipeline and model type unchanged but add a few extra interaction features and remove the unnecessary snapping of predictions to the nearest observed pressure (which inflates MAE). Slightly stronger gradient‑boosting hyper‑parameters are also applied. These modest adjustments should lower the validation MAE and move the score closer to the target while preserving the original logic.'
+- What this solution (achieved 3.90362) has done: 'The changes cache the engineered feature matrix once for the full training set and once for the test set, then reuse these slices for each (R, C) subgroup instead of rebuilding the features repeatedly. This eliminates thousands of duplicate pandas operations while keeping exactly the same feature columns, model hyper‑parameters, and training logic, so predictions remain unchanged but runtime drops dramatically. Additionally, the cells are renumbered to start at 1 as required.'
+- What this solution (achieved 3.89761) has done: 'Implemented three targeted speed‑ups while keeping the exact modeling pipeline unchanged:  
+
+1. **Feature dtype reduction** – all numeric features are created as `float32` instead of the default `float64`, cutting memory bandwidth and speeding up the histogram‑gradient boosting fits.  
+2. **Parallel piece‑wise training** – the nine `(R, C)` models are now trained concurrently using a `ThreadPoolExecutor`, preserving the same hyper‑parameters and model class.  
+3. **Minor memory clean‑up** – after the global model fit we explicitly delete the validation split objects and run garbage collection to free RAM before the heavier piece‑wise fits.
+
+These changes only affect performance‑critical parts and leave the model architecture, loss, feature engineering, and prediction logic identical.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import random
+import gc
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.model_selection import train_test_split
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+
+def set_seed(seed=2021):
+    np.random.seed(seed)
+    random_state = np.random.RandomState(seed)
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    return random_state
+
+
+
+
+## === cell 1
+dtype_dict = {
+    "R": "int8",
+    "C": "int8",
+    "breath_id": "int32",
+    "id": "int16",
+    "time_step": "float32",
+    "u_in": "float32",
+    "u_out": "int8",
+    "pressure": "float32",
+}
+df_train = pd.read_csv(
+    "../input/ventilator-pressure-prediction/train.csv", dtype=dtype_dict
+)
+
+unique_pressures = df_train["pressure"].unique()
+sorted_pressures = np.sort(unique_pressures)
+total_pressures_len = len(sorted_pressures)
+
+
+def find_nearest(prediction):
+    insert_idx = np.searchsorted(sorted_pressures, prediction)
+    if insert_idx == total_pressures_len:
+        return sorted_pressures[-1]
+    elif insert_idx == 0:
+        return sorted_pressures[0]
+    lower_val = sorted_pressures[insert_idx - 1]
+    upper_val = sorted_pressures[insert_idx]
+    return (
+        lower_val
+        if abs(lower_val - prediction) < abs(upper_val - prediction)
+        else upper_val
+    )
+
+
+
+
+## === cell 2
+def make_features(df):
+    """
+    Build an enriched feature set:
+    - original numeric controls
+    - squared terms
+    - simple interactions (including with lung attributes R and C)
+    - one‑hot encode R and C
+    """
+    base = df[["u_in", "u_out", "time_step"]].astype(np.float32).copy()
+    base["u_in_sq"] = base["u_in"] ** 2
+    base["time_step_sq"] = base["time_step"] ** 2
+    base["u_in_time"] = base["u_in"] * base["time_step"]
+    base["u_in_R"] = base["u_in"] * df["R"].astype(np.float32)
+    base["u_in_C"] = base["u_in"] * df["C"].astype(np.float32)
+    base["u_out_R"] = base["u_out"] * df["R"].astype(np.float32)
+    base["time_step_R"] = base["time_step"] * df["R"].astype(np.float32)
+    base["time_step_C"] = base["time_step"] * df["C"].astype(np.float32)
+    base["u_in_u_out"] = base["u_in"] * base["u_out"]
+    base["time_step_u_out"] = base["time_step"] * base["u_out"]
+    base["R_C"] = (df["R"] * df["C"]).astype(np.float32)
+
+    r_dummies = pd.get_dummies(df["R"], prefix="R")
+    c_dummies = pd.get_dummies(df["C"], prefix="C")
+    features = pd.concat([base, r_dummies, c_dummies], axis=1)
+    return features
+
+
+train_features = make_features(df_train)
+
+
+
+
+## === cell 3
+def _fit_piecewise(args):
+    """Helper for parallel training of a single (R, C) model."""
+    R_val, C_val, idx, full_features_np, pressures = args
+    X = full_features_np[idx]
+    y = pressures[idx].astype(np.float64)
+
+    os.environ["OMP_NUM_THREADS"] = "1"
+
+    gbr = HistGradientBoostingRegressor(
+        max_iter=3000,
+        learning_rate=0.01,
+        max_depth=12,
+        random_state=2021,
+        loss="absolute_error",
+    )
+    gbr.fit(X, y)
+    return (R_val, C_val), gbr
+
+
+def train_models_by_pair(train_df, full_features):
+    """
+    Fit a separate HistGradientBoostingRegressor for each (R, C) pair.
+    Uses ThreadPoolExecutor to train the nine models in parallel,
+    preserving the original hyper‑parameters and feature ordering.
+    Returns a dict mapping (R, C) -> fitted model and the column order used.
+    """
+    col_order = full_features.columns
+    models = {}
+
+    full_features_np = full_features.values
+    pressures = train_df["pressure"].values.astype(np.float64)
+
+    tasks = []
+    for (R_val, C_val), group in train_df.groupby(["R", "C"]):
+        idx = group.index.values  # NumPy integer array
+        tasks.append((R_val, C_val, idx, full_features_np, pressures))
+
+    with ThreadPoolExecutor(max_workers=min(9, os.cpu_count())) as executor:
+        futures = {executor.submit(_fit_piecewise, arg): arg for arg in tasks}
+        for future in as_completed(futures):
+            key, model = future.result()
+            models[key] = model
+
+    return models, col_order
+
+
+
+
+## === cell 4
+def make_submission():
+    set_seed(2021)
+
+    piecewise_models, col_order = train_models_by_pair(df_train, train_features)
+
+    test_path = "../input/ventilator-pressure-prediction/test.csv"
+    df_test = pd.read_csv(test_path, dtype=dtype_dict)
+
+    test_features = make_features(df_test)
+
+    test_features_np = test_features.values
+    preds = np.empty(len(df_test), dtype=np.float64)
+
+    for (R_val, C_val), idx in df_test.groupby(["R", "C"]).groups.items():
+        model = piecewise_models[(R_val, C_val)]
+        idx_np = idx.values
+        preds[idx_np] = model.predict(test_features_np[idx_np])
+
+    df_test["pressure"] = preds
+    submission = df_test[["id", "pressure"]]
+    submission.to_csv("submission.csv", index=False)
+    print("Submission file 'submission.csv' created with", len(submission), "rows.")
+
+
+make_submission()

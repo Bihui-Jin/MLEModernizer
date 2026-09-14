@@ -1,0 +1,241 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Given some text, predict the author.
+
+## Metric
+Multi-class logarithmic loss. 
+
+The submitted probabilities for a given sentences are not required to sum to one because they are rescaled prior to being scored (each row is divided by the row sum).
+
+In order to avoid the extremes of the log function, predicted probabilities are replaced with \\(max(min(p,1-10^{-15}),10^{-15})\\).
+
+## Submission Format
+You must submit a csv file with the id, and a probability for each of the three classes. The order of the rows does not matter. The file must have a header and should look like the following:
+
+```
+id,EAP,HPL,MWS
+id07943,0.33,0.33,0.33
+...
+```
+
+## Dataset 
+### File descriptions
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+
+### Data fields
+- **id** - a unique identifier for each sentence
+- **text** - some text written by one of the authors
+- **author** - the author of the sentence (EAP: Edgar Allan Poe, HPL: HP Lovecraft; MWS: Mary Wollstonecraft Shelley)
+
+# 2. Python version
+
+3.6
+
+# 3. Installed packages
+
+gensim==4.4.0
+geopandas==0.14.4
+nltk==3.9.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+sklearn-pandas==2.2.0
+xgboost==2.0.3
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (98 lines)
+            sample_submission.csv (1959 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.csv (1959 lines)
+            test.csv.zip (133.3 kB)
+            train.csv (17622 lines)
+            train.csv.zip (1.2 MB)
+            train.zip (1.2 MB)
+            spooky-author-identification/
+                description.md (98 lines)
+                sample_submission.csv (1959 lines)
+                ... and 6 other files
+                spooky-author-identification/
+        input/
+            description.md (98 lines)
+            sample_submission.csv (1959 lines)
+            sample_submission.csv.zip (7.4 kB)
+            test.csv (1959 lines)
+            test.csv.zip (133.3 kB)
+            train.csv (17622 lines)
+            train.csv.zip (1.2 MB)
+            train.zip (1.2 MB)
+            spooky-author-identification/
+                description.md (98 lines)
+                sample_submission.csv (1959 lines)
+                ... and 6 other files
+                spooky-author-identification/
+        working/
+            spooky-author-identification/
+                description.md (98 lines)
+                sample_submission.csv (1959 lines)
+                ... and 6 other files
+                spooky-author-identification/
+```
+
+-> data/sample_submission.csv has 1958 rows and 4 columns.
+The columns are: id, EAP, HPL, MWS
+
+-> data/spooky-author-identification/sample_submission.csv has 1958 rows and 4 columns.
+The columns are: id, EAP, HPL, MWS
+
+-> data/spooky-author-identification/test.csv has 1958 rows and 2 columns.
+The columns are: id, text
+
+-> data/spooky-author-identification/train.csv has 17621 rows and 3 columns.
+The columns are: id, text, author
+
+-> data/test.csv has 1958 rows and 2 columns.
+The columns are: id, text
+
+-> data/train.csv has 17621 rows and 3 columns.
+The columns are: id, text, author
+
+-> input/sample_submission.csv has 1958 rows and 4 columns.
+The columns are: id, EAP, HPL, MWS
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.61281
+
+# 6. Current score
+
+0.75737
+
+# 7. Whether higher score is better
+
+Lower is better.
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.75737) has done: 'I remove the failing Word2Vec/XGBoost sections and keep the working TF‑IDF + MultinomialNB pipeline. After training the model with a 5‑fold cross‑validation I directly write the predicted probabilities for the test set (using the original test IDs) to **submission.csv** in the required format.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
+import nltk
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import KFold
+from sklearn.naive_bayes import MultinomialNB
+
+nltk.download("stopwords", quiet=True)
+
+alpha_tokenizer = RegexpTokenizer("[A-Za-z]\\w+")
+lemmatizer = WordNetLemmatizer()
+stop = stopwords.words("english")
+
+
+
+## === cell 1
+train = pd.read_csv("../input/train.csv")
+test = pd.read_csv("../input/test.csv")
+test_id = test["id"].values
+
+author_mapping = {"EAP": 0, "HPL": 1, "MWS": 2}
+y_train = train["author"].map(author_mapping).values
+
+
+
+## === cell 2
+train_text = [
+    " ".join(
+        [
+            lemmatizer.lemmatize(w.lower())
+            for w in alpha_tokenizer.tokenize(t)
+            if w.lower() not in stop
+        ]
+    )
+    for t in train["text"].values
+]
+
+test_text = [
+    " ".join(
+        [
+            lemmatizer.lemmatize(w.lower())
+            for w in alpha_tokenizer.tokenize(t)
+            if w.lower() not in stop
+        ]
+    )
+    for t in test["text"].values
+]
+
+
+
+## === cell 3
+vectorizer = TfidfVectorizer(ngram_range=(1, 5), analyzer="char")
+X_all = vectorizer.fit_transform(train_text + test_text)
+X_train = vectorizer.transform(train_text)
+X_test = vectorizer.transform(test_text)
+
+
+
+## === cell 4
+pred_test = np.zeros((test.shape[0], 3))
+pred_train = np.zeros((train.shape[0], 3))
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+for dev_idx, val_idx in kf.split(X_train):
+    X_dev, X_val = X_train[dev_idx], X_train[val_idx]
+    y_dev, y_val = y_train[dev_idx], y_train[val_idx]
+
+    model = MultinomialNB()
+    model.fit(X_dev, y_dev)
+
+    pred_train[val_idx] = model.predict_proba(X_val)
+
+    pred_test += model.predict_proba(X_test)
+
+pred_test /= 5.0  # average over folds
+
+
+
+## === cell 5
+submission = pd.DataFrame(
+    {
+        "id": test_id,
+        "EAP": pred_test[:, 0],
+        "HPL": pred_test[:, 1],
+        "MWS": pred_test[:, 2],
+    }
+)
+
+submission.to_csv("submission.csv", index=False)

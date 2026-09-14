@@ -1,0 +1,439 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Classify each cassava image into four disease categories or a fifth category indicating a healthy leaf.
+
+## Metric
+Categorization accuracy.
+
+## Submission Format
+```
+image_id,label
+1000471002.jpg,4
+1000840542.jpg,4
+etc.
+```
+
+## Dataset
+**[train/test]_images** the image files.
+
+**train.csv**
+
+- `image_id` the image file name.
+
+- `label` the ID code for the disease.
+
+**sample_submission.csv** A properly formatted sample submission, given the disclosed test set content.
+
+- `image_id` the image file name.
+
+- `label` the predicted ID code for the disease.
+
+**[train/test]_tfrecords** the image files in tfrecord format.
+
+**label_num_to_disease_map.json** The mapping between each disease code and the real disease name.
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        input/
+            description.md (124 lines)
+            label_num_to_disease_map.json (1 lines)
+            sample_submission.csv (2677 lines)
+            sample_submission.csv.zip (13.4 kB)
+            test.zip (160 Bytes)
+            test_images.zip (319.5 MB)
+            test_tfrecords.zip (451.9 MB)
+            train.csv (18722 lines)
+            train.csv.zip (100.0 kB)
+            train.zip (162 Bytes)
+            train_images.zip (2.2 GB)
+            train_tfrecords.zip (3.2 GB)
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+            test_images/
+                2574872277.jpg (183.5 kB)
+                1449210447.jpg (100.8 kB)
+                ... and 2674 other files
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+            test_tfrecords/
+                ld_test00-1338.tfrec (225.9 MB)
+                ld_test01-1338.tfrec (226.2 MB)
+            train_images/
+                478676678.jpg (90.6 kB)
+                2315755156.jpg (59.5 kB)
+                ... and 18719 other files
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+            train_tfrecords/
+                ld_train00-1338.tfrec (227.2 MB)
+                ld_train01-1338.tfrec (227.0 MB)
+                ... and 12 other files
+        working/
+            cassava-leaf-disease-classification/
+                description.md (124 lines)
+                label_num_to_disease_map.json (1 lines)
+                ... and 10 other files
+                cassava-leaf-disease-classification/
+                test_images/
+                    2574872277.jpg (183.5 kB)
+                    1449210447.jpg (100.8 kB)
+                    ... and 2674 other files
+                    test_images/
+                test_tfrecords/
+                    ld_test00-1338.tfrec (225.9 MB)
+                    ld_test01-1338.tfrec (226.2 MB)
+                train_images/
+                    478676678.jpg (90.6 kB)
+                    2315755156.jpg (59.5 kB)
+                    ... and 18719 other files
+                    train_images/
+                train_tfrecords/
+                    ld_train00-1338.tfrec (227.2 MB)
+                    ld_train01-1338.tfrec (227.0 MB)
+                    ... and 12 other files
+```
+
+-> data/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/cassava-leaf-disease-classification/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/cassava-leaf-disease-classification/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> data/sample_submission.csv has 2676 rows and 2 columns.
+The columns are: image_id, label
+
+-> data/train.csv has 18721 rows and 2 columns.
+The columns are: image_id, label
+
+-> input/cassava-leaf-disease-classification/label_num_to_disease_map.json has auto-generated json schema:
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "0": {
+      "type": "string"
+    },
+    "1": {
+      "type": "string"
+    },
+    "2": {
+      "type": "string"
+    },
+    "3": {
+      "type": "string"
+    },
+    "4": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4"
+  ]
+}
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.7719854941069809
+
+# 6. Current score
+
+0.61659
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plan
+
+- What this solution (achieved 0.61659) has done: 'I replace the failing TensorFlow workflow with a lightweight scikit‑learn pipeline that loads the images, resizes them to a modest size, applies PCA for dimensionality reduction and trains a linear SVM. This fixes the import errors, creates a valid model, evaluates it on a validation split, and finally writes a properly formatted `submission.csv` file, bringing the solution back to a runnable state while keeping the overall structure of the notebook.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import pandas as pd
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
+from sklearn.svm import LinearSVC
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+
+
+## === cell 1
+data_path = "../input/cassava-leaf-disease-classification/"
+train_csv_path = os.path.join(data_path, "train.csv")
+label_json_path = os.path.join(data_path, "label_num_to_disease_map.json")
+train_images_dir = os.path.join(data_path, "train_images")
+test_images_dir = os.path.join(data_path, "test_images")
+sample_submission_path = os.path.join(data_path, "sample_submission.csv")
+
+
+
+## === cell 2
+train_df = pd.read_csv(train_csv_path)
+train_df["label"] = train_df["label"].astype(str)  # keep as string for consistency
+
+label_map = pd.read_json(label_json_path, orient="index")
+label_names = label_map.values.flatten().tolist()
+
+print("Label names :", label_names)
+
+
+
+## === cell 3
+IMG_SIZE = 64  # small size to keep memory usage low
+
+
+def load_and_preprocess(img_path):
+    img = cv2.imread(img_path)
+    if img is None:
+        img = np.zeros((IMG_SIZE, IMG_SIZE, 3), dtype=np.uint8)
+    else:
+        img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+    img = img.astype(np.float32) / 255.0
+    return img
+
+
+print("Loading training images (this may take a little while)...")
+X = []
+y = []
+for idx, row in train_df.iterrows():
+    img_path = os.path.join(train_images_dir, row["image_id"])
+    img = load_and_preprocess(img_path)
+    X.append(img.flatten())
+    y.append(row["label"])
+X = np.array(X)
+y = np.array(y)
+print("Training data shape:", X.shape)
+
+
+
+## === cell 4
+X_train, X_val, y_train, y_val = train_test_split(
+    X, y, test_size=0.15, random_state=42, stratify=y
+)
+
+
+
+## === cell 5
+pca = PCA(n_components=100, random_state=42, svd_solver="randomized")
+X_train_pca = pca.fit_transform(X_train)
+X_val_pca = pca.transform(X_val)
+
+clf = LinearSVC(random_state=42, max_iter=5000)
+clf.fit(X_train_pca, y_train)
+
+val_pred = clf.predict(X_val_pca)
+val_acc = accuracy_score(y_val, val_pred)
+print(f"Validation accuracy: {val_acc:.4f}")
+
+print("Classification report:")
+print(classification_report(y_val, val_pred, target_names=label_names))
+
+print("Confusion matrix:")
+print(confusion_matrix(y_val, val_pred))
+
+
+
+## === cell 6
+sample_sub = pd.read_csv(sample_submission_path)
+test_ids = sample_sub["image_id"].values
+
+print("Loading test images...")
+X_test = []
+for img_id in test_ids:
+    img_path = os.path.join(test_images_dir, img_id)
+    img = load_and_preprocess(img_path)
+    X_test.append(img.flatten())
+X_test = np.array(X_test)
+
+X_test_pca = pca.transform(X_test)
+test_pred = clf.predict(X_test_pca)
+
+submission = pd.DataFrame(
+    {
+        "image_id": test_ids,
+        "label": test_pred.astype(int),  # ensure integer labels as required
+    }
+)
+submission_path = "submission.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission file written to {submission_path}")
+
+
+
+## === cell 7
+print("First 10 predictions:")
+print(submission.head(10))

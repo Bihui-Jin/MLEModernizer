@@ -1,0 +1,375 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Use binary leaf images and extracted features to identify the species of plant.
+
+## Metric
+Multi-class log loss. 
+
+The submitted probabilities for a given device are not required to sum to one because they are rescaled prior to being scored (each row is divided by the row sum), but they need to be in the range of [0, 1]. In order to avoid the extremes of the log function, predicted probabilities are replaced with \\(max(min(p,1-10^{-15}),10^{-15})\\).
+
+## Submission Format
+You must submit a csv file with the image id, all candidate species names, and a probability for each species. The order of the rows does not matter. The file must have a header and should look like the following:
+
+id,Acer_Capillipes,Acer_Circinatum,Acer_Mono,...
+2,0.1,0.5,0,0.2,...
+5,0,0.3,0,0.4,...
+6,0,0,0,0.7,...
+etc.
+
+## Dataset
+The dataset consists of images of leaf specimens which have been converted to binary black leaves against white backgrounds. 
+
+Three sets of features are also provided per image: a shape contiguous descriptor, an interior texture histogram, and a ﬁne-scale margin histogram. 
+
+For each feature, a 64-attribute vector is given per leaf sample.
+
+### File descriptions
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+- **images/** - the image files (each image is named with its corresponding id)
+
+### Data fields
+- **id** - an anonymous id unique to an image
+- **margin_1, margin_2, margin_3, ..., margin_64** - each of the 64 attribute vectors for the margin feature
+- **shape_1, shape_2, shape_3, ..., shape_64** - each of the 64 attribute vectors for the shape feature
+- **texture_1, texture_2, texture_3, ..., texture_64** - each of the 64 attribute vectors for the texture feature
+
+# 2. Python version
+
+3.6
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (70 lines)
+            images.zip (22.0 MB)
+            sample_submission.csv (100 lines)
+            sample_submission.csv.zip (2.3 kB)
+            test.csv (100 lines)
+            test.csv.zip (39.3 kB)
+            train.csv (892 lines)
+            train.csv.zip (357.1 kB)
+            images/
+                42.jpg (32.6 kB)
+                168.jpg (16.5 kB)
+                ... and 988 other files
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+        input/
+            description.md (70 lines)
+            images.zip (22.0 MB)
+            sample_submission.csv (100 lines)
+            sample_submission.csv.zip (2.3 kB)
+            test.csv (100 lines)
+            test.csv.zip (39.3 kB)
+            train.csv (892 lines)
+            train.csv.zip (357.1 kB)
+            images/
+                42.jpg (32.6 kB)
+                168.jpg (16.5 kB)
+                ... and 988 other files
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+        working/
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+```
+
+-> data/leaf-classification/sample_submission.csv has 99 rows and 100 columns.
+The columns are: id, Acer_Capillipes, Acer_Circinatum, Acer_Mono, Acer_Opalus, Acer_Palmatum, Acer_Pictum, Acer_Platanoids, Acer_Rubrum, Acer_Rufinerve, Acer_Saccharinum, Alnus_Cordata, Alnus_Maximowiczii, Alnus_Rubra, Alnus_Sieboldiana... and 85 more columns
+
+-> data/leaf-classification/test.csv has 99 rows and 193 columns.
+The columns are: id, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13, margin14... and 178 more columns
+
+-> data/leaf-classification/train.csv has 891 rows and 194 columns.
+The columns are: id, species, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13... and 179 more columns
+
+-> data/sample_submission.csv has 99 rows and 100 columns.
+The columns are: id, Acer_Capillipes, Acer_Circinatum, Acer_Mono, Acer_Opalus, Acer_Palmatum, Acer_Pictum, Acer_Platanoids, Acer_Rubrum, Acer_Rufinerve, Acer_Saccharinum, Alnus_Cordata, Alnus_Maximowiczii, Alnus_Rubra, Alnus_Sieboldiana... and 85 more columns
+
+-> data/test.csv has 99 rows and 193 columns.
+The columns are: id, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13, margin14... and 178 more columns
+
+-> data/train.csv has 891 rows and 194 columns.
+The columns are: id, species, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13... and 179 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.01653
+
+# 6. Current score
+
+4.70524
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.45352) has done: 'The script had several import errors, outdated Keras arguments, and was not creating the required submission format. I updated the imports, fixed the train‑test split, used current Keras layer arguments, applied the same scaler to train and test data, generated predictions with `model.predict`, aligned the columns with the sample‑submission file, added the `id` column, and finally wrote a proper `.csv` submission file.'
+- What this solution (achieved 0.05462) has done: 'I fixed the import error by switching to TensorFlow Keras, added a deterministic seed, changed hidden‑layer activations to relu, increased training epochs, and clipped predictions to the allowed probability range. These adjustments resolve the crash and should lower the log‑loss toward the target while preserving the original model structure.'
+- What this solution (achieved 0.00575) has done: 'The changes fix the import error by using the standalone Keras package instead of TensorFlow, set the random seed via keras.utils.set_random_seed, and add a modest extra dense layer plus more training epochs to improve validation performance while keeping the original model structure essentially unchanged. The script now runs end‑to‑end and writes a correctly‑formatted submission_nn_kernel.csv file.'
+- What this solution (achieved 0.0615) has done: 'I removed the problematic imports (`matplotlib`, `seaborn`, and the Keras seed helper) that triggered a protobuf‑related error and replaced them with a simple NumPy/`random` seed setup. The rest of the pipeline (data loading, preprocessing, model definition, training, prediction, and CSV writing) is kept unchanged, preserving the original logic while ensuring the script runs to produce a valid submission file.'
+- What this solution (achieved 0.00575) has done: 'I replace the legacy keras imports with tensorflow.keras (which avoids the protobuf error) and set the TensorFlow random seed for reproducibility. The rest of the pipeline—including scaling, model architecture, training, and CSV creation—remains unchanged, ensuring a valid submission file while preserving the original logic.'
+- What this solution (achieved 0.00575) has done: 'The fix removes the problematic TensorFlow import that caused a protobuf error and replaces the TensorFlow seed setting with Keras’s `set_random_seed`, which works with the standalone Keras package already used later. No other logic is changed, so the model, training, and submission generation remain identical, preserving the very low log‑loss score while ensuring the script runs end‑to‑end and writes a proper CSV file.'
+- What this solution (achieved 0.09433) has done: 'Fix the runtime error caused by the outdated `set_random_seed` call in cell 0 by removing the import and function call, keeping only NumPy/random seed handling. No other logic changes are needed since the current model already achieves a score better than the target. The script now runs end‑to‑end and writes a correctly formatted `submission_nn_kernel.csv` file.'
+- What this solution (achieved 0.15797) has done: 'Implemented fixes to resolve the TensorFlow import error by switching to the standalone Keras API, aligned prediction columns with the label encoder’s class order to ensure correct probability mapping, and increased training epochs modestly to improve model performance. These changes keep the original architecture intact while enabling the script to run end‑to‑end and produce a valid submission CSV.'
+- What this solution (achieved 0.07506) has done: 'The fix replaces the failing `keras` imports with the TensorFlow Keras API (which works with the installed tf_keras package) and sets the TensorFlow random seed for reproducibility. This resolves the import error, lets the model train and predict, and ensures a correctly‑formatted CSV submission is written.'
+- What this solution (achieved 0.07506) has done: 'The plan is to (1) replace the failing TensorFlow import with the compatible Keras imports provided in the environment, (2) set the random seed using Keras’s utility, and (3) ensure the submission columns follow the exact order of the official sample‑submission file so predictions map to the correct species, which lower the log‑loss toward the target while keeping the original model architecture unchanged.'
+- What this solution (achieved 0.1665) has done: 'I fixed the import error by switching to TensorFlow‑Keras and setting the seed with TensorFlow’s random API. I also nudged the model toward a better score by training a few more epochs and normalising the predicted probabilities so each row sums to 1, which matches the competition’s rescaling step. The rest of the pipeline and the submission format remain unchanged.'
+- What this solution (achieved 0.04917) has done: 'I replaced the failing TensorFlow import with the compatible Keras 3 API, using `keras`’s own utilities to set the random seed, and lowered the training epochs to a more reasonable number so the script finishes quickly while still improving the model’s generalisation. These changes fix the runtime error, keep the original architecture, and are expected to bring the validation loss closer to the target score.'
+- What this solution (achieved 4.70524) has done: 'The fix removes the incompatible `set_random_seed` call, adds a proper early‑stopping callback to improve validation loss, and updates the first dense layer to use the current‑standard `"glorot_uniform"` initializer (the old `"uniform"` initializer is deprecated). These minimal changes resolve the runtime error and are expected to lower the log‑loss toward the target while keeping the original model architecture unchanged.'
+
+# 9. Code solution
+
+## === cell 0
+import numpy as np
+import pandas as pd
+import random
+import os
+
+seed = 42
+np.random.seed(seed)
+random.seed(seed)
+os.environ["PYTHONHASHSEED"] = str(seed)
+
+
+
+
+## === cell 1
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+
+
+
+
+## === cell 2
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.callbacks import EarlyStopping
+
+
+
+
+
+## --- ERROR in cell 2, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 3
+train_path = "../input/train.csv"
+data = pd.read_csv(train_path)
+ids = data.pop("id")  # keep ids if needed later (not used for training)
+
+
+
+
+## === cell 4
+y_raw = data.pop("species")
+label_encoder = LabelEncoder()
+y_int = label_encoder.fit_transform(y_raw)
+num_classes = len(label_encoder.classes_)
+
+
+
+
+## === cell 5
+scaler = StandardScaler()
+X = scaler.fit_transform(data.values)
+
+
+
+
+## === cell 6
+y_cat = to_categorical(y_int, num_classes=num_classes)
+
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2906371123.py in <cell line: 0>()
+----> 1 y_cat = to_categorical(y_int, num_classes=num_classes)
+      2 
+      3 
+
+NameError: name 'to_categorical' is not defined
+
+## === cell 7
+model = Sequential()
+model.add(
+    Dense(
+        128,
+        input_shape=(X.shape[1],),
+        kernel_initializer="glorot_uniform",
+        activation="relu",
+    )
+)
+model.add(Dropout(0.3))
+model.add(Dense(128, kernel_initializer="glorot_uniform", activation="relu"))
+model.add(Dropout(0.3))
+model.add(Dense(64, kernel_initializer="glorot_uniform", activation="relu"))
+model.add(Dropout(0.3))
+model.add(Dense(num_classes, activation="softmax"))
+
+
+
+
+## === cell 8
+model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
+
+
+
+
+## === cell 9
+early_stop = EarlyStopping(
+    monitor="val_loss", patience=20, restore_best_weights=True, verbose=0
+)
+
+history = model.fit(
+    X,
+    y_cat,
+    batch_size=32,
+    epochs=300,
+    verbose=0,
+    validation_split=0.1,
+    callbacks=[early_stop],
+)
+
+
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/3516140027.py in <cell line: 0>()
+      5 history = model.fit(
+      6     X,
+----> 7     y_cat,
+      8     batch_size=32,
+      9     epochs=300,
+
+NameError: name 'y_cat' is not defined
+
+## === cell 10
+best_val_acc = max(history.history["val_accuracy"])
+print(f"Best validation accuracy: {best_val_acc:.4f}")
+
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/1373902889.py in <cell line: 0>()
+----> 1 best_val_acc = max(history.history["val_accuracy"])
+      2 print(f"Best validation accuracy: {best_val_acc:.4f}")
+      3 
+      4 
+
+NameError: name 'history' is not defined
+
+## === cell 11
+test_path = "../input/test.csv"
+test_df = pd.read_csv(test_path)
+test_ids = test_df.pop("id")
+X_test = scaler.transform(test_df.values)
+
+
+
+
+## === cell 12
+y_pred = model.predict(X_test, verbose=0)
+y_pred = np.clip(y_pred, 1e-15, 1 - 1e-15)
+y_pred = y_pred / y_pred.sum(axis=1, keepdims=True)
+
+
+
+
+## === cell 13
+sample_sub_path = "../input/sample_submission.csv"
+sample_sub = pd.read_csv(sample_sub_path)
+expected_cols = list(
+    sample_sub.columns
+)  # includes 'id' then species columns in correct order
+
+pred_df = pd.DataFrame(y_pred, columns=label_encoder.classes_)
+pred_df.insert(0, "id", test_ids.values)
+pred_df = pred_df.reindex(columns=expected_cols, fill_value=0)
+
+
+
+
+## === cell 14
+submission_path = "submission_nn_kernel.csv"
+pred_df.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")

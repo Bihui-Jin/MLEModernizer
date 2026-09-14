@@ -1,0 +1,504 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Use binary leaf images and extracted features to identify the species of plant.
+
+## Metric
+Multi-class log loss. 
+
+The submitted probabilities for a given device are not required to sum to one because they are rescaled prior to being scored (each row is divided by the row sum), but they need to be in the range of [0, 1]. In order to avoid the extremes of the log function, predicted probabilities are replaced with \\(max(min(p,1-10^{-15}),10^{-15})\\).
+
+## Submission Format
+You must submit a csv file with the image id, all candidate species names, and a probability for each species. The order of the rows does not matter. The file must have a header and should look like the following:
+
+id,Acer_Capillipes,Acer_Circinatum,Acer_Mono,...
+2,0.1,0.5,0,0.2,...
+5,0,0.3,0,0.4,...
+6,0,0,0,0.7,...
+etc.
+
+## Dataset
+The dataset consists of images of leaf specimens which have been converted to binary black leaves against white backgrounds. 
+
+Three sets of features are also provided per image: a shape contiguous descriptor, an interior texture histogram, and a ﬁne-scale margin histogram. 
+
+For each feature, a 64-attribute vector is given per leaf sample.
+
+### File descriptions
+- **train.csv** - the training set
+- **test.csv** - the test set
+- **sample_submission.csv** - a sample submission file in the correct format
+- **images/** - the image files (each image is named with its corresponding id)
+
+### Data fields
+- **id** - an anonymous id unique to an image
+- **margin_1, margin_2, margin_3, ..., margin_64** - each of the 64 attribute vectors for the margin feature
+- **shape_1, shape_2, shape_3, ..., shape_64** - each of the 64 attribute vectors for the shape feature
+- **texture_1, texture_2, texture_3, ..., texture_64** - each of the 64 attribute vectors for the texture feature
+
+# 2. Python version
+
+3.5
+
+# 3. Installed packages
+
+geopandas==0.14.4
+keras==3.8.0
+keras-core==0.1.7
+keras-cv==0.9.0
+keras-hub==0.18.1
+keras-nlp==0.18.1
+keras-tuner==1.4.7
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-learn==1.2.2
+scikit-learn-intelex==2025.9.0
+seaborn==0.12.2
+sklearn-pandas==2.2.0
+tf_keras==2.18.0
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (70 lines)
+            images.zip (22.0 MB)
+            sample_submission.csv (100 lines)
+            sample_submission.csv.zip (2.3 kB)
+            test.csv (100 lines)
+            test.csv.zip (39.3 kB)
+            train.csv (892 lines)
+            train.csv.zip (357.1 kB)
+            images/
+                42.jpg (32.6 kB)
+                168.jpg (16.5 kB)
+                ... and 988 other files
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+        input/
+            description.md (70 lines)
+            images.zip (22.0 MB)
+            sample_submission.csv (100 lines)
+            sample_submission.csv.zip (2.3 kB)
+            test.csv (100 lines)
+            test.csv.zip (39.3 kB)
+            train.csv (892 lines)
+            train.csv.zip (357.1 kB)
+            images/
+                42.jpg (32.6 kB)
+                168.jpg (16.5 kB)
+                ... and 988 other files
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+        working/
+            leaf-classification/
+                description.md (70 lines)
+                images.zip (22.0 MB)
+                ... and 6 other files
+                images/
+                    42.jpg (32.6 kB)
+                    168.jpg (16.5 kB)
+                    ... and 988 other files
+                leaf-classification/
+```
+
+-> data/leaf-classification/sample_submission.csv has 99 rows and 100 columns.
+The columns are: id, Acer_Capillipes, Acer_Circinatum, Acer_Mono, Acer_Opalus, Acer_Palmatum, Acer_Pictum, Acer_Platanoids, Acer_Rubrum, Acer_Rufinerve, Acer_Saccharinum, Alnus_Cordata, Alnus_Maximowiczii, Alnus_Rubra, Alnus_Sieboldiana... and 85 more columns
+
+-> data/leaf-classification/test.csv has 99 rows and 193 columns.
+The columns are: id, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13, margin14... and 178 more columns
+
+-> data/leaf-classification/train.csv has 891 rows and 194 columns.
+The columns are: id, species, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13... and 179 more columns
+
+-> data/sample_submission.csv has 99 rows and 100 columns.
+The columns are: id, Acer_Capillipes, Acer_Circinatum, Acer_Mono, Acer_Opalus, Acer_Palmatum, Acer_Pictum, Acer_Platanoids, Acer_Rubrum, Acer_Rufinerve, Acer_Saccharinum, Alnus_Cordata, Alnus_Maximowiczii, Alnus_Rubra, Alnus_Sieboldiana... and 85 more columns
+
+-> data/test.csv has 99 rows and 193 columns.
+The columns are: id, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13, margin14... and 178 more columns
+
+-> data/train.csv has 891 rows and 194 columns.
+The columns are: id, species, margin1, margin2, margin3, margin4, margin5, margin6, margin7, margin8, margin9, margin10, margin11, margin12, margin13... and 179 more columns
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.01993
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Lower is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.70978) has done: 'I fixed the import errors, updated deprecated Keras arguments, ensured the label encoding and one‑hot conversion work, replaced `predict_proba` with `predict`, and built the submission DataFrame using the column order from the provided sample submission. The script now runs end‑to‑end and writes a correctly formatted `submission_nn_kernel.csv` file.'
+- What this solution (achieved 0.12029) has done: 'The fix switches to TensorFlow’s Keras implementation to avoid the protobuf import error, fits a single StandardScaler on the training data and reuses it for the test set (preventing data‑leakage), and modestly strengthens the model by using the Adam optimizer and more epochs. These changes resolve the runtime crash and improve classification quality, moving the log‑loss toward the target while keeping the original workflow unchanged.'
+- What this solution (achieved 0.10565) has done: 'The fix adds a small compatibility patch for protobuf before importing TensorFlow Keras (which eliminates the `MessageFactory` error), makes the data‑file paths robust by trying both the typical Kaggle input directory and a local relative path, and otherwise keeps the original model, training, and submission logic unchanged.'
+- What this solution (achieved 0.07615) has done: 'I add a dropout layer and switch the second hidden activation to relu for better learning, increase epochs modestly, and use a ModelCheckpoint callback to keep the weights with the lowest validation loss. The predictions are then clipped to the required [1e‑15, 1‑1e‑15] range before building the submission, which should lower the log‑loss toward the target while keeping the original architecture and workflow intact.'
+- What this solution (achieved 0.08613) has done: 'I fix the stratified split error by enlarging the validation size so it can contain at least one sample per class (test_size = 0.2). This restores the `X_train`, `X_val`, `y_train_cat`, and `y_val_cat` variables, allowing the model to train, the checkpoint file to be created, and the subsequent cells to run without NameError. No other logic changes are made, preserving the original architecture and training flow while enabling a valid submission CSV to be written.'
+- What this solution (achieved 0.05776) has done: 'I add class‑weighting to balance the species distribution, which often lowers multi‑class log‑loss.  I compute balanced weights from the training labels and pass them to `model.fit`.  This is a minimal change that keeps the model architecture and training loop unchanged while nudging the validation loss closer to the target.'
+- What this solution (achieved 0.06069) has done: 'I keep the overall pipeline unchanged but make three small, targeted tweaks that are likely to lower the log‑loss toward the target: (1) set a deterministic seed for reproducibility, (2) increase the network capacity slightly (256 → 128 units) to capture more patterns, and (3) add a ReduceLROnPlateau callback so the optimizer can fine‑tune the learning rate after the loss plateaus. These changes preserve the core architecture and training loop while giving the model a better chance to achieve a lower validation loss and thus a lower competition score.'
+- What this solution (achieved 0.03203) has done: 'I strengthen the neural network slightly and give the optimizer a smaller learning rate so it can fine‑tune better. The model now uses a wider first layer (512 units), a second layer (256 units) and an added third hidden layer (128 units) with a reduced dropout (0.2). The Adam optimizer is created with `learning_rate=5e-4`. All other steps—including scaling, class‑weighting, early stopping, and submission construction—remain unchanged, preserving the core workflow while nudging the log‑loss closer to the target.'
+- What this solution (achieved 0.10009) has done: 'We slightly boost the network capacity (add a small hidden layer), increase dropout to 0.3 for better regularization, lower the learning rate, and give early stopping more patience while restoring the best weights. These minimal tweaks should help the model converge to a lower validation loss and move the log‑loss closer to the target without altering the overall workflow.'
+- What this solution (achieved 0.22051) has done: 'I slightly reduce dropout (to lessen under‑fitting), add a small label‑smoothing term to the categorical‑crossentropy loss (which often improves log‑loss), and give early‑stopping a bit more patience so the model can train longer if beneficial. These minimal tweaks keep the original network layout while nudging validation loss lower, moving the score toward the target.'
+- What this solution (achieved 0.03173) has done: 'I modestly adjust the network capacity (larger hidden layers), lower dropout a little, remove label‑smoothing, and raise the learning rate so the model can fit the data more effectively while keeping the overall workflow unchanged. These tweaks are expected to lower the validation log‑loss and move the score toward the target without altering the core pipeline.'
+- What this solution (achieved 0.07206) has done: 'I lower the optimizer learning rate (to 5e‑4) so the model can fine‑tune more gently, and I renormalize the predicted probabilities to sum to 1 per row before the final clipping. These tiny adjustments keep the original architecture and training flow unchanged while encouraging a modest reduction in the log‑loss, moving the score closer to the target.'
+- What this solution (achieved 0.20114) has done: 'I add a small amount of label‑smoothing to the categorical‑crossentropy loss and slightly deepen the network with an extra hidden layer and a modest dropout after the 128‑unit layer. These minimal tweaks preserve the overall workflow while improving regularisation and calibration, which should lower the multi‑class log‑loss and move the score closer to the target.'
+
+# 9. Code solution
+
+## === cell 0
+import sys
+
+try:
+    from google.protobuf import message_factory
+
+    if not hasattr(message_factory.MessageFactory, "GetPrototype"):
+
+        def _GetPrototype(self, descriptor):
+            return self.GetMessageClass(descriptor)
+
+        message_factory.MessageFactory.GetPrototype = _GetPrototype
+except Exception:
+    pass
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.utils.class_weight import compute_class_weight
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+
+np.random.seed(42)
+tf.random.set_seed(42)
+
+
+
+
+## === cell 1
+plt.rcParams["figure.figsize"] = (10, 10)
+
+
+
+
+## === cell 2
+import os
+
+
+def read_csv_safe(relative_path):
+    possible_paths = [
+        os.path.join("/kaggle/input/leaf-classification", relative_path),
+        os.path.join("../input", relative_path),
+        relative_path,
+    ]
+    for p in possible_paths:
+        if os.path.exists(p):
+            return pd.read_csv(p)
+    raise FileNotFoundError(f"Unable to locate {relative_path}")
+
+
+train_path = "train.csv"
+data = read_csv_safe(train_path)
+ids = data.pop("id")  # store ids, not used for training
+
+
+
+
+## === cell 3
+y_raw = data.pop("species")
+le = LabelEncoder()
+y_int = le.fit_transform(y_raw)  # integer encoded labels
+y_cat = to_categorical(y_int)  # one‑hot encoding
+
+class_weights_array = compute_class_weight(
+    class_weight="balanced", classes=np.unique(y_int), y=y_int
+)
+class_weight_dict = {i: w for i, w in enumerate(class_weights_array)}
+
+scaler = StandardScaler().fit(data.values)
+X = scaler.transform(data.values)
+
+X_train, X_val, y_train_cat, y_val_cat = train_test_split(
+    X, y_cat, test_size=0.1, random_state=42, stratify=y_int
+)
+
+
+
+
+## --- ERROR in cell 3, traceback:
+---------------------------------------------------------------------------
+ValueError                                Traceback (most recent call last)
+/tmp/ipykernel_55/2731297545.py in <cell line: 0>()
+     13 
+     14 # Use a smaller validation split to give the model more training data
+---> 15 X_train, X_val, y_train_cat, y_val_cat = train_test_split(
+     16     X, y_cat, test_size=0.1, random_state=42, stratify=y_int
+     17 )
+
+/usr/local/lib/python3.11/dist-packages/sklearn/model_selection/_split.py in train_test_split(test_size, train_size, random_state, shuffle, stratify, *arrays)
+   2581         cv = CVClass(test_size=n_test, train_size=n_train, random_state=random_state)
+   2582 
+-> 2583         train, test = next(cv.split(X=arrays[0], y=stratify))
+   2584 
+   2585     return list(
+
+/usr/local/lib/python3.11/dist-packages/sklearn/model_selection/_split.py in split(self, X, y, groups)
+   1687         """
+   1688         X, y, groups = indexable(X, y, groups)
+-> 1689         for train, test in self._iter_indices(X, y, groups):
+   1690             yield train, test
+   1691 
+
+/usr/local/lib/python3.11/dist-packages/sklearn/model_selection/_split.py in _iter_indices(self, X, y, groups)
+   2089             )
+   2090         if n_test < n_classes:
+-> 2091             raise ValueError(
+   2092                 "The test_size = %d should be greater or "
+   2093                 "equal to the number of classes = %d" % (n_test, n_classes)
+
+ValueError: The test_size = 90 should be greater or equal to the number of classes = 99
+
+## === cell 4
+num_features = X.shape[1]  # should be 192
+num_classes = y_cat.shape[1]  # should be 99
+
+model = Sequential()
+model.add(
+    Dense(
+        1024,
+        input_dim=num_features,
+        kernel_initializer="glorot_uniform",
+        activation="relu",
+    )
+)
+model.add(Dropout(0.3))  # increased dropout for better regularisation
+model.add(Dense(512, kernel_initializer="glorot_normal", activation="relu"))
+model.add(Dense(256, activation="relu"))
+model.add(Dense(128, activation="relu"))
+model.add(Dropout(0.3))  # increased dropout
+model.add(Dense(64, activation="relu"))
+model.add(Dense(num_classes, activation="softmax"))
+
+
+
+
+## === cell 5
+loss_fn = tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.0)
+model.compile(
+    loss=loss_fn,
+    optimizer=Adam(learning_rate=1e-4),
+    metrics=["accuracy"],
+)
+
+
+
+
+## === cell 6
+checkpoint_cb = tf.keras.callbacks.ModelCheckpoint(
+    "best_model.h5", save_best_only=True, monitor="val_loss", mode="min"
+)
+
+early_stop_cb = EarlyStopping(
+    monitor="val_loss", patience=30, restore_best_weights=True
+)
+
+reduce_lr_cb = ReduceLROnPlateau(
+    monitor="val_loss", factor=0.5, patience=8, min_lr=1e-6, verbose=0
+)
+
+history = model.fit(
+    X_train,
+    y_train_cat,
+    batch_size=32,
+    epochs=2000,  # allow more epochs; early stopping will halt when appropriate
+    verbose=0,
+    validation_data=(X_val, y_val_cat),
+    callbacks=[checkpoint_cb, early_stop_cb, reduce_lr_cb],
+    class_weight=class_weight_dict,
+)
+
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2048970127.py in <cell line: 0>()
+     12 
+     13 history = model.fit(
+---> 14     X_train,
+     15     y_train_cat,
+     16     batch_size=32,
+
+NameError: name 'X_train' is not defined
+
+## === cell 7
+print("Best val accuracy:", max(history.history["val_accuracy"]))
+
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/2502661833.py in <cell line: 0>()
+----> 1 print("Best val accuracy:", max(history.history["val_accuracy"]))
+      2 
+      3 
+
+NameError: name 'history' is not defined
+
+## === cell 8
+test_path = "test.csv"
+test_df = read_csv_safe(test_path)
+test_ids = test_df.pop("id")
+X_test = scaler.transform(test_df.values)
+
+
+
+
+## === cell 9
+model.load_weights("best_model.h5")  # use the best validation weights
+y_pred_probs = model.predict(X_test, verbose=0)  # shape (n_test, n_classes)
+
+y_pred_probs = np.clip(y_pred_probs, 1e-15, 1 - 1e-15)
+
+
+
+
+## --- ERROR in cell 9, traceback:
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+/tmp/ipykernel_55/4021301269.py in <cell line: 0>()
+----> 1 model.load_weights("best_model.h5")  # use the best validation weights
+      2 y_pred_probs = model.predict(X_test, verbose=0)  # shape (n_test, n_classes)
+      3 
+      4 # The softmax already sums to 1 per row; no extra normalization is needed.
+      5 y_pred_probs = np.clip(y_pred_probs, 1e-15, 1 - 1e-15)
+
+/usr/local/lib/python3.11/dist-packages/keras/src/utils/traceback_utils.py in error_handler(*args, **kwargs)
+    120             # To get the full stack trace, call:
+    121             # `keras.config.disable_traceback_filtering()`
+--> 122             raise e.with_traceback(filtered_tb) from None
+    123         finally:
+    124             del filtered_tb
+
+/usr/local/lib/python3.11/dist-packages/h5py/_hl/files.py in __init__(self, name, mode, driver, libver, userblock_size, swmr, rdcc_nslots, rdcc_nbytes, rdcc_w0, track_order, fs_strategy, fs_persist, fs_threshold, fs_page_size, page_buf_size, min_meta_keep, min_raw_keep, locking, alignment_threshold, alignment_interval, meta_block_size, **kwds)
+    562                                  fs_persist=fs_persist, fs_threshold=fs_threshold,
+    563                                  fs_page_size=fs_page_size)
+--> 564                 fid = make_fid(name, mode, userblock_size, fapl, fcpl, swmr=swmr)
+    565 
+    566             if isinstance(libver, tuple):
+
+/usr/local/lib/python3.11/dist-packages/h5py/_hl/files.py in make_fid(name, mode, userblock_size, fapl, fcpl, swmr)
+    236         if swmr and swmr_support:
+    237             flags |= h5f.ACC_SWMR_READ
+--> 238         fid = h5f.open(name, flags, fapl=fapl)
+    239     elif mode == 'r+':
+    240         fid = h5f.open(name, h5f.ACC_RDWR, fapl=fapl)
+
+h5py/_objects.pyx in h5py._objects.with_phil.wrapper()
+
+h5py/_objects.pyx in h5py._objects.with_phil.wrapper()
+
+h5py/h5f.pyx in h5py.h5f.open()
+
+FileNotFoundError: [Errno 2] Unable to synchronously open file (unable to open file: name = 'best_model.h5', errno = 2, error message = 'No such file or directory', flags = 0, o_flags = 0)
+
+## === cell 10
+sample_sub_path = "sample_submission.csv"
+sample_sub = read_csv_safe(sample_sub_path)
+
+class_cols = sample_sub.columns.tolist()[1:]  # all species columns
+
+class_to_idx = {cls: idx for idx, cls in enumerate(le.classes_)}
+ordered_preds = np.zeros((y_pred_probs.shape[0], len(class_cols)))
+
+for col_idx, cls_name in enumerate(class_cols):
+    if cls_name in class_to_idx:
+        ordered_preds[:, col_idx] = y_pred_probs[:, class_to_idx[cls_name]]
+    else:
+        ordered_preds[:, col_idx] = 1e-15  # fallback for missing classes
+
+submission = pd.DataFrame(ordered_preds, columns=class_cols)
+submission.insert(0, "id", test_ids.values)
+
+
+
+
+## --- ERROR in cell 10, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/4228678733.py in <cell line: 0>()
+      5 
+      6 class_to_idx = {cls: idx for idx, cls in enumerate(le.classes_)}
+----> 7 ordered_preds = np.zeros((y_pred_probs.shape[0], len(class_cols)))
+      8 
+      9 for col_idx, cls_name in enumerate(class_cols):
+
+NameError: name 'y_pred_probs' is not defined
+
+## === cell 11
+submission_path = "submission_nn_kernel.csv"
+submission.to_csv(submission_path, index=False)
+print(f"Submission written to {submission_path}")
+
+## --- ERROR in cell 11, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_55/424627302.py in <cell line: 0>()
+      1 submission_path = "submission_nn_kernel.csv"
+----> 2 submission.to_csv(submission_path, index=False)
+      3 print(f"Submission written to {submission_path}")
+
+NameError: name 'submission' is not defined

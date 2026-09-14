@@ -1,0 +1,489 @@
+# Goal
+
+I want you to improve my Kaggle competition solution to increase the score toward a target. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Segment regions of salt in seismic images.
+
+## Metric
+Mean average precision at different intersection over union (IoU) thresholds. The IoU of a proposed set of object pixels and a set of true object pixels is calculated as:
+
+$$\text{IoU}(A, B)=\frac{A \cap B}{A \cup B}$$
+
+The metric sweeps over a range of IoU thresholds, at each point calculating an average precision value. The threshold values range from 0.5 to 0.95 with a step size of 0.05: `(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95)`. In other words, at a threshold of 0.5, a predicted object is considered a "hit" if its intersection over union with a ground truth object is greater than 0.5.
+
+At each threshold value 𝑡t, a precision value is calculated based on the number of true positives (TP), false negatives (FN), and false positives (FP) resulting from comparing the predicted object to all ground truth objects:
+
+$$\frac{T P(t)}{T P(t)+F P(t)+F N(t)}$$
+
+A true positive is counted when a single predicted object matches a ground truth object with an IoU above the threshold. A false positive indicates a predicted object had no associated ground truth object. A false negative indicates a ground truth object had no associated predicted object. The average precision of a single image is then calculated as the mean of the above precision values at each IoU threshold:
+
+$$\frac{1}{\mid \text { thresholds } \mid} \sum_t \frac{T P(t)}{T P(t)+F P(t)+F N(t)}$$
+
+## Submission Format
+Use run-length encoding on the pixel values. Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
+
+The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The pixels are one-indexed\
+and numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+
+The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. It also checks that no two predicted masks for the same image are overlapping.
+
+The file should contain a header and have the following format. Each row in your submission represents a single predicted salt segmentation for the given image.
+
+```
+id,rle_mask
+3e06571ef3,1 1
+a51b08d882,1 1
+c32590b06f,1 1
+etc.
+```
+
+## Dataset
+The data is a set of images chosen at various locations chosen at random in the subsurface. The images are 101 x 101 pixels and each pixel is classified as either salt or sediment. In addition to the seismic images, the depth of the imaged location is provided for each image.
+
+# 2. Python version
+
+3.7
+
+# 3. Installed packages
+
+geopandas==0.14.4
+matplotlib==3.7.2
+matplotlib-inline==0.1.7
+matplotlib-venn==1.1.2
+numpy==1.26.4
+pandas==2.2.3
+pandas-datareader==0.10.0
+pandas-gbq==0.29.2
+pandas-profiling==3.6.6
+pandas-stubs==2.2.2.240909
+pandasql==0.7.3
+scikit-image==0.25.2
+sklearn-pandas==2.2.0
+tqdm==4.67.1
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            depths.csv (3001 lines)
+            depths.csv.zip (25.0 kB)
+            description.md (83 lines)
+            sample_submission.csv (1001 lines)
+            sample_submission.csv.zip (6.8 kB)
+            test.zip (9.8 MB)
+            train.csv (3001 lines)
+            train.csv.zip (293.9 kB)
+            train.zip (30.9 MB)
+            test/
+                images/
+                    a05ae39815.png (10.5 kB)
+                    9bf8a38b92.png (10.7 kB)
+                    ... and 998 other files
+                test/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+            train/
+                images/
+                    66cf41c563.png (7.7 kB)
+                    429bf7c665.png (8.2 kB)
+                    ... and 2998 other files
+                masks/
+                    6eeeda7f4a.png (230 Bytes)
+                    5d600057f5.png (230 Bytes)
+                    ... and 2998 other files
+                train/
+        input/
+            depths.csv (3001 lines)
+            depths.csv.zip (25.0 kB)
+            description.md (83 lines)
+            sample_submission.csv (1001 lines)
+            sample_submission.csv.zip (6.8 kB)
+            test.zip (9.8 MB)
+            train.csv (3001 lines)
+            train.csv.zip (293.9 kB)
+            train.zip (30.9 MB)
+            test/
+                images/
+                    a05ae39815.png (10.5 kB)
+                    9bf8a38b92.png (10.7 kB)
+                    ... and 998 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+            train/
+                images/
+                    66cf41c563.png (7.7 kB)
+                    429bf7c665.png (8.2 kB)
+                    ... and 2998 other files
+                masks/
+                    6eeeda7f4a.png (230 Bytes)
+                    5d600057f5.png (230 Bytes)
+                    ... and 2998 other files
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+        working/
+            tgs-salt-identification-challenge/
+                depths.csv (3001 lines)
+                depths.csv.zip (25.0 kB)
+                ... and 7 other files
+                test/
+                    images/
+                        a05ae39815.png (10.5 kB)
+                        9bf8a38b92.png (10.7 kB)
+                        ... and 998 other files
+                    test/
+                tgs-salt-identification-challenge/
+                train/
+                    images/
+                        66cf41c563.png (7.7 kB)
+                        429bf7c665.png (8.2 kB)
+                        ... and 2998 other files
+                    masks/
+                        6eeeda7f4a.png (230 Bytes)
+                        5d600057f5.png (230 Bytes)
+                        ... and 2998 other files
+                    train/
+```
+
+-> data/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> data/sample_submission.csv has 1000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/tgs-salt-identification-challenge/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> data/tgs-salt-identification-challenge/sample_submission.csv has 1000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/tgs-salt-identification-challenge/train.csv has 3000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> data/train.csv has 3000 rows and 2 columns.
+The columns are: id, rle_mask
+
+-> input/depths.csv has 3000 rows and 2 columns.
+The columns are: id, z
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.808913890090869
+
+# 6. Current score
+
+0.1054
+
+# 7. Whether higher score is better
+
+Higher is better.
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.0) has done: 'The fix removes the unavailable pydensecrf dependency, adds missing imports, safely loads the sample submission, implements a fallback crf that simply returns the original mask, corrects NaN handling, and ensures the script writes a proper .csv submission file.'
+- What this solution (achieved 0.0) has done: 'The changes fix the file paths, add a simple Otsu‑based mask generator for rows where the original submission provides no mask, and keep the optional CRF refinement unchanged. This ensures a valid CSV with predictions for every test image, moving the score away from 0.0 toward the target while preserving the original workflow.'
+- What this solution (achieved 0.0) has done: 'I invert the Otsu mask (salt is the darker region) and treat the placeholder “1 1” masks in the sample submission as missing, generating a proper Otsu mask for those rows. This keeps the original workflow while producing non‑trivial predictions, moving the score toward the target.'
+- What this solution (achieved 0.0) has done: 'I added a small path‑search routine to reliably locate the test image folder (mirroring how the sample submission is found) and adjusted the cell numbering to start at 1 as required. This ensures the script actually reads each test image, generates a mask (via Otsu or the placeholder decode), applies the optional CRF, and writes a proper `submission.csv`. With real masks produced for all rows the score move away from 0.0 toward the target.'
+- What this solution (achieved 0.0313) has done: 'The fix updates **`simple_mask`** to correctly handle PNG images that contain an alpha channel (shape 101×101×4). It trims the image to the first three channels before converting to grayscale, preventing the `ValueError` from `rgb2gray`. The rest of the pipeline remains unchanged, so the script now runs end‑to‑end and writes a valid `submission.csv` with meaningful masks, moving the score away from 0.0 toward the target.'
+- What this solution (achieved 0.0263) has done: 'I shift the cell numbering so it starts at 1 as required and improve the mask generation by smoothing each image with a Gaussian filter before applying Otsu thresholding; this modest change often yields cleaner binary masks and moves the validation score closer to the target while preserving the overall pipeline. The only code alteration is in the `simple_mask` function and the added import of `gaussian`.'
+- What this solution (achieved 0.0) has done: 'I renumber the cells so they start at 1 (as required) and keep the same execution order. The only functional change is to improve the Otsu‑based mask generation: after thresholding I now apply a small binary opening and fill tiny holes, which yields cleaner masks and raises the mean‑average‑precision toward the target score while preserving the original workflow and all other logic. Additional imports for the morphology operations are added accordingly.'
+- What this solution (achieved 0.0263) has done: 'The fix updates the morphology call in `simple_mask` to use the current `binary_opening` signature (`footprint=` instead of the removed `selem=` argument). This resolves the TypeError that stopped the pipeline, allowing masks to be generated, refined (or left unchanged when CRF is unavailable), and finally written to a valid `submission.csv`. The change is minimal and keeps the original workflow intact while enabling a non‑zero score.'
+- What this solution (achieved 0.0284) has done: 'I renumber the cells to start at 1, add the missing imports for intensity rescaling and binary closing, and enhance the `simple_mask` function by rescaling the grayscale intensity, applying a Gaussian blur, Otsu thresholding, then a sequence of opening, closing, and hole‑filling operations. These modest morphological tweaks are expected to yield cleaner masks and raise the mean‑average‑precision toward the target while preserving the original pipeline.'
+- What this solution (achieved 0.0272) has done: 'I add the missing `label` import and enhance `simple_mask` to keep only the largest connected component, which usually corresponds to the main salt region. This modest refinement tends to reduce false positives and improves the mean‑average‑precision, moving the score closer to the target while preserving the original workflow.'
+- What this solution (achieved 0.0272) has done: 'I enhance the `simple_mask` function to generate two candidate masks (Otsu‑based and a fixed‑percentile threshold), apply identical morphological clean‑up to each, and then keep the mask with the larger foreground area. This modest increase in segmentation quality should raise the mean‑average‑precision toward the target while preserving the overall pipeline and all existing logic. I also renumber the cells so they start at 1, satisfying the required format.'
+- What this solution (achieved 0.0304) has done: 'I make a very small tweak to the `simple_mask` function: use a slightly stronger Gaussian blur (σ=2) and a larger structuring element for opening/closing (disk radii 3 and 5) plus a higher hole‑area threshold. These modest changes keep the overall pipeline unchanged but usually produce cleaner binary masks, which should raise the mean‑average‑precision and move the score nearer the target. No other parts of the code are altered.'
+- What this solution (achieved 0.017) has done: 'I improve the mask generation by adding adaptive histogram equalization before thresholding, which enhances contrast and typically yields better Otsu/percentile masks while keeping the overall workflow unchanged. This small change is expected to raise the mean‑average‑precision toward the target score.'
+- What this solution (achieved 0.017) has done: 'I load the depth information and pass each image’s depth to `simple_mask`. The mask generator adjust its low‑percentile threshold based on depth (deeper images use a lower percentile), which gives a modest but targeted improvement while preserving the original workflow. I also update the function signature and its calls accordingly.'
+- What this solution (achieved 0.1054) has done: 'I adjust the mask generation to treat higher‑intensity pixels as salt (using `>=` instead of `<=` for both Otsu and percentile thresholds). This corrects the likely inversion issue, keeping the rest of the pipeline unchanged while still applying the same morphological clean‑up and depth‑adapted logic, which should move the validation score toward the target.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+from skimage.io import imread
+from skimage.color import gray2rgb, rgb2gray
+from skimage.filters import threshold_otsu, gaussian
+from skimage.morphology import binary_opening, binary_closing, disk, remove_small_holes
+from skimage.exposure import rescale_intensity, equalize_adapthist
+from skimage.measure import label  # added for largest‑component selection
+
+try:
+    import pydensecrf.densecrf as dcrf
+    from pydensecrf.utils import unary_from_labels, create_pairwise_bilateral
+
+    HAVE_CRF = True
+except ModuleNotFoundError:
+    HAVE_CRF = False
+
+
+
+## === cell 1
+possible_paths = [
+    "../input/tgs-salt-identification-challenge/sample_submission.csv",
+    "./input/tgs-salt-identification-challenge/sample_submission.csv",
+    "./sample_submission.csv",
+]
+df = None
+for p in possible_paths:
+    try:
+        df = pd.read_csv(p)
+        break
+    except FileNotFoundError:
+        continue
+if df is None:
+    raise FileNotFoundError("Sample submission not found in expected locations.")
+df = df.reset_index(drop=True)
+
+depth_paths = [
+    "../input/tgs-salt-identification-challenge/depths.csv",
+    "./input/tgs-salt-identification-challenge/depths.csv",
+    "./depths.csv",
+]
+depth_df = None
+for p in depth_paths:
+    try:
+        depth_df = pd.read_csv(p)
+        break
+    except FileNotFoundError:
+        continue
+if depth_df is None:
+    raise FileNotFoundError("Depth file not found in expected locations.")
+depth_map = dict(zip(depth_df["id"], depth_df["z"]))
+median_depth = np.median(list(depth_map.values()))
+
+
+
+
+## === cell 2
+def rle_decode(rle_mask):
+    """
+    rle_mask: run-length as string formatted (start length)
+    Returns numpy array, 1 - mask, 0 - background
+    """
+    s = rle_mask.split()
+    starts, lengths = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
+    starts -= 1
+    ends = starts + lengths
+    img = np.zeros(101 * 101, dtype=np.uint8)
+    for lo, hi in zip(starts, ends):
+        img[lo:hi] = 1
+    return img.reshape(101, 101)
+
+
+
+
+## === cell 3
+def rle_encode(im):
+    """
+    im: numpy array, 1 - mask, 0 - background
+    Returns run length as string formatted
+    """
+    pixels = im.flatten()
+    pixels = np.concatenate([[0], pixels, [0]])
+    runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
+    runs[1::2] -= runs[::2]
+    return " ".join(str(x) for x in runs)
+
+
+
+
+## === cell 4
+def simple_mask(image, depth=None):
+    """
+    Generate a binary mask from an image using two complementary thresholds
+    (Otsu and a depth‑adapted low‑percentile threshold). After identical
+    morphological clean‑up, the mask with the larger foreground area is returned.
+    """
+    if image.ndim == 3 and image.shape[2] == 4:
+        image = image[..., :3]
+
+    if image.ndim == 3:
+        gray = rgb2gray(image)
+    else:
+        gray = image.astype(np.float32) / 255.0
+
+    gray = rescale_intensity(gray, out_range=(0, 1))
+    gray = equalize_adapthist(gray)
+
+    gray_blur = gaussian(gray, sigma=2, preserve_range=True)
+
+    thresh_otsu = threshold_otsu(gray_blur)
+    mask_otsu = (gray_blur >= thresh_otsu).astype(np.uint8)
+
+    if depth is not None:
+        perc_val = 15 if depth > median_depth else 20
+    else:
+        perc_val = 20
+    perc = np.percentile(gray_blur, perc_val)
+    mask_perc = (gray_blur >= perc).astype(np.uint8)
+
+    def clean(mask):
+        mask = binary_opening(mask, footprint=disk(3))
+        mask = binary_closing(mask, footprint=disk(5))
+        mask = remove_small_holes(mask, area_threshold=128)
+
+        labeled = label(mask)
+        if labeled.max() > 0:
+            component_sizes = np.bincount(labeled.ravel())
+            component_sizes[0] = 0  # ignore background
+            largest_label = component_sizes.argmax()
+            mask = (labeled == largest_label).astype(np.uint8)
+        return mask
+
+    mask_otsu = clean(mask_otsu)
+    mask_perc = clean(mask_perc)
+
+    return mask_perc if mask_perc.sum() > mask_otsu.sum() else mask_otsu
+
+
+
+
+## === cell 5
+def crf(original_image, mask_img):
+    """
+    If pydensecrf is available, run the full CRF refinement.
+    Otherwise, return the mask unchanged (identity fallback).
+    """
+    if not HAVE_CRF:
+        return mask_img.astype(np.uint8)
+
+    if mask_img.ndim < 3:
+        mask_img = gray2rgb(mask_img)
+
+    annotated_label = (
+        mask_img[:, :, 0] + (mask_img[:, :, 1] << 8) + (mask_img[:, :, 2] << 16)
+    )
+    colors, labels = np.unique(annotated_label, return_inverse=True)
+
+    n_labels = 2
+    d = dcrf.DenseCRF2D(original_image.shape[1], original_image.shape[0], n_labels)
+
+    U = unary_from_labels(labels, n_labels, gt_prob=0.7, zero_unsure=False)
+    d.setUnaryEnergy(U)
+
+    d.addPairwiseGaussian(
+        sxy=(3, 3),
+        compat=3,
+        kernel=dcrf.DIAG_KERNEL,
+        normalization=dcrf.NORMALIZE_SYMMETRIC,
+    )
+
+    Q = d.inference(10)
+    MAP = np.argmax(Q, axis=0)
+    return MAP.reshape((original_image.shape[0], original_image.shape[1]))
+
+
+
+
+## === cell 6
+possible_test_paths = [
+    "./input/tgs-salt-identification-challenge/test/images/",
+    "./tgs-salt-identification-challenge/test/images/",
+    "./test/images/",
+    "./input/test/images/",
+    "../input/tgs-salt-identification-challenge/test/images/",
+]
+test_path = None
+for p in possible_test_paths:
+    if os.path.isdir(p):
+        test_path = p
+        break
+if test_path is None:
+    raise FileNotFoundError("Test image directory not found in expected locations.")
+
+
+
+## === cell 7
+for i in tqdm(range(df.shape[0]), desc="Generating masks"):
+    img_id = df.loc[i, "id"]
+    img_path = os.path.join(test_path, img_id + ".png")
+    try:
+        orig_img = imread(img_path)
+    except FileNotFoundError:
+        orig_img = np.zeros((101, 101), dtype=np.uint8)
+
+    rle = df.loc[i, "rle_mask"]
+    if pd.isna(rle) or rle.strip() == "1 1":
+        depth_val = depth_map.get(img_id, None)
+        decoded_mask = simple_mask(orig_img, depth=depth_val)
+    else:
+        decoded_mask = rle_decode(rle)
+
+    refined_mask = crf(orig_img, decoded_mask)
+    df.loc[i, "rle_mask"] = rle_encode(refined_mask)
+
+
+
+## === cell 8
+df.to_csv("submission.csv", index=False)

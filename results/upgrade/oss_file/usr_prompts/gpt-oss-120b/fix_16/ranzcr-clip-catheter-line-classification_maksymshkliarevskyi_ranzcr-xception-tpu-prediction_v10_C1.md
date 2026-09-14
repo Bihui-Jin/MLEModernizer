@@ -1,0 +1,547 @@
+# Goal
+
+I want you to fix bugs and increase the score toward a target for a Kaggle competition solution. Here is the information you need.
+
+# Requirements
+
+- Keep changes minimal unless necessary.
+- Preserve the core logic, including model architecture, layers, training approach/loops, feature extraction, or loss function. Maintain identical core logic and evaluation semantics; only allow negligible floating-point differences.
+- Every change must be directly relevant to the stated issue (big fix and/or evaluation score improvement); avoid unrelated refactors or stylistic edits.
+- Do NOT introduce extra approximations, sampling, reduced precision, early stopping, or relaxed convergence criteria.
+- Ensure it runs end-to-end and produces a valid submission file.
+
+
+# 1. Kaggle task description
+
+## Task
+Detect the presence and position of catheters and lines on chest x-rays.
+
+## Metric
+Area under the ROC curve for each label, with the final score being the average of the individual AUCs of each predicted column.
+
+## Submission Format
+For each ID in the test set, you must predict a probability for all target variables. The file should contain a header and have the following format:
+```
+StudyInstanceUID,ETT - Abnormal,ETT - Borderline,ETT - Normal,NGT - Abnormal,NGT - Borderline,NGT - Incompletely Imaged,NGT - Normal,CVC - Abnormal,CVC - Borderline,CVC - Normal,Swan Ganz Catheter Present
+1.2.826.0.1.3680043.8.498.62451881164053375557257228990443168843,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.83721761279899623084220697845011427274,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.12732270010839808189235995393981377825,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.11769539755086084996287023095028033598,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.87838627504097587943394933987052577153,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.53211840524738036417560823327351887819,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.93555795394184819372299157360228027866,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.52241894131170494723503100795076463919,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.36500167484503936720548852591033878284,0,0,0,0,0,0,0,0,0,0,0
+1.2.826.0.1.3680043.8.498.86199852603457900780565655267977637728,0,0,0,0,0,0,0,0,0,0,0
+```
+
+## Dataset
+`train.csv` contains image IDs, binary labels, and patient IDs.
+
+TFRecords are available for both train and test.
+
+We've also included `train_annotations.csv`. These are segmentation annotations for training samples that have them. They are included solely as additional information for competitors.
+
+- train.csv - contains image IDs, binary labels, and patient IDs.
+- sample_submission.csv - a sample submission file in the correct format
+- test - test images
+- train - training images
+
+### Columns
+- `StudyInstanceUID` - unique ID for each image
+- `ETT - Abnormal` - endotracheal tube placement abnormal
+- `ETT - Borderline` - endotracheal tube placement borderline abnormal
+- `ETT - Normal` - endotracheal tube placement normal
+- `NGT - Abnormal` - nasogastric tube placement abnormal
+- `NGT - Borderline` - nasogastric tube placement borderline abnormal
+- `NGT - Incompletely Imaged` - nasogastric tube placement inconclusive due to imaging
+- `NGT - Normal` - nasogastric tube placement borderline normal
+- `CVC - Abnormal` - central venous catheter placement abnormal
+- `CVC - Borderline` - central venous catheter placement borderline abnormal
+- `CVC - Normal` - central venous catheter placement normal
+- `Swan Ganz Catheter Present`
+- `PatientID` - unique ID for each patient in the dataset
+
+# 2. Python version
+
+3.9
+
+# 3. Installed packages
+
+No external packages required in the script and installed.
+
+# 4. Data file paths
+
+```
+/
+    kaggle/
+        data/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+        input/
+            description.md (172 lines)
+            sample_submission.csv (3010 lines)
+            sample_submission.csv.zip (64.2 kB)
+            test.zip (642.8 MB)
+            train.csv (27075 lines)
+            train.csv.zip (798.6 kB)
+            train.zip (5.8 GB)
+            train_annotations.csv (16262 lines)
+            train_annotations.csv.zip (1.4 MB)
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+            test/
+                1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                ... and 3007 other files
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+            train/
+                1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                ... and 27072 other files
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+        working/
+            ranzcr-clip-catheter-line-classification/
+                description.md (172 lines)
+                sample_submission.csv (3010 lines)
+                ... and 7 other files
+                ranzcr-clip-catheter-line-classification/
+                test/
+                    1.2.826.0.1.3680043.8.498.57477258980718966370268402373568359767.jpg (201.5 kB)
+                    1.2.826.0.1.3680043.8.498.70369997506092680321332747830211112877.jpg (176.2 kB)
+                    ... and 3007 other files
+                    test/
+                train/
+                    1.2.826.0.1.3680043.8.498.22695482406757766723043400617436591679.jpg (306.8 kB)
+                    1.2.826.0.1.3680043.8.498.67485046061813043086989609654834659261.jpg (315.8 kB)
+                    ... and 27072 other files
+                    train/
+```
+
+-> data/ranzcr-clip-catheter-line-classification/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/ranzcr-clip-catheter-line-classification/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/ranzcr-clip-catheter-line-classification/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> data/sample_submission.csv has 3009 rows and 10 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline
+
+-> data/train.csv has 27074 rows and 13 columns.
+The columns are: StudyInstanceUID, ETT - Abnormal, ETT - Borderline, ETT - Normal, NGT - Abnormal, NGT - Borderline, NGT - Incompletely Imaged, NGT - Normal, CVC - Abnormal, CVC - Borderline, CVC - Normal, Swan Ganz Catheter Present, PatientID
+
+-> data/train_annotations.csv has 16261 rows and 3 columns.
+The columns are: StudyInstanceUID, label, data
+
+-> (stopped after 10 files for performance)
+
+# 5. Target score
+
+0.9503905288598182
+
+# 6. Current score
+
+Not yielded
+
+# 7. Whether higher score is better
+
+Higher is better
+
+# 8. Previous improvement plans
+
+- What this solution (achieved 0.47766) has done: 'The changes lower the image resolution to Xception’s default 299 × 299 (instead of 750 × 750) and increase the batch size to 16, which halves the number of training steps while keeping the same model architecture, loss, and training loop.  Reducing the input size cuts the per‑image convolution cost dramatically, and a larger batch improves GPU/CPU utilization, keeping overall semantics identical.'
+- What this solution (achieved 0.54213) has done: 'I fixed the protobuf import error, removed the failing stratified split, and added a fallback that uses a simple scikit‑learn OneVsRest LogisticRegression model when TensorFlow cannot be imported. This ensures the script runs end‑to‑end, creates a valid submission.csv file, and makes a modest but safe improvement toward the target score without altering the core Xception‑based approach when TensorFlow is available.'
+
+# 9. Code solution
+
+## === cell 0
+import os
+
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+
+import numpy as np
+import pandas as pd
+import warnings
+
+warnings.simplefilter("ignore")
+
+from sklearn.model_selection import train_test_split
+
+try:
+    import tensorflow as tf
+    from tensorflow.keras import models, layers
+    from tensorflow.keras.callbacks import (
+        ModelCheckpoint,
+        EarlyStopping,
+        ReduceLROnPlateau,
+    )
+    from tensorflow.keras.applications import Xception
+    from tensorflow.keras.optimizers import Adam
+
+    tf.constant(1)
+    TF_AVAILABLE = True
+
+    try:
+        from tensorflow.keras.mixed_precision import experimental as mixed_precision
+
+        mixed_precision.set_policy("mixed_float16")
+    except Exception:
+        pass
+    tf.config.optimizer.set_jit(True)
+    tf.config.threading.set_inter_op_parallelism_threads(4)
+    tf.config.threading.set_intra_op_parallelism_threads(8)
+
+except Exception as e:
+    print("TensorFlow import failed, will use scikit‑learn fallback. Reason:", e)
+    TF_AVAILABLE = False
+
+
+
+## --- ERROR in cell 0, traceback:
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+AttributeError: 'MessageFactory' object has no attribute 'GetPrototype'
+
+## === cell 1
+WORK_DIR = "../input/ranzcr-clip-catheter-line-classification"
+print("Workspace contents:", os.listdir(WORK_DIR))
+
+
+
+## === cell 2
+print("Train images: %d" % len(os.listdir(os.path.join(WORK_DIR, "train"))))
+
+
+
+## === cell 3
+train = pd.read_csv(os.path.join(WORK_DIR, "train.csv"))
+train_images = (
+    os.path.join(WORK_DIR, "train") + "/" + train["StudyInstanceUID"] + ".jpg"
+)
+
+ss = pd.read_csv(os.path.join(WORK_DIR, "sample_submission.csv"))
+test_images = os.path.join(WORK_DIR, "test") + "/" + ss["StudyInstanceUID"] + ".jpg"
+
+label_cols = ss.columns[1:]  # columns that need prediction
+labels = train[label_cols].values  # use only those columns
+
+train_annot = pd.read_csv(os.path.join(WORK_DIR, "train_annotations.csv"))
+
+print("Labels:\n", "*" * 20, "\n", label_cols.values)
+print("*" * 50)
+train.head()
+
+
+
+## === cell 5
+BATCH_SIZE = 512
+EPOCHS = 3
+TARGET_SIZE = 299
+VALID_SPLIT = 0.2
+import math  # needed for ceil computation later
+
+
+
+
+## === cell 6
+def build_decoder(with_labels=True, target_size=(TARGET_SIZE, TARGET_SIZE)):
+    def decode(path):
+        file_bytes = tf.io.read_file(path)
+        img = tf.image.decode_image(file_bytes, channels=3, expand_animations=False)
+        img = tf.cast(img, tf.float32) / 255.0
+        img = tf.image.resize(img, target_size)
+        return img
+
+    def decode_with_labels(path, label):
+        return decode(path), label
+
+    return decode_with_labels if with_labels else decode
+
+
+def build_augmenter(with_labels=True):
+    def augment(img):
+        img = tf.image.random_flip_left_right(img)
+        img = tf.image.random_flip_up_down(img)
+        img = tf.image.adjust_brightness(img, 0.9)
+        img = tf.image.random_contrast(img, 0.9, 1.0)
+        img = tf.image.random_saturation(img, 0.9, 1.0)
+        return img
+
+    def augment_with_labels(img, label):
+        return augment(img), label
+
+    return augment_with_labels if with_labels else augment
+
+
+def build_dataset(
+    paths,
+    labels=None,
+    bsize=BATCH_SIZE,
+    cache=False,  # cache disabled for large training set to avoid slow disk I/O
+    decode_fn=None,
+    augment_fn=None,
+    augment=True,
+    repeat=False,
+    shuffle=256,
+    cache_dir="",
+):
+    """
+    Build a tf.data.Dataset with optional caching.
+    """
+    if decode_fn is None:
+        decode_fn = build_decoder(labels is not None)
+    if augment_fn is None:
+        augment_fn = build_augmenter(labels is not None)
+    AUTO = tf.data.experimental.AUTOTUNE
+    slices = paths if labels is None else (paths, labels)
+    dset = tf.data.Dataset.from_tensor_slices(slices)
+    dset = dset.map(decode_fn, num_parallel_calls=AUTO)
+    if cache:
+        dset = dset.cache(cache_dir) if cache_dir else dset.cache()
+    dset = dset.map(augment_fn, num_parallel_calls=AUTO) if augment else dset
+    dset = dset.repeat() if repeat else dset
+    dset = dset.shuffle(shuffle) if shuffle else dset
+    dset = dset.batch(bsize).prefetch(AUTO)
+    return dset
+
+
+train_idx, val_idx = train_test_split(
+    np.arange(len(train_images)),
+    test_size=VALID_SPLIT,
+    random_state=42,
+    shuffle=True,
+)
+
+train_paths = train_images.iloc[train_idx].values
+val_paths = train_images.iloc[val_idx].values
+train_lbls = labels[train_idx]
+val_lbls = labels[val_idx]
+
+if TF_AVAILABLE:
+    train_ds = build_dataset(
+        train_paths,
+        train_lbls,
+        augment=False,
+        repeat=False,
+        shuffle=256,
+        cache=False,
+    )
+    val_ds = build_dataset(
+        val_paths,
+        val_lbls,
+        augment=False,
+        repeat=False,
+        shuffle=False,
+        cache=True,  # in‑memory cache for validation (fits easily)
+        cache_dir="",
+    )
+
+    steps_per_epoch = math.ceil(len(train_paths) / BATCH_SIZE)
+    validation_steps = math.ceil(len(val_paths) / BATCH_SIZE)
+else:
+
+    def extract_feats(paths):
+        feats = []
+        for p in paths:
+            img = cv2.imread(p)
+            if img is None:
+                img = np.zeros((TARGET_SIZE, TARGET_SIZE, 3), dtype=np.uint8)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            mean_rgb = img.mean(axis=(0, 1))
+            feats.append(mean_rgb)
+        return np.array(feats, dtype=np.float32)
+
+    X_train = extract_feats(train_paths)
+    X_val = extract_feats(val_paths)
+
+
+
+## --- ERROR in cell 6, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3627472944.py in <cell line: 0>()
+    108         return np.array(feats, dtype=np.float32)
+    109 
+--> 110     X_train = extract_feats(train_paths)
+    111     X_val = extract_feats(val_paths)
+    112 
+
+/tmp/ipykernel_11/3627472944.py in extract_feats(paths)
+    100         feats = []
+    101         for p in paths:
+--> 102             img = cv2.imread(p)
+    103             if img is None:
+    104                 img = np.zeros((TARGET_SIZE, TARGET_SIZE, 3), dtype=np.uint8)
+
+NameError: name 'cv2' is not defined
+
+## === cell 7
+if TF_AVAILABLE:
+    base_model = Xception(
+        weights="imagenet", include_top=False, input_shape=(TARGET_SIZE, TARGET_SIZE, 3)
+    )
+    base_model.trainable = False
+
+    x = layers.GlobalAveragePooling2D()(base_model.output)
+    output = layers.Dense(len(label_cols), activation="sigmoid")(x)
+
+    model = models.Model(inputs=base_model.input, outputs=output)
+    model.compile(
+        optimizer=Adam(1e-4),
+        loss="binary_crossentropy",
+        metrics=[tf.keras.metrics.AUC(name="auc")],
+    )
+    model.summary()
+
+    ckpt_path = "best_model.h5"
+    callbacks = [
+        ModelCheckpoint(
+            ckpt_path, monitor="val_auc", mode="max", save_best_only=True, verbose=1
+        ),
+        EarlyStopping(monitor="val_auc", patience=2, mode="max", verbose=1),
+        ReduceLROnPlateau(
+            monitor="val_auc", factor=0.5, patience=1, mode="max", verbose=1
+        ),
+    ]
+
+    model.fit(
+        train_ds,
+        epochs=EPOCHS,
+        steps_per_epoch=steps_per_epoch,
+        validation_data=val_ds,
+        validation_steps=validation_steps,
+        callbacks=callbacks,
+        verbose=2,
+    )
+    if os.path.exists(ckpt_path):
+        model.load_weights(ckpt_path)
+else:
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.multiclass import OneVsRestClassifier
+    from sklearn.metrics import roc_auc_score
+
+    ovrc = OneVsRestClassifier(LogisticRegression(max_iter=200, solver="lbfgs"))
+    ovrc.fit(X_train, train_lbls)
+
+    val_pred = ovrc.predict_proba(X_val)
+    try:
+        aucs = [
+            roc_auc_score(val_lbls[:, i], val_pred[:, i])
+            for i in range(val_pred.shape[1])
+        ]
+        print(f"Validation AUCs (mean): {np.mean(aucs):.4f}")
+    except Exception:
+        pass
+
+
+
+## --- ERROR in cell 7, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/3247930396.py in <cell line: 0>()
+     44 
+     45     ovrc = OneVsRestClassifier(LogisticRegression(max_iter=200, solver="lbfgs"))
+---> 46     ovrc.fit(X_train, train_lbls)
+     47 
+     48     val_pred = ovrc.predict_proba(X_val)
+
+NameError: name 'X_train' is not defined
+
+## === cell 8
+if TF_AVAILABLE:
+    test_df = build_dataset(
+        pd.Series(test_images),
+        bsize=BATCH_SIZE,
+        repeat=False,
+        shuffle=False,
+        augment=False,
+        cache=False,  # no need to cache test set
+    )
+    ss[label_cols] = model.predict(test_df, verbose=1)
+else:
+    test_paths = (
+        ss["StudyInstanceUID"]
+        .apply(lambda uid: os.path.join(WORK_DIR, "test", uid + ".jpg"))
+        .values
+    )
+    X_test = extract_feats(test_paths)
+    ss[label_cols] = ovrc.predict_proba(X_test)
+
+ss.to_csv("submission.csv", index=False)
+print("Submission written to submission.csv")
+
+## --- ERROR in cell 8, traceback:
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+/tmp/ipykernel_11/4112632961.py in <cell line: 0>()
+     15         .values
+     16     )
+---> 17     X_test = extract_feats(test_paths)
+     18     ss[label_cols] = ovrc.predict_proba(X_test)
+     19 
+
+/tmp/ipykernel_11/3627472944.py in extract_feats(paths)
+    100         feats = []
+    101         for p in paths:
+--> 102             img = cv2.imread(p)
+    103             if img is None:
+    104                 img = np.zeros((TARGET_SIZE, TARGET_SIZE, 3), dtype=np.uint8)
+
+NameError: name 'cv2' is not defined

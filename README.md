@@ -10,20 +10,20 @@ https://doi.org/10.1145/383216
 Please cite using the following BibTeX entry:
 ```
 @article{jin2026automatedReproducibility,
-  author    = {Jin, Bihui and Wang, Kaiyuan and Nie, Pengyu},
-  title     = {Automated Modernization of Machine Learning Engineering Notebooks for Reproducibility},
-  journal   = {Proc. ACM Softw. Eng.},
-  publisher = {Association for Computing Machinery},
-  address = {New York, NY, USA},
-  volume    = {3},
-  numpages = {22},
-  number    = {ISSTA},
-  articleno = {ISSTA075},
-  year      = {2026},
-  issue_date = {Oct 2026},
-  month     = {10},
-  url = {https://doi.org/10.1145/383216},
-  doi       = {10.1145/383216}
+author = {Jin, Bihui and Wang, Kaiyuan and Nie, Pengyu},
+title = {Automated Modernization of Machine Learning Engineering Notebooks for Reproducibility},
+year = {2026},
+issue_date = {October 2026},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {3},
+number = {ISSTA},
+url = {https://doi.org/10.1145/3832166},
+doi = {10.1145/3832166},
+journal = {Proc. ACM Softw. Eng.},
+month = {10},
+articleno = {ISSTA075},
+numpages = {22}
 }
 ```
 
@@ -34,10 +34,30 @@ The replication package is split across two repositories so that source code is 
 - [GitHub](https://github.com/Bihui-Jin/MLEModernizer) contains source code, data-processing programs, and compact result artifacts. Every GitHub file is smaller than 50 MB.
 - [Hugging Face](https://huggingface.co/datasets/BihuiJ/MLEModernizer) contains the Meta Kaggle archives, collected/processed notebooks, all execution outputs, and any other included artifact that is at least 50 MB.
 
-Paths are identical in the two repositories and do not overlap, apart from
-repository administration files and the three packed directories described
-below. Reconstruct the complete package by cloning GitHub and overlaying the
-Hugging Face dataset:
+To keep the Hugging Face repository small in file count, everything except the
+two Meta Kaggle zips is shipped as `.tar.gz` bundles under `archives/`. Every
+bundle stores paths relative to the repository root, so extracting it in the
+GitHub checkout restores the original layout (`results/...`, `verification/...`,
+`baseline/notebooks/...`, `crash_report/...`). GitHub and the extracted bundles
+never contain the same path.
+
+| Hugging Face path | Restores |
+| --- | --- |
+| `.kaggle/meta-kaggle.zip` | Meta Kaggle tables (raw) |
+| `.kaggle/meta-kaggle-code/meta-kaggle-code.zip` | Meta Kaggle Code notebooks (raw) |
+| `archives/baseline.tar.gz` | `baseline/notebooks/` |
+| `archives/crash_report.tar.gz` | large files in `crash_report/` |
+| `archives/results__baseline*.tar.gz` | `results/baseline/` outputs |
+| `archives/results__downgrade__baseline.part*.tar.gz` | `results/downgrade/baseline/` outputs |
+| `archives/results__upgrade__{gpt_cell,gpt_file,oss_file}.part*.tar.gz` | `results/upgrade/<variant>/` outputs |
+| `archives/verification*.tar.gz` | `verification/` notebooks and repeated runs |
+
+Large collections are split into independent `partNNN` bundles of roughly
+40 GB (uncompressed) each; every part is a standalone archive, so parts can
+be extracted in any order. `archives/INDEX.tsv` lists each bundle with its
+source directory, file count, and uncompressed size.
+
+Reconstruct the complete package:
 
 ```bash
 git clone https://github.com/Bihui-Jin/MLEModernizer.git
@@ -47,44 +67,28 @@ hf download BihuiJ/MLEModernizer \
   --local-dir . \
   --exclude README.md .gitattributes
 
-# Restore directories packed to satisfy Hugging Face's 10,000-entry limit.
-tar -xzf baseline/notebooks.tar.gz \
-  -C baseline
-tar -xzf results/baseline/script_out_allINone.tar.gz \
-  -C results/baseline
-tar -xzf results/downgrade/baseline/script_out_allINone.tar.gz \
-  -C results/downgrade/baseline
+# Unpack every bundle in place (restores the original directory structure).
+for archive in archives/*.tar.gz; do
+  tar -xzf "$archive" -C .
+done
 ```
 
-This download is very large. To retrieve selected content, add one or more `--include` patterns, for example:
+The full download is very large (~1.3 TB). To retrieve selected content,
+download only the bundles you need, for example:
 
 ```bash
 # Raw Meta Kaggle archives only
-hf download BihuiJ/MLEModernizer \
-  --repo-type dataset \
-  --local-dir . \
+hf download BihuiJ/MLEModernizer --repo-type dataset --local-dir . \
   --include ".kaggle/**"
 
 # Baseline execution outputs only
-hf download BihuiJ/MLEModernizer \
-  --repo-type dataset \
-  --local-dir . \
-  --include "results/baseline/**"
+hf download BihuiJ/MLEModernizer --repo-type dataset --local-dir . \
+  --include "archives/results__baseline*"
+for archive in archives/results__baseline*.tar.gz; do tar -xzf "$archive" -C .; done
 ```
 
-The raw archives are restored to:
-
-- `.kaggle/meta-kaggle.zip`
-- `.kaggle/meta-kaggle-code/meta-kaggle-code.zip`
-
-Execution notebooks, CSV submissions, and run metadata retain their original
-relative paths below `results/` and `verification/`. The only packed paths are
-`baseline/notebooks.tar.gz`,
-`results/baseline/script_out_allINone.tar.gz`, and
-`results/downgrade/baseline/script_out_allINone.tar.gz`; each archive contains
-the correspondingly named directory. The Hugging Face tag
-`legacy-full-repo-2026-07-24` preserves the earlier monolithic dataset
-snapshot; use `main` for the current split package.
+The Hugging Face tag `legacy-full-repo-2026-07-24` preserves the earlier
+monolithic dataset snapshot; use `main` for the current split package.
 
 ## Environment
 

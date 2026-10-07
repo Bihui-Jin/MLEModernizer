@@ -4,7 +4,7 @@ This is replication package of paper "Automated Modernization of Machine Learnin
 
 Bihui Jin, Kaiyuan Wang, and Pengyu Nie. 2026. Automated Modernization of Machine Learning Engineering
 Notebooks for Reproducibility. Proc. ACM Softw. Eng. 3, ISSTA, Article ISSTA075 (October 2026), 22 pages.
-https://doi.org/10.1145/383216
+
 
 ## Citation
 Please cite using the following BibTeX entry:
